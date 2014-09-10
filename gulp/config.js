@@ -14,7 +14,7 @@ global.config = {
             assets: [SRC_FOLDER + '/assets/**/*', '!' + SRC_FOLDER + '/assets/images/**/*'],
             images: SRC_FOLDER + '/assets/images/**/*',
             scripts: SRC_FOLDER + '/modules/**/*.js',
-            appStyles: SRC_FOLDER + '/styles/riq-grid.scss',
+            appStyles: SRC_FOLDER + '/styles/riq-grid-prototype.scss',
             releaseStyles: SRC_FOLDER + '/styles/riq-grid.scss',
             stylesGlob: SRC_FOLDER + '/styles/**/*.scss',
             templates: SRC_FOLDER + '/modules/**/*.html',
