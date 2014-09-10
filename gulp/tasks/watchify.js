@@ -12,7 +12,7 @@ module.exports = gulp.task('watchify', function () {
     });
 
 
-    bundler.transform(browserifyShim);
+    //bundler.transform(browserifyShim);
 
     bundler.on('update', rebundle);
 

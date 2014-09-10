@@ -1,3 +1,4 @@
 'use strict';
 
-require('uiQ');
+require('riq-grid');
+

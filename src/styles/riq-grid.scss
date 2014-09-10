@@ -1,0 +1,21 @@
+.odds {
+  .cell {
+    &.odd {
+      background: #f7f7f7;
+    }
+
+    &.even {
+      background: white;
+    }
+
+  }
+}
+
+.cell {
+  &.even {
+    background: #f7f7f7;
+  }
+  &.odd {
+    background: white;
+  }
+}

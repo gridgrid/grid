@@ -14,7 +14,7 @@ global.config = {
             assets: [SRC_FOLDER + '/assets/**/*', '!' + SRC_FOLDER + '/assets/images/**/*'],
             images: SRC_FOLDER + '/assets/images/**/*',
             scripts: SRC_FOLDER + '/modules/**/*.js',
-            appStyles: SRC_FOLDER + '/styles/app.scss',
+            appStyles: SRC_FOLDER + '/styles/riq-grid.scss',
             releaseStyles: SRC_FOLDER + '/styles/riq-grid.scss',
             stylesGlob: SRC_FOLDER + '/styles/**/*.scss',
             templates: SRC_FOLDER + '/modules/**/*.html',
@@ -22,7 +22,7 @@ global.config = {
             templatesHTML: SRC_FOLDER + '/modules/**/*.html',
             templatesCompiled: TMP_FOLDER,
             livereload: [BUILD_FOLDER + '/**/*', '!' + BUILD_FOLDER + '/assets/**/*'],
-            modules: './' + SRC_FOLDER + '/modules/index.js',
+            modules: './' + SRC_FOLDER + '/modules/riq-grid-app.js',
             riqGridModule: './' + SRC_FOLDER + '/modules/riq-grid-entry.js'
         },
         release: RELEASE_FOLDER,

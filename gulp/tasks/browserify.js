@@ -13,10 +13,9 @@ var filter = require('gulp-filter');
 module.exports = gulp.task('browserify', function () {
     var scriptFilter = filter(config.filenames.release.scripts);
     return browserify({
-        entries: [config.paths.src.riqGridModule],
+        entries: [config.paths.src.uiQModule],
         paths: config.paths.browserify
     })
-        .transform(browserifyShim)
         .bundle({debug: true})
         .pipe(exorcist(config.paths.dest.release.scripts + '/' + config.filenames.release.scripts + '.map', undefined, "."))
         .pipe(source(config.filenames.release.scripts))
