@@ -1,4 +1,7 @@
-uiQ
+riq-grid
 ===
 
-A rich set of ui components built on angular with extremely interactive single page apps in mind
+A highly scaleable grid component written in javscript
+
+etc..
+
