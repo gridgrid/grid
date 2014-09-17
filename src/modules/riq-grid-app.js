@@ -5,6 +5,17 @@ require('jquery');
 require('sugar');
 require('angular');
 
-require('@grid/proto/prototype-harness');
+angular.module('riqGridApp', [])
+    .directive('riqGridApp', function () {
+        return {
+            restrict: 'E',
+            replace: true,
+            template: '<div>Grid App</div>',
+            link: function ($scope, elem) {
+
+            }
+        };
+    })
+;
 
 

@@ -16,6 +16,7 @@ module.exports = gulp.task('index', function () {
       replace('<!--scripts-->', '<script src="' + config.filenames.release.scripts + '"></script>'),
       replace('<!--scripts-->', '<script src="' + config.filenames.build.scripts + '"></script>')
     ))
+      .pipe(replace('ng-app="*"', 'ng-app="' +config.filenames.build.angularApp + '"'))
     .pipe(gulpif(release,
       gulp.dest(config.paths.dest.release.index),
       gulp.dest(config.paths.dest.build.index)));

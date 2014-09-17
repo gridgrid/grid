@@ -49,15 +49,17 @@ global.config = {
     filenames: {
         build: {
             styles: 'bundle.css',
-            scripts: 'riq-grid-app.js'
+            scripts: 'riq-grid-app.js',
+            angularApp: 'riqGridApp'
         },
         release: {
             styles: 'riq-grid.css',
             scripts: 'riq-grid.js'
         },
-        prototype : {
+        prototype: {
             styles: 'bundle.css',
-            scripts: 'riq-grid-prototype-app.js'
+            scripts: 'riq-grid-prototype-app.js',
+            angularApp: 'prototype-harness'
         },
         templates: {
             compiled: 'templates.js',
