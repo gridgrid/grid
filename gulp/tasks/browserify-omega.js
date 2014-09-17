@@ -14,6 +14,8 @@
 
     var browserifyShim = require('browserify-shim');
 
+    var glob = require('glob');
+
     files = [
         {
             input: [config.paths.src.riqGridModule],
@@ -25,6 +27,11 @@
         {
             input: [config.paths.src.riqGridApp],
             output: config.filenames.build.scripts
+        },
+        {
+            input: glob.sync('./src/**/*.spec.js'),
+            output: 'bundle-tests.js',
+            dest: 'test-assets'
         }
     ];
 
@@ -37,7 +44,7 @@
             entries: options.input,
             paths: config.paths.browserify
         });
-        var destination = global.release ? config.paths.dest.release.scripts : config.paths.dest.build.scripts;
+        var destination = options.dest || (global.release ? config.paths.dest.release.scripts : config.paths.dest.build.scripts);
         rebundle = function () {
             var startTime;
             startTime = new Date().getTime();

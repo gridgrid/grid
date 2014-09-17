@@ -15,9 +15,11 @@ module.exports = gulp.task('default', function (cb) {
             'clean',
             'prebuild',
             'browserify-omega',
+            'karma',
             'minify',
             cb
-        );
+        )
+        ;
     } else {
         runSequence(
             'clean',
