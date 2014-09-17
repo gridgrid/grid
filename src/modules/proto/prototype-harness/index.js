@@ -1,5 +1,5 @@
-var renderOncePType = require('render-once');
-var addRemovePType = require('add-remove');
+var renderOncePType = require('@grid/proto/render-once');
+var addRemovePType = require('@grid/proto/add-remove');
 
 module.exports =
     angular.module('prototype-harness', [

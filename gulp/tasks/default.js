@@ -6,7 +6,7 @@ var map = require('map-stream');
 
 gulp.task('prebuild', ['index', 'styles', 'images', 'assets', 'templates', 'lint']);
 
-gulp.task('watchServe', ['watchify', 'watch', 'serve']);
+gulp.task('watchServe', ['browserify-omega', 'watch', 'serve']);
 
 
 module.exports = gulp.task('default', function (cb) {
@@ -14,7 +14,7 @@ module.exports = gulp.task('default', function (cb) {
         runSequence(
             'clean',
             'prebuild',
-            'browserify',
+            'browserify-omega',
             'minify',
             cb
         );

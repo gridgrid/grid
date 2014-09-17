@@ -1,4 +1,4 @@
 'use strict';
 
-require('riq-grid');
+require('@grid/riq-grid');
 

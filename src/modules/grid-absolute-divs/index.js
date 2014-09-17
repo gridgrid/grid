@@ -1,4 +1,4 @@
-var util = require('grid-util');
+var util = require('@grid/grid-util');
 
 module.exports = {
     makeCell: function (r, c, grid) {
