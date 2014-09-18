@@ -2,6 +2,9 @@
     "node": true,
     "browser": true,
     "globals": {
-        "angular": false
+        "angular": false,
+        "describe": false,
+        "it": false,
+        "beforeEach": false
     }
 }

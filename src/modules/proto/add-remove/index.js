@@ -1,6 +1,6 @@
-var core = require('@grid/grid-core');
-var absDivs = require('@grid/grid-absolute-divs');
-var util = require('@grid/grid-util');
+var core = require('@grid/proto/grid-core');
+var absDivs = require('@grid/proto/grid-absolute-divs');
+var util = require('@grid/proto/grid-util');
 
 module.exports = function (container) {
     var $container = $(container);

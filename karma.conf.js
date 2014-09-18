@@ -15,7 +15,7 @@ module.exports = function (config) {
 
 // list of files / patterns to load in the browser
             files: [
-                'spec_helper.js',
+                'test-assets/matchers.js',
                 'node_modules/jquery/jquery.js',
                 'bower_components/angular/angular.js',
                 'bower_components/angular-mocks/angular-mocks.js',
@@ -25,8 +25,7 @@ module.exports = function (config) {
 
 
             // list of files to exclude
-            exclude: [
-            ],
+            exclude: [],
 
 
 // test results reporter to use
