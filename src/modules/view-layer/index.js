@@ -7,32 +7,37 @@ module.exports = function (_grid) {
     var cellContainer;
     var cells;
 
-    viewInterface.viewPort = require('@grid/view-port')(grid);
+    var viewPort = viewInterface.viewPort = require('@grid/view-port')(grid);
 
     viewInterface.build = function (elem) {
         container = elem;
+        viewPort.sizeToContainer(container);
+
+
         cleanup();
-
-
         cellContainer = document.createElement('div');
         cellContainer.setAttribute('dts', 'grid-cells');
         buildCells(cellContainer);
 
         root = document.createElement('div');
-        root.appendChild(cellContainer);
 
-        viewInterface.viewPort.sizeToContainer(container);
+        root.appendChild(cellContainer);
 
         container.appendChild(root);
     };
 
     viewInterface.draw = function () {
-        viewInterface.viewPort.iterateCells(function (r, c) {
+        viewPort.iterateCells(function (r, c) {
             var cell = cells[r][c];
             var width = grid.colModel.width(c);
             var height = grid.rowModel.height(r); //maybe faster to do this only on row iterations but meh
             cell.style.width = width + 'px';
             cell.style.height = height + 'px';
+
+            var top = viewPort.getRowTop(r);
+            var left = viewPort.getColLeft(c);
+            cell.style.top = top + 'px';
+            cell.style.left = left + 'px';
 
             while (cell.firstChild) {
                 cell.removeChild(cell.firstChild);
@@ -46,7 +51,7 @@ module.exports = function (_grid) {
 
     function buildCells(cellContainer) {
         cells = [];
-        viewInterface.viewPort.iterateCells(function (r, c) {
+        viewPort.iterateCells(function (r, c) {
             var cell = buildDivCell();
             cells[r][c] = cell;
             cellContainer.appendChild(cell);

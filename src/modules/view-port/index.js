@@ -1,3 +1,5 @@
+var util = require('@grid/util');
+
 module.exports = (function (_grid) {
     var grid = _grid;
     var viewPort = {};
@@ -6,6 +8,53 @@ module.exports = (function (_grid) {
         viewPort.height = elem.offsetHeight;
         viewPort.minRows = calculateMaxLengths(viewPort.height, grid.rowModel);
         viewPort.minCols = calculateMaxLengths(viewPort.width, grid.colModel);
+    };
+
+
+    // converts a viewport row or column to a real row or column 
+    // clamps it if the column would be outside the range
+    function getRealRowColUnsafe(viewCoord, rowOrCol) {
+        return viewCoord + grid.cellScrollModel[rowOrCol];
+    }
+
+    function getRealRowColClamped(viewCoord, rowOrCol) {
+        var realRowCol = getRealRowColUnsafe(viewCoord, rowOrCol);
+        var maxRowCol = grid[rowOrCol + 'Model'].length();
+        return util.clamp(realRowCol, 0, maxRowCol);
+    }
+
+    viewPort.toRealRow = function (r) {
+        return getRealRowColClamped(r, 'row');
+    };
+
+    viewPort.toRealCol = function (c) {
+        return getRealRowColClamped(c, 'col');
+    };
+
+    viewPort.clampRow = function (r) {
+        return util.clamp(r, 0, viewPort.minRows);
+    };
+
+    viewPort.clampCol = function (c) {
+        return util.clamp(c, 0, viewPort.minCols);
+    };
+
+    viewPort.getRowTop = function (row) {
+        var length = 0;
+        for (var r = 0; r < viewPort.clampRow(row); r++) {
+            var realRow = viewPort.toRealRow(r);
+            length += grid.rowModel.height(realRow);
+        }
+        return length;
+    };
+
+    viewPort.getColLeft = function (col) {
+        var length = 0;
+        for (var c = 0; c < viewPort.clampCol(col); c++) {
+            var realCol = viewPort.toRealCol(c);
+            length += grid.colModel.width(realCol);
+        }
+        return length;
     };
 
 
@@ -36,14 +85,16 @@ module.exports = (function (_grid) {
         return maxSize === 0 ? 0 : maxSize + numFixed + 1;
     }
 
+
     viewPort.iterateCells = function (cellFn, optionalRowFn) {
         for (var r = 0; r < viewPort.minRows; r++) {
             if (optionalRowFn) {
                 optionalRowFn(r);
             }
-            for (var c = 0; c < viewPort.minCols; c++) {
-                if (cellFn) {
+            if (cellFn) {
+                for (var c = 0; c < viewPort.minCols; c++) {
                     cellFn(r, c);
+
                 }
             }
         }

@@ -68,6 +68,12 @@ describe('view-layer', function () {
         expect(findGridCells(div).first().text()).toEqual('5-6');
     });
 
+    it('should position the cells in a grid', function () {
+        var div = buildGrid();
+        view.draw();
+        expect(findGridCells(div).last().position()).toEqual({top: 30 * (minRows - 1), left: 100 * (minCols - 1)});
+    });
+
     function findGridCells(div) {
         return $(div).find('[dts="grid-cell"]');
     }
