@@ -19,7 +19,7 @@ module.exports = function (config) {
                 'node_modules/jquery/jquery.js',
                 'bower_components/angular/angular.js',
                 'bower_components/angular-mocks/angular-mocks.js',
-                'node_modules/sugar/release/sugar-full.development.js',
+                //'node_modules/sugar/release/sugar-full.development.js',
                 'test-assets/bundle-tests.js'
             ],
 

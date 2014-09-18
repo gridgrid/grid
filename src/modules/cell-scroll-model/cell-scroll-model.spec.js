@@ -10,7 +10,7 @@ describe('cell-scroll-model', function () {
         model = require('@grid/cell-scroll-model')(core.buildSimpleGrid(numRows, numCols));
     });
 
-    it('should have a top and left value that start at 0', function () {
+    it('should have a row and col value that start at 0', function () {
         expect(model.row).toEqual(0);
         expect(model.col).toEqual(0);
 
@@ -22,13 +22,19 @@ describe('cell-scroll-model', function () {
         expect(model.col).toEqual(6);
     });
 
-    it('should not let you scroll to a cell that doesnt exist', function () {
+    it('should not let you scroll to a row that doesnt exist', function () {
         model.scrollTo(1000, 5);
         expect(model.row).toEqual(numRows - 1);
         expect(model.col).toEqual(5);
         model.scrollTo(5, 1000);
         expect(model.row).toEqual(5);
         expect(model.col).toEqual(numCols - 1);
+        model.scrollTo(-5, 5);
+        expect(model.row).toEqual(0);
+        expect(model.col).toEqual(5);
+        model.scrollTo(5, -5);
+        expect(model.row).toEqual(5);
+        expect(model.col).toEqual(0);
     });
 
 });

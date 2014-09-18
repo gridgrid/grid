@@ -10,7 +10,7 @@ describe('view-layer', function () {
 
     beforeEach(inject(function () {
         grid = core.buildSimpleGrid(100, 20);
-        view = viewLayer(grid);
+        view = grid.viewLayer;
         //mock the view port
         view.viewPort.sizeToContainer = function () {
         };

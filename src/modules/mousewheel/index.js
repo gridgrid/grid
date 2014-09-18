@@ -1,4 +1,6 @@
-module.exports = {
+var EVENT_NAMES = ['mousewheel', 'wheel', 'DOMMouseScroll'];
+
+var api = {
     getDelta: function (event, xaxis) {
         if (event.wheelDelta) { //for everything but firefox
             var delta = event.wheelDeltaY;
@@ -19,6 +21,34 @@ module.exports = {
             }
         }
         return 0;
-    }
+    },
 
+    //binds a cross browser normalized mousewheel event, and returns a function that will unbind the listener;
+    bind: function (elem, listener) {
+        var normalizedListener = function (e) {
+            listener(normalizeWheelEvent(e));
+        };
+
+        EVENT_NAMES.forEach(function (name) {
+            elem.addEventListener(name, normalizedListener);
+        });
+
+        return function () {
+            EVENT_NAMES.forEach(function (name) {
+                elem.removeEventListener(name, normalizedListener);
+            });
+        };
+
+    }
+};
+
+function normalizeWheelEvent(e) {
+    var deltaX = api.getDelta(e, true);
+    var deltaY = api.getDelta(e);
+    e.deltaY = deltaY;
+    e.deltaX = deltaX;
+    e.type = 'mousewheel';
+    return e;
 }
+
+module.exports = api;

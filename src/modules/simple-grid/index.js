@@ -5,6 +5,7 @@ module.exports = function (numRows, numCols) {
     grid.colModel = require('@grid/col-model')(grid);
     grid.dataModel = require('@grid/simple-data-model')(grid);
     grid.cellScrollModel = require('@grid/cell-scroll-model')(grid);
+    grid.viewLayer = require('@grid/view-layer')(grid);
 
     if (numRows) {
         for (var r = 0; r < numRows; r++) {
