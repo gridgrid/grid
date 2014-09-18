@@ -10,7 +10,7 @@ module.exports = function (_grid) {
     function loop(e) {
         switch(e.type){
             case 'mousewheel':
-                
+                grid.pixelScrollModel.handleMouseWheel(e);
                 break;
         }
     }

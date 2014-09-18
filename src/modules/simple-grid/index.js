@@ -1,11 +1,17 @@
 module.exports = function (numRows, numCols) {
 
     var grid = {};
+
+    //the order here matters because some of these depend on each other
     grid.rowModel = require('@grid/row-model')(grid);
     grid.colModel = require('@grid/col-model')(grid);
     grid.dataModel = require('@grid/simple-data-model')(grid);
+    grid.pixelScrollModel = require('@grid/pixel-scroll-model')(grid);
     grid.cellScrollModel = require('@grid/cell-scroll-model')(grid);
+
+
     grid.viewLayer = require('@grid/view-layer')(grid);
+    grid.eventLoop = require('@grid/event-loop')(grid);
 
     if (numRows) {
         for (var r = 0; r < numRows; r++) {

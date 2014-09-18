@@ -8,7 +8,7 @@ describe('cell-scroll-model', function () {
 
     beforeEach(function () {
         grid = core.buildSimpleGrid(numRows, numCols);
-        model = require('@grid/pixel-scroll-model')(grid);
+        model = grid.pixelScrollModel;
     });
 
     it('should have a top and left value that start at 0', function () {
@@ -42,12 +42,57 @@ describe('cell-scroll-model', function () {
         model.setScrollSize(100, 200);
         grid.viewLayer.viewPort.width = 10;
         grid.viewLayer.viewPort.height = 5;
+
         model.scrollTo(1000, 10);
         expect(model.top).toEqual(95);
         expect(model.left).toEqual(10);
+
         model.scrollTo(10, 1000);
         expect(model.top).toEqual(10);
         expect(model.left).toEqual(190);
+    });
+
+    function sendMouseWheelToModel(y, x) {
+        var event = {deltaY: y, deltaX: x};
+        model.handleMouseWheel(event);
+    }
+
+    it('should handle a mousewheel event and offset the scroll accordingly', function () {
+        //mock the event to look like our standardized one
+        sendMouseWheelToModel(40, 30);
+        expect(model.top).toEqual(40);
+        expect(model.left).toEqual(30);
+
+    });
+
+    it('should allow me to add and remove a scroll listener', function () {
+        var spy = jasmine.createSpy();
+        var unbind = model.addListener(spy);
+        unbind();
+    });
+
+    it('should call a scroll listener on scrollTo', function () {
+        var spy = jasmine.createSpy();
+        var unbind = model.addListener(spy);
+        model.scrollTo(5, 6);
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('should not call a scroll listener synchronously on mousewheel', function () {
+        var spy = jasmine.createSpy();
+        var unbind = model.addListener(spy);
+        sendMouseWheelToModel(40, 30);
+        expect(spy).not.toHaveBeenCalled();
+    });
+
+    it('should call a scroll listener asynchronously on mousewheel', function () {
+        var spy = jasmine.createSpy();
+        var unbind = model.addListener(spy);
+        sendMouseWheelToModel(40, 30);
+        waits(10);
+        runs(function () {
+            expect(spy).toHaveBeenCalled();
+        });
     });
 
 });
