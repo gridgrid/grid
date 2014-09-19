@@ -6,6 +6,7 @@ module.exports = function (numRows, numCols) {
     grid.rowModel = require('@grid/row-model')(grid);
     grid.colModel = require('@grid/col-model')(grid);
     grid.dataModel = require('@grid/simple-data-model')(grid);
+    grid.virtualPixelCellModel = require('@grid/virtual-pixel-cell-model')(grid);
     grid.pixelScrollModel = require('@grid/pixel-scroll-model')(grid);
     grid.cellScrollModel = require('@grid/cell-scroll-model')(grid);
 
@@ -27,6 +28,20 @@ module.exports = function (numRows, numCols) {
         }
     }
 
+    var drawRequested = false;
+    grid.requestRedraw = function () {
+        if (!grid.eventLoop.isRunning) {
+            grid.viewLayer.draw();
+        } else {
+            drawRequested = true;
+        }
+    };
+
+    grid.eventLoop.addExitListener(function () {
+        if (drawRequested) {
+            grid.viewLayer.draw();
+        }
+    });
 
     return grid;
 };

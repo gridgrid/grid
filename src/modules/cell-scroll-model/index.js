@@ -5,7 +5,13 @@ module.exports = (function (_grid) {
     var model = {row: 0, col: 0};
 
     grid.pixelScrollModel.addListener(function () {
-        //TODO: calculate pixel to cell conversion
+        var scrollTop = grid.pixelScrollModel.top;
+        var row = grid.virtualPixelCellModel.getRow(scrollTop);
+
+        var scrollLeft = grid.pixelScrollModel.left;
+        var col = grid.virtualPixelCellModel.getCol(scrollLeft);
+
+        model.scrollTo(row, col);
     });
 
     model.scrollTo = function (r, c) {
@@ -14,5 +20,7 @@ module.exports = (function (_grid) {
         model.row = util.clamp(r, 0, maxRow);
         model.col = util.clamp(c, 0, maxCol);
     };
+    
+    
     return model;
 })

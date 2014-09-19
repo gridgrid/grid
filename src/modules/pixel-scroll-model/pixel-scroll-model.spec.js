@@ -1,4 +1,4 @@
-describe('cell-scroll-model', function () {
+describe('pixel-scroll-model', function () {
 
     var core = require('@grid/grid-spec-helper')();
     var model;
@@ -53,7 +53,7 @@ describe('cell-scroll-model', function () {
     });
 
     function sendMouseWheelToModel(y, x) {
-        var event = {deltaY: y, deltaX: x};
+        var event = {deltaY: -y, deltaX: -x};
         model.handleMouseWheel(event);
     }
 

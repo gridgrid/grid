@@ -5,7 +5,7 @@ module.exports = function () {
         CONTAINER_HEIGHT: 500,
         container: undefined,
         buildSimpleGrid: function (numRows, numCols) {
-            gridTestCore.grid = require('@grid/simple-grid')(numRows, numCols)
+            gridTestCore.grid = require('@grid/simple-grid')(numRows || 100, numCols, 10);
             return gridTestCore.grid;
         }
     };

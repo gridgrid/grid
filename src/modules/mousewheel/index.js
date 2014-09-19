@@ -45,10 +45,12 @@ var api = {
 function normalizeWheelEvent(e) {
     var deltaX = api.getDelta(e, true);
     var deltaY = api.getDelta(e);
-    var newEvent = Object.create(e);
-    newEvent.deltaY = deltaY;
-    newEvent.deltaX = deltaX;
-    newEvent.type = 'mousewheel';
+    var newEvent = Object.create(e,
+        {
+            deltaY: {value: deltaY},
+            deltaX: {value: deltaX},
+            type: {value: 'mousewheel'}
+        });
     return newEvent;
 }
 

@@ -4,10 +4,12 @@ describe('cell-scroll-model', function () {
     var model;
     var numRows = 100;
     var numCols = 10;
+    var grid;
 
     beforeEach(function () {
 
-        model = require('@grid/cell-scroll-model')(core.buildSimpleGrid(numRows, numCols));
+        grid = core.buildSimpleGrid(numRows, numCols);
+        model = require('@grid/cell-scroll-model')(grid);
     });
 
     it('should have a row and col value that start at 0', function () {
@@ -35,6 +37,22 @@ describe('cell-scroll-model', function () {
         model.scrollTo(5, -5);
         expect(model.row).toEqual(5);
         expect(model.col).toEqual(0);
+    });
+
+    it('should scroll the cells down when it receives a pixel scroll down', function () {
+        grid.pixelScrollModel.scrollTo(90, 0);
+        expect(model.row).toEqual(3);
+    });
+
+    it('should scroll the cells over when it receives a pixel scroll over', function () {
+        grid.pixelScrollModel.scrollTo(0, 200);
+        expect(model.col).toEqual(2);
+    });
+
+    it('should scroll the cells over and down when it receives a pixel scroll diagonally', function () {
+        grid.pixelScrollModel.scrollTo(90, 200);
+        expect(model.row).toEqual(3);
+        expect(model.col).toEqual(2);
     });
 
 });
