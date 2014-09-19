@@ -29,7 +29,7 @@ module.exports = function (numRows, numCols) {
     }
 
     var drawRequested = false;
-    grid.requestRedraw = function () {
+    grid.requestDraw = function () {
         if (!grid.eventLoop.isRunning) {
             grid.viewLayer.draw();
         } else {

@@ -18,7 +18,7 @@ module.exports = (function (_grid) {
         scrollListeners.notify();
     }
 
-    var debouncedNotify = debounce(notifyListeners, 1);
+    var debouncedNotify = notifyListeners || debounce(notifyListeners, 1);
 
     model.scrollTo = function (top, left, dontNotify) {
         model.top = util.clamp(top, 0, model.height - grid.viewLayer.viewPort.height);

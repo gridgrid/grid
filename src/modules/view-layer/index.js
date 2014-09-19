@@ -7,11 +7,11 @@ module.exports = function (_grid) {
     var cellContainer;
     var cells;
 
-    var viewPort = viewInterface.viewPort = require('@grid/view-port')(grid);
+    viewInterface.viewPort = require('@grid/view-port')(grid);
 
     viewInterface.build = function (elem) {
         container = elem;
-        viewPort.sizeToContainer(container);
+        viewInterface.viewPort.sizeToContainer(container);
 
 
         cleanup();
@@ -27,15 +27,15 @@ module.exports = function (_grid) {
     };
 
     viewInterface.draw = function () {
-        viewPort.iterateCells(function (r, c) {
+        viewInterface.viewPort.iterateCells(function (r, c) {
             var cell = cells[r][c];
             var width = grid.colModel.width(c);
             var height = grid.rowModel.height(r); //maybe faster to do this only on row iterations but meh
             cell.style.width = width + 'px';
             cell.style.height = height + 'px';
 
-            var top = viewPort.getRowTop(r);
-            var left = viewPort.getColLeft(c);
+            var top = viewInterface.viewPort.getRowTop(r);
+            var left = viewInterface.viewPort.getColLeft(c);
             cell.style.top = top + 'px';
             cell.style.left = left + 'px';
 
@@ -51,7 +51,7 @@ module.exports = function (_grid) {
 
     function buildCells(cellContainer) {
         cells = [];
-        viewPort.iterateCells(function (r, c) {
+        viewInterface.viewPort.iterateCells(function (r, c) {
             var cell = buildDivCell();
             cells[r][c] = cell;
             cellContainer.appendChild(cell);

@@ -9,7 +9,7 @@ describe('simple-grid', function () {
 
     it('should let me request a redraw', function () {
         var draw = spyOn(grid.viewLayer, 'draw');
-        grid.requestRedraw();
+        grid.requestDraw();
         expect(draw).toHaveBeenCalled();
     });
 
@@ -18,7 +18,7 @@ describe('simple-grid', function () {
         grid.eventLoop.addInterceptor(inLoopFn);
         grid.eventLoop.testInterface.loop();
         function inLoopFn() {
-            grid.requestRedraw();
+            grid.requestDraw();
             expect(draw).not.toHaveBeenCalled();
         }
 

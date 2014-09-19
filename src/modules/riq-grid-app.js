@@ -13,15 +13,13 @@ angular.module('riqGridApp', [])
             template: '<div class="pin-to-edges">Grid App</div>',
             link: function ($scope, $elem) {
                 var elem = $elem[0];
-                
+
                 var numRows = 1000;
                 var numCols = 100;
                 var grid = require('@grid/simple-grid')(numRows, numCols);
-
-
-                grid.viewModel = require('@grid/view-layer')(grid);
-                grid.viewModel.build(elem);
-                grid.viewModel.draw();
+                
+                grid.viewLayer.build(elem);
+                grid.viewLayer.draw();
 
                 grid.eventLoop.bind(elem);
 

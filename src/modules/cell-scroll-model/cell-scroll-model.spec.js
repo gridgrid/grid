@@ -55,4 +55,15 @@ describe('cell-scroll-model', function () {
         expect(model.col).toEqual(2);
     });
 
+    it('should request draw if the cells have shifted', function () {
+        var request = spyOn(grid, 'requestDraw');
+        model.scrollTo(1, 1);
+        expect(request).toHaveBeenCalled();
+    });
+
+    it('should not request draw if the cells havent shifted even if asked to scroll', function () {
+        var request = spyOn(grid, 'requestDraw');
+        model.scrollTo(0, 0);
+        expect(request).not.toHaveBeenCalled();
+    });
 });

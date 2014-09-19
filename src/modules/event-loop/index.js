@@ -6,7 +6,7 @@ module.exports = function (_grid) {
         isRunning: false
     };
     eloop.bind = function (container) {
-        var unbindMouseWheelFn = mousewheel.bind(container, eloop);
+        var unbindMouseWheelFn = mousewheel.bind(container, loop);
     };
 
     var listeners = require('@grid/listeners');

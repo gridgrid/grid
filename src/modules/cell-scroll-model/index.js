@@ -17,10 +17,15 @@ module.exports = (function (_grid) {
     model.scrollTo = function (r, c) {
         var maxRow = grid.rowModel.length() - 1;
         var maxCol = grid.colModel.length() - 1;
+        var lastRow = model.row;
+        var lastCol = model.col;
         model.row = util.clamp(r, 0, maxRow);
         model.col = util.clamp(c, 0, maxCol);
+        if (lastRow !== model.row || lastCol !== model.col) {
+            grid.requestDraw();
+        }
     };
-    
-    
+
+
     return model;
 })
