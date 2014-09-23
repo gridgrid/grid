@@ -16,6 +16,9 @@
 
     var glob = require('glob');
 
+    var istanbul = require('browserify-istanbul');
+
+
     files = [
         {
             input: [config.paths.src.riqGridModule],
@@ -43,7 +46,7 @@
         bundler = bundleMethod({
             entries: options.input,
             paths: config.paths.browserify
-        });
+        }).transform(istanbul);
         var destination = options.dest || (global.release ? config.paths.dest.release.scripts : config.paths.dest.build.scripts);
         rebundle = function () {
             var startTime;
