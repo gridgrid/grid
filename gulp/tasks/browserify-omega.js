@@ -32,7 +32,7 @@
             output: config.filenames.build.scripts
         },
         {
-            input: glob.sync('./src/**/*.spec.js'),
+            input: glob.sync('./node_modules/@grid/**/*.js'), //we load the tests through this symlink so istanbul can map correctly
             output: 'bundle-tests.js',
             dest: 'test-assets'
         }
@@ -46,7 +46,12 @@
         bundler = bundleMethod({
             entries: options.input,
             paths: config.paths.browserify
-        }).transform(istanbul);
+        })
+            .transform(istanbul({
+                ignore: ['**/bower_components/**', '**/templates.js', '**/proto/**', '**/grid-spec-helper/**', '**/*.spec.js', '**/node_modules/!(@grid)/**'],
+                defaultIgnore: false
+            }))
+        ;
         var destination = options.dest || (global.release ? config.paths.dest.release.scripts : config.paths.dest.build.scripts);
         rebundle = function () {
             var startTime;

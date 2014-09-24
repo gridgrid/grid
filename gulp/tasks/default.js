@@ -8,7 +8,6 @@ gulp.task('prebuild', ['index', 'styles', 'images', 'assets', 'templates', 'lint
 
 gulp.task('watchServe', ['watch', 'serve']);
 
-
 module.exports = gulp.task('default', function (cb) {
     if (release) {
         runSequence(
