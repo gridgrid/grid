@@ -16,7 +16,6 @@ module.exports = function (config) {
 // list of files / patterns to load in the browser
             files: [
                 'test-assets/matchers.js',
-                'node_modules/jquery/jquery.js',
                 'bower_components/angular/angular.js',
                 'bower_components/angular-mocks/angular-mocks.js',
                 //'node_modules/sugar/release/sugar-full.development.js',
@@ -31,7 +30,7 @@ module.exports = function (config) {
 // test results reporter to use
 // possible values: 'dots', 'progress'
 // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-            reporters: ['story', 'coverage'],
+            reporters: ['progress', /*'story',*/ 'coverage'],
 
 
             // web server port
@@ -62,7 +61,7 @@ module.exports = function (config) {
             // if true, Karma captures browsers, runs the tests and exits
             singleRun: false,
 
-            
+
         }
     )
     ;

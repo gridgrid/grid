@@ -32,7 +32,7 @@
             output: config.filenames.build.scripts
         },
         {
-            input: glob.sync('./node_modules/@grid/**/*.js'), //we load the tests through this symlink so istanbul can map correctly
+            input: glob.sync('./node_modules/@grid/!(proto)/*.js'), //we load the tests through this symlink so istanbul can map correctly
             output: 'bundle-tests.js',
             dest: 'test-assets'
         }

@@ -1,8 +1,7 @@
 'use strict';
 
 var grid = require('@grid/riq-grid');
-require('jquery');
-require('sugar');
+
 require('angular');
 
 angular.module('riqGridApp', [])
@@ -17,7 +16,7 @@ angular.module('riqGridApp', [])
                 var numRows = 1000;
                 var numCols = 100;
                 var grid = require('@grid/simple-grid')(numRows, numCols);
-                
+
                 grid.viewLayer.build(elem);
                 grid.viewLayer.draw();
 

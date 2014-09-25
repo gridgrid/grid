@@ -1,4 +1,5 @@
 module.exports = function () {
+    var $ = require('jQuery');
 
     var gridTestCore = {
         CONTAINER_WIDTH: 800,

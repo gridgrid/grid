@@ -6,7 +6,8 @@ describe('view-layer', function () {
     var minRows = 10;
     var minCols = 10;
     var view;
-    var grid
+    var grid;
+    var $ = require('jQuery');
 
     beforeEach(inject(function () {
         grid = core.buildSimpleGrid(100, 20);

@@ -23,7 +23,7 @@ global.config = {
             templatesCompiled: TMP_FOLDER,
             livereload: [BUILD_FOLDER + '/**/*', '!' + BUILD_FOLDER + '/assets/**/*'],
             riqGridApp: './' + SRC_FOLDER + '/modules/riq-grid-app.js',
-            riqGridPrototypeApp: './' + SRC_FOLDER + '/modules/riq-grid-prototype-app.js',
+            riqGridPrototypeApp: './' + SRC_FOLDER + '/modules/proto/riq-grid-prototype-app.js',
             riqGridModule: './' + SRC_FOLDER + '/modules/riq-grid-entry.js'
         },
         release: RELEASE_FOLDER,
