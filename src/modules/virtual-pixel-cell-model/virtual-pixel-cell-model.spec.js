@@ -52,9 +52,17 @@ describe('virtual-pixel-cell-model', function () {
         expect(model.width(0, -1)).toBe(0);
     });
 
+    it('should let me clamp a row or col', function () {
+        expect(model.clampRow(-1)).toBe(0);
+        expect(model.clampCol(-1)).toBe(0);
+        expect(model.clampRow(10000000)).toBe(100);
+        expect(model.clampCol(10000000)).toBe(10);
+    });
+
 
     it('should clamp to the virtual cell size', function () {
-
+        expect(model.height(99, 110)).toBe(2 * 30);
+        expect(model.width(9, 11)).toBe(200);
     });
 
     it('should notify listeners on size changes', function () {

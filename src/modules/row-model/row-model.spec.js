@@ -25,9 +25,16 @@ describe('row-model', function () {
         rowModel.add({height: weirdHeight});
         expect(rowModel.height(0)).toEqual(weirdHeight);
     });
-    
-    it('should tell you there are 0 fixed rows by default', function(){
-       rowModel.add({});
+
+    it('should tell you there are 0 fixed rows by default', function () {
+        rowModel.add({});
         expect(rowModel.numFixed()).toEqual(0);
+    });
+
+    it('should fire changes if rows are added', function () {
+        var listener = jasmine.createSpy();
+        rowModel.addChangeListener(listener);
+        rowModel.add({});
+        expect(listener).toHaveBeenCalled();
     });
 });

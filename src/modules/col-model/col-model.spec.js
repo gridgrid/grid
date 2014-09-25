@@ -29,4 +29,11 @@ describe('col-model', function () {
         colModel.add({});
         expect(colModel.numFixed()).toEqual(0);
     });
+
+    it('should notify listeners if cols are added', function () {
+        var spy = jasmine.createSpy();
+        colModel.addChangeListener(spy);
+        colModel.add({});
+        expect(spy).toHaveBeenCalled();
+    });
 });

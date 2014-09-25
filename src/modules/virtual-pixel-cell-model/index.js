@@ -34,24 +34,44 @@ module.exports = (function (_grid) {
         return NaN;
     };
 
+
+    function clampRowOrCol(virtualRowCol, rowOrCol) {
+        var maxRowCol = grid[rowOrCol + 'Model'].length();
+        return util.clamp(virtualRowCol, 0, maxRowCol);
+    }
+
+    model.clampRow = function (virtualRow) {
+        return clampRowOrCol(virtualRow, 'row');
+    };
+
+    model.clampCol = function (virtualCol) {
+        return clampRowOrCol(virtualCol, 'col');
+    };
+
     //for now these just call through to the row and column model, but very likely it will need to include some other calculations
     model.height = function (virtualRowStart, virtualRowEnd) {
-        var height = 0;
-        virtualRowEnd = util.isNumber(virtualRowEnd) ? virtualRowEnd : virtualRowStart;
-        for (var r = virtualRowStart; r <= virtualRowEnd; r++) {
-            height += grid.rowModel.height(r);
-        }
-        return height;
+        return heightOrWidth(virtualRowStart, virtualRowEnd, 'row');
     };
 
     model.width = function (virtualColStart, virtualColEnd) {
-        var width = 0;
-        virtualColEnd = util.isNumber(virtualColEnd) ? virtualColEnd : virtualColStart;
-        for (var c = virtualColStart; c <= virtualColEnd; c++) {
-            width += grid.colModel.width(c);
-        }
-        return width;
+        return heightOrWidth(virtualColStart, virtualColEnd, 'col');
     };
+
+    function heightOrWidth(start, end, rowOrCol) {
+        var length = 0;
+        if (end < start) {
+            return 0;
+        }
+        end = util.isNumber(end) ? end : start;
+        end = clampRowOrCol(end, rowOrCol);
+        start = clampRowOrCol(start, rowOrCol);
+        var lengthModel = grid[rowOrCol + 'Model'];
+        var lengthFn = lengthModel.width || lengthModel.height;
+        for (var i = start; i <= end; i++) {
+            length += lengthFn(i);
+        }
+        return length;
+    }
 
     return model;
 })

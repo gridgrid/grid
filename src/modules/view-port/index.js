@@ -1,4 +1,5 @@
 var util = require('@grid/util');
+var capitalize = require('capitalize');
 
 module.exports = (function (_grid) {
     var grid = _grid;
@@ -17,10 +18,10 @@ module.exports = (function (_grid) {
         return viewCoord + grid.cellScrollModel[rowOrCol];
     }
 
+
     function getVirtualRowColClamped(viewCoord, rowOrCol) {
         var virtualRowCol = getVirtualRowColUnsafe(viewCoord, rowOrCol);
-        var maxRowCol = grid[rowOrCol + 'Model'].length();
-        return util.clamp(virtualRowCol, 0, maxRowCol);
+        return grid.virtualPixelCellModel['clamp' + capitalize(rowOrCol)](virtualRowCol);
     }
 
     viewPort.toVirtualRow = function (r) {
