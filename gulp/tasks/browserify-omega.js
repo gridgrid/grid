@@ -23,9 +23,6 @@
         {
             input: [config.paths.src.riqGridModule],
             output: config.filenames.release.scripts
-        }, {
-            input: [config.paths.src.riqGridPrototypeApp],
-            output: config.filenames.prototype.scripts
         },
         {
             input: [config.paths.src.riqGridApp],
@@ -34,7 +31,8 @@
         {
             input: glob.sync('./node_modules/@grid/!(proto)/*.js'), //we load the tests through this symlink so istanbul can map correctly
             output: 'bundle-tests.js',
-            dest: 'test-assets'
+            dest: 'test-assets',
+            istanbul: true
         }
     ];
 
@@ -46,12 +44,16 @@
         bundler = bundleMethod({
             entries: options.input,
             paths: config.paths.browserify
-        })
-            .transform(istanbul({
+        });
+        
+        if (options.istanbul) {
+            //only do this when testing
+            bundler.transform(istanbul({
                 ignore: ['**/bower_components/**', '**/templates.js', '**/proto/**', '**/grid-spec-helper/**', '**/*.spec.js', '**/node_modules/!(@grid)/**'],
                 defaultIgnore: false
-            }))
-        ;
+            }));
+        }
+
         var destination = options.dest || (global.release ? config.paths.dest.release.scripts : config.paths.dest.build.scripts);
         rebundle = function () {
             var startTime;

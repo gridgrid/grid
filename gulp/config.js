@@ -71,7 +71,7 @@ global.config = {
         }
     },
     ports: {
-        staticServer: 8080,
+        staticServer: 8081,
         livereloadServer: 35729
     }
 };

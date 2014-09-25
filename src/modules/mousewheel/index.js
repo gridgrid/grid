@@ -39,8 +39,17 @@ var api = {
             });
         };
 
-    }
+    },
+    normalize: normalizeWheelEvent
 };
+
+function returnFalse() {
+    return false;
+}
+
+function returnTrue() {
+    return true;
+}
 
 function normalizeWheelEvent(e) {
     var deltaX = api.getDelta(e, true);
@@ -51,6 +60,18 @@ function normalizeWheelEvent(e) {
             deltaX: {value: deltaX},
             type: {value: 'mousewheel'}
         });
+
+    newEvent.isDefaultPrevented = returnFalse;
+
+    newEvent.preventDefault = function () {
+
+
+        newEvent.isDefaultPrevented = returnTrue;
+
+        if (e && e.preventDefault) {
+            e.preventDefault();
+        }
+    };
     return newEvent;
 }
 

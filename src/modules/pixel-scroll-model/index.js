@@ -34,6 +34,7 @@ module.exports = (function (_grid) {
     model.handleMouseWheel = function (e) {
         model.scrollTo(model.top - e.deltaY, model.left - e.deltaX, true);
         debouncedNotify();
+        e.preventDefault();
     };
 
     return model;

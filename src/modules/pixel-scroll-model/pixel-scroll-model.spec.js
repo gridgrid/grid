@@ -53,8 +53,12 @@ describe('pixel-scroll-model', function () {
     });
 
     function sendMouseWheelToModel(y, x) {
-        var event = {deltaY: -y, deltaX: -x};
+        var event = require('@grid/mock-event')('mousewheel');
+        event.deltaY = y;
+        event.deltaX = x;
+        event = require('@grid/mousewheel').normalize(event);
         model.handleMouseWheel(event);
+        return event;
     }
 
     it('should handle a mousewheel event and offset the scroll accordingly', function () {
@@ -93,6 +97,11 @@ describe('pixel-scroll-model', function () {
         runs(function () {
             expect(spy).toHaveBeenCalled();
         });
+    });
+
+    it('should prevent default on events', function () {
+        var event = sendMouseWheelToModel(0, 0);
+        expect(event.isDefaultPrevented()).toBe(true);
     });
 
 });
