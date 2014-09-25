@@ -34,5 +34,24 @@ module.exports = (function (_grid) {
         return NaN;
     };
 
+    //for now these just call through to the row and column model, but very likely it will need to include some other calculations
+    model.height = function (virtualRowStart, virtualRowEnd) {
+        var height = 0;
+        virtualRowEnd = util.isNumber(virtualRowEnd) ? virtualRowEnd : virtualRowStart;
+        for (var r = virtualRowStart; r <= virtualRowEnd; r++) {
+            height += grid.rowModel.height(r);
+        }
+        return height;
+    };
+
+    model.width = function (virtualColStart, virtualColEnd) {
+        var width = 0;
+        virtualColEnd = util.isNumber(virtualColEnd) ? virtualColEnd : virtualColStart;
+        for (var c = virtualColStart; c <= virtualColEnd; c++) {
+            width += grid.colModel.width(c);
+        }
+        return width;
+    };
+
     return model;
 })

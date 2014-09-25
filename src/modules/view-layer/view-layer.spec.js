@@ -74,7 +74,7 @@ describe('view-layer', function () {
         view.draw();
         expect(findGridCells(div).last().position()).toEqual({top: 30 * (minRows - 1), left: 100 * (minCols - 1)});
     });
-
+    
     function findGridCells(div) {
         return $(div).find('[dts="grid-cell"]');
     }

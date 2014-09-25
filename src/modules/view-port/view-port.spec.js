@@ -45,21 +45,27 @@ describe('view port', function () {
 
     describe('cell coordinate conversion', function () {
         it('should do nothing when not scrolled', function () {
-            expect(viewPort.toRealRow(5)).toEqual(5);
-            expect(viewPort.toRealCol(6)).toEqual(6);
+            expect(viewPort.toVirtualRow(5)).toEqual(5);
+            expect(viewPort.toVirtualCol(6)).toEqual(6);
         });
 
         it('should offset result by the scroll amount', function () {
             grid.cellScrollModel.scrollTo(5, 6);
-            expect(viewPort.toRealRow(3)).toEqual(8);
-            expect(viewPort.toRealCol(4)).toEqual(10);
+            expect(viewPort.toVirtualRow(3)).toEqual(8);
+            expect(viewPort.toVirtualCol(4)).toEqual(10);
         });
     });
-    
+
 
     it('should calculate the top left value of a viewport cell', function () {
         expect(viewPort.getRowTop(2)).toEqual(30 * 2);
         expect(viewPort.getColLeft(3)).toEqual(100 * 3);
+    });
+
+    it('should calculate the top left value of a viewport cell when shifted by one', function () {
+        grid.cellScrollModel.scrollTo(0, 1);
+        expect(viewPort.getRowTop(2)).toEqual(30 * 2);
+        expect(viewPort.getColLeft(0)).toEqual(0);
     });
 
 });

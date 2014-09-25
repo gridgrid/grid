@@ -29,8 +29,8 @@ module.exports = function (_grid) {
     viewInterface.draw = function () {
         viewInterface.viewPort.iterateCells(function (r, c) {
             var cell = cells[r][c];
-            var width = grid.colModel.width(c);
-            var height = grid.rowModel.height(r); //maybe faster to do this only on row iterations but meh
+            var width = grid.virtualPixelCellModel.width(c);
+            var height = grid.virtualPixelCellModel.height(r); //maybe faster to do this only on row iterations but meh
             cell.style.width = width + 'px';
             cell.style.height = height + 'px';
 

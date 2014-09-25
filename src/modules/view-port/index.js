@@ -13,22 +13,22 @@ module.exports = (function (_grid) {
 
     // converts a viewport row or column to a real row or column 
     // clamps it if the column would be outside the range
-    function getRealRowColUnsafe(viewCoord, rowOrCol) {
+    function getVirtualRowColUnsafe(viewCoord, rowOrCol) {
         return viewCoord + grid.cellScrollModel[rowOrCol];
     }
 
-    function getRealRowColClamped(viewCoord, rowOrCol) {
-        var realRowCol = getRealRowColUnsafe(viewCoord, rowOrCol);
+    function getVirtualRowColClamped(viewCoord, rowOrCol) {
+        var virtualRowCol = getVirtualRowColUnsafe(viewCoord, rowOrCol);
         var maxRowCol = grid[rowOrCol + 'Model'].length();
-        return util.clamp(realRowCol, 0, maxRowCol);
+        return util.clamp(virtualRowCol, 0, maxRowCol);
     }
 
-    viewPort.toRealRow = function (r) {
-        return getRealRowColClamped(r, 'row');
+    viewPort.toVirtualRow = function (r) {
+        return getVirtualRowColClamped(r, 'row');
     };
 
-    viewPort.toRealCol = function (c) {
-        return getRealRowColClamped(c, 'col');
+    viewPort.toVirtualCol = function (c) {
+        return getVirtualRowColClamped(c, 'col');
     };
 
     viewPort.clampRow = function (r) {
@@ -39,27 +39,18 @@ module.exports = (function (_grid) {
         return util.clamp(c, 0, viewPort.minCols);
     };
 
-    viewPort.getRowTop = function (row) {
-        var length = 0;
-        for (var r = 0; r < viewPort.clampRow(row); r++) {
-            var realRow = viewPort.toRealRow(r);
-            length += grid.rowModel.height(realRow);
-        }
-        return length;
+
+    viewPort.getRowTop = function (viewPortRow) {
+        return grid.virtualPixelCellModel.height(viewPort.toVirtualRow(0), viewPort.toVirtualRow(viewPort.clampRow(viewPortRow)) - 1);
     };
 
-    viewPort.getColLeft = function (col) {
-        var length = 0;
-        for (var c = 0; c < viewPort.clampCol(col); c++) {
-            var realCol = viewPort.toRealCol(c);
-            length += grid.colModel.width(realCol);
-        }
-        return length;
+    viewPort.getColLeft = function (viewPortCol) {
+        return grid.virtualPixelCellModel.width(viewPort.toVirtualCol(0), viewPort.toVirtualCol(viewPort.clampCol(viewPortCol)) - 1);
     };
 
 
     function calculateMaxLengths(totalLength, lengthModel) {
-        var lengthMethod = lengthModel.width || lengthModel.height;
+        var lengthMethod = lengthModel.width && grid.virtualPixelCellModel.width || grid.virtualPixelCellModel.height;
         var numFixed = lengthModel.numFixed();
         var windowLength = 0;
         var maxSize = 0;
