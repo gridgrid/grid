@@ -104,4 +104,9 @@ describe('pixel-scroll-model', function () {
         expect(event.isDefaultPrevented()).toBe(true);
     });
 
+    it('should set its width and height on creation', function () {
+        expect(model.width).toBe(10 * 100);
+        expect(model.height).toBe(100 * 30);
+    });
+
 });

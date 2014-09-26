@@ -7,6 +7,10 @@ module.exports = function (_grid) {
     var cellContainer;
     var cells;
 
+    var drawListeners = require('@grid/listeners')();
+
+    viewInterface.addDrawListener = drawListeners.addListener;
+
     viewInterface.viewPort = require('@grid/view-port')(grid);
 
     viewInterface.build = function (elem) {
@@ -26,7 +30,14 @@ module.exports = function (_grid) {
         container.appendChild(root);
     };
 
+
     viewInterface.draw = function () {
+        drawCells();
+
+        drawListeners.notify();
+    };
+
+    function drawCells() {
         viewInterface.viewPort.iterateCells(function (r, c) {
             var cell = cells[r][c];
             var width = grid.virtualPixelCellModel.width(c);
@@ -47,7 +58,7 @@ module.exports = function (_grid) {
             var formattedData = grid.dataModel.getFormatted(modelR, modelC);
             cell.appendChild(document.createTextNode(formattedData));
         });
-    };
+    }
 
     function buildCells(cellContainer) {
         cells = [];

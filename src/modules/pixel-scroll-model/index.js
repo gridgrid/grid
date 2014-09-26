@@ -8,6 +8,10 @@ module.exports = (function (_grid) {
 
     model.addListener = scrollListeners.addListener;
 
+    grid.virtualPixelCellModel.addListener(function () {
+        model.setScrollSize(grid.virtualPixelCellModel.totalHeight(), grid.virtualPixelCellModel.totalWidth());
+    });
+
     model.setScrollSize = function (h, w) {
         model.height = h;
         model.width = w;
@@ -25,7 +29,6 @@ module.exports = (function (_grid) {
         model.left = util.clamp(left, 0, model.width - grid.viewLayer.viewPort.width);
 
         if (!dontNotify) {
-
             notifyListeners();
         }
     };
@@ -38,4 +41,4 @@ module.exports = (function (_grid) {
     };
 
     return model;
-})
+});

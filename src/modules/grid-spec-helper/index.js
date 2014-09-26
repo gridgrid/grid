@@ -1,30 +1,34 @@
 module.exports = function () {
     var $ = require('jQuery');
 
-    var gridTestCore = {
+    var core = {
         CONTAINER_WIDTH: 800,
         CONTAINER_HEIGHT: 500,
         container: undefined,
         buildSimpleGrid: function (numRows, numCols) {
-            gridTestCore.grid = require('@grid/simple-grid')(numRows || 100, numCols, 10);
-            return gridTestCore.grid;
+            core.grid = require('@grid/simple-grid')(numRows || 100, numCols, 10);
+            return core.grid;
+        },
+        viewBuild : function () {
+            core.grid.viewLayer.build(core.container);
+            return core.container;
         }
     };
 
     beforeEach(inject(function () {
-        gridTestCore.container = document.createElement('div');
-        $(gridTestCore.container).css({
-            width: gridTestCore.CONTAINER_WIDTH + 'px',
-            height: gridTestCore.CONTAINER_HEIGHT + 'px'
+        core.container = document.createElement('div');
+        $(core.container).css({
+            width: core.CONTAINER_WIDTH + 'px',
+            height: core.CONTAINER_HEIGHT + 'px'
         });
-        $('body').append(gridTestCore.container);
+        $('body').append(core.container);
     }));
 
     afterEach(function () {
-        $(gridTestCore.container).remove();
+        $(core.container).remove();
     });
 
-    return gridTestCore;
+    return core;
 
 };
         

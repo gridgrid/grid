@@ -3,6 +3,7 @@ var util = require('@grid/util');
 module.exports = (function (_grid) {
     var grid = _grid;
     var model = {};
+    var listeners = require('@grid/listeners')();
 
     //all pixels are assumed to be in the virtual world, no real world pixels are dealt with here :)
     model.getRow = function (topPx) {
@@ -36,7 +37,7 @@ module.exports = (function (_grid) {
 
 
     function clampRowOrCol(virtualRowCol, rowOrCol) {
-        var maxRowCol = grid[rowOrCol + 'Model'].length();
+        var maxRowCol = grid[rowOrCol + 'Model'].length() - 1;
         return util.clamp(virtualRowCol, 0, maxRowCol);
     }
 
@@ -73,5 +74,23 @@ module.exports = (function (_grid) {
         return length;
     }
 
+    model.totalHeight = function () {
+        return model.height(0, grid.rowModel.length() - 1);
+    };
+
+    model.totalWidth = function () {
+        return model.width(0, grid.colModel.length() - 1);
+    };
+
+    model.addListener = listeners.addListener;
+
+    function sizeChangeListener() {
+        //for now we don't cache anything about this so we just notify
+        listeners.notify();
+    }
+
+    grid.rowModel.addChangeListener(sizeChangeListener);
+    grid.colModel.addChangeListener(sizeChangeListener);
+
     return model;
-})
+});

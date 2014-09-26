@@ -55,15 +55,17 @@ describe('cell-scroll-model', function () {
         expect(model.col).toEqual(2);
     });
 
-    it('should request draw if the cells have shifted', function () {
+    it('should request draw if the cells have shifted and should be dirty', function () {
         var request = spyOn(grid, 'requestDraw');
         model.scrollTo(1, 1);
         expect(request).toHaveBeenCalled();
+        expect(model.isDirty()).toBe(true);
     });
 
-    it('should not request draw if the cells havent shifted even if asked to scroll', function () {
+    it('should not request draw if the cells havent shifted even if asked to scroll and should not be dirty', function () {
         var request = spyOn(grid, 'requestDraw');
         model.scrollTo(0, 0);
         expect(request).not.toHaveBeenCalled();
+        expect(model.isDirty()).toBe(false);
     });
 });

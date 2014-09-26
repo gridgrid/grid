@@ -55,17 +55,35 @@ describe('virtual-pixel-cell-model', function () {
     it('should let me clamp a row or col', function () {
         expect(model.clampRow(-1)).toBe(0);
         expect(model.clampCol(-1)).toBe(0);
-        expect(model.clampRow(10000000)).toBe(100);
-        expect(model.clampCol(10000000)).toBe(10);
+        expect(model.clampRow(10000000)).toBe(99);
+        expect(model.clampCol(10000000)).toBe(9);
     });
 
 
     it('should clamp to the virtual cell size', function () {
-        expect(model.height(99, 110)).toBe(2 * 30);
-        expect(model.width(9, 11)).toBe(200);
+        expect(model.height(98, 110)).toBe(2 * 30);
+        expect(model.width(8, 11)).toBe(200);
     });
 
-    it('should notify listeners on size changes', function () {
+    it('should notify listeners on size changes from row model', function () {
+        var spy = jasmine.createSpy();
+        model.addListener(spy);
+        grid.rowModel.add({});
+        expect(spy).toHaveBeenCalled();
+    });
 
+    it('should notify listeners on size changes from col model', function () {
+        var spy = jasmine.createSpy();
+        model.addListener(spy);
+        grid.colModel.add({});
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('should tell me the total height', function () {
+        expect(model.totalHeight()).toBe(100 * 30);
+    });
+
+    it('should tell me the total width', function () {
+        expect(model.totalWidth()).toBe(10 * 100);
     });
 });

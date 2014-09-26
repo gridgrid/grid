@@ -52,7 +52,7 @@ describe('view port', function () {
         it('should offset result by the scroll amount', function () {
             grid.cellScrollModel.scrollTo(5, 6);
             expect(viewPort.toVirtualRow(3)).toEqual(8);
-            expect(viewPort.toVirtualCol(4)).toEqual(10);
+            expect(viewPort.toVirtualCol(2)).toEqual(8);
         });
     });
 

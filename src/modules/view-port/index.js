@@ -33,11 +33,11 @@ module.exports = (function (_grid) {
     };
 
     viewPort.clampRow = function (r) {
-        return util.clamp(r, 0, viewPort.minRows);
+        return util.clamp(r, 0, viewPort.minRows - 1);
     };
 
     viewPort.clampCol = function (c) {
-        return util.clamp(c, 0, viewPort.minCols);
+        return util.clamp(c, 0, viewPort.minCols - 1);
     };
 
 
