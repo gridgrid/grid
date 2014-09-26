@@ -16,7 +16,7 @@ describe('simple-grid', function () {
     it('should not draw on request if in event loop but should draw after', function () {
         var draw = spyOnDraw();
         grid.eventLoop.addInterceptor(inLoopFn);
-        grid.eventLoop.testInterface.loop();
+        grid.eventLoop.fire({});
         function inLoopFn() {
             grid.requestDraw();
             expect(draw).not.toHaveBeenCalled();

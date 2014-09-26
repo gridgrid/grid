@@ -1,30 +1,30 @@
 module.exports = function (_grid) {
     var grid = _grid;
+    var dirtyClean = require('@grid/dirty-clean')(grid);
 
-    var DEFAULT_WIDTH = 100;
-    var cols = [];
-    var numFixed = 0;
-    var changeListeners = require('@grid/listeners')();
+    var aliveDecorators = [];
+    var deadDecorators = [];
 
     var api = {
-        add: function (col) {
-            cols.push(col);
-            changeListeners.notify();
+        add: function (decorator) {
+            aliveDecorators.push(decorator);
+            dirtyClean.setDirty();
         },
-        get: function (index) {
-            return cols[index];
+        remove: function (decorator) {
+            aliveDecorators.splice(aliveDecorators.indexOf(decorator), 1);
+            deadDecorators.push(decorator);
+            dirtyClean.setDirty();
         },
-        length: function () {
-            return cols.length;
+        getAlive: function () {
+            return aliveDecorators;
         },
-        width: function (index) {
-            return cols[0].width || DEFAULT_WIDTH;
+        popAllDead: function () {
+            return deadDecorators;
         },
-        numFixed: function () {
-            return numFixed;
-        },
-        addChangeListener: changeListeners.addListener
+        isDirty: dirtyClean.isDirty
+
     };
+
 
     return api;
 };

@@ -67,14 +67,14 @@ describe('virtual-pixel-cell-model', function () {
 
     it('should notify listeners on size changes from row model', function () {
         var spy = jasmine.createSpy();
-        model.addListener(spy);
+        grid.eventLoop.bind('grid-virtual-pixel-cell-change', spy);
         grid.rowModel.add({});
         expect(spy).toHaveBeenCalled();
     });
 
     it('should notify listeners on size changes from col model', function () {
         var spy = jasmine.createSpy();
-        model.addListener(spy);
+        grid.eventLoop.bind('grid-virtual-pixel-cell-change', spy);
         grid.colModel.add({});
         expect(spy).toHaveBeenCalled();
     });

@@ -1,7 +1,7 @@
 describe('mousewheel', function () {
     var mousewheel;
     var $ = require('jQuery');
-    var mockEvent = require('@grid/mock-event');
+    var mockEvent = require('@grid/custom-event');
     var div;
 
     var events = ['mousewheel', 'wheel', 'DOMMouseScroll'];

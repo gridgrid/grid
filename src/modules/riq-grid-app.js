@@ -20,7 +20,7 @@ angular.module('riqGridApp', [])
                 grid.viewLayer.build(elem);
                 grid.viewLayer.draw();
 
-                grid.eventLoop.bind(elem);
+                grid.eventLoop.setContainer(elem);
 
             }
         };

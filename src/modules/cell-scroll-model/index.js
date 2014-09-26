@@ -2,14 +2,14 @@ var util = require('@grid/util');
 
 module.exports = (function (_grid) {
     var grid = _grid;
-    //var dirtyClean = require('@grid/dirty-clean')(grid);
+    var dirtyClean = require('@grid/dirty-clean')(grid);
 
 
     var model = {row: 0, col: 0};
 
-    //model.isDirty = dirtyClean.isDirty;
-
-    grid.pixelScrollModel.addListener(function () {
+    model.isDirty = dirtyClean.isDirty;
+ 
+    grid.eventLoop.bind('grid-pixel-scroll', function () {
         var scrollTop = grid.pixelScrollModel.top;
         var row = grid.virtualPixelCellModel.getRow(scrollTop);
 
@@ -27,8 +27,7 @@ module.exports = (function (_grid) {
         model.row = util.clamp(r, 0, maxRow);
         model.col = util.clamp(c, 0, maxCol);
         if (lastRow !== model.row || lastCol !== model.col) {
-            //dirtyClean.setDirty();
-            grid.requestDraw();
+            dirtyClean.setDirty();
         }
     };
 

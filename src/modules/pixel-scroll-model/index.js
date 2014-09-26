@@ -4,11 +4,8 @@ var debounce = require('debounce');
 module.exports = (function (_grid) {
     var grid = _grid;
     var model = {top: 0, left: 0};
-    var scrollListeners = require('@grid/listeners')();
 
-    model.addListener = scrollListeners.addListener;
-
-    grid.virtualPixelCellModel.addListener(function () {
+    grid.eventLoop.bind('grid-virtual-pixel-cell-change', function () {
         model.setScrollSize(grid.virtualPixelCellModel.totalHeight(), grid.virtualPixelCellModel.totalWidth());
     });
 
@@ -19,7 +16,7 @@ module.exports = (function (_grid) {
 
     function notifyListeners() {
         //TODO: possibly keep track of delta since last update and send it along. for now, no
-        scrollListeners.notify();
+        grid.eventLoop.fire('grid-pixel-scroll');
     }
 
     var debouncedNotify = debounce(notifyListeners, 1);
@@ -39,6 +36,8 @@ module.exports = (function (_grid) {
         debouncedNotify();
         e.preventDefault();
     };
+
+    grid.eventLoop.bind('mousewheel', model.handleMouseWheel);
 
     return model;
 });

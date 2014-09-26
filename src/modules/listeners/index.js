@@ -7,11 +7,9 @@ module.exports = function () {
     return {
         //returns a removal function to unbind the listener
         addListener: function (fn) {
-            var index = listeners.length;
             listeners.push(fn);
             return function () {
-                //since we are the only ones modifying this array keeping the index is a nice perf win
-                listeners.splice(index);
+                listeners.splice(listeners.indexOf(fn), 1);
             };
         },
         notify: function (e) {

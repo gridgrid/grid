@@ -1,7 +1,10 @@
 describe('col-model', function () {
+    var core = require('@grid/grid-spec-helper')();
     var colModel;
+    var grid;
     beforeEach(inject(function () {
-        colModel = require('@grid/col-model')();
+        grid = core.buildSimpleGrid();
+        colModel = require('@grid/col-model')(grid);
     }));
 
     it('should be able to add and get back a col object', function () {
@@ -11,7 +14,8 @@ describe('col-model', function () {
 
     it('should tell you the number of cols', function () {
         colModel.add({});
-        expect(colModel.length()).toBe(1);
+        colModel.add({});
+        expect(colModel.length()).toBe(2);
     });
 
     it('should be able to tell you a default col width', function () {
@@ -32,7 +36,7 @@ describe('col-model', function () {
 
     it('should notify listeners if cols are added', function () {
         var spy = jasmine.createSpy();
-        colModel.addChangeListener(spy);
+        grid.eventLoop.bind('grid-col-change', spy);
         colModel.add({});
         expect(spy).toHaveBeenCalled();
     });

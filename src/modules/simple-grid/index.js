@@ -3,6 +3,8 @@ module.exports = function (numRows, numCols) {
     var grid = {};
 
     //the order here matters because some of these depend on each other
+    grid.eventLoop = require('@grid/event-loop')(grid);
+    grid.decorators = require('@grid/decorators')(grid);
     grid.rowModel = require('@grid/row-model')(grid);
     grid.colModel = require('@grid/col-model')(grid);
     grid.dataModel = require('@grid/simple-data-model')(grid);
@@ -12,7 +14,7 @@ module.exports = function (numRows, numCols) {
 
 
     grid.viewLayer = require('@grid/view-layer')(grid);
-    grid.eventLoop = require('@grid/event-loop')(grid);
+
 
     if (numRows) {
         for (var r = 0; r < numRows; r++) {
@@ -36,6 +38,10 @@ module.exports = function (numRows, numCols) {
             drawRequested = true;
         }
     };
+
+    grid.eventLoop.bind('grid-draw', function () {
+        drawRequested = false;
+    });
 
     grid.eventLoop.addExitListener(function () {
         if (drawRequested) {

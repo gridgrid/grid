@@ -26,4 +26,16 @@ describe('listeners', function () {
         listeners.notify(event);
         expect(spy).not.toHaveBeenCalled();
     });
+
+    it('should let me add multiple listeners and unbind out of order', function () {
+        var spy = jasmine.createSpy();
+        var unbind = listeners.addListener(function () {
+        });
+        var unbind2 = listeners.addListener(spy);
+        unbind();
+        unbind2();
+        var event = {};
+        listeners.notify(event);
+        expect(spy).not.toHaveBeenCalled();
+    });
 });

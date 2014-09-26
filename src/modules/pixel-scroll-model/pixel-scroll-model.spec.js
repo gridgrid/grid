@@ -53,7 +53,7 @@ describe('pixel-scroll-model', function () {
     });
 
     function sendMouseWheelToModel(y, x) {
-        var event = require('@grid/mock-event')('mousewheel');
+        var event = require('@grid/custom-event')('mousewheel');
         event.deltaY = y;
         event.deltaX = x;
         event = require('@grid/mousewheel').normalize(event);
@@ -69,29 +69,23 @@ describe('pixel-scroll-model', function () {
 
     });
 
-    it('should allow me to add and remove a scroll listener', function () {
-        var spy = jasmine.createSpy();
-        var unbind = model.addListener(spy);
-        unbind();
-    });
-
     it('should call a scroll listener on scrollTo', function () {
         var spy = jasmine.createSpy();
-        var unbind = model.addListener(spy);
+        var unbind = grid.eventLoop.bind('grid-pixel-scroll', spy);
         model.scrollTo(5, 6);
         expect(spy).toHaveBeenCalled();
     });
 
     it('should not call a scroll listener synchronously on mousewheel', function () {
         var spy = jasmine.createSpy();
-        var unbind = model.addListener(spy);
+        var unbind = grid.eventLoop.bind('grid-pixel-scroll', spy);
         sendMouseWheelToModel(40, 30);
         expect(spy).not.toHaveBeenCalled();
     });
 
     it('should call a scroll listener asynchronously on mousewheel', function () {
         var spy = jasmine.createSpy();
-        var unbind = model.addListener(spy);
+        var unbind = grid.eventLoop.bind('grid-pixel-scroll', spy);
         sendMouseWheelToModel(40, 30);
         waits(10);
         runs(function () {

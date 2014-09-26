@@ -1,8 +1,10 @@
 describe('row-model', function () {
-
+    var core = require('@grid/grid-spec-helper')();
     var rowModel;
+    var grid;
     beforeEach(inject(function () {
-        rowModel = require('@grid/row-model')();
+        grid = core.buildSimpleGrid();
+        rowModel = require('@grid/row-model')(grid);
     }));
 
     it('should be able to add and get back a row object', function () {
@@ -33,7 +35,7 @@ describe('row-model', function () {
 
     it('should fire changes if rows are added', function () {
         var listener = jasmine.createSpy();
-        rowModel.addChangeListener(listener);
+        grid.eventLoop.bind('grid-row-change', listener);
         rowModel.add({});
         expect(listener).toHaveBeenCalled();
     });

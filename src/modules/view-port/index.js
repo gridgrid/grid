@@ -62,6 +62,7 @@ module.exports = (function (_grid) {
             fixedLength += lengthMethod(fixed);
         }
 
+        //it might be safer to sum the lengths in the virtualPixelCellModel but for now here is ok
         for (var index = numFixed; index < lengthModel.length(); index++) {
             windowLength += lengthMethod(index);
             while (windowLength + fixedLength > totalLength && windowStartIndex < index) {

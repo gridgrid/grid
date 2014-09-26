@@ -1,5 +1,6 @@
 describe('event-loop', function () {
     var core = require('@grid/grid-spec-helper')();
+    var mockEvent = require('@grid/custom-event');
     var loop;
     var grid;
     beforeEach(inject(function () {
@@ -10,7 +11,7 @@ describe('event-loop', function () {
     it('should bind event listeners to a container', function () {
         var div = document.createElement('div');
         var add = spyOn(div, 'addEventListener');
-        loop.bind(div);
+        loop.setContainer(div);
         expect(add).toHaveBeenCalled();
     });
 
@@ -26,11 +27,11 @@ describe('event-loop', function () {
         });
 
         var interceptorCalledFirst = true;
-        loop.testInterface.handleTestEvent = function () {
+        loop.bind('test-event', function () {
             interceptorCalledFirst = interceptorCalled;
-        };
+        });
         //using mousewheel to get some other handler, we know will be there
-        loop.testInterface.loop({type: 'testevent'});
+        loop.fire({type: 'testevent'});
         expect(interceptorCalledFirst).toBe(true);
 
     });
@@ -40,9 +41,9 @@ describe('event-loop', function () {
     });
 
     it('should say its in the loop if it is', function () {
-        loop.addInterceptor(interceptor);
-        loop.testInterface.loop();
-        function interceptor() {
+        loop.addInterceptor(inLoopFn);
+        loop.fire({});
+        function inLoopFn() {
             expect(loop.isRunning).toEqual(true);
         }
     });
@@ -56,8 +57,66 @@ describe('event-loop', function () {
         var spy = jasmine.createSpy();
         loop.addExitListener(spy);
         var event = {};
-        loop.testInterface.loop(event);
+        loop.fire(event);
         expect(spy).toHaveBeenCalledWith(event);
+    });
+
+    describe('binding', function () {
+        var wasInLoop;
+        beforeEach(function () {
+            wasInLoop = false;
+        });
+
+        function setWasInLoop() {
+            wasInLoop = true;
+        }
+
+        it('should let me bind and fire an event and be in loop during', function () {
+
+            var spy = jasmine.createSpy();
+            grid.eventLoop.bind('test-event', setWasInLoop);
+            grid.eventLoop.bind('test-event', spy);
+            grid.eventLoop.fire('test-event');
+            expect(spy).toHaveBeenCalled();
+            expect(wasInLoop).toEqual(true);
+        });
+
+        it('should let me bind a function to a specfic dom event on an element and be in loop during', function () {
+            var spy = jasmine.createSpy();
+            var div = document.createElement('div');
+            grid.eventLoop.bind('click', div, setWasInLoop);
+            grid.eventLoop.bind('click', div, spy);
+            var click = mockEvent('click');
+            div.dispatchEvent(click);
+            expect(spy).toHaveBeenCalled();
+            expect(wasInLoop).toEqual(true);
+        });
+
+        it('should let me bind a dom event to the grid container and be in loop during', function () {
+            var spy = jasmine.createSpy();
+            var container = core.container;
+            grid.eventLoop.setContainer(container);
+            var div = document.createElement('div');
+            container.appendChild(div);
+
+            grid.eventLoop.bind('click', setWasInLoop);
+            grid.eventLoop.bind('click', spy);
+            var click = mockEvent('click', true);
+            div.dispatchEvent(click);
+            expect(spy).toHaveBeenCalled();
+
+            expect(wasInLoop).toEqual(true);
+
+        });
+
+        it('should still be running if an event is fired from within an event', function () {
+            grid.eventLoop.bind('outer', function () {
+                grid.eventLoop.fire('inner');
+                expect(grid.eventLoop.isRunning).toBe(true);
+            });
+            grid.eventLoop.fire('outer');
+            expect(grid.eventLoop.isRunning).toBe(false);
+        });
     });
 
 });

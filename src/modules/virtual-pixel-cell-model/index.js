@@ -3,7 +3,6 @@ var util = require('@grid/util');
 module.exports = (function (_grid) {
     var grid = _grid;
     var model = {};
-    var listeners = require('@grid/listeners')();
 
     //all pixels are assumed to be in the virtual world, no real world pixels are dealt with here :)
     model.getRow = function (topPx) {
@@ -82,15 +81,13 @@ module.exports = (function (_grid) {
         return model.width(0, grid.colModel.length() - 1);
     };
 
-    model.addListener = listeners.addListener;
-
     function sizeChangeListener() {
         //for now we don't cache anything about this so we just notify
-        listeners.notify();
+        grid.eventLoop.fire('grid-virtual-pixel-cell-change');
     }
 
-    grid.rowModel.addChangeListener(sizeChangeListener);
-    grid.colModel.addChangeListener(sizeChangeListener);
+    grid.eventLoop.bind('grid-col-change', sizeChangeListener);
+    grid.eventLoop.bind('grid-row-change', sizeChangeListener);
 
     return model;
 });
