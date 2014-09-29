@@ -28,7 +28,18 @@ describe('decorators', function () {
         expect(decorators.isDirty()).toBe(true);
         expect(decorators.getAlive()).toEqual([]);
         expect(decorators.popAllDead()).toEqual([dec]);
+    });
 
+    it('should let me remove multiple decorators', function () {
+        var spy = spyOn(grid, 'requestDraw'); //mock the method to prevent draw
+
+        var dec2 = {};
+        var dec1 = {};
+        decorators.add(dec1);
+        decorators.add(dec2);
+        decorators.remove([dec1, dec2]);
+        expect(decorators.getAlive()).toEqual([]);
+        expect(decorators.popAllDead()).toEqual([dec1, dec2]);
     });
 
     it('should give me alive and dead decorators and all', function () {

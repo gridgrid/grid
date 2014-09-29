@@ -9,7 +9,6 @@ module.exports = function (_grid) {
     var root;
     var cellContainer;
     var decoratorContainer;
-    var boundingBoxes;
 
     var cells; //matrix of rendered cell elements;
 
@@ -78,6 +77,7 @@ module.exports = function (_grid) {
                     renderedElement.dispatchEvent(destroyEvent);
                 }
                 decoratorContainer.removeChild(boundingBox);
+                decorator.boundingBox = undefined;
             }
         });
     }

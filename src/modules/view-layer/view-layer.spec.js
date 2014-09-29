@@ -141,6 +141,7 @@ describe('view-layer', function () {
             expect(spy).toHaveBeenCalled();
             var boundingBox = decorator.getDiv().parentElement;
             expect(boundingBox.parentElement).toBeFalsy();
+            expect(decorator.boundingBox).toBeFalsy();
         }
 
         it('should receive a destroy event when the grid is cleaned up and not be in the dom', function () {
