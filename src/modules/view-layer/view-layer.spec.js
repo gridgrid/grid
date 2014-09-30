@@ -159,6 +159,51 @@ describe('view-layer', function () {
             grid.decorators.remove(decorator); //remove implicitly calls draw
             expectDestroySpyToBeCalledAndDecoratorToBeOutOfTheDom(spy);
         });
+
+        function setDecoratorPosition(top, left, bottom, right) {
+            decorator.top = top;
+            decorator.left = left;
+            decorator.bottom = bottom;
+            decorator.right = right;
+        }
+
+        function expectBoundingBoxSize(top, left, height, width) {
+            var $boundingBox = $(decorator.boundingBox);
+            expect($boundingBox.position().top).toBe(top);
+            expect($boundingBox.position().left).toBe(left);
+            expect($boundingBox.height()).toBe(height);
+            expect($boundingBox.width()).toBe(width);
+        }
+
+        it('should position a virtual cell range decorator', function () {
+            setDecoratorPosition(5, 6, 7, 9);
+            grid.decorators.add(decorator);
+            expectBoundingBoxSize(5 * 30, 6 * 100, 3 * 30, 3 * 100);
+        });
+
+        it('should position a virtual pixel range decorator', function () {
+            setDecoratorPosition(5, 6, 7, 9);
+            decorator.units = 'px';
+            grid.decorators.add(decorator);
+            expectBoundingBoxSize(5, 6, 3, 3);
+        });
+
+        it('should position a real cell range decorator', function () {
+            setDecoratorPosition(5, 6, 7, 9);
+            decorator.space = 'real';
+            grid.cellScrollModel.scrollTo(1, 1); //scroll should have no effect on the position;
+            grid.decorators.add(decorator);
+            expectBoundingBoxSize(5 * 30, 6 * 100, 3 * 30, 3 * 100);
+        });
+
+        it('should position a real pixel range decorator', function () {
+            setDecoratorPosition(5, 6, 7, 9);
+            decorator.units = 'px';
+            decorator.space = 'virtual';
+            grid.cellScrollModel.scrollTo(1, 1); //scroll should have no effect on the position;
+            grid.decorators.add(decorator);
+            expectBoundingBoxSize(5, 6, 3, 3);
+        });
     });
 
 

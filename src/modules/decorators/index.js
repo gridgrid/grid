@@ -1,9 +1,10 @@
 var util = require('@grid/util');
-
+var makeDirtyClean = require('@grid/dirty-clean');
 
 module.exports = function (_grid) {
     var grid = _grid;
-    var dirtyClean = require('@grid/dirty-clean')(grid);
+
+    var dirtyClean = makeDirtyClean(grid);
 
     var aliveDecorators = [];
     var deadDecorators = [];
@@ -30,7 +31,32 @@ module.exports = function (_grid) {
         popAllDead: function () {
             return deadDecorators;
         },
-        isDirty: dirtyClean.isDirty
+        isDirty: dirtyClean.isDirty,
+        create: function () {
+            var decorator = {};
+            var decoratorDirtyClean = makeDirtyClean(grid);
+            decorator.isDirty = decoratorDirtyClean.isDirty;
+            var watchedProperties = ['top', 'left', 'bottom', 'right', 'units', 'space'];
+            watchedProperties.forEach(function (prop) {
+                var val;
+                Object.defineProperty(decorator, prop, {
+                    enumerable: true,
+                    get: function () {
+                        return val;
+                    }, set: function (_val) {
+                        if (_val !== val) {
+                            decoratorDirtyClean.setDirty();
+                        }
+                        val = _val;
+                    }
+                });
+            });
+            //defaults
+            decorator.units = 'cell';
+            decorator.space = 'virtual';
+            return decorator;
+
+        }
 
     };
 
