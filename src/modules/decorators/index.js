@@ -38,7 +38,7 @@ module.exports = function (_grid) {
             var thisDirtyClean = makeDirtyClean(grid);
             decorator.isDirty = thisDirtyClean.isDirty;
 
-            var watchedProperties = ['top', 'left', 'bottom', 'right', 'units', 'space'];
+            var watchedProperties = ['top', 'left', 'height', 'width', 'units', 'space'];
             watchedProperties.forEach(function (prop) {
                 var val;
                 Object.defineProperty(decorator, prop, {

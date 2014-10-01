@@ -15,6 +15,13 @@ describe('view port', function () {
         expect(viewPort.height).toEqual(core.CONTAINER_HEIGHT);
     });
 
+    it('should fire an event when sized', function () {
+        var spy = jasmine.createSpy();
+        grid.eventLoop.bind('grid-viewport-change', spy);
+        viewPort.sizeToContainer(core.container);
+        expect(spy).toHaveBeenCalled();
+    });
+
     it('should calculate the max number of cells that could fit in the screen', function () {
         //basic test for default heights and widths
 

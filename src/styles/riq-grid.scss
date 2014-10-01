@@ -23,6 +23,13 @@
   border: 1px solid #eee;
 }
 
+.grid-scroll-bar {
+  //the decorator will take care of the sizing
+  @extend .pin-to-edges;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, .5);
+}
+
 .cell {
   &.even {
     background: #f7f7f7;

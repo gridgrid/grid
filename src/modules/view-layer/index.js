@@ -56,7 +56,7 @@ module.exports = function (_grid) {
         if (!container) {
             return;
         }
-        
+
         if (grid.cellScrollModel.isDirty()) {
             drawCells();
         }
@@ -95,7 +95,7 @@ module.exports = function (_grid) {
             if (decorator.isDirty()) {
                 switch (decorator.units) {
                     case 'px':
-                        setPosition(boundingBox, decorator.top, decorator.left, decorator.bottom - decorator.top, decorator.right - decorator.left);
+                        setPosition(boundingBox, decorator.top, decorator.left, decorator.height, decorator.width);
                         break;
                     case 'cell':
                     /* jshint -W086 */

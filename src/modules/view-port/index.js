@@ -9,6 +9,7 @@ module.exports = function (_grid) {
         viewPort.height = elem.offsetHeight;
         viewPort.minRows = calculateMaxLengths(viewPort.height, grid.rowModel);
         viewPort.minCols = calculateMaxLengths(viewPort.width, grid.colModel);
+        grid.eventLoop.fire('grid-viewport-change');
     };
 
 

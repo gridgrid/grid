@@ -4,9 +4,11 @@ var debounce = require('debounce');
 module.exports = (function (_grid) {
     var grid = _grid;
     var model = {top: 0, left: 0};
+    var scrollBarWidth = 10;
 
     grid.eventLoop.bind('grid-virtual-pixel-cell-change', function () {
         model.setScrollSize(grid.virtualPixelCellModel.totalHeight(), grid.virtualPixelCellModel.totalWidth());
+        sizeScrollBars();
     });
 
     model.setScrollSize = function (h, w) {
@@ -25,6 +27,8 @@ module.exports = (function (_grid) {
         model.top = util.clamp(top, 0, model.height - grid.viewLayer.viewPort.height);
         model.left = util.clamp(left, 0, model.width - grid.viewLayer.viewPort.width);
 
+        moveScrollBars();
+
         if (!dontNotify) {
             notifyListeners();
         }
@@ -39,8 +43,37 @@ module.exports = (function (_grid) {
 
     grid.eventLoop.bind('mousewheel', model.handleMouseWheel);
 
-    model.vertScrollBar = grid.decorators.create();
-    model.horzScrollBar = grid.decorators.create();
+    function scrollBarRender() {
+        var div = document.createElement('div');
+        div.setAttribute('class', 'grid-scroll-bar');
+        return div;
+    }
+
+    function makeScrollBarDecorator() {
+        var decorator = grid.decorators.create();
+        decorator.render = scrollBarRender;
+        decorator.units = 'px';
+        return decorator;
+    }
+
+    model.vertScrollBar = makeScrollBarDecorator();
+    model.horzScrollBar = makeScrollBarDecorator();
+    model.vertScrollBar.width = scrollBarWidth;
+    model.horzScrollBar.height = scrollBarWidth;
+
+    function moveScrollBars() {
+        model.vertScrollBar.top = model.top / model.height * grid.viewLayer.viewPort.height;
+        model.horzScrollBar.left = model.left / model.width * grid.viewLayer.viewPort.width;
+    }
+
+    function sizeScrollBars() {
+        model.vertScrollBar.left = grid.viewLayer.viewPort.width - scrollBarWidth;
+        model.horzScrollBar.top = grid.viewLayer.viewPort.height - scrollBarWidth;
+        model.vertScrollBar.height = grid.viewLayer.viewPort.height / model.height * grid.viewLayer.viewPort.height;
+        model.horzScrollBar.width = grid.viewLayer.viewPort.width / model.width * grid.viewLayer.viewPort.width;
+    }
+
+    grid.eventLoop.bind('grid-viewport-change', sizeScrollBars);
 
     grid.decorators.add(model.vertScrollBar);
     grid.decorators.add(model.horzScrollBar);

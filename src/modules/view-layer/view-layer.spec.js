@@ -209,11 +209,11 @@ describe('view-layer', function () {
 
         });
 
-        function setDecoratorPosition(top, left, bottom, right) {
+        function setDecoratorPosition(top, left, height, width) {
             decorator.top = top;
             decorator.left = left;
-            decorator.bottom = bottom;
-            decorator.right = right;
+            decorator.height = height;
+            decorator.width = width;
         }
 
         function expectBoundingBoxSize(top, left, height, width, nextFn) {
@@ -231,7 +231,7 @@ describe('view-layer', function () {
         }
 
         xit('should position a virtual cell range decorator', function () {
-            setDecoratorPosition(5, 6, 7, 9);
+            setDecoratorPosition(5, 6, 3, 3);
             grid.decorators.add(decorator);
 
             expectBoundingBoxSize(5 * 30, 6 * 100, 3 * 30, 3 * 100);
@@ -239,14 +239,14 @@ describe('view-layer', function () {
 
         xit('should position a virtual pixel range decorator', function () {
             grid.cellScrollModel.scrollTo(1, 1);
-            setDecoratorPosition(5, 6, 7, 9);
+            setDecoratorPosition(5, 6, 2, 3);
             decorator.units = 'px';
             grid.decorators.add(decorator);
             expectBoundingBoxSize(35, 106, 2, 3);
         });
 
         xit('should position a real cell range decorator', function () {
-            setDecoratorPosition(5, 6, 7, 9);
+            setDecoratorPosition(5, 6, 3, 3);
             decorator.space = 'real';
             grid.cellScrollModel.scrollTo(1, 1); //scroll should have no effect on the position;
             grid.decorators.add(decorator);
@@ -254,7 +254,7 @@ describe('view-layer', function () {
         });
 
         it('should position a real pixel range decorator', function () {
-            setDecoratorPosition(5, 6, 7, 10);
+            setDecoratorPosition(5, 6, 2, 4);
             decorator.units = 'px';
             decorator.space = 'virtual';
             grid.cellScrollModel.scrollTo(1, 1); //scroll should have no effect on the position;
@@ -264,11 +264,11 @@ describe('view-layer', function () {
         });
 
         it('should reposition if decorators box changes', function () {
-            setDecoratorPosition(5, 6, 7, 9);
+            setDecoratorPosition(5, 6, 2, 3);
             decorator.units = 'px';
             grid.decorators.add(decorator);
             expectBoundingBoxSize(5, 6, 2, 3, function next() {
-                setDecoratorPosition(1, 6, 7, 9);
+                setDecoratorPosition(1, 6, 6, 3);
             });
 
             expectBoundingBoxSize(1, 6, 6, 3);

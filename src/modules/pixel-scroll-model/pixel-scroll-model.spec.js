@@ -1,5 +1,5 @@
 describe('pixel-scroll-model', function () {
-
+    var $ = require('jquery');
     var core = require('@grid/grid-spec-helper')();
     var model;
     var numRows = 100;
@@ -103,13 +103,46 @@ describe('pixel-scroll-model', function () {
         expect(model.height).toBe(100 * 30);
     });
     describe('scroll bars', function () {
+        //weird numbers so we don't get confused by even division
+        var viewWidth = 531;
+        var viewHeight = 233;
+        beforeEach(function () {
+            grid.viewLayer.viewPort.sizeToContainer({offsetWidth: viewWidth, offsetHeight: viewHeight});
+        });
+
         it('should register a vertical and horizontal decorator', function () {
+            expect(model.vertScrollBar.units).toBe('px');
+            expect(model.horzScrollBar.units).toBe('px');
             expect(grid.decorators.getAlive()).toContain(model.vertScrollBar);
             expect(grid.decorators.getAlive()).toContain(model.horzScrollBar);
         });
 
+        function expectRenderToBeAScrollBar(div) {
+            expect(div).toBeAnElement();
+            expect($(div).hasClass('grid-scroll-bar')).toBe(true);
+        }
+
+        it('should render a div with a scroll bar class', function () {
+            expectRenderToBeAScrollBar(model.vertScrollBar.render());
+            expectRenderToBeAScrollBar(model.horzScrollBar.render());
+        });
+
         it('should size the scroll bars to the right percentage of the view', function () {
-           
+            expect(model.vertScrollBar.height).toBe(viewHeight / grid.virtualPixelCellModel.totalHeight() * viewHeight);
+            expect(model.vertScrollBar.width).toBe(10);
+            expect(model.horzScrollBar.width).toBe(viewWidth / grid.virtualPixelCellModel.totalWidth() * viewWidth);
+            expect(model.horzScrollBar.height).toBe(10);
+        });
+
+        it('should position the bars at the edges of the view', function () {
+            expect(model.vertScrollBar.left).toBe(viewWidth - 10);
+            expect(model.horzScrollBar.top).toBe(viewHeight - 10);
+        });
+
+        it('should set the top and left positions on scroll', function () {
+            model.scrollTo(13, 23);
+            expect(model.vertScrollBar.top).toBe(13 / grid.virtualPixelCellModel.totalHeight() * viewHeight);
+            expect(model.horzScrollBar.left).toBe(23 / grid.virtualPixelCellModel.totalWidth() * viewWidth);
         });
     });
 

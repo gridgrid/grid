@@ -22,8 +22,8 @@ describe('decorators', function () {
             expect(decorator.isDirty).toBeAFunction();
             expect('top' in decorator).toBe(true);
             expect('left' in decorator).toBe(true);
-            expect('bottom' in decorator).toBe(true);
-            expect('right' in decorator).toBe(true);
+            expect('height' in decorator).toBe(true);
+            expect('width' in decorator).toBe(true);
             expect(decorator.units).toBe('cell');
             expect(decorator.space).toBe('virtual');
             expect(decorator.render).toBeAFunction();
@@ -37,7 +37,7 @@ describe('decorators', function () {
         }
 
         it('that get marked dirty on relevant property changes', function () {
-            ['top', 'left', 'bottom', 'right', 'units', 'space'].forEach(function (prop) {
+            ['top', 'left', 'height', 'width', 'units', 'space'].forEach(function (prop) {
                 setPropAndCheckDirty(prop, 1); //any value should do    
             });
         });

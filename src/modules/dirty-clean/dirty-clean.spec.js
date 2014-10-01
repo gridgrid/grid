@@ -24,9 +24,9 @@ describe('dirty-clean', function () {
         var spy = spyOn(grid, 'requestDraw');
         core.resetAllDirties();
         dirtyClean.setDirty();
+        expect(dirtyClean.isDirty()).toBe(true);
+        expect(dirtyClean.isClean()).toBe(false);
         core.onDraw(function () {
-            expect(dirtyClean.isDirty()).toBe(true);
-            expect(dirtyClean.isClean()).toBe(false);
             expect(spy).toHaveBeenCalled();
         });
     });
