@@ -127,19 +127,19 @@ describe('pixel-scroll-model', function () {
             expectRenderToBeAScrollBar(model.horzScrollBar.render());
         });
 
-        it('should size the scroll bars to the right percentage of the view', function () {
+        it('should size to the right percentage of the view', function () {
             expect(model.vertScrollBar.height).toBe(viewHeight / grid.virtualPixelCellModel.totalHeight() * viewHeight);
             expect(model.vertScrollBar.width).toBe(10);
             expect(model.horzScrollBar.width).toBe(viewWidth / grid.virtualPixelCellModel.totalWidth() * viewWidth);
             expect(model.horzScrollBar.height).toBe(10);
         });
 
-        it('should position the bars at the edges of the view', function () {
+        it('should position at the edges of the view', function () {
             expect(model.vertScrollBar.left).toBe(viewWidth - 10);
             expect(model.horzScrollBar.top).toBe(viewHeight - 10);
         });
 
-        it('should set the top and left positions on scroll', function () {
+        it('should change top and left positions on scroll', function () {
             model.scrollTo(13, 23);
             expect(model.vertScrollBar.top).toBe(13 / grid.virtualPixelCellModel.totalHeight() * viewHeight);
             expect(model.horzScrollBar.left).toBe(23 / grid.virtualPixelCellModel.totalWidth() * viewWidth);
