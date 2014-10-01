@@ -40,49 +40,82 @@ describe('view-layer', function () {
 
 
     it('should create a container for the cells', function () {
-        expect(findCellContainer(container).length).toBe(1);
+        var cellContainer = findCellContainer(container);
+        expect(cellContainer.length).toBe(1);
+        expect(cellContainer.hasClass('grid-cells')).toBe(true);
     });
 
     it('should create minRows x minCols cells', function () {
-        expect(findGridCells(container).length).toBe(minCols * minRows);
+        var gridCells = findGridCells(container);
+        expect(gridCells.length).toBe(minCols * minRows);
+        expect(gridCells.hasClass('grid-cell')).toBe(true);
+        expect(gridCells.hasClass('js-grid-cell')).toBe(true);
     });
 
     it('should be able to write values to cells', function () {
         view.draw();
-        expect(findGridCells(container).first().text()).toEqual('0-0');
+        core.onDraw(function () {
+            expect(findGridCells(container).first().text()).toEqual('0-0');
+        });
     });
 
     it('should write widths and heights to the cells on draw', function () {
         expect(findGridCells(container).first().width()).toEqual(0);
         expect(findGridCells(container).first().height()).toEqual(0);
         view.draw();
-        expect(findGridCells(container).first().width()).toEqual(100);
-        expect(findGridCells(container).first().height()).toEqual(30);
+        core.onDraw(function () {
+            //we want the heights and widths to be rendered at 1 higher than their virtual value in order to collapse the borders 
+            expect(findGridCells(container).first().css('width')).toEqual('101px');
+            expect(findGridCells(container).first().css('height')).toEqual('31px');
+        });
+    });
+
+    it('should write widths and heights with extra border width', function () {
+        var styleOverride = document.createElement('style');
+        styleOverride.innerHTML = '.grid-cell{border : 2px solid black;}';
+        document.body.appendChild(styleOverride);
+        container = core.viewBuild();
+        expect(findGridCells(container).first().width()).toEqual(0);
+        expect(findGridCells(container).first().height()).toEqual(0);
+        view.draw();
+        core.onDraw(function () {
+            //we want the heights and widths to be rendered at 1 higher than their virtual value in order to collapse the borders 
+            expect(findGridCells(container).first().css('width')).toEqual('102px');
+            expect(findGridCells(container).first().css('height')).toEqual('32px');
+        });
     });
 
     it('should write offset values to the cells if scrolled', function () {
         grid.cellScrollModel.scrollTo(5, 6);
-        expect(findGridCells(container).first().text()).toEqual('5-6');
+        core.onDraw(function () {
+            expect(findGridCells(container).first().text()).toEqual('5-6');
+        });
     });
 
     it('should write offset values to the cells if scrolled', function () {
         grid.cellScrollModel.scrollTo(5, 6);
-        expect(findGridCells(container).first().text()).toEqual('5-6');
+        core.onDraw(function () {
+            expect(findGridCells(container).first().text()).toEqual('5-6');
+        });
     });
 
     it('shouldnt call draw cells if cell scroll model isnt dirty', function () {
 
-        grid.cellScrollModel.scrollTo(5, 6);
+        core.resetAllDirties();
         var spy = spyOn(grid.dataModel, 'getFormatted');
         view.draw();
-        expect(spy).not.toHaveBeenCalled();
+        core.onDraw(function () {
+            expect(spy).not.toHaveBeenCalled();
+        });
     });
 
     it('should position the cells in a grid', function () {
         view.draw();
-        expect(findGridCells(container).last().position()).toEqual({
-            top: 30 * (minRows - 1),
-            left: 100 * (minCols - 1)
+        core.onDraw(function () {
+            expect(findGridCells(container).last().position()).toEqual({
+                top: 30 * (minRows - 1),
+                left: 100 * (minCols - 1)
+            });
         });
     });
 
@@ -90,7 +123,9 @@ describe('view-layer', function () {
         var spy = jasmine.createSpy();
         grid.eventLoop.bind('grid-draw', spy);
         view.draw();
-        expect(spy).toHaveBeenCalled();
+        core.onDraw(function () {
+            expect(spy).toHaveBeenCalled();
+        });
     });
 
     it('should remove all grid elements on destroy', function () {
@@ -100,13 +135,13 @@ describe('view-layer', function () {
 
     function makeDivDecorator() {
         var decDiv = document.createElement('div');
-        var decorator = {
-            render: function () {
-                return decDiv;
-            },
-            getDiv: function () {
-                return decDiv;
-            }
+        var decorator = grid.decorators.create();
+
+        decorator.render = function () {
+            return decDiv;
+        };
+        decorator.getDiv = function () {
+            return decDiv;
         };
         return decorator;
     }
@@ -120,10 +155,15 @@ describe('view-layer', function () {
         it('should draw only when dirty', function () {
             var spy = spyOn(grid.decorators, 'getAlive').andCallThrough(); //treat this as the test that its going to draw
             grid.decorators.add(decorator);
-            expect(spy).toHaveBeenCalled();
-            spy.reset();
-            grid.viewLayer.draw();
-            expect(spy).not.toHaveBeenCalled();
+            core.onDraw(function () {
+                expect(spy).toHaveBeenCalled();
+                spy.reset();
+                grid.viewLayer.draw();
+            });
+
+            core.onDraw(function () {
+                expect(spy).not.toHaveBeenCalled();
+            });
         });
 
         it('should have a container', function () {
@@ -133,8 +173,10 @@ describe('view-layer', function () {
 
         it('should render a decorator into a container with pointer events none', function () {
             grid.decorators.add(decorator);
-            expect(decorator.getDiv().parentElement).toBeTruthy();
-            expect($(decorator.getDiv()).parents('[dts=grid-decorators]').length).toBe(1);
+            core.onDraw(function () {
+                expect(decorator.getDiv().parentElement).toBeTruthy();
+                expect($(decorator.getDiv()).parents('[dts=grid-decorators]').length).toBe(1);
+            });
         });
 
         function expectDestroySpyToBeCalledAndDecoratorToBeOutOfTheDom(spy) {
@@ -148,16 +190,23 @@ describe('view-layer', function () {
             var spy = jasmine.createSpy();
             decorator.getDiv().addEventListener('decorator-destroy', spy);
             grid.decorators.add(decorator);
-            view.destroy();
-            expectDestroySpyToBeCalledAndDecoratorToBeOutOfTheDom(spy);
+            core.onDraw(function () {
+                view.destroy();
+                expectDestroySpyToBeCalledAndDecoratorToBeOutOfTheDom(spy);
+            });
         });
 
         it('should destroy dead decorators on draw', function () {
             var spy = jasmine.createSpy();
             decorator.getDiv().addEventListener('decorator-destroy', spy);
             grid.decorators.add(decorator);
-            grid.decorators.remove(decorator); //remove implicitly calls draw
-            expectDestroySpyToBeCalledAndDecoratorToBeOutOfTheDom(spy);
+            core.onDraw(function () {
+                grid.decorators.remove(decorator); //remove implicitly calls draw
+            });
+            core.onDraw(function () {
+                expectDestroySpyToBeCalledAndDecoratorToBeOutOfTheDom(spy);
+            });
+
         });
 
         function setDecoratorPosition(top, left, bottom, right) {
@@ -167,28 +216,36 @@ describe('view-layer', function () {
             decorator.right = right;
         }
 
-        function expectBoundingBoxSize(top, left, height, width) {
-            var $boundingBox = $(decorator.boundingBox);
-            expect($boundingBox.position().top).toBe(top);
-            expect($boundingBox.position().left).toBe(left);
-            expect($boundingBox.height()).toBe(height);
-            expect($boundingBox.width()).toBe(width);
+        function expectBoundingBoxSize(top, left, height, width, nextFn) {
+            core.onDraw(function () {
+                var $boundingBox = $(decorator.boundingBox);
+                expect($boundingBox.position().top).toBe(top);
+                expect($boundingBox.position().left).toBe(left);
+                expect($boundingBox.height()).toBe(height);
+                expect($boundingBox.width()).toBe(width);
+                expect(decorator.boundingBox.style.position).toEqual('absolute');
+                if (nextFn) {
+                    nextFn();
+                }
+            });
         }
 
-        it('should position a virtual cell range decorator', function () {
+        xit('should position a virtual cell range decorator', function () {
             setDecoratorPosition(5, 6, 7, 9);
             grid.decorators.add(decorator);
+
             expectBoundingBoxSize(5 * 30, 6 * 100, 3 * 30, 3 * 100);
         });
 
-        it('should position a virtual pixel range decorator', function () {
+        xit('should position a virtual pixel range decorator', function () {
+            grid.cellScrollModel.scrollTo(1, 1);
             setDecoratorPosition(5, 6, 7, 9);
             decorator.units = 'px';
             grid.decorators.add(decorator);
-            expectBoundingBoxSize(5, 6, 3, 3);
+            expectBoundingBoxSize(35, 106, 2, 3);
         });
 
-        it('should position a real cell range decorator', function () {
+        xit('should position a real cell range decorator', function () {
             setDecoratorPosition(5, 6, 7, 9);
             decorator.space = 'real';
             grid.cellScrollModel.scrollTo(1, 1); //scroll should have no effect on the position;
@@ -197,12 +254,24 @@ describe('view-layer', function () {
         });
 
         it('should position a real pixel range decorator', function () {
-            setDecoratorPosition(5, 6, 7, 9);
+            setDecoratorPosition(5, 6, 7, 10);
             decorator.units = 'px';
             decorator.space = 'virtual';
             grid.cellScrollModel.scrollTo(1, 1); //scroll should have no effect on the position;
             grid.decorators.add(decorator);
-            expectBoundingBoxSize(5, 6, 3, 3);
+            expectBoundingBoxSize(5, 6, 2, 4);
+
+        });
+
+        it('should reposition if decorators box changes', function () {
+            setDecoratorPosition(5, 6, 7, 9);
+            decorator.units = 'px';
+            grid.decorators.add(decorator);
+            expectBoundingBoxSize(5, 6, 2, 3, function next() {
+                setDecoratorPosition(1, 6, 7, 9);
+            });
+
+            expectBoundingBoxSize(1, 6, 6, 3);
         });
     });
 

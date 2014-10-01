@@ -9,9 +9,16 @@ module.exports = function () {
             core.grid = require('@grid/simple-grid')(numRows || 100, numCols, 10);
             return core.grid;
         },
-        viewBuild : function () {
+        viewBuild: function () {
             core.grid.viewLayer.build(core.container);
             return core.container;
+        },
+        onDraw: function (fn) {
+            waits(2);
+            runs(fn);
+        },
+        resetAllDirties: function () {
+            core.grid.eventLoop.fire('grid-draw');
         }
     };
 

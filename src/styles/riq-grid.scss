@@ -19,6 +19,10 @@
   }
 }
 
+.grid-cell {
+  border: 1px solid #eee;
+}
+
 .cell {
   &.even {
     background: #f7f7f7;

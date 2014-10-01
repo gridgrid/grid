@@ -1,4 +1,5 @@
 var customEvent = require('@grid/custom-event');
+var debounce = require('debounce');
 
 
 module.exports = function (_grid) {
@@ -9,6 +10,7 @@ module.exports = function (_grid) {
     var root;
     var cellContainer;
     var decoratorContainer;
+    var borderWidth;
 
     var cells; //matrix of rendered cell elements;
 
@@ -22,6 +24,7 @@ module.exports = function (_grid) {
         cleanup();
         cellContainer = document.createElement('div');
         cellContainer.setAttribute('dts', 'grid-cells');
+        cellContainer.setAttribute('class', 'grid-cells');
         buildCells(cellContainer);
 
         decoratorContainer = document.createElement('div');
@@ -33,10 +36,22 @@ module.exports = function (_grid) {
         root.appendChild(decoratorContainer);
 
         container.appendChild(root);
+
+        //read the border width, for the rare case of larger than 1px borders, otherwise default to 1
+        var jsGridCell = document.body.querySelector('.js-grid-cell');
+        if (jsGridCell) {
+            var computedStyle = getComputedStyle(jsGridCell);
+            var borderWidthProp = computedStyle.getPropertyValue('border-left-width');
+            borderWidth = parseInt(borderWidthProp);
+        }
+        borderWidth = isNaN(borderWidth) || !borderWidth ? 1 : borderWidth;
+
+
     };
 
 
-    viewLayer.draw = function () {
+    //only draw once per js turn, may need to create a synchronous version
+    viewLayer.draw = debounce(function () {
         if (grid.cellScrollModel.isDirty()) {
             drawCells();
         }
@@ -46,7 +61,16 @@ module.exports = function (_grid) {
         }
 
         grid.eventLoop.fire('grid-draw');
-    };
+    }, 1);
+
+    function setPosition(boundingBox, top, left, height, width) {
+        var style = boundingBox.style;
+        style.top = top + 'px';
+        style.left = left + 'px';
+        style.height = height + 'px';
+        style.width = width + 'px';
+        style.position = 'absolute';
+    }
 
     function drawDecorators() {
         var aliveDecorators = grid.decorators.getAlive();
@@ -59,6 +83,20 @@ module.exports = function (_grid) {
                 var decElement = decorator.render();
                 boundingBox.appendChild(decElement);
                 decoratorContainer.appendChild(boundingBox);
+            }
+
+            if (decorator.isDirty()) {
+                switch (decorator.units) {
+                    case 'px':
+                        setPosition(boundingBox, decorator.top, decorator.left, decorator.bottom - decorator.top, decorator.right - decorator.left);
+                        break;
+                    case 'cell':
+                    /* jshint -W086 */
+                    default:
+
+                        break;
+                    /* jshint +W018 */
+                }
             }
         });
 
@@ -87,8 +125,8 @@ module.exports = function (_grid) {
             var cell = cells[r][c];
             var width = grid.virtualPixelCellModel.width(c);
             var height = grid.virtualPixelCellModel.height(r); //maybe faster to do this only on row iterations but meh
-            cell.style.width = width + 'px';
-            cell.style.height = height + 'px';
+            cell.style.width = width + borderWidth + 'px';
+            cell.style.height = height + borderWidth + 'px';
 
             var top = viewLayer.viewPort.getRowTop(r);
             var left = viewLayer.viewPort.getColLeft(c);
@@ -119,6 +157,7 @@ module.exports = function (_grid) {
     function buildDivCell() {
         var cell = document.createElement('div');
         cell.setAttribute('dts', 'grid-cell');
+        cell.setAttribute('class', 'grid-cell js-grid-cell');
         var style = cell.style;
         style.position = 'absolute';
         style.boxSizing = 'border-box';
