@@ -23,13 +23,14 @@ module.exports = function (_grid) {
                 deadDecorators.push(decorator);
                 dirtyClean.setDirty();
             });
-
         },
         getAlive: function () {
-            return aliveDecorators;
+            return aliveDecorators.slice(0);
         },
         popAllDead: function () {
-            return deadDecorators;
+            var oldDead = deadDecorators;
+            deadDecorators = [];
+            return oldDead;
         },
         isDirty: dirtyClean.isDirty,
         create: function () {
@@ -56,6 +57,10 @@ module.exports = function (_grid) {
             //defaults
             decorator.units = 'cell';
             decorator.space = 'virtual';
+            //they can override but we should have an empty default to prevent npes
+            decorator.render = function () {
+                return document.createElement('div');
+            };
             return decorator;
 
         }

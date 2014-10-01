@@ -16,7 +16,11 @@ module.exports = function (_grid) {
         },
         setDirty: function () {
             dirty = true;
-            grid.requestDraw();
+            //when things are initalizing sometimes this doesn't exist yet
+            //we have to hope that at the end of initialization the grid will call request draw itself
+            if (grid.requestDraw) {
+                grid.requestDraw();
+            }
         },
         setClean: function () {
             dirty = false;

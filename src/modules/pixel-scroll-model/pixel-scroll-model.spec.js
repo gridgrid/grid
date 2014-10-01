@@ -102,5 +102,16 @@ describe('pixel-scroll-model', function () {
         expect(model.width).toBe(10 * 100);
         expect(model.height).toBe(100 * 30);
     });
+    describe('scroll bars', function () {
+        it('should register a vertical and horizontal decorator', function () {
+            expect(grid.decorators.getAlive()).toContain(model.vertScrollBar);
+            expect(grid.decorators.getAlive()).toContain(model.horzScrollBar);
+        });
+
+        it('should size the scroll bars to the right percentage of the view', function () {
+           
+        });
+    });
+
 
 });

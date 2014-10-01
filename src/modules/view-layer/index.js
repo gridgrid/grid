@@ -52,6 +52,11 @@ module.exports = function (_grid) {
 
     //only draw once per js turn, may need to create a synchronous version
     viewLayer.draw = debounce(function () {
+        //return if we haven't built yet
+        if (!container) {
+            return;
+        }
+        
         if (grid.cellScrollModel.isDirty()) {
             drawCells();
         }
@@ -81,8 +86,10 @@ module.exports = function (_grid) {
                 boundingBox = document.createElement('div');
                 decorator.boundingBox = boundingBox;
                 var decElement = decorator.render();
-                boundingBox.appendChild(decElement);
-                decoratorContainer.appendChild(boundingBox);
+                if (decElement) {
+                    boundingBox.appendChild(decElement);
+                    decoratorContainer.appendChild(boundingBox);
+                }
             }
 
             if (decorator.isDirty()) {

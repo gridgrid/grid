@@ -39,5 +39,11 @@ module.exports = (function (_grid) {
 
     grid.eventLoop.bind('mousewheel', model.handleMouseWheel);
 
+    model.vertScrollBar = grid.decorators.create();
+    model.horzScrollBar = grid.decorators.create();
+
+    grid.decorators.add(model.vertScrollBar);
+    grid.decorators.add(model.horzScrollBar);
+
     return model;
 });

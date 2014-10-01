@@ -5,8 +5,11 @@ describe('decorators', function () {
     beforeEach(inject(function () {
         grid = core.buildSimpleGrid();
         decorators = grid.decorators;
+        //clear any other decorators
+        decorators.remove(grid.decorators.getAlive());
+        decorators.popAllDead();
         var spy = spyOn(grid, 'requestDraw'); //mock the method to prevent draw
-        grid.eventLoop.fire('grid-draw'); //set everything clean to start
+        core.resetAllDirties(); //set everything clean to start
     }));
 
     describe('should create decorators', function () {
@@ -23,10 +26,11 @@ describe('decorators', function () {
             expect('right' in decorator).toBe(true);
             expect(decorator.units).toBe('cell');
             expect(decorator.space).toBe('virtual');
+            expect(decorator.render).toBeAFunction();
         });
 
         function setPropAndCheckDirty(prop, val) {
-            grid.eventLoop.fire('grid-draw');
+            core.resetAllDirties();
             expect(decorator.isDirty()).toBe(false);
             decorator[prop] = val;
             expect(decorator.isDirty()).toBe(true);
@@ -41,7 +45,8 @@ describe('decorators', function () {
 
 
     it('should let me add a decorator and request draw', function () {
-        var dec = {};
+        var dec = decorators.create();
+        core.resetAllDirties();
         expect(decorators.isDirty()).toBe(false);
         decorators.add(dec);
         expect(decorators.isDirty()).toBe(true);
@@ -49,10 +54,11 @@ describe('decorators', function () {
     });
 
     it('should let me remove a decorator', function () {
-        var dec = {};
+        var dec = decorators.create();
+        core.resetAllDirties();
         expect(decorators.isDirty()).toBe(false);
         decorators.add(dec);
-        grid.eventLoop.fire('grid-draw');
+        core.resetAllDirties();
         expect(decorators.isDirty()).toBe(false);
         decorators.remove(dec);
         expect(decorators.isDirty()).toBe(true);
@@ -62,8 +68,8 @@ describe('decorators', function () {
 
     it('should let me remove multiple decorators', function () {
 
-        var dec2 = {};
-        var dec1 = {};
+        var dec2 = decorators.create();
+        var dec1 = decorators.create();
         decorators.add(dec1);
         decorators.add(dec2);
         decorators.remove([dec1, dec2]);
@@ -72,13 +78,15 @@ describe('decorators', function () {
     });
 
     it('should give me alive and dead decorators and all', function () {
-        var dec = {};
+        var dec = decorators.create();
         decorators.add(dec);
-        var dec2 = {};
+        var dec2 = decorators.create();
         decorators.add(dec2);
         decorators.remove(dec);
         expect(decorators.getAlive()).toEqual([dec2]);
         expect(decorators.popAllDead()).toEqual([dec]);
+        expect(decorators.popAllDead()).toEqual([]);
+
     });
 
 });

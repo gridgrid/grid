@@ -1,7 +1,7 @@
 var util = require('@grid/util');
 var capitalize = require('capitalize');
 
-module.exports = (function (_grid) {
+module.exports = function (_grid) {
     var grid = _grid;
     var viewPort = {};
     viewPort.sizeToContainer = function (elem) {
@@ -94,4 +94,4 @@ module.exports = (function (_grid) {
     };
 
     return viewPort;
-})
+}
