@@ -42,13 +42,21 @@ module.exports = function (_grid) {
 
 
         var elem = args.filter(function (arg) {
-            return util.isElement(arg);
+            return util.isElement(arg) || arg === window || arg === document;
         })[0];
 
         if (!elem) {
             getHandlers(name).push(handler);
+            return function () {
+                var handlers = getHandlers(name);
+                handlers.splice(handlers.indexOf(handler), 1);
+            };
         } else {
-            elem.addEventListener(name, loopWith(handler));
+            var listener = loopWith(handler);
+            elem.addEventListener(name, listener);
+            return function () {
+                elem.removeEventListener(name, listener);
+            };
         }
     };
 
@@ -81,7 +89,7 @@ module.exports = function (_grid) {
         interceptors.notify(e);
 
         bodyFn(e);
-        
+
         if (!isOuterLoopRunning) {
             eloop.isRunning = false;
             exitListeners.notify(e);

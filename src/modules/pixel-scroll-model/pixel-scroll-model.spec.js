@@ -1,3 +1,5 @@
+var mockEvent = require('@grid/custom-event');
+
 describe('pixel-scroll-model', function () {
     var $ = require('jquery');
     var core = require('@grid/grid-spec-helper')();
@@ -57,7 +59,7 @@ describe('pixel-scroll-model', function () {
         event.deltaY = y;
         event.deltaX = x;
         event = require('@grid/mousewheel').normalize(event);
-        model.handleMouseWheel(event);
+        grid.eventLoop.fire(event);
         return event;
     }
 
@@ -127,10 +129,19 @@ describe('pixel-scroll-model', function () {
             expectRenderToBeAScrollBar(model.horzScrollBar.render());
         });
 
+        function getScrollBarHeight() {
+            return viewHeight / grid.virtualPixelCellModel.totalHeight() * viewHeight;
+        }
+
+        function getScrollBarWidth() {
+            return viewWidth / grid.virtualPixelCellModel.totalWidth() * viewWidth;
+        }
+
         it('should size to the right percentage of the view', function () {
-            expect(model.vertScrollBar.height).toBe(viewHeight / grid.virtualPixelCellModel.totalHeight() * viewHeight);
+
+            expect(model.vertScrollBar.height).toBe(getScrollBarHeight());
             expect(model.vertScrollBar.width).toBe(10);
-            expect(model.horzScrollBar.width).toBe(viewWidth / grid.virtualPixelCellModel.totalWidth() * viewWidth);
+            expect(model.horzScrollBar.width).toBe(getScrollBarWidth());
             expect(model.horzScrollBar.height).toBe(10);
         });
 
@@ -143,6 +154,108 @@ describe('pixel-scroll-model', function () {
             model.scrollTo(13, 23);
             expect(model.vertScrollBar.top).toBe(13 / grid.virtualPixelCellModel.totalHeight() * viewHeight);
             expect(model.horzScrollBar.left).toBe(23 / grid.virtualPixelCellModel.totalWidth() * viewWidth);
+        });
+
+        it('should bind mousedown events on render', function () {
+            var spy = spyOn(grid.eventLoop, 'bind');
+            model.vertScrollBar.render();
+            expect(spy.argsForCall[0][0]).toEqual('mousedown');
+            expect(spy.argsForCall[0][1]).toBeAnElement();
+            expect(spy.argsForCall[0][2]).toBeAFunction();
+        });
+
+        it('should bind mousedown and mouseup to the window on mousedown and prevent default', function () {
+            var bar = model.vertScrollBar.render();
+            var mousedown = mockEvent('mousedown');
+            var bind = spyOn(grid.eventLoop, 'bind').andCallThrough();
+            var preventDefault = spyOn(mousedown, 'preventDefault').andCallThrough();
+            bar.dispatchEvent(mousedown);
+            expect(bind.argsForCall[0][0]).toEqual('mousemove');
+            expect(bind.argsForCall[0][1]).toBe(window);
+            expect(bind.argsForCall[0][2]).toBeAFunction();
+            expect(bind.argsForCall[1][0]).toEqual('mouseup');
+            expect(bind.argsForCall[1][1]).toBe(window);
+            expect(bind.argsForCall[1][2]).toBeAFunction();
+
+            expect(preventDefault).toHaveBeenCalled();
+
+        });
+
+        function scrollBy(mouseDownClient, scrollAmount, screenOffset, previousScroll, scrollBarOffset, isHorz) {
+            var move = mockEvent('mousemove', true);
+            var scrollClient = mouseDownClient + scrollAmount;
+
+            move.clientY = scrollClient;
+            move.clientX = scrollClient;
+            move.screenY = scrollClient + screenOffset;
+            move.screenX = scrollClient + screenOffset;
+            //expect(model.top).toBe(previousScroll / viewHeight * grid.virtualPixelCellModel.totalHeight());
+            document.body.dispatchEvent(move);
+
+            var actualScroll = isHorz ? model.left : model.top;
+            var view = isHorz ? viewWidth : viewHeight;
+            var total = isHorz ? grid.virtualPixelCellModel.totalWidth() : grid.virtualPixelCellModel.totalHeight();
+            expect(actualScroll).toBe((scrollClient - scrollBarOffset) / view * total);
+        }
+
+
+        function sendScrollToBar(bar, scrolls, scrollBarPosition, isHorz) {
+            var down = mockEvent('mousedown');
+            var scrollBarOffset = Math.floor(isHorz ? getScrollBarWidth() : getScrollBarHeight() / 2);
+            var mouseDownClient = scrollBarPosition + scrollBarOffset;
+            var screenYOffset = 11;
+            down.clientY = mouseDownClient;
+            down.clientX = mouseDownClient;
+            down.layerY = scrollBarOffset;
+            down.layerX = scrollBarOffset;
+            var mouseDownScreen = mouseDownClient + screenYOffset;
+            down.screenY = mouseDownScreen;
+            down.screenX = mouseDownScreen;
+            //x shouldn't matter
+
+            bar.dispatchEvent(down);
+
+            scrolls.forEach(function (scroll, i) {
+                var newScroll = scrollBarPosition + scroll;
+                scrollBy(mouseDownClient, newScroll, screenYOffset, scrolls[i - 1] || scrollBarPosition, scrollBarOffset, isHorz);
+                scrollBarPosition += scroll;
+            });
+
+            fireMouseUp(bar);
+            return scrollBarPosition;
+        }
+
+        it('should scroll with mousemove', function () {
+            var vertBar = model.vertScrollBar.render();
+            //send two scrolls to ensure it doesn't reset in between (cause that was a bug)
+            var top = sendScrollToBar(vertBar, [4, 6, 3, 2, -1], 0);
+            sendScrollToBar(vertBar, [2, 5, 6], top);
+
+            var horzBar = model.horzScrollBar.render();
+            //send two scrolls to ensure it doesn't reset in between (cause that was a bug)
+            var left = sendScrollToBar(horzBar, [2, 8, -1, 3, 2], 0, true);
+            sendScrollToBar(horzBar, [5, 2, 9], left, true);
+        });
+
+        function fireMouseUp(bar) {
+
+            var up = mockEvent('mouseup');
+            window.dispatchEvent(up);
+        }
+
+        it('should unbind on mouseup', function () {
+            var bar = model.vertScrollBar.render();
+            var unbind = jasmine.createSpy();
+            var bind = grid.eventLoop.bind;
+            grid.eventLoop.bind = function () {
+                bind.apply(bind, arguments);
+                return unbind;
+            };
+            var mousedown = mockEvent('mousedown');
+            bar.dispatchEvent(mousedown);
+            fireMouseUp(bar);
+            expect(unbind).toHaveBeenCalled();
+            expect(unbind.callCount).toBe(2);
         });
     });
 

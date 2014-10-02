@@ -62,6 +62,13 @@ describe('view port', function () {
             expect(viewPort.toVirtualCol(2)).toEqual(8);
         });
     });
+    
+    it('should clamp pixels to the viewport', function(){
+        expect(viewPort.clampY(-1)).toBe(0);
+        expect(viewPort.clampY(100000000)).toBe(core.CONTAINER_HEIGHT);       
+        expect(viewPort.clampX(-1)).toBe(0);
+        expect(viewPort.clampX(100000000)).toBe(core.CONTAINER_WIDTH);
+    });
 
 
     it('should calculate the top left value of a viewport cell', function () {

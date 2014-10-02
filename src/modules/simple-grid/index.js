@@ -9,11 +9,11 @@ module.exports = function (numRows, numCols) {
     grid.colModel = require('@grid/col-model')(grid);
     grid.dataModel = require('@grid/simple-data-model')(grid);
     grid.virtualPixelCellModel = require('@grid/virtual-pixel-cell-model')(grid);
-    grid.pixelScrollModel = require('@grid/pixel-scroll-model')(grid);
     grid.cellScrollModel = require('@grid/cell-scroll-model')(grid);
 
 
     grid.viewLayer = require('@grid/view-layer')(grid);
+    grid.pixelScrollModel = require('@grid/pixel-scroll-model')(grid);
 
 
     if (numRows) {

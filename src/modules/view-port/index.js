@@ -41,6 +41,13 @@ module.exports = function (_grid) {
         return util.clamp(c, 0, viewPort.minCols - 1);
     };
 
+    viewPort.clampY = function (y) {
+        return util.clamp(y, 0, viewPort.height);
+    };
+
+    viewPort.clampX = function (x) {
+        return util.clamp(x, 0, viewPort.width);
+    };
 
     viewPort.getRowTop = function (viewPortRow) {
         return grid.virtualPixelCellModel.height(viewPort.toVirtualRow(0), viewPort.toVirtualRow(viewPort.clampRow(viewPortRow)) - 1);

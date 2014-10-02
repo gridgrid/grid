@@ -71,28 +71,38 @@ describe('event-loop', function () {
             wasInLoop = true;
         }
 
-        it('should let me bind and fire an event and be in loop during', function () {
+        it('should let me bind, fire and unbind an event and be in loop during', function () {
 
             var spy = jasmine.createSpy();
             grid.eventLoop.bind('test-event', setWasInLoop);
-            grid.eventLoop.bind('test-event', spy);
+            var unbind = grid.eventLoop.bind('test-event', spy);
             grid.eventLoop.fire('test-event');
             expect(spy).toHaveBeenCalled();
             expect(wasInLoop).toEqual(true);
+
+            spy.reset();
+            unbind();
+            grid.eventLoop.fire('test-event');
+            expect(spy).not.toHaveBeenCalled();
         });
 
-        it('should let me bind a function to a specfic dom event on an element and be in loop during', function () {
+        it('should let me bind, fire and unbind a function to a specfic dom event on an element and be in loop during', function () {
             var spy = jasmine.createSpy();
             var div = document.createElement('div');
             grid.eventLoop.bind('click', div, setWasInLoop);
-            grid.eventLoop.bind('click', div, spy);
+            var unbind = grid.eventLoop.bind('click', div, spy);
             var click = mockEvent('click');
             div.dispatchEvent(click);
             expect(spy).toHaveBeenCalled();
             expect(wasInLoop).toEqual(true);
+
+            spy.reset();
+            unbind();
+            div.dispatchEvent(click);
+            expect(spy).not.toHaveBeenCalled();
         });
 
-        it('should let me bind a dom event to the grid container and be in loop during', function () {
+        it('should let me bind, fire and unbind a dom event to the grid container and be in loop during', function () {
             var spy = jasmine.createSpy();
             var container = core.container;
             grid.eventLoop.setContainer(container);
@@ -100,12 +110,16 @@ describe('event-loop', function () {
             container.appendChild(div);
 
             grid.eventLoop.bind('click', setWasInLoop);
-            grid.eventLoop.bind('click', spy);
+            var unbind = grid.eventLoop.bind('click', spy);
             var click = mockEvent('click', true);
             div.dispatchEvent(click);
             expect(spy).toHaveBeenCalled();
-
             expect(wasInLoop).toEqual(true);
+
+            spy.reset();
+            unbind();
+            div.dispatchEvent(click);
+            expect(spy).not.toHaveBeenCalled();
 
         });
 
@@ -117,6 +131,7 @@ describe('event-loop', function () {
             grid.eventLoop.fire('outer');
             expect(grid.eventLoop.isRunning).toBe(false);
         });
+
     });
 
 });
