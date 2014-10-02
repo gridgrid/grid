@@ -23,10 +23,13 @@ describe('col-model', function () {
         expect(colModel.width(0)).toBeANumber();
     });
 
-    it('should be able to tell you a specified col width', function () {
+    it('should be able to tell you a few specified col widths', function () {
         var weirdWidth = 311;
         colModel.add({width: weirdWidth});
         expect(colModel.width(0)).toEqual(weirdWidth);
+        var weirdWidth2 = 105;
+        colModel.add({width: weirdWidth2});
+        expect(colModel.width(1)).toBe(weirdWidth2);
     });
 
     it('should tell you there are 0 fixed cols by default', function () {

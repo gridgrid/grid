@@ -1,4 +1,6 @@
-module.exports = function (numRows, numCols) {
+var util = require('@grid/util');
+
+module.exports = function (numRows, numCols, varyWidths) {
 
     var grid = {};
 
@@ -18,11 +20,21 @@ module.exports = function (numRows, numCols) {
 
     if (numRows) {
         for (var r = 0; r < numRows; r++) {
-            grid.rowModel.add({});
+            var row = {};
+            grid.rowModel.add(row);
             if (numCols) {
                 for (var c = 0; c < numCols || 0; c++) {
                     if (r === 0) {
-                        grid.colModel.add({});
+                        var col = {};
+                        if (varyWidths) {
+                            if (util.isArray(varyWidths)) {
+                                col.width = varyWidths[c % varyWidths.length];
+                            } else {
+                                col.width = Math.random() * 10 + 101;
+                            }
+
+                        }
+                        grid.colModel.add(col);
                     }
                     grid.dataModel.set(r, c, {value: r + '-' + c});
                 }

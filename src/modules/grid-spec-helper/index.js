@@ -5,8 +5,8 @@ module.exports = function () {
         CONTAINER_WIDTH: 800,
         CONTAINER_HEIGHT: 500,
         container: undefined,
-        buildSimpleGrid: function (numRows, numCols) {
-            core.grid = require('@grid/simple-grid')(numRows || 100, numCols, 10);
+        buildSimpleGrid: function (numRows, numCols, varyWidths) {
+            core.grid = require('@grid/simple-grid')(numRows || 100, numCols || 10, varyWidths);
             return core.grid;
         },
         viewBuild: function () {

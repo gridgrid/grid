@@ -25,6 +25,13 @@ describe('simple-grid', function () {
         expect(draw).toHaveBeenCalled();
     });
 
+    it('should let me vary the widths ', function () {
+        grid = core.buildSimpleGrid(100, 10, [99, 100, 101]);
+        expect(grid.colModel.width(0)).toBe(99);
+        expect(grid.colModel.width(1)).toBe(100);
+        expect(grid.colModel.width(2)).toBe(101);
+    });
+
     function spyOnDraw() {
         return spyOn(grid.viewLayer, 'draw');
     }

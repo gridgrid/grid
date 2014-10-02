@@ -10,8 +10,8 @@ describe('view-layer', function () {
     var $ = require('jQuery');
     var container;
 
-    beforeEach(inject(function () {
-        grid = core.buildSimpleGrid(100, 20);
+    function viewBeforeEach(vary) {
+        grid = core.buildSimpleGrid(100, 20, vary);
         view = grid.viewLayer;
         //mock the view port
         view.viewPort.sizeToContainer = function () {
@@ -19,6 +19,10 @@ describe('view-layer', function () {
         view.viewPort.minRows = minRows;
         view.viewPort.minCols = minCols;
         container = core.viewBuild();
+    }
+
+    beforeEach(inject(function () {
+        viewBeforeEach();
     }));
 
     function findGridCells(div) {
@@ -82,6 +86,21 @@ describe('view-layer', function () {
             //we want the heights and widths to be rendered at 1 higher than their virtual value in order to collapse the borders 
             expect(findGridCells(container).first().css('width')).toEqual('102px');
             expect(findGridCells(container).first().css('height')).toEqual('32px');
+        });
+        document.body.removeChild(styleOverride);
+    });
+
+    it('should write varied widths and heights', function () {
+        viewBeforeEach([99, 100, 101]);
+        expect(findGridCells(container).first().width()).toEqual(0);
+        expect(findGridCells(container).first().height()).toEqual(0);
+        view.draw();
+        core.onDraw(function () {
+            //we want the heights and widths to be rendered at 1 higher than their virtual value in order to collapse the borders 
+            expect(findGridCells(container).first().css('width')).toEqual('100px');
+            expect($(findGridCells(container)[1]).css('width')).toEqual('101px');
+            expect($(findGridCells(container)[2]).css('width')).toEqual('102px');
+            expect(findGridCells(container).first().css('height')).toEqual('31px');
         });
     });
 
@@ -276,4 +295,5 @@ describe('view-layer', function () {
     });
 
 
-});
+})
+;

@@ -17,7 +17,7 @@ module.exports = function (_grid) {
             return cols.length;
         },
         width: function (index) {
-            return cols[0].width || DEFAULT_WIDTH;
+            return cols[index].width || DEFAULT_WIDTH;
         },
         numFixed: function () {
             return numFixed;
