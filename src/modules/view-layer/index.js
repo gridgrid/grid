@@ -68,6 +68,54 @@ module.exports = function (_grid) {
         grid.eventLoop.fire('grid-draw');
     }, 1);
 
+    /* CELL LOGIC */
+    function drawCells() {
+        viewLayer.viewPort.iterateCells(function (r, c) {
+            var cell = cells[r][c];
+            var width = grid.virtualPixelCellModel.width(c);
+            var height = grid.virtualPixelCellModel.height(r); //maybe faster to do this only on row iterations but meh
+            cell.style.width = width + borderWidth + 'px';
+            cell.style.height = height + borderWidth + 'px';
+
+            var top = viewLayer.viewPort.getRowTop(r);
+            var left = viewLayer.viewPort.getColLeft(c);
+            cell.style.top = top + 'px';
+            cell.style.left = left + 'px';
+
+            while (cell.firstChild) {
+                cell.removeChild(cell.firstChild);
+            }
+            var modelR = r + grid.cellScrollModel.row;
+            var modelC = c + grid.cellScrollModel.col;
+            var formattedData = grid.dataModel.getFormatted(modelR, modelC);
+            cell.appendChild(document.createTextNode(formattedData));
+        });
+    }
+
+    function buildCells(cellContainer) {
+        cells = [];
+        viewLayer.viewPort.iterateCells(function (r, c) {
+            var cell = buildDivCell();
+            cells[r][c] = cell;
+            cellContainer.appendChild(cell);
+        }, function (r) {
+            cells[r] = [];
+        });
+    }
+
+    function buildDivCell() {
+        var cell = document.createElement('div');
+        cell.setAttribute('dts', 'grid-cell');
+        cell.setAttribute('class', 'grid-cell js-grid-cell');
+        var style = cell.style;
+        style.position = 'absolute';
+        style.boxSizing = 'border-box';
+        return cell;
+    }
+
+    /* END CELL LOGIC */
+
+    /* DECORATOR LOGIC */
     function setPosition(boundingBox, top, left, height, width) {
         var style = boundingBox.style;
         style.top = top + 'px';
@@ -127,49 +175,7 @@ module.exports = function (_grid) {
         });
     }
 
-    function drawCells() {
-        viewLayer.viewPort.iterateCells(function (r, c) {
-            var cell = cells[r][c];
-            var width = grid.virtualPixelCellModel.width(c);
-            var height = grid.virtualPixelCellModel.height(r); //maybe faster to do this only on row iterations but meh
-            cell.style.width = width + borderWidth + 'px';
-            cell.style.height = height + borderWidth + 'px';
-
-            var top = viewLayer.viewPort.getRowTop(r);
-            var left = viewLayer.viewPort.getColLeft(c);
-            cell.style.top = top + 'px';
-            cell.style.left = left + 'px';
-
-            while (cell.firstChild) {
-                cell.removeChild(cell.firstChild);
-            }
-            var modelR = r + grid.cellScrollModel.row;
-            var modelC = c + grid.cellScrollModel.col;
-            var formattedData = grid.dataModel.getFormatted(modelR, modelC);
-            cell.appendChild(document.createTextNode(formattedData));
-        });
-    }
-
-    function buildCells(cellContainer) {
-        cells = [];
-        viewLayer.viewPort.iterateCells(function (r, c) {
-            var cell = buildDivCell();
-            cells[r][c] = cell;
-            cellContainer.appendChild(cell);
-        }, function (r) {
-            cells[r] = [];
-        });
-    }
-
-    function buildDivCell() {
-        var cell = document.createElement('div');
-        cell.setAttribute('dts', 'grid-cell');
-        cell.setAttribute('class', 'grid-cell js-grid-cell');
-        var style = cell.style;
-        style.position = 'absolute';
-        style.boxSizing = 'border-box';
-        return cell;
-    }
+    /* END DECORATOR LOGIC */
 
     viewLayer.destroy = cleanup;
 
