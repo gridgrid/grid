@@ -4,11 +4,12 @@ describe('view port', function () {
     var viewPort;
     var grid;
 
-    beforeEach(function () {
-        grid = core.buildSimpleGrid(100, 10);
-        viewPort = require('@grid/view-port')(grid);
+    var beforeEachFunction = function (varyHeights, varyWidths, frows, fcols) {
+        grid = core.buildSimpleGrid(100, 10, varyHeights, varyWidths, frows, fcols);
+        viewPort = grid.viewLayer.viewPort;
         viewPort.sizeToContainer(core.container);
-    });
+    };
+    beforeEach(beforeEachFunction);
 
     it('should accurately calculate the width and height of the container', function () {
         expect(viewPort.width).toEqual(core.CONTAINER_WIDTH);
@@ -62,10 +63,10 @@ describe('view port', function () {
             expect(viewPort.toVirtualCol(2)).toEqual(8);
         });
     });
-    
-    it('should clamp pixels to the viewport', function(){
+
+    it('should clamp pixels to the viewport', function () {
         expect(viewPort.clampY(-1)).toBe(0);
-        expect(viewPort.clampY(100000000)).toBe(core.CONTAINER_HEIGHT);       
+        expect(viewPort.clampY(100000000)).toBe(core.CONTAINER_HEIGHT);
         expect(viewPort.clampX(-1)).toBe(0);
         expect(viewPort.clampX(100000000)).toBe(core.CONTAINER_WIDTH);
     });
@@ -81,5 +82,56 @@ describe('view port', function () {
         expect(viewPort.getRowTop(2)).toEqual(30 * 2);
         expect(viewPort.getColLeft(0)).toEqual(0);
     });
+
+    it('should calculate the width and height value of a viewport cell', function () {
+        beforeEachFunction([20, 30], [99, 100]);
+        expect(viewPort.getRowHeight(0)).toEqual(20);
+        expect(viewPort.getColWidth(0)).toEqual(99);
+    });
+
+    it('should calculate the width and height value of a viewport cell when shifted by one', function () {
+        beforeEachFunction([20, 30], [99, 100]);
+        grid.cellScrollModel.scrollTo(1, 1);
+        expect(viewPort.getRowHeight(0)).toEqual(30);
+        expect(viewPort.getColWidth(0)).toEqual(100);
+    });
+
+    describe('fixed rows and cols', function () {
+
+        it('should affect conversion to virtual', function () {
+            beforeEachFunction(false, false, 1, 2);
+            grid.cellScrollModel.scrollTo(2, 1);
+            expect(viewPort.toVirtualRow(0)).toBe(0);
+            expect(viewPort.toVirtualCol(0)).toBe(0);
+
+            expect(viewPort.toVirtualRow(1)).toBe(3);
+            expect(viewPort.toVirtualCol(2)).toBe(3);
+        });
+
+
+        it('should affect height and width', function () {
+            beforeEachFunction([5, 10, 15], [10, 20, 30], 1, 1);
+            grid.cellScrollModel.scrollTo(1, 1);
+            expect(viewPort.getColWidth(0)).toBe(10);
+            expect(viewPort.getColWidth(1)).toBe(30);
+            expect(viewPort.getRowHeight(0)).toBe(5);
+            expect(viewPort.getRowHeight(1)).toBe(15);
+        });
+
+        it('should affect top and left', function () {
+            beforeEachFunction([5, 10, 15], [10, 20, 30], 1, 1);
+            grid.cellScrollModel.scrollTo(1, 1);
+            expect(viewPort.getColLeft(0)).toBe(0);
+            expect(viewPort.getColLeft(1)).toBe(10);
+            //skip the scrolled width
+            expect(viewPort.getColLeft(2)).toBe(10 + 30);
+
+            expect(viewPort.getRowTop(0)).toBe(0);
+            expect(viewPort.getRowTop(1)).toBe(5);
+            //skip the scrolled width
+            expect(viewPort.getRowTop(2)).toBe(5 + 15);
+        });
+    });
+
 
 });

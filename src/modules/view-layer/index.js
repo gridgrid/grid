@@ -72,8 +72,8 @@ module.exports = function (_grid) {
     function drawCells() {
         viewLayer.viewPort.iterateCells(function (r, c) {
             var cell = cells[r][c];
-            var width = grid.virtualPixelCellModel.width(c);
-            var height = grid.virtualPixelCellModel.height(r); //maybe faster to do this only on row iterations but meh
+            var width = viewLayer.viewPort.getColWidth(c);
+            var height = viewLayer.viewPort.getRowHeight(r); //maybe faster to do this only on row iterations but meh
             cell.style.width = width + borderWidth + 'px';
             cell.style.height = height + borderWidth + 'px';
 
@@ -85,9 +85,9 @@ module.exports = function (_grid) {
             while (cell.firstChild) {
                 cell.removeChild(cell.firstChild);
             }
-            var modelR = r + grid.cellScrollModel.row;
-            var modelC = c + grid.cellScrollModel.col;
-            var formattedData = grid.dataModel.getFormatted(modelR, modelC);
+            var virtualRow = viewLayer.viewPort.toVirtualRow(r);
+            var virtualCol = viewLayer.viewPort.toVirtualCol(c);
+            var formattedData = grid.dataModel.getFormatted(virtualRow, virtualCol);
             cell.appendChild(document.createTextNode(formattedData));
         });
     }

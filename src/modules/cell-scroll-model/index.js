@@ -8,7 +8,7 @@ module.exports = (function (_grid) {
     var model = {row: 0, col: 0};
 
     model.isDirty = dirtyClean.isDirty;
- 
+
     grid.eventLoop.bind('grid-pixel-scroll', function () {
         var scrollTop = grid.pixelScrollModel.top;
         var row = grid.virtualPixelCellModel.getRow(scrollTop);

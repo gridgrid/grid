@@ -4,6 +4,12 @@ var capitalize = require('capitalize');
 module.exports = function (_grid) {
     var grid = _grid;
     var viewPort = {};
+    var fixed = {rows: 0, cols: 0};
+
+    function getFixed(rowOrCol) {
+        return fixed[rowOrCol + 's'];
+    }
+
     viewPort.sizeToContainer = function (elem) {
         viewPort.width = elem.offsetWidth;
         viewPort.height = elem.offsetHeight;
@@ -12,10 +18,22 @@ module.exports = function (_grid) {
         grid.eventLoop.fire('grid-viewport-change');
     };
 
+    grid.eventLoop.bind('grid-row-change', function () {
+        fixed.rows = grid.rowModel.numFixed();
+    });
+
+    grid.eventLoop.bind('grid-col-change', function () {
+        fixed.cols = grid.colModel.numFixed();
+    });
 
     // converts a viewport row or column to a real row or column 
     // clamps it if the column would be outside the range
     function getVirtualRowColUnsafe(viewCoord, rowOrCol) {
+        //could cache this on changes i.e. row-change or col-change events
+        var numFixed = getFixed(rowOrCol);
+        if (viewCoord < numFixed) {
+            return viewCoord;
+        }
         return viewCoord + grid.cellScrollModel[rowOrCol];
     }
 
@@ -49,12 +67,40 @@ module.exports = function (_grid) {
         return util.clamp(x, 0, viewPort.width);
     };
 
-    viewPort.getRowTop = function (viewPortRow) {
-        return grid.virtualPixelCellModel.height(viewPort.toVirtualRow(0), viewPort.toVirtualRow(viewPort.clampRow(viewPortRow)) - 1);
+    function getTopOrLeft(viewPortCoord, rowOrCol, heightOrWidth) {
+        var rowOrColCap = capitalize(rowOrCol);
+        var toVirtual = viewPort['toVirtual' + rowOrColCap];
+        var lengthFn = grid.virtualPixelCellModel[heightOrWidth];
+        var clampFn = viewPort['clamp' + rowOrColCap];
+        var pos = 0;
+        var crossesFixed;
+        var numFixed = getFixed(rowOrCol);
+        if (numFixed) {
+            console.log(numFixed);
+            crossesFixed = viewPortCoord >= numFixed;
+            pos += lengthFn(0, (crossesFixed ? numFixed : viewPortCoord) - 1);
+        }
+        if (crossesFixed || !numFixed) {
+            pos += lengthFn(toVirtual(numFixed), toVirtual(clampFn(viewPortCoord)) - 1);
+        }
+        return pos;
+    }
+
+    viewPort.getRowTop = function (viewPortCoord) {
+        return getTopOrLeft(viewPortCoord, 'row', 'height');
     };
 
     viewPort.getColLeft = function (viewPortCol) {
-        return grid.virtualPixelCellModel.width(viewPort.toVirtualCol(0), viewPort.toVirtualCol(viewPort.clampCol(viewPortCol)) - 1);
+        return getTopOrLeft(viewPortCol, 'col', 'width');
+    };
+
+
+    viewPort.getRowHeight = function (viewPortRow) {
+        return grid.virtualPixelCellModel.height(viewPort.toVirtualRow(viewPort.clampRow(viewPortRow)));
+    };
+
+    viewPort.getColWidth = function (viewPortCol) {
+        return grid.virtualPixelCellModel.width(viewPort.toVirtualCol(viewPort.clampCol(viewPortCol)));
     };
 
 
@@ -70,7 +116,7 @@ module.exports = function (_grid) {
             fixedLength += lengthMethod(fixed);
         }
 
-        //it might be safer to sum the lengths in the virtualPixelCellModel but for now here is ok
+        //it might be safer to actually sum the lengths in the virtualPixelCellModel but for now here is ok
         for (var index = numFixed; index < lengthModel.length(); index++) {
             windowLength += lengthMethod(index);
             while (windowLength + fixedLength > totalLength && windowStartIndex < index) {

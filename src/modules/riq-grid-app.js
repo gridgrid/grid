@@ -15,7 +15,7 @@ angular.module('riqGridApp', [])
 
                 var numRows = 1000;
                 var numCols = 100;
-                var grid = require('@grid/simple-grid')(numRows, numCols, true);
+                var grid = require('@grid/simple-grid')(numRows, numCols, false, false, 1, 3);
 
                 grid.viewLayer.build(elem);
                 grid.viewLayer.draw();

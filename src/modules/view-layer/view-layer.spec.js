@@ -10,8 +10,8 @@ describe('view-layer', function () {
     var $ = require('jQuery');
     var container;
 
-    function viewBeforeEach(vary) {
-        grid = core.buildSimpleGrid(100, 20, vary);
+    function viewBeforeEach(varyHeight, varyWidth, frows, fcols) {
+        grid = core.buildSimpleGrid(100, 20, varyHeight, varyWidth, frows, fcols);
         view = grid.viewLayer;
         //mock the view port
         view.viewPort.sizeToContainer = function () {
@@ -21,9 +21,9 @@ describe('view-layer', function () {
         container = core.viewBuild();
     }
 
-    beforeEach(inject(function () {
+    beforeEach(function () {
         viewBeforeEach();
-    }));
+    });
 
     function findGridCells(div) {
         return $(div).find('[dts="grid-cell"]');
@@ -90,31 +90,40 @@ describe('view-layer', function () {
         document.body.removeChild(styleOverride);
     });
 
+    function findColCellByIndex(index) {
+        return $(findGridCells(container)[index]);
+    }
+
+    function findRowCellByIndex(index) {
+        return $(findGridCells(container)[index * minCols]);
+    }
+
     it('should write varied widths and heights', function () {
-        viewBeforeEach([99, 100, 101]);
+        viewBeforeEach([20, 30, 40], [99, 100, 101]);
         expect(findGridCells(container).first().width()).toEqual(0);
         expect(findGridCells(container).first().height()).toEqual(0);
         view.draw();
         core.onDraw(function () {
             //we want the heights and widths to be rendered at 1 higher than their virtual value in order to collapse the borders 
-            expect(findGridCells(container).first().css('width')).toEqual('100px');
-            expect($(findGridCells(container)[1]).css('width')).toEqual('101px');
-            expect($(findGridCells(container)[2]).css('width')).toEqual('102px');
-            expect(findGridCells(container).first().css('height')).toEqual('31px');
+            expect(findColCellByIndex(0).css('width')).toEqual('100px');
+            expect(findColCellByIndex(1).css('width')).toEqual('101px');
+            expect(findColCellByIndex(2).css('width')).toEqual('102px');
+            expect(findRowCellByIndex(0).css('height')).toEqual('21px');
+            expect(findRowCellByIndex(1).css('height')).toEqual('31px');
+            expect(findRowCellByIndex(2).css('height')).toEqual('41px');
         });
     });
+
+    function expectFirstCellText(text) {
+
+        expect(findGridCells(container).first().text()).toEqual(text);
+
+    }
 
     it('should write offset values to the cells if scrolled', function () {
         grid.cellScrollModel.scrollTo(5, 6);
         core.onDraw(function () {
-            expect(findGridCells(container).first().text()).toEqual('5-6');
-        });
-    });
-
-    it('should write offset values to the cells if scrolled', function () {
-        grid.cellScrollModel.scrollTo(5, 6);
-        core.onDraw(function () {
-            expect(findGridCells(container).first().text()).toEqual('5-6');
+            expectFirstCellText('5-6');
         });
     });
 
@@ -135,6 +144,31 @@ describe('view-layer', function () {
                 top: 30 * (minRows - 1),
                 left: 100 * (minCols - 1)
             });
+        });
+    });
+
+    function expectFirstAndSecondCell(firstCellWidth) {
+        var cells = findGridCells(container);
+        expect(cells.first().position()).toEqual({
+            top: 0,
+            left: 0
+        });
+
+        expect(cells.first().css('width')).toBe(firstCellWidth + 'px');
+        expect(cells.first().width()).toBe(firstCellWidth);
+        expect($(cells[1]).position()).toEqual({top: 0, left: firstCellWidth - 1});
+    }
+
+    it('should position varied width and height cells on scroll', function () {
+        viewBeforeEach([20, 30, 40], [99, 100, 101]);
+        view.draw();
+        core.onDraw(function () {
+            expectFirstAndSecondCell(100);
+            grid.cellScrollModel.scrollTo(1, 1);
+        });
+
+        core.onDraw(function () {
+            expectFirstAndSecondCell(101);
         });
     });
 
@@ -291,6 +325,30 @@ describe('view-layer', function () {
             });
 
             expectBoundingBoxSize(1, 6, 6, 3);
+        });
+    });
+
+    describe('fixed rows and cols', function () {
+        it('should not move on scroll', function () {
+            viewBeforeEach(false, false, 1, 0);
+            grid.cellScrollModel.scrollTo(1, 0);
+            core.onDraw(function () {
+                expectFirstCellText('0-0');
+                viewBeforeEach(false, false, 0, 1);
+                grid.cellScrollModel.scrollTo(0, 1);
+            });
+
+            core.onDraw(function () {
+                expectFirstCellText('0-0');
+            });
+        });
+
+        it('should affect positioning of unfixed', function () {
+            viewBeforeEach(false, false, 1, 0);
+            grid.cellScrollModel.scrollTo(1, 0);
+            core.onDraw(function () {
+                findGridCells(container);
+            });
         });
     });
 
