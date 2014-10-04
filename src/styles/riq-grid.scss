@@ -23,6 +23,12 @@
   border: 1px solid #eee;
 }
 
+.grid-row {
+  &:hover .grid-cell {
+    background-color: transparentize(green, .8);
+  }
+}
+
 .grid-scroll-bar {
   //the decorator will take care of the sizing
   @extend .pin-to-edges;

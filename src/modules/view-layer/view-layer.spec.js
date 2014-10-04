@@ -25,8 +25,12 @@ describe('view-layer', function () {
         viewBeforeEach();
     });
 
-    function findGridCells(div) {
-        return $(div).find('[dts="grid-cell"]');
+    function findGridCells() {
+        return $(container).find('[dts="grid-cell"]');
+    }
+
+    function findGridRows() {
+        return $(container).find('[dts="grid-row"]');
     }
 
     function findCellContainer(div) {
@@ -54,6 +58,12 @@ describe('view-layer', function () {
         expect(gridCells.length).toBe(minCols * minRows);
         expect(gridCells.hasClass('grid-cell')).toBe(true);
         expect(gridCells.hasClass('js-grid-cell')).toBe(true);
+    });
+
+    it('should wrap rows in a div', function () {
+        var rows = findGridRows();
+        expect(rows.length).toBe(minRows);
+        expect(rows.hasClass('grid-row'));
     });
 
     it('should be able to write values to cells', function () {

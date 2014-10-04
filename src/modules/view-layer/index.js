@@ -94,12 +94,17 @@ module.exports = function (_grid) {
 
     function buildCells(cellContainer) {
         cells = [];
+        var row;
         viewLayer.viewPort.iterateCells(function (r, c) {
             var cell = buildDivCell();
             cells[r][c] = cell;
-            cellContainer.appendChild(cell);
+            row.appendChild(cell);
         }, function (r) {
             cells[r] = [];
+            row = document.createElement('div');
+            row.setAttribute('class', 'grid-row');
+            row.setAttribute('dts', 'grid-row');
+            cellContainer.appendChild(row);
         });
     }
 

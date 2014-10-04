@@ -76,7 +76,6 @@ module.exports = function (_grid) {
         var crossesFixed;
         var numFixed = getFixed(rowOrCol);
         if (numFixed) {
-            console.log(numFixed);
             crossesFixed = viewPortCoord >= numFixed;
             pos += lengthFn(0, (crossesFixed ? numFixed : viewPortCoord) - 1);
         }
