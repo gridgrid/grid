@@ -45,7 +45,7 @@
             entries: options.input,
             paths: config.paths.browserify
         });
-        
+
         if (options.istanbul) {
             //only do this when testing
             bundler.transform(istanbul({

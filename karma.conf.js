@@ -15,7 +15,6 @@ module.exports = function (config) {
 
 // list of files / patterns to load in the browser
             files: [
-                'test-assets/matchers.js',
                 'bower_components/angular/angular.js',
                 'bower_components/angular-mocks/angular-mocks.js',
                 //'node_modules/sugar/release/sugar-full.development.js',

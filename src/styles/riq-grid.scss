@@ -6,16 +6,29 @@
   bottom: 0;
 }
 
+.grid-row:nth-of-type(odd) {
+  .grid-cell {
+    background: transparent;
+  }
+}
+
+.grid-row:nth-of-type(even) {
+  .grid-cell {
+    background: #f7f7f7;
+  }
+}
+
 .odds {
-  .cell {
-    &.odd {
+  .grid-row:nth-of-type(odd) {
+    .grid-cell {
       background: #f7f7f7;
     }
+  }
 
-    &.even {
-      background: white;
+  .grid-row:nth-of-type(even) {
+    .grid-cell {
+      background: transparent;
     }
-
   }
 }
 
@@ -42,13 +55,4 @@
   @extend .pin-to-edges;
   border-radius: 6px;
   background: rgba(0, 0, 0, .5);
-}
-
-.cell {
-  &.even {
-    background: #f7f7f7;
-  }
-  &.odd {
-    background: white;
-  }
 }

@@ -33,8 +33,8 @@ describe('view-layer', function () {
         return $(container).find('[dts="grid-row"]');
     }
 
-    function findCellContainer(div) {
-        return $(div).find('[dts=grid-cells]');
+    function findCellContainer() {
+        return $(container).find('[dts=grid-cells]');
     }
 
     it('should add a grid element to a supplied container', function () {
@@ -64,6 +64,17 @@ describe('view-layer', function () {
         var rows = findGridRows();
         expect(rows.length).toBe(minRows);
         expect(rows.hasClass('grid-row'));
+    });
+
+    it('should add a class to indicate the scroll top is odd', function () {
+        grid.cellScrollModel.scrollTo(1, 0);
+        core.onDraw(function () {
+            expect(findCellContainer()).toHaveClass('odds');
+            grid.cellScrollModel.scrollTo(2, 0);
+        });
+        core.onDraw(function () {
+            expect(findCellContainer()).not.toHaveClass('odds');
+        });
     });
 
     it('should be able to write values to cells', function () {

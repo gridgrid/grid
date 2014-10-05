@@ -12,6 +12,8 @@ module.exports = function (_grid) {
     var decoratorContainer;
     var borderWidth;
 
+    var GRID_CELL_CONTAINER_BASE_CLASS = 'grid-cells';
+
     var cells; //matrix of rendered cell elements;
 
     viewLayer.viewPort = require('@grid/view-port')(grid);
@@ -24,7 +26,7 @@ module.exports = function (_grid) {
         cleanup();
         cellContainer = document.createElement('div');
         cellContainer.setAttribute('dts', 'grid-cells');
-        cellContainer.setAttribute('class', 'grid-cells');
+        cellContainer.setAttribute('class', GRID_CELL_CONTAINER_BASE_CLASS);
         buildCells(cellContainer);
 
         decoratorContainer = document.createElement('div');
@@ -45,8 +47,6 @@ module.exports = function (_grid) {
             borderWidth = parseInt(borderWidthProp);
         }
         borderWidth = isNaN(borderWidth) || !borderWidth ? 1 : borderWidth;
-
-
     };
 
 
@@ -90,6 +90,12 @@ module.exports = function (_grid) {
             var formattedData = grid.dataModel.getFormatted(virtualRow, virtualCol);
             cell.appendChild(document.createTextNode(formattedData));
         });
+
+        if (grid.cellScrollModel.row % 2) {
+            cellContainer.className = GRID_CELL_CONTAINER_BASE_CLASS + ' odds';
+        } else {
+            cellContainer.className = GRID_CELL_CONTAINER_BASE_CLASS;
+        }
     }
 
     function buildCells(cellContainer) {
