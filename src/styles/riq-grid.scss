@@ -32,13 +32,20 @@
   }
 }
 
+//header
+.grid-row:first-of-type {
+  .grid-cell {
+    background: #f7f3f3 !important;
+  }
+}
+
 .grid-cell {
   border: 1px solid #eee;
 }
 
 .grid-row {
   &:hover .grid-cell {
-    background-color: transparentize(green, .8);
+    background-color: transparentize(green, .8) !important;
   }
 
   &:nth-of-type(1) .grid-cell {
