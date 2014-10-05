@@ -247,8 +247,10 @@ describe('view-layer', function () {
             });
         });
 
-        it('should have a container', function () {
-            expect($(container).find('[dts="grid-decorators"]').length).toBe(1);
+        it('should have a container after the cell container', function () {
+            var decoratorContainer = $(container).find('[dts="grid-decorators"]');
+            expect(decoratorContainer.length).toBe(1);
+            expect(decoratorContainer.prevAll('[dts=grid-cells]').length).toBe(1);
         });
 
 
