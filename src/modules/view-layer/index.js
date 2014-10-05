@@ -15,6 +15,7 @@ module.exports = function (_grid) {
     var GRID_CELL_CONTAINER_BASE_CLASS = 'grid-cells';
 
     var cells; //matrix of rendered cell elements;
+    var rows; //array of all rendered rows
 
     viewLayer.viewPort = require('@grid/view-port')(grid);
 
@@ -70,17 +71,14 @@ module.exports = function (_grid) {
 
     /* CELL LOGIC */
     function drawCells() {
-        viewLayer.viewPort.iterateCells(function (r, c) {
+        viewLayer.viewPort.iterateCells(function drawCell(r, c) {
             var cell = cells[r][c];
             var width = viewLayer.viewPort.getColWidth(c);
-            var height = viewLayer.viewPort.getRowHeight(r); //maybe faster to do this only on row iterations but meh
             cell.style.width = width + borderWidth + 'px';
-            cell.style.height = height + borderWidth + 'px';
 
-            var top = viewLayer.viewPort.getRowTop(r);
             var left = viewLayer.viewPort.getColLeft(c);
-            cell.style.top = top + 'px';
             cell.style.left = left + 'px';
+
 
             while (cell.firstChild) {
                 cell.removeChild(cell.firstChild);
@@ -89,6 +87,12 @@ module.exports = function (_grid) {
             var virtualCol = viewLayer.viewPort.toVirtualCol(c);
             var formattedData = grid.dataModel.getFormatted(virtualRow, virtualCol);
             cell.appendChild(document.createTextNode(formattedData));
+        }, function drawRow(r) {
+            var height = viewLayer.viewPort.getRowHeight(r); //maybe faster to do this only on row iterations but meh
+            var row = rows[r];
+            row.style.height = height + borderWidth + 'px';
+            var top = viewLayer.viewPort.getRowTop(r);
+            row.style.top = top + 'px';
         });
 
         if (grid.cellScrollModel.row % 2) {
@@ -100,6 +104,7 @@ module.exports = function (_grid) {
 
     function buildCells(cellContainer) {
         cells = [];
+        rows = [];
         var row;
         viewLayer.viewPort.iterateCells(function (r, c) {
             var cell = buildDivCell();
@@ -110,6 +115,10 @@ module.exports = function (_grid) {
             row = document.createElement('div');
             row.setAttribute('class', 'grid-row');
             row.setAttribute('dts', 'grid-row');
+            row.style.position = 'absolute';
+            row.style.left = 0;
+            row.style.right = 0;
+            rows[r] = row;
             cellContainer.appendChild(row);
         });
     }
@@ -121,6 +130,8 @@ module.exports = function (_grid) {
         var style = cell.style;
         style.position = 'absolute';
         style.boxSizing = 'border-box';
+        style.top = '0px';
+        style.bottom = '0px';
         return cell;
     }
 

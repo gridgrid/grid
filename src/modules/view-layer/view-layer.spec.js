@@ -84,14 +84,23 @@ describe('view-layer', function () {
         });
     });
 
+
+    it('should set the height of rows on draw', function () {
+        view.draw();
+        core.onDraw(function () {
+            var rows = findGridRows();
+            expect(rows.first().height()).toBe(31);
+        });
+    });
+
     it('should write widths and heights to the cells on draw', function () {
         expect(findGridCells(container).first().width()).toEqual(0);
         expect(findGridCells(container).first().height()).toEqual(0);
         view.draw();
         core.onDraw(function () {
             //we want the heights and widths to be rendered at 1 higher than their virtual value in order to collapse the borders 
-            expect(findGridCells(container).first().css('width')).toEqual('101px');
-            expect(findGridCells(container).first().css('height')).toEqual('31px');
+            expect(findGridCells(container).first().width()).toEqual(101);
+            expect(findGridCells(container).first().height()).toEqual(31);
         });
     });
 
@@ -105,8 +114,8 @@ describe('view-layer', function () {
         view.draw();
         core.onDraw(function () {
             //we want the heights and widths to be rendered at 1 higher than their virtual value in order to collapse the borders 
-            expect(findGridCells(container).first().css('width')).toEqual('102px');
-            expect(findGridCells(container).first().css('height')).toEqual('32px');
+            expect(findGridCells(container).first().width()).toEqual(102);
+            expect(findGridCells(container).first().height()).toEqual(32);
         });
         document.body.removeChild(styleOverride);
     });
@@ -126,12 +135,12 @@ describe('view-layer', function () {
         view.draw();
         core.onDraw(function () {
             //we want the heights and widths to be rendered at 1 higher than their virtual value in order to collapse the borders 
-            expect(findColCellByIndex(0).css('width')).toEqual('100px');
-            expect(findColCellByIndex(1).css('width')).toEqual('101px');
-            expect(findColCellByIndex(2).css('width')).toEqual('102px');
-            expect(findRowCellByIndex(0).css('height')).toEqual('21px');
-            expect(findRowCellByIndex(1).css('height')).toEqual('31px');
-            expect(findRowCellByIndex(2).css('height')).toEqual('41px');
+            expect(findColCellByIndex(0).width()).toEqual(100);
+            expect(findColCellByIndex(1).width()).toEqual(101);
+            expect(findColCellByIndex(2).width()).toEqual(102);
+            expect(findRowCellByIndex(0).height()).toEqual(21);
+            expect(findRowCellByIndex(1).height()).toEqual(31);
+            expect(findRowCellByIndex(2).height()).toEqual(41);
         });
     });
 
@@ -161,10 +170,9 @@ describe('view-layer', function () {
     it('should position the cells in a grid', function () {
         view.draw();
         core.onDraw(function () {
-            expect(findGridCells(container).last().position()).toEqual({
-                top: 30 * (minRows - 1),
-                left: 100 * (minCols - 1)
-            });
+            //the row does the vertical positioning so we have to check the top value of offset and left value of position
+            expect(findGridCells(container).last().offset().top).toEqual(30 * (minRows - 1));
+            expect(findGridCells(container).last().position().left).toEqual(100 * (minCols - 1));
         });
     });
 
@@ -175,7 +183,6 @@ describe('view-layer', function () {
             left: 0
         });
 
-        expect(cells.first().css('width')).toBe(firstCellWidth + 'px');
         expect(cells.first().width()).toBe(firstCellWidth);
         expect($(cells[1]).position()).toEqual({top: 0, left: firstCellWidth - 1});
     }

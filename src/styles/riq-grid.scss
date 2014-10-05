@@ -32,13 +32,6 @@
   }
 }
 
-//header
-.grid-row:first-of-type {
-  .grid-cell {
-    background: #f7f3f3 !important;
-  }
-}
-
 .grid-cell {
   border: 1px solid #eee;
 }
@@ -48,8 +41,16 @@
     background-color: transparentize(green, .8) !important;
   }
 
-  &:nth-of-type(1) .grid-cell {
-    border-bottom-width: 3px;
+  //header row
+  &:nth-of-type(1) {
+    box-shadow: 3px 0px 10px rgba(0, 0, 0, 0.6);
+    z-index: 1;
+
+    //header cell
+    .grid-cell {
+      background: #f7f3f3 !important;
+    }
+
   }
 
   .grid-cell:nth-of-type(3) {
