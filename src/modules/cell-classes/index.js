@@ -1,5 +1,6 @@
 var positionRange = require('@grid/position-range');
 var makeDirtyClean = require('@grid/dirty-clean');
+var addDirtyProps = require('@grid/add-dirty-props');
 
 module.exports = function (_grid) {
     var grid = _grid;
@@ -9,7 +10,10 @@ module.exports = function (_grid) {
     var api = {
         create: function () {
             var thisDirtyClean = makeDirtyClean(grid);
-            var descriptor = positionRange(undefined, thisDirtyClean, dirtyClean);
+            var descriptor = {};
+            //mixins
+            positionRange(descriptor, thisDirtyClean, dirtyClean);
+            addDirtyProps(descriptor, ['class'], [thisDirtyClean, dirtyClean]);
             return descriptor;
         },
         isDirty: dirtyClean.isDirty
