@@ -19,26 +19,16 @@ describe('decorators', function () {
         });
 
         it('with the right defaults', function () {
-            expect(decorator.isDirty).toBeAFunction();
-            expect('top' in decorator).toBe(true);
-            expect('left' in decorator).toBe(true);
-            expect('height' in decorator).toBe(true);
-            expect('width' in decorator).toBe(true);
-            expect(decorator.units).toBe('cell');
-            expect(decorator.space).toBe('virtual');
             expect(decorator.render).toBeAFunction();
         });
 
-        function setPropAndCheckDirty(prop, val) {
-            core.resetAllDirties();
-            expect(decorator.isDirty()).toBe(false);
-            decorator[prop] = val;
-            expect(decorator.isDirty()).toBe(true);
-        }
-
-        it('that get marked dirty on relevant property changes', function () {
-            ['top', 'left', 'height', 'width', 'units', 'space'].forEach(function (prop) {
-                setPropAndCheckDirty(prop, 1); //any value should do    
+        describe('that satisify', function () {
+            require('@grid/position-range/test-body')(function () {
+                return {
+                    range: decorator,
+                    core: core,
+                    parent: decorators
+                };
             });
         });
     });

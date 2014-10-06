@@ -1,5 +1,6 @@
 var util = require('@grid/util');
 var makeDirtyClean = require('@grid/dirty-clean');
+var positionRange = require('@grid/position-range');
 
 module.exports = function (_grid) {
     var grid = _grid;
@@ -36,27 +37,10 @@ module.exports = function (_grid) {
         create: function () {
             var decorator = {};
             var thisDirtyClean = makeDirtyClean(grid);
-            decorator.isDirty = thisDirtyClean.isDirty;
 
-            var watchedProperties = ['top', 'left', 'height', 'width', 'units', 'space'];
-            watchedProperties.forEach(function (prop) {
-                var val;
-                Object.defineProperty(decorator, prop, {
-                    enumerable: true,
-                    get: function () {
-                        return val;
-                    }, set: function (_val) {
-                        if (_val !== val) {
-                            dirtyClean.setDirty();
-                            thisDirtyClean.setDirty();
-                        }
-                        val = _val;
-                    }
-                });
-            });
-            //defaults
-            decorator.units = 'cell';
-            decorator.space = 'virtual';
+            //mixin the position range functionality
+            positionRange(decorator, thisDirtyClean, dirtyClean);
+
             //they can override but we should have an empty default to prevent npes
             decorator.render = function () {
                 return document.createElement('div');
