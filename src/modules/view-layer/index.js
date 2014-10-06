@@ -71,7 +71,6 @@ module.exports = function (_grid) {
 
     /* CELL LOGIC */
     function drawCells() {
-        container.removeChild(root);
         viewLayer.viewPort.iterateCells(function drawCell(r, c) {
             var cell = cells[r][c];
             var width = viewLayer.viewPort.getColWidth(c);
@@ -101,7 +100,6 @@ module.exports = function (_grid) {
         } else {
             cellContainer.className = GRID_CELL_CONTAINER_BASE_CLASS;
         }
-        container.appendChild(root);
     }
 
     function buildCells(cellContainer) {

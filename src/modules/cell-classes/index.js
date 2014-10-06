@@ -1,11 +1,20 @@
 var positionRange = require('@grid/position-range');
+var makeDirtyClean = require('@grid/dirty-clean');
 
 module.exports = function (_grid) {
     var grid = _grid;
-    var dirtyClean = require('@grid/dirty-clean')(grid);
 
-    var api = {};
-    positionRange(api, dirtyClean);
+    var dirtyClean = makeDirtyClean(grid);
+
+    var api = {
+        create: function () {
+            var thisDirtyClean = makeDirtyClean(grid);
+            var descriptor = positionRange(undefined, thisDirtyClean, dirtyClean);
+            return descriptor;
+        },
+        isDirty: dirtyClean.isDirty
+    };
+
 
     return api;
 };

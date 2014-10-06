@@ -7,13 +7,22 @@ describe('cell-classes', function () {
         classes = grid.cellClasses;
     });
 
-    describe('should satisfy', function () {
-        require('@grid/position-range/test-body')(function () {
-            return {
-                range: classes,
-                core: core
-            };
+    describe('should create descriptors', function () {
+        var descriptor;
+        beforeEach(function () {
+            descriptor = classes.create();
         });
+
+        describe('that satisfy', function () {
+            require('@grid/position-range/test-body')(function () {
+                return {
+                    range: descriptor,
+                    core: core,
+                    parent: classes
+                };
+            });
+        });
+
     });
 
 });
