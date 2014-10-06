@@ -2,15 +2,15 @@ describe('decorators', function () {
     var core = require('@grid/grid-spec-helper')();
     var decorators;
     var grid;
-    beforeEach(inject(function () {
+    beforeEach(function () {
         grid = core.buildSimpleGrid();
         decorators = grid.decorators;
         //clear any other decorators
         decorators.remove(grid.decorators.getAlive());
         decorators.popAllDead();
-        var spy = spyOn(grid, 'requestDraw'); //mock the method to prevent draw
+        spyOn(grid, 'requestDraw'); //mock the method to prevent draw
         core.resetAllDirties(); //set everything clean to start
-    }));
+    });
 
     describe('should create decorators', function () {
         var decorator;
