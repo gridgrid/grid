@@ -12,6 +12,7 @@ module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows,
     grid.dataModel = require('@grid/simple-data-model')(grid);
     grid.virtualPixelCellModel = require('@grid/virtual-pixel-cell-model')(grid);
     grid.cellScrollModel = require('@grid/cell-scroll-model')(grid);
+    grid.cellClasses = require('@grid/cell-classes')(grid);
 
 
     grid.viewLayer = require('@grid/view-layer')(grid);
