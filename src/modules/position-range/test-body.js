@@ -23,7 +23,9 @@ function testPositionRange(context) {
             expect(range.space).toBe('virtual');
         });
 
-        require('@grid/add-dirty-props/test-body')(dirtyPropsCtx);
+        describe('should satisfy', function () {
+            require('@grid/add-dirty-props/test-body')(dirtyPropsCtx);
+        });
     });
 }
 
