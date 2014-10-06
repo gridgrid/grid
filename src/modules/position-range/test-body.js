@@ -1,13 +1,16 @@
-function testPositionRange(beforeEachFn) {
+function testPositionRange(context) {
     describe('position-range', function () {
         var range;
         var core;
         var parent;
+        var dirtyPropsCtx = {props: ['top', 'left', 'height', 'width', 'units', 'space']};
         beforeEach(function () {
-            var models = beforeEachFn();
-            range = models.range;
-            core = models.core;
-            parent = models.parent;
+            range = context.range;
+            core = context.core;
+            parent = context.parent;
+            dirtyPropsCtx.core = core;
+            dirtyPropsCtx.obj = range;
+            dirtyPropsCtx.parent = parent;
         });
 
         it('should have the right defaults', function () {
@@ -20,24 +23,7 @@ function testPositionRange(beforeEachFn) {
             expect(range.space).toBe('virtual');
         });
 
-        function setPropAndCheckDirty(prop, val) {
-            core.resetAllDirties();
-            expect(range.isDirty()).toBe(false);
-            if (parent) {
-                expect(parent.isDirty()).toBe(false);
-            }
-            range[prop] = val;
-            expect(range.isDirty()).toBe(true);
-            if (parent) {
-                expect(parent.isDirty()).toBe(true);
-            }
-        }
-
-        it('should get marked dirty on relevant property changes', function () {
-            ['top', 'left', 'height', 'width', 'units', 'space'].forEach(function (prop) {
-                setPropAndCheckDirty(prop, 1); //any value should do    
-            });
-        });
+        require('@grid/add-dirty-props/test-body')(dirtyPropsCtx);
     });
 }
 

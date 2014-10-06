@@ -1,25 +1,16 @@
+var addDirtyProps = require('@grid/add-dirty-props');
+
 module.exports = function (range, dirtyClean, parentDirtyClean) {
     range = range || {}; //allow mixin functionality
     range.isDirty = dirtyClean.isDirty;
 
     var watchedProperties = ['top', 'left', 'height', 'width', 'units', 'space'];
-    watchedProperties.forEach(function (prop) {
-        var val;
-        Object.defineProperty(range, prop, {
-            enumerable: true,
-            get: function () {
-                return val;
-            }, set: function (_val) {
-                if (_val !== val) {
-                    dirtyClean.setDirty();
-                    if (parentDirtyClean) {
-                        parentDirtyClean.setDirty();
-                    }
-                }
-                val = _val;
-            }
-        });
-    });
+    var dirtyCleans = [dirtyClean];
+    if (parentDirtyClean) {
+        dirtyCleans.push(parentDirtyClean);
+    }
+
+    addDirtyProps(range, watchedProperties, dirtyCleans);
     //defaults
     range.units = 'cell';
     range.space = 'virtual';

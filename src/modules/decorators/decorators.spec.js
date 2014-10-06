@@ -14,8 +14,11 @@ describe('decorators', function () {
 
     describe('should create decorators', function () {
         var decorator;
+        var ctx = {core: core};
         beforeEach(function () {
             decorator = decorators.create();
+            ctx.range = decorator;
+            ctx.parent = decorators;
         });
 
         it('with the right defaults', function () {
@@ -23,13 +26,7 @@ describe('decorators', function () {
         });
 
         describe('that satisify', function () {
-            require('@grid/position-range/test-body')(function () {
-                return {
-                    range: decorator,
-                    core: core,
-                    parent: decorators
-                };
-            });
+            require('@grid/position-range/test-body')(ctx);
         });
     });
 

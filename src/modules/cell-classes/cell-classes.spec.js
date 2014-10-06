@@ -9,18 +9,14 @@ describe('cell-classes', function () {
 
     describe('should create descriptors', function () {
         var descriptor;
+        var ctx = {core: core};
         beforeEach(function () {
-            descriptor = classes.create();
+            ctx.range = descriptor = classes.create();
+            ctx.parent = classes;
         });
 
         describe('that satisfy', function () {
-            require('@grid/position-range/test-body')(function () {
-                return {
-                    range: descriptor,
-                    core: core,
-                    parent: classes
-                };
-            });
+            require('@grid/position-range/test-body')(ctx);
         });
 
     });
