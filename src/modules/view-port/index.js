@@ -59,6 +59,8 @@ module.exports = function (_grid) {
         return getVirtualRowColClamped(c, 'col');
     };
 
+
+    //default unclamped cause that seems to be the more likely use case converting this direction
     viewPort.toRealRow = function (virtualRow) {
         return getRealRowColUnsafe(virtualRow, 'row');
     };

@@ -1,6 +1,16 @@
-beforeEach(function () {
+(function () {
+    function addFieldMatcher(matchers, fieldName) {
+        matchers[fieldName + 'ToBe'] = function (val) {
+            this.message = function () {
+                return 'Expected ' + fieldName + (this.isNot ? ' not' : '') + ' to be ' + val + ' but it was ' + actualVal;
+            };
+            var actualVal = this.actual[fieldName];
+            return actualVal === val;
+        };
+    }
+
     var $ = require('jquery');
-    this.addMatchers({
+    var matchers = {
         toBeDisplayNone: function () {
             var elem = this.actual;
             return jasmine.getEnv().equals_(elem.css('display'), ('none'));
@@ -101,5 +111,14 @@ beforeEach(function () {
             };
             return this.actual.isClean();
         }
+    };
+
+    var commonFields = ['row', 'col', 'top', 'left', 'width', 'height', 'units', 'space', 'class'];
+    commonFields.forEach(function (fieldName) {
+        addFieldMatcher(matchers, fieldName);
     });
-});
+
+    beforeEach(function () {
+        this.addMatchers(matchers);
+    });
+})();

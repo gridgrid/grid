@@ -7,13 +7,13 @@ module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows,
     //the order here matters because some of these depend on each other
     grid.eventLoop = require('@grid/event-loop')(grid);
     grid.decorators = require('@grid/decorators')(grid);
+    grid.cellClasses = require('@grid/cell-classes')(grid);
     grid.rowModel = require('@grid/row-model')(grid);
     grid.colModel = require('@grid/col-model')(grid);
     grid.dataModel = require('@grid/simple-data-model')(grid);
     grid.virtualPixelCellModel = require('@grid/virtual-pixel-cell-model')(grid);
     grid.cellScrollModel = require('@grid/cell-scroll-model')(grid);
-    grid.cellClasses = require('@grid/cell-classes')(grid);
-
+    grid.navigationModel = require('@grid/navigation-model')(grid);
 
     grid.viewLayer = require('@grid/view-layer')(grid);
     grid.pixelScrollModel = require('@grid/pixel-scroll-model')(grid);
