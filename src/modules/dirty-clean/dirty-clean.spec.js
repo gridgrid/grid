@@ -2,21 +2,21 @@ describe('dirty-clean', function () {
     var core = require('@grid/grid-spec-helper')();
     var dirtyClean;
     var grid;
-    beforeEach(inject(function () {
+    beforeEach(function () {
         grid = core.buildSimpleGrid();
         core.viewBuild();
         dirtyClean = require('@grid/dirty-clean')(grid);
-    }));
+    });
 
     it('should start dirty', function () {
-        expect(dirtyClean.isDirty()).toBe(true);
+        expect(dirtyClean).toBeDirty();
     });
 
 
     it('should be clean on draw', function () {
         grid.viewLayer.draw();
         core.onDraw(function () {
-            expect(dirtyClean.isDirty()).toBe(false);
+            expect(dirtyClean).not.toBeDirty();
         });
     });
 
@@ -24,8 +24,8 @@ describe('dirty-clean', function () {
         var spy = spyOn(grid, 'requestDraw');
         core.resetAllDirties();
         dirtyClean.setDirty();
-        expect(dirtyClean.isDirty()).toBe(true);
-        expect(dirtyClean.isClean()).toBe(false);
+        expect(dirtyClean).toBeDirty();
+        expect(dirtyClean).not.toBeClean();
         core.onDraw(function () {
             expect(spy).toHaveBeenCalled();
         });
@@ -33,7 +33,7 @@ describe('dirty-clean', function () {
 
     it('should let me set it to clean', function () {
         dirtyClean.setClean();
-        expect(dirtyClean.isClean()).toBe(true);
-        expect(dirtyClean.isDirty()).toBe(false);
+        expect(dirtyClean).toBeClean();
+        expect(dirtyClean).not.toBeDirty();
     });
 });

@@ -84,9 +84,22 @@ beforeEach(function () {
         },
         toHaveClass: function (className) {
             this.message = function () {
-                return 'Expected ' + this.actual + (this.isNot ? ' not' : '') + ' to have class ' + className + ' but it was ' + $(this.actual).attr('class');
+                return 'Expected "' + $(this.actual).attr('class') + '"' + (this.isNot ? ' not' : '') + ' to have class "' + className + '"';
             };
             return $(this.actual).hasClass(className);
+        },
+        toBeDirty: function () {
+            var isDirty = this.actual.isDirty();
+            this.message = function () {
+                return 'Expected ' + JSON.stringify(this.actual) + (this.isNot ? ' not' : '') + ' to be dirty but instead isDirty() was ' + isDirty;
+            };
+            return isDirty;
+        },
+        toBeClean: function () {
+            this.message = function () {
+                return 'Expected ' + JSON.stringify(this.actual) + (this.isNot ? ' not' : '') + ' to be clean';
+            };
+            return this.actual.isClean();
         }
     });
 });

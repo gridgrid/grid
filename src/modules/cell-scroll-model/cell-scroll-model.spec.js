@@ -60,7 +60,7 @@ describe('cell-scroll-model', function () {
         grid.eventLoop.fire('grid-draw'); //first set it to false
         model.scrollTo(1, 1);
         expect(request).toHaveBeenCalled();
-        expect(model.isDirty()).toBe(true);
+        expect(model).toBeDirty();
     });
 
     it('should not request draw if the cells havent shifted even if asked to scroll and should not be dirty', function () {
@@ -68,6 +68,6 @@ describe('cell-scroll-model', function () {
         grid.eventLoop.fire('grid-draw'); //first set it to false
         model.scrollTo(0, 0);
         expect(request).not.toHaveBeenCalled();
-        expect(model.isDirty()).toBe(false);
+        expect(model).not.toBeDirty();
     });
 });

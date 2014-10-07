@@ -133,5 +133,11 @@ describe('view port', function () {
         });
     });
 
+    it('should let me get a real row or col from a virtual one', function () {
+        grid.cellScrollModel.scrollTo(1, 1);
+        expect(viewPort.toRealRow(1)).toBe(0);
+        expect(viewPort.toRealCol(1)).toBe(0);
+    });
+
 
 });

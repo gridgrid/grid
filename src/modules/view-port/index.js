@@ -26,15 +26,23 @@ module.exports = function (_grid) {
         fixed.cols = grid.colModel.numFixed();
     });
 
-    // converts a viewport row or column to a real row or column 
-    // clamps it if the column would be outside the range
-    function getVirtualRowColUnsafe(viewCoord, rowOrCol) {
+    function convertRealToVirtual(coord, rowOrCol, coordIsVirtual) {
         //could cache this on changes i.e. row-change or col-change events
         var numFixed = getFixed(rowOrCol);
-        if (viewCoord < numFixed) {
-            return viewCoord;
+        if (coord < numFixed) {
+            return coord;
         }
-        return viewCoord + grid.cellScrollModel[rowOrCol];
+        return coord + (coordIsVirtual ? -1 : 1) * grid.cellScrollModel[rowOrCol];
+    }
+
+    // converts a viewport row or column to a real row or column 
+    // clamps it if the column would be outside the range
+    function getVirtualRowColUnsafe(realCoord, rowOrCol) {
+        return convertRealToVirtual(realCoord, rowOrCol);
+    }
+
+    function getRealRowColUnsafe(virtualCoord, rowOrCol) {
+        return convertRealToVirtual(virtualCoord, rowOrCol, true);
     }
 
 
@@ -49,6 +57,14 @@ module.exports = function (_grid) {
 
     viewPort.toVirtualCol = function (c) {
         return getVirtualRowColClamped(c, 'col');
+    };
+
+    viewPort.toRealRow = function (virtualRow) {
+        return getRealRowColUnsafe(virtualRow, 'row');
+    };
+
+    viewPort.toRealCol = function (virtualCol) {
+        return getRealRowColUnsafe(virtualCol, 'col');
     };
 
     viewPort.clampRow = function (r) {

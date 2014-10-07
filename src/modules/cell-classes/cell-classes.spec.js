@@ -5,6 +5,7 @@ describe('cell-classes', function () {
     beforeEach(function () {
         var grid = core.buildSimpleGrid();
         classes = grid.cellClasses;
+        spyOn(grid, 'requestDraw'); //mock the draw;
     });
 
     describe('should create descriptors that', function () {
@@ -31,6 +32,41 @@ describe('cell-classes', function () {
             require('@grid/position-range/test-body')(ctx);
         });
 
+    });
+
+    it('should allow created descriptors to be initialized', function () {
+        var descriptor = classes.create(0, 1, 'name', 2, 3);
+        expect(descriptor.top).toBe(0);
+        expect(descriptor.left).toBe(1);
+        expect(descriptor.height).toBe(2);
+        expect(descriptor.width).toBe(3);
+        expect(descriptor.class).toBe('name');
+    });
+
+    it('should allow created descriptors to be initialized without width and height', function () {
+        var descriptor = classes.create(2, 3, 'name');
+        expect(descriptor.top).toBe(2);
+        expect(descriptor.left).toBe(3);
+        expect(descriptor.height).toBe(1);
+        expect(descriptor.width).toBe(1);
+        expect(descriptor.class).toBe('name');
+    });
+
+    it('should be able to add descriptors and be dirty', function () {
+        var descriptor = classes.create();
+        core.resetAllDirties();
+        classes.add(descriptor);
+        expect(classes.getAll()).toContain(descriptor);
+        expect(classes).toBeDirty();
+    });
+
+    it('should be able to remove descriptors and be dirty', function () {
+        var descriptor = classes.create();
+        classes.add(descriptor);
+        core.resetAllDirties();
+        classes.remove(descriptor);
+        expect(classes.getAll()).not.toContain(descriptor);
+        expect(classes).toBeDirty();
     });
 
 });

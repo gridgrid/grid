@@ -13,20 +13,20 @@ module.exports = function (context) {
     describe('add-dirty-props', function () {
         function setPropAndCheckDirty(prop, val) {
             core.resetAllDirties();
-            expect(obj.isDirty()).toBe(false);
+            expect(obj).not.toBeDirty();
             if (parent) {
-                expect(parent.isDirty()).toBe(false);
+                expect(parent).not.toBeDirty();
             }
             obj[prop] = val;
-            expect(obj.isDirty()).toBe(true);
+            expect(obj).toBeDirty();
             if (parent) {
-                expect(parent.isDirty()).toBe(true);
+                expect(parent).toBeDirty();
             }
         }
 
         it('should get marked dirty on relevant property changes', function () {
             props.forEach(function (prop) {
-                setPropAndCheckDirty(prop, 1); //any value should do    
+                setPropAndCheckDirty(prop, 'some really weird value that hopefully no one would use as a default'); //any value should do    
             });
         });
     });

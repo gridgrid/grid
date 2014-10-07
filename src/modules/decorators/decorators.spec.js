@@ -34,21 +34,21 @@ describe('decorators', function () {
     it('should let me add a decorator and request draw', function () {
         var dec = decorators.create();
         core.resetAllDirties();
-        expect(decorators.isDirty()).toBe(false);
+        expect(decorators).not.toBeDirty();
         decorators.add(dec);
-        expect(decorators.isDirty()).toBe(true);
+        expect(decorators).toBeDirty();
         expect(decorators.getAlive()[0]).toEqual(dec);
     });
 
     it('should let me remove a decorator', function () {
         var dec = decorators.create();
         core.resetAllDirties();
-        expect(decorators.isDirty()).toBe(false);
+        expect(decorators).not.toBeDirty();
         decorators.add(dec);
         core.resetAllDirties();
-        expect(decorators.isDirty()).toBe(false);
+        expect(decorators).not.toBeDirty();
         decorators.remove(dec);
-        expect(decorators.isDirty()).toBe(true);
+        expect(decorators).toBeDirty();
         expect(decorators.getAlive()).toEqual([]);
         expect(decorators.popAllDead()).toEqual([dec]);
     });

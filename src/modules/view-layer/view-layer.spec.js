@@ -382,6 +382,43 @@ describe('view-layer', function () {
         });
     });
 
+    describe('cell classes', function () {
+        it('should draw the classes only  when dirty', function () {
+            grid.cellClasses.add(grid.cellClasses.create(1, 1, ''));
+            var spy = spyOn(grid.cellClasses, 'getAll').andCallThrough();
+            core.onDraw(function () {
+                expect(spy).toHaveBeenCalled();
+                spy.reset();
+                view.draw();
+            });
+            core.onDraw(function () {
+                expect(spy).not.toHaveBeenCalled();
+            });
+        });
+
+        it('should add a class to a cell', function () {
+            var cellClass = 'myCellClasssss';
+            var descriptor = grid.cellClasses.create(0, 0, cellClass);
+            grid.cellClasses.add(descriptor);
+            core.onDraw(function () {
+                expect(findGridCells().first()).toHaveClass(cellClass);
+            });
+        });
+
+        it('should add a class to the right virtual cell', function () {
+            var cellClass = 'myCellClasssss';
+            var cellClass2 = 'invisible';
+            var descriptor = grid.cellClasses.create(1, 1, cellClass);
+            var descriptor2 = grid.cellClasses.create(0, 0, cellClass2);
+            grid.cellClasses.add(descriptor);
+            grid.cellClasses.add(descriptor2);
+            grid.cellScrollModel.scrollTo(1, 1);
+            core.onDraw(function () {
+                expect(findGridCells().first()).toHaveClass(cellClass);
+                expect(findGridCells().first()).not.toHaveClass(cellClass2);
+            });
+        });
+    });
 
 })
 ;

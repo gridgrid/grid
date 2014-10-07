@@ -66,6 +66,10 @@ module.exports = function (_grid) {
             drawDecorators();
         }
 
+        if (grid.cellClasses.isDirty()) {
+            drawCellClasses();
+        }
+
         grid.eventLoop.fire('grid-draw');
     }, 1);
 
@@ -198,6 +202,27 @@ module.exports = function (_grid) {
     }
 
     /* END DECORATOR LOGIC */
+
+    /* CELL CLASSES LOGIC */
+    function drawCellClasses() {
+        var all = grid.cellClasses.getAll();
+        all.forEach(function (descriptor) {
+            var row = viewLayer.viewPort.toRealRow(descriptor.top);
+            var col = viewLayer.viewPort.toRealCol(descriptor.left);
+
+            var cellRow = cells[row];
+            if (!cellRow) {
+                return;
+            }
+            var cell = cellRow[col];
+            if (!cell) {
+                return;
+            }
+            cell.className = cell.className + ' ' + descriptor.class;
+        });
+    }
+
+    /* END CELL CLASSES LOGIC*/
 
     viewLayer.destroy = cleanup;
 
