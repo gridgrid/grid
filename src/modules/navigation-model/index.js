@@ -8,6 +8,14 @@ module.exports = function (_grid) {
         col: 0
     };
 
+
+    api.navTo = function navTo(row, col) {
+        api.row = row;
+        api.col = col;
+        focusClass.top = row;
+        focusClass.left = col;
+    };
+
     grid.eventLoop.bind('keydown', function (e) {
         //if nothing changes great we'll stay where we are
         var navToRow = api.row;
@@ -28,13 +36,8 @@ module.exports = function (_grid) {
                 navToCol--;
                 break;
         }
-        navTo(navToRow, navToCol);
+        api.navTo(navToRow, navToCol);
     });
-
-    function navTo(row, col) {
-        api.row = row;
-        api.col = col;
-    }
 
     var focusClass = grid.cellClasses.create(0, 0, 'focus');
     grid.cellClasses.add(focusClass);

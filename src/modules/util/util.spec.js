@@ -6,7 +6,7 @@ describe('util', function () {
     });
 
     describe('clamp', function () {
-        
+
         it('should do nothing to a number in the range', function () {
             expect(util.clamp(5, 0, 10)).toEqual(5);
         });
@@ -22,6 +22,11 @@ describe('util', function () {
         it('should do nothing to a number at the range endpoints', function () {
             expect(util.clamp(0, 0, 10)).toEqual(0);
             expect(util.clamp(10, 0, 10)).toEqual(10);
+        });
+
+        it('should have the option to return NaN for numbers outside the range', function () {
+            expect(util.clamp(11, 0, 10, true)).toBeNaN();
+            expect(util.clamp(-1, 0, 10, true)).toBeNaN();
         });
     });
 

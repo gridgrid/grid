@@ -1,10 +1,10 @@
 module.exports = {
-    clamp: function (num, min, max) {
+    clamp: function (num, min, max, returnNaN) {
         if (num > max) {
-            return max;
+            return returnNaN ? NaN : max;
         }
         if (num < min) {
-            return min;
+            return returnNaN ? NaN : min;
         }
         return num;
     },

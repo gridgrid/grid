@@ -3,8 +3,8 @@ var viewLayer = require('@grid/view-layer');
 describe('view-layer', function () {
 
     var core = require('@grid/grid-spec-helper')();
-    var minRows = 10;
-    var minCols = 10;
+    var viewRows = 10;
+    var viewCols = 10;
     var view;
     var grid;
     var $ = require('jQuery');
@@ -16,8 +16,8 @@ describe('view-layer', function () {
         //mock the view port
         view.viewPort.sizeToContainer = function () {
         };
-        view.viewPort.minRows = minRows;
-        view.viewPort.minCols = minCols;
+        view.viewPort.rows = viewRows;
+        view.viewPort.cols = viewCols;
         container = core.viewBuild();
     }
 
@@ -53,16 +53,23 @@ describe('view-layer', function () {
         expect(cellContainer.hasClass('grid-cells')).toBe(true);
     });
 
-    it('should create minRows x minCols cells', function () {
+    it('should create rows x cols cells', function () {
         var gridCells = findGridCells(container);
-        expect(gridCells.length).toBe(minCols * minRows);
-        expect(gridCells.hasClass('grid-cell')).toBe(true);
-        expect(gridCells.hasClass('js-grid-cell')).toBe(true);
+        expect(gridCells.length).toBe(viewCols * viewRows);
+    });
+
+    it('should add style classes to the cell on draw', function () {
+        view.draw();
+        core.onDraw(function () {
+            var gridCells = findGridCells(container);
+            expect(gridCells).toHaveClass('grid-cell');
+
+        });
     });
 
     it('should wrap rows in a div', function () {
         var rows = findGridRows();
-        expect(rows.length).toBe(minRows);
+        expect(rows.length).toBe(viewRows);
         expect(rows.hasClass('grid-row'));
     });
 
@@ -109,15 +116,14 @@ describe('view-layer', function () {
         styleOverride.innerHTML = '.grid-cell{border : 2px solid black;}';
         document.body.appendChild(styleOverride);
         container = core.viewBuild();
-        expect(findGridCells(container).first().width()).toEqual(0);
-        expect(findGridCells(container).first().height()).toEqual(0);
         view.draw();
         core.onDraw(function () {
+            document.body.removeChild(styleOverride);
             //we want the heights and widths to be rendered at 1 higher than their virtual value in order to collapse the borders 
             expect(findGridCells(container).first().width()).toEqual(102);
             expect(findGridCells(container).first().height()).toEqual(32);
         });
-        document.body.removeChild(styleOverride);
+
     });
 
     function findColCellByIndex(index) {
@@ -125,7 +131,11 @@ describe('view-layer', function () {
     }
 
     function findRowCellByIndex(index) {
-        return $(findGridCells(container)[index * minCols]);
+        return $(findGridCells(container)[index * viewCols]);
+    }
+
+    function findCellByRowCol(r, c) {
+        return $(findGridCells(container)[r * viewCols + c]);
     }
 
     it('should write varied widths and heights', function () {
@@ -171,8 +181,8 @@ describe('view-layer', function () {
         view.draw();
         core.onDraw(function () {
             //the row does the vertical positioning so we have to check the top value of offset and left value of position
-            expect(findGridCells(container).last().offset().top).toEqual(30 * (minRows - 1));
-            expect(findGridCells(container).last().position().left).toEqual(100 * (minCols - 1));
+            expect(findGridCells(container).last().offset().top).toEqual(30 * (viewRows - 1));
+            expect(findGridCells(container).last().position().left).toEqual(100 * (viewCols - 1));
         });
     });
 
@@ -405,14 +415,67 @@ describe('view-layer', function () {
             });
         });
 
-        it('should add a class to the right virtual cell', function () {
+        function expectRangeToHaveClass(t, l, h, w, cellClass) {
+            for (var r = 0; r < h; r++) {
+                for (var c = 0; c < w; c++) {
+                    expect(findCellByRowCol(t + r, l + c)).toHaveClass(cellClass);
+                }
+            }
+        }
+
+        it('should add a class to a range of cells cell', function () {
+            var cellClass = 'myRangedClass';
+            var descriptor = grid.cellClasses.create(0, 0, cellClass, 2, 3);
+            grid.cellClasses.add(descriptor);
+            core.onDraw(function () {
+                expectRangeToHaveClass(0, 0, 2, 3, cellClass);
+            });
+        });
+
+        it('should add a class to infinite ranges', function () {
+            var cellClass = 'myRangedClass';
+            var descriptor = grid.cellClasses.create(0, 0, cellClass, Infinity, 2);
+            grid.cellClasses.add(descriptor);
+            core.onDraw(function () {
+                expectRangeToHaveClass(0, 0, viewRows, 2, cellClass);
+                grid.cellScrollModel.scrollTo(viewRows, viewCols);
+            });
+            core.onDraw(function () {
+                expectRangeToHaveClass(0, 0, viewRows, 2, cellClass);
+            });
+        });
+
+        it('should clear previous classes on redraw', function () {
+            var cellClass = 'myCellClasssss';
+            var secondClass = 'totallyNewClass';
+            var descriptor = grid.cellClasses.create(0, 0, cellClass);
+            grid.cellClasses.add(descriptor);
+            core.onDraw(function () {
+
+                descriptor.class = secondClass;
+            });
+            core.onDraw(function () {
+                expect(findCellByRowCol(0, 0)).toHaveClass(secondClass);
+                expect(findCellByRowCol(0, 0)).not.toHaveClass(cellClass);
+            });
+        });
+
+        it('should add a class to the right virtual cell after scroll', function () {
             var cellClass = 'myCellClasssss';
             var cellClass2 = 'invisible';
             var descriptor = grid.cellClasses.create(1, 1, cellClass);
             var descriptor2 = grid.cellClasses.create(0, 0, cellClass2);
             grid.cellClasses.add(descriptor);
             grid.cellClasses.add(descriptor2);
-            grid.cellScrollModel.scrollTo(1, 1);
+            core.onDraw(function () {
+                var cell = findCellByRowCol(1, 1);
+                expect(cell).toHaveClass(cellClass);
+                var cell2 = findCellByRowCol(0, 0);
+                expect(cell2).toHaveClass(cellClass2);
+
+                grid.cellScrollModel.scrollTo(1, 1);
+            });
+
             core.onDraw(function () {
                 expect(findGridCells().first()).toHaveClass(cellClass);
                 expect(findGridCells().first()).not.toHaveClass(cellClass2);

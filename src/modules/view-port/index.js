@@ -13,8 +13,8 @@ module.exports = function (_grid) {
     viewPort.sizeToContainer = function (elem) {
         viewPort.width = elem.offsetWidth;
         viewPort.height = elem.offsetHeight;
-        viewPort.minRows = calculateMaxLengths(viewPort.height, grid.rowModel);
-        viewPort.minCols = calculateMaxLengths(viewPort.width, grid.colModel);
+        viewPort.rows = calculateMaxLengths(viewPort.height, grid.rowModel);
+        viewPort.cols = calculateMaxLengths(viewPort.width, grid.colModel);
         grid.eventLoop.fire('grid-viewport-change');
     };
 
@@ -59,22 +59,31 @@ module.exports = function (_grid) {
         return getVirtualRowColClamped(c, 'col');
     };
 
+    function getRealRowColClamped(virtualCoord, rowOrCol) {
+        var numFixed = getFixed(rowOrCol);
+        if (virtualCoord < numFixed) {
+            return virtualCoord;
+        }
+        var maxViewPortIndex = viewPort[rowOrCol + 's'] - 1;
+        return util.clamp(virtualCoord - grid.cellScrollModel[rowOrCol], numFixed, maxViewPortIndex, true);
+    }
+
 
     //default unclamped cause that seems to be the more likely use case converting this direction
     viewPort.toRealRow = function (virtualRow) {
-        return getRealRowColUnsafe(virtualRow, 'row');
+        return getRealRowColClamped(virtualRow, 'row');
     };
 
     viewPort.toRealCol = function (virtualCol) {
-        return getRealRowColUnsafe(virtualCol, 'col');
+        return getRealRowColClamped(virtualCol, 'col');
     };
 
     viewPort.clampRow = function (r) {
-        return util.clamp(r, 0, viewPort.minRows - 1);
+        return util.clamp(r, 0, viewPort.rows - 1);
     };
 
     viewPort.clampCol = function (c) {
-        return util.clamp(c, 0, viewPort.minCols - 1);
+        return util.clamp(c, 0, viewPort.cols - 1);
     };
 
     viewPort.clampY = function (y) {
@@ -120,6 +129,32 @@ module.exports = function (_grid) {
         return grid.virtualPixelCellModel.width(viewPort.toVirtualCol(viewPort.clampCol(viewPortCol)));
     };
 
+    function intersectRowsOrCols(intersection, range, topOrLeft, rowOrCol, heightOrWidth) {
+        var virtualBegin = range[topOrLeft];
+        var rangeBegin = getRealRowColUnsafe(virtualBegin, rowOrCol);
+        var rangeLength = range[heightOrWidth];
+        var rangeEnd = getRealRowColUnsafe(virtualBegin + rangeLength - 1, rowOrCol);
+        var viewPortMax = viewPort[rowOrCol + 's'];
+        var noIntersection = rangeBegin >= viewPortMax || (rangeEnd < 0);
+        if (noIntersection) {
+            return null;
+        }
+
+
+        intersection[topOrLeft] = util.clamp(rangeBegin, 0, viewPortMax - 1);
+        intersection[heightOrWidth] = Math.min(viewPortMax - intersection.top, rangeEnd + 1);
+        return intersection;
+    }
+
+    viewPort.intersect = function (range) {
+        //assume virtual cells for now
+        var intersection = intersectRowsOrCols({}, range, 'top', 'row', 'height');
+        if (!intersection) {
+            return null;
+        }
+        return intersectRowsOrCols(intersection, range, 'left', 'col', 'width');
+    };
+
 
     function calculateMaxLengths(totalLength, lengthModel) {
         var lengthMethod = lengthModel.width && grid.virtualPixelCellModel.width || grid.virtualPixelCellModel.height;
@@ -150,13 +185,15 @@ module.exports = function (_grid) {
     }
 
 
-    viewPort.iterateCells = function (cellFn, optionalRowFn) {
-        for (var r = 0; r < viewPort.minRows; r++) {
+    viewPort.iterateCells = function (cellFn, optionalRowFn, optionalMaxRow, optionalMaxCol) {
+        optionalMaxRow = optionalMaxRow || Infinity;
+        optionalMaxCol = optionalMaxCol || Infinity;
+        for (var r = 0; r < Math.min(viewPort.rows, optionalMaxRow); r++) {
             if (optionalRowFn) {
                 optionalRowFn(r);
             }
             if (cellFn) {
-                for (var c = 0; c < viewPort.minCols; c++) {
+                for (var c = 0; c < Math.min(viewPort.cols, optionalMaxCol); c++) {
                     cellFn(r, c);
 
                 }

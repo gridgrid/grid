@@ -19,6 +19,9 @@ module.exports = function (_grid) {
 
     viewLayer.viewPort = require('@grid/view-port')(grid);
 
+    //add the cell classes through the standard way
+    grid.cellClasses.add(grid.cellClasses.create(0, 0, 'grid-cell', Infinity, Infinity));
+
     viewLayer.build = function (elem) {
         container = elem;
         viewLayer.viewPort.sizeToContainer(container);
@@ -40,22 +43,32 @@ module.exports = function (_grid) {
 
         container.appendChild(root);
 
-        //read the border width, for the rare case of larger than 1px borders, otherwise default to 1
-        var jsGridCell = document.body.querySelector('.js-grid-cell');
+    };
+
+
+    function measureBorderWidth() {
+        //read the border width, for the rare case of larger than 1px borders, otherwise the draw will default to 1
+        if (borderWidth) {
+            return;
+        }
+        var jsGridCell = cells[0] && cells[0][0];
         if (jsGridCell) {
             var computedStyle = getComputedStyle(jsGridCell);
             var borderWidthProp = computedStyle.getPropertyValue('border-left-width');
             borderWidth = parseInt(borderWidthProp);
         }
-        borderWidth = isNaN(borderWidth) || !borderWidth ? 1 : borderWidth;
-    };
-
+        borderWidth = isNaN(borderWidth) || !borderWidth ? undefined : borderWidth;
+        return borderWidth;
+    }
 
     //only draw once per js turn, may need to create a synchronous version
     viewLayer.draw = debounce(function () {
         //return if we haven't built yet
         if (!container) {
             return;
+        }
+        if (grid.cellClasses.isDirty() || grid.cellScrollModel.isDirty()) {
+            drawCellClasses();
         }
 
         if (grid.cellScrollModel.isDirty()) {
@@ -66,15 +79,12 @@ module.exports = function (_grid) {
             drawDecorators();
         }
 
-        if (grid.cellClasses.isDirty()) {
-            drawCellClasses();
-        }
-
         grid.eventLoop.fire('grid-draw');
     }, 1);
 
     /* CELL LOGIC */
     function drawCells() {
+        var borderWidth = measureBorderWidth() || 1;
         viewLayer.viewPort.iterateCells(function drawCell(r, c) {
             var cell = cells[r][c];
             var width = viewLayer.viewPort.getColWidth(c);
@@ -82,7 +92,6 @@ module.exports = function (_grid) {
 
             var left = viewLayer.viewPort.getColLeft(c);
             cell.style.left = left + 'px';
-
 
             while (cell.firstChild) {
                 cell.removeChild(cell.firstChild);
@@ -130,7 +139,6 @@ module.exports = function (_grid) {
     function buildDivCell() {
         var cell = document.createElement('div');
         cell.setAttribute('dts', 'grid-cell');
-        cell.setAttribute('class', 'grid-cell js-grid-cell');
         var style = cell.style;
         style.position = 'absolute';
         style.boxSizing = 'border-box';
@@ -205,20 +213,27 @@ module.exports = function (_grid) {
 
     /* CELL CLASSES LOGIC */
     function drawCellClasses() {
-        var all = grid.cellClasses.getAll();
-        all.forEach(function (descriptor) {
-            var row = viewLayer.viewPort.toRealRow(descriptor.top);
-            var col = viewLayer.viewPort.toRealCol(descriptor.left);
+        viewLayer.viewPort.iterateCells(function (r, c) {
+            cells[r][c].className = '';
+        });
+        grid.cellClasses.getAll().forEach(function (descriptor) {
+            viewLayer.viewPort.iterateCells(function (r, c) {
+                //if the height or width is infinite we'll just apply the class
+                var row = descriptor.height === Infinity ? r : viewLayer.viewPort.toRealRow(descriptor.top + r);
+                var col = descriptor.width === Infinity ? c : viewLayer.viewPort.toRealCol(descriptor.left + c);
 
-            var cellRow = cells[row];
-            if (!cellRow) {
-                return;
-            }
-            var cell = cellRow[col];
-            if (!cell) {
-                return;
-            }
-            cell.className = cell.className + ' ' + descriptor.class;
+                var cellRow = cells[row];
+                if (!cellRow) {
+                    return;
+                }
+                var cell = cellRow[col];
+                if (!cell) {
+                    return;
+                }
+                cell.className = (cell.className ? cell.className + ' ' : '') + descriptor.class;
+            }, function (r) {
+
+            }, descriptor.height, descriptor.width); //these are the short circuit
         });
     }
 
