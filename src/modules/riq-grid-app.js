@@ -16,10 +16,10 @@ angular.module('riqGridApp', [])
                 var numRows = 1000;
                 var numCols = 100;
                 var grid = require('@grid/simple-grid')(numRows, numCols, [30], [40, 100, 400, 90], 1, 3);
-                grid.viewLayer.build(elem);
-                grid.eventLoop.setContainer(elem);
-                //this really shouldn't be necessary but just to make sure
+                grid.build(elem);
                 grid.navigationModel.navTo(1, 1);
+                
+                //this really shouldn't be necessary but just to make sure
                 grid.requestDraw();
 
             }

@@ -25,14 +25,14 @@ module.exports = function () {
         }
     };
 
-    beforeEach(inject(function () {
+    beforeEach(function () {
         core.container = document.createElement('div');
         $(core.container).css({
             width: core.CONTAINER_WIDTH + 'px',
             height: core.CONTAINER_HEIGHT + 'px'
         });
         $('body').append(core.container);
-    }));
+    });
 
     afterEach(function () {
         $(core.container).remove();

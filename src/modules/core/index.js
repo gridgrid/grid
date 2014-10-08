@@ -1,3 +1,5 @@
+var elementClass = require('element-class');
+
 module.exports = function () {
 
     var grid = {};
@@ -36,9 +38,35 @@ module.exports = function () {
         }
     });
 
+    var textarea;
+    var container;
+
+    function createFocusTextArea() {
+        var textarea = document.createElement('textarea');
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-100000px';
+        textarea.addEventListener('focus', function () {
+            if (container) {
+                elementClass(container).add('focus');
+            }
+        });
+
+        textarea.addEventListener('blur', function () {
+            if (container) {
+                elementClass(container).remove('focus');
+            }
+        });
+
+        return textarea;
+    }
+
     grid.build = function (_container) {
-        grid.viewLayer.build(_container);
-        grid.eventLoop.setContainer(_container);
+        container = _container;
+        textarea = createFocusTextArea();
+        container.appendChild(textarea);
+        grid.viewLayer.build(container);
+        grid.eventLoop.setContainer(container);
+
     };
 
     return grid;

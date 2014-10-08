@@ -13,6 +13,8 @@ module.exports = function (_grid) {
     var borderWidth;
 
     var GRID_CELL_CONTAINER_BASE_CLASS = 'grid-cells';
+    var GRID_VIEW_ROOT_CLASS = 'js-grid-view-root';
+
 
     var cells; //matrix of rendered cell elements;
     var rows; //array of all rendered rows
@@ -37,6 +39,7 @@ module.exports = function (_grid) {
         decoratorContainer.setAttribute('dts', 'grid-decorators');
 
         root = document.createElement('div');
+        root.setAttribute('class', GRID_VIEW_ROOT_CLASS);
 
         root.appendChild(cellContainer);
         root.appendChild(decoratorContainer);
@@ -246,8 +249,10 @@ module.exports = function (_grid) {
 
     function cleanup() {
         removeDecorators(grid.decorators.getAlive().concat(grid.decorators.popAllDead()));
-        while (container.firstChild) {
-            container.removeChild(container.firstChild);
+        var querySelectorAll = container.querySelectorAll('.' + GRID_VIEW_ROOT_CLASS);
+        for (var i = 0; i < querySelectorAll.length; ++i) {
+            var root = querySelectorAll[i];
+            container.removeChild(root);
         }
     }
 

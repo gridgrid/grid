@@ -1,4 +1,6 @@
 describe('grid-core', function () {
+    var helper = require('@grid/grid-spec-helper')();
+    var $ = require('jquery');
     var grid;
     beforeEach(function () {
         grid = require('@grid/core')();
@@ -21,7 +23,7 @@ describe('grid-core', function () {
     it('should have a main build function', function () {
         var viewBuild = spyOn(grid.viewLayer, 'build');
         var loopBuild = spyOn(grid.eventLoop, 'setContainer');
-        grid.build(document.createElement('div'));
+        grid.build(helper.container);
         expect(viewBuild).toHaveBeenCalled();
         expect(loopBuild).toHaveBeenCalled();
     });
@@ -47,4 +49,16 @@ describe('grid-core', function () {
 
         expect(draw).toHaveBeenCalled();
     });
+
+    it('should have a focusable text area on build', function () {
+        grid.build(helper.container);
+        expect($(helper.container).find('textarea')).toBeAnElement();
+    });
+
+    it('should add a class to the container on focus', function () {
+        grid.build(helper.container);
+        $(helper.container).find('textarea').focus();
+        expect(helper.container).toHaveClass('focus');
+    });
+
 });
