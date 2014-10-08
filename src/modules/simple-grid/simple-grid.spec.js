@@ -7,29 +7,6 @@ describe('simple-grid', function () {
         grid = helper.buildSimpleGrid();
     });
 
-
-    function spyOnDraw() {
-        return spyOn(grid.viewLayer, 'draw');
-    }
-
-    it('should let me request a redraw', function () {
-        var draw = spyOn(grid.viewLayer, 'draw');
-        grid.requestDraw();
-        expect(draw).toHaveBeenCalled();
-    });
-
-    it('should not draw on request if in event loop but should draw after', function () {
-        var draw = spyOnDraw();
-        grid.eventLoop.addInterceptor(inLoopFn);
-        grid.eventLoop.fire({});
-        function inLoopFn() {
-            grid.requestDraw();
-            expect(draw).not.toHaveBeenCalled();
-        }
-
-        expect(draw).toHaveBeenCalled();
-    });
-
     it('should let me vary the widths ', function () {
         grid = helper.buildSimpleGrid(100, 10, undefined, [99, 100, 101]);
         expect(grid.colModel.width(0)).toBe(99);

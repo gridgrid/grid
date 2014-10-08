@@ -110,6 +110,12 @@
                 return 'Expected ' + JSON.stringify(this.actual) + (this.isNot ? ' not' : '') + ' to be clean';
             };
             return this.actual.isClean();
+        },
+        toHaveField: function (fieldName) {
+            this.message = function () {
+                return 'Expected ' + JSON.stringify(this.actual) + (this.isNot ? ' not' : '') + 'to have field: ' + fieldName;
+            };
+            return fieldName in this.actual;
         }
     };
 
