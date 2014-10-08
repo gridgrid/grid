@@ -1,5 +1,5 @@
 describe('range-util', function () {
-    var core = require('@grid/grid-spec-helper')();
+    var helper = require('@grid/grid-spec-helper')();
     var util;
     beforeEach(function () {
         util = require('@grid/range-util');

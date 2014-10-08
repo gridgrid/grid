@@ -2,14 +2,14 @@ var mockEvent = require('@grid/custom-event');
 
 describe('pixel-scroll-model', function () {
     var $ = require('jquery');
-    var core = require('@grid/grid-spec-helper')();
+    var helper = require('@grid/grid-spec-helper')();
     var model;
     var numRows = 100;
     var numCols = 10;
     var grid;
 
     beforeEach(function () {
-        grid = core.buildSimpleGrid(numRows, numCols);
+        grid = helper.buildSimpleGrid(numRows, numCols);
         model = grid.pixelScrollModel;
     });
 

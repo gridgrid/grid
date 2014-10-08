@@ -19,6 +19,25 @@ module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows,
     grid.pixelScrollModel = require('@grid/pixel-scroll-model')(grid);
 
 
+    var drawRequested = false;
+    grid.requestDraw = function () {
+        if (!grid.eventLoop.isRunning) {
+            grid.viewLayer.draw();
+        } else {
+            drawRequested = true;
+        }
+    };
+
+    grid.eventLoop.bind('grid-draw', function () {
+        drawRequested = false;
+    });
+
+    grid.eventLoop.addExitListener(function () {
+        if (drawRequested) {
+            grid.viewLayer.draw();
+        }
+    });
+
     if (numRows) {
         for (var r = 0; r < numRows; r++) {
             var row = {};
@@ -51,25 +70,6 @@ module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows,
             }
         }
     }
-
-    var drawRequested = false;
-    grid.requestDraw = function () {
-        if (!grid.eventLoop.isRunning) {
-            grid.viewLayer.draw();
-        } else {
-            drawRequested = true;
-        }
-    };
-
-    grid.eventLoop.bind('grid-draw', function () {
-        drawRequested = false;
-    });
-
-    grid.eventLoop.addExitListener(function () {
-        if (drawRequested) {
-            grid.viewLayer.draw();
-        }
-    });
 
     return grid;
 };

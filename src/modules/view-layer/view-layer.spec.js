@@ -2,7 +2,7 @@ var viewLayer = require('@grid/view-layer');
 
 describe('view-layer', function () {
 
-    var core = require('@grid/grid-spec-helper')();
+    var helper = require('@grid/grid-spec-helper')();
     var viewRows = 10;
     var viewCols = 10;
     var view;
@@ -11,14 +11,14 @@ describe('view-layer', function () {
     var container;
 
     function viewBeforeEach(varyHeight, varyWidth, frows, fcols) {
-        grid = core.buildSimpleGrid(100, 20, varyHeight, varyWidth, frows, fcols);
+        grid = helper.buildSimpleGrid(100, 20, varyHeight, varyWidth, frows, fcols);
         view = grid.viewLayer;
         //mock the view port
         view.viewPort.sizeToContainer = function () {
         };
         view.viewPort.rows = viewRows;
         view.viewPort.cols = viewCols;
-        container = core.viewBuild();
+        container = helper.viewBuild();
     }
 
     beforeEach(function () {
@@ -60,7 +60,7 @@ describe('view-layer', function () {
 
     it('should add style classes to the cell on draw', function () {
         view.draw();
-        core.onDraw(function () {
+        helper.onDraw(function () {
             expectOnlyRangeToHaveClass(0, 0, viewRows, viewCols, 'grid-cell');
         });
     });
@@ -73,18 +73,18 @@ describe('view-layer', function () {
 
     it('should add a class to indicate the scroll top is odd', function () {
         grid.cellScrollModel.scrollTo(1, 0);
-        core.onDraw(function () {
+        helper.onDraw(function () {
             expect(findCellContainer()).toHaveClass('odds');
             grid.cellScrollModel.scrollTo(2, 0);
         });
-        core.onDraw(function () {
+        helper.onDraw(function () {
             expect(findCellContainer()).not.toHaveClass('odds');
         });
     });
 
     it('should be able to write values to cells', function () {
         view.draw();
-        core.onDraw(function () {
+        helper.onDraw(function () {
             expect(findGridCells(container).first().text()).toEqual('0-0');
         });
     });
@@ -92,7 +92,7 @@ describe('view-layer', function () {
 
     it('should set the height of rows on draw', function () {
         view.draw();
-        core.onDraw(function () {
+        helper.onDraw(function () {
             var rows = findGridRows();
             expect(rows.first().height()).toBe(31);
         });
@@ -102,7 +102,7 @@ describe('view-layer', function () {
         expect(findGridCells(container).first().width()).toEqual(0);
         expect(findGridCells(container).first().height()).toEqual(0);
         view.draw();
-        core.onDraw(function () {
+        helper.onDraw(function () {
             //we want the heights and widths to be rendered at 1 higher than their virtual value in order to collapse the borders 
             expect(findGridCells(container).first().width()).toEqual(101);
             expect(findGridCells(container).first().height()).toEqual(31);
@@ -113,9 +113,9 @@ describe('view-layer', function () {
         var styleOverride = document.createElement('style');
         styleOverride.innerHTML = '.grid-cell{border : 2px solid black;}';
         document.body.appendChild(styleOverride);
-        container = core.viewBuild();
+        container = helper.viewBuild();
         view.draw();
-        core.onDraw(function () {
+        helper.onDraw(function () {
             document.body.removeChild(styleOverride);
             //we want the heights and widths to be rendered at 1 higher than their virtual value in order to collapse the borders 
             expect(findGridCells(container).first().width()).toEqual(102);
@@ -157,7 +157,7 @@ describe('view-layer', function () {
         expect(findGridCells(container).first().width()).toEqual(0);
         expect(findGridCells(container).first().height()).toEqual(0);
         view.draw();
-        core.onDraw(function () {
+        helper.onDraw(function () {
             //we want the heights and widths to be rendered at 1 higher than their virtual value in order to collapse the borders 
             expect(findColCellByIndex(0).width()).toEqual(100);
             expect(findColCellByIndex(1).width()).toEqual(101);
@@ -176,24 +176,24 @@ describe('view-layer', function () {
 
     it('should write offset values to the cells if scrolled', function () {
         grid.cellScrollModel.scrollTo(5, 6);
-        core.onDraw(function () {
+        helper.onDraw(function () {
             expectFirstCellText('5-6');
         });
     });
 
     it('shouldnt call draw cells if cell scroll model isnt dirty', function () {
 
-        core.resetAllDirties();
+        helper.resetAllDirties();
         var spy = spyOn(grid.dataModel, 'getFormatted');
         view.draw();
-        core.onDraw(function () {
+        helper.onDraw(function () {
             expect(spy).not.toHaveBeenCalled();
         });
     });
 
     it('should position the cells in a grid', function () {
         view.draw();
-        core.onDraw(function () {
+        helper.onDraw(function () {
             //the row does the vertical positioning so we have to check the top value of offset and left value of position
             expect(findGridCells(container).last().offset().top).toEqual(30 * (viewRows - 1));
             expect(findGridCells(container).last().position().left).toEqual(100 * (viewCols - 1));
@@ -214,12 +214,12 @@ describe('view-layer', function () {
     it('should position varied width and height cells on scroll', function () {
         viewBeforeEach([20, 30, 40], [99, 100, 101]);
         view.draw();
-        core.onDraw(function () {
+        helper.onDraw(function () {
             expectFirstAndSecondCell(100);
             grid.cellScrollModel.scrollTo(1, 1);
         });
 
-        core.onDraw(function () {
+        helper.onDraw(function () {
             expectFirstAndSecondCell(101);
         });
     });
@@ -228,7 +228,7 @@ describe('view-layer', function () {
         var spy = jasmine.createSpy();
         grid.eventLoop.bind('grid-draw', spy);
         view.draw();
-        core.onDraw(function () {
+        helper.onDraw(function () {
             expect(spy).toHaveBeenCalled();
         });
     });
@@ -260,13 +260,13 @@ describe('view-layer', function () {
         it('should draw only when dirty', function () {
             var spy = spyOn(grid.decorators, 'getAlive').andCallThrough(); //treat this as the test that its going to draw
             grid.decorators.add(decorator);
-            core.onDraw(function () {
+            helper.onDraw(function () {
                 expect(spy).toHaveBeenCalled();
                 spy.reset();
                 grid.viewLayer.draw();
             });
 
-            core.onDraw(function () {
+            helper.onDraw(function () {
                 expect(spy).not.toHaveBeenCalled();
             });
         });
@@ -280,7 +280,7 @@ describe('view-layer', function () {
 
         it('should render a decorator into a container with pointer events none', function () {
             grid.decorators.add(decorator);
-            core.onDraw(function () {
+            helper.onDraw(function () {
                 expect(decorator.getDiv().parentElement).toBeTruthy();
                 expect($(decorator.getDiv()).parents('[dts=grid-decorators]').length).toBe(1);
             });
@@ -297,7 +297,7 @@ describe('view-layer', function () {
             var spy = jasmine.createSpy();
             decorator.getDiv().addEventListener('decorator-destroy', spy);
             grid.decorators.add(decorator);
-            core.onDraw(function () {
+            helper.onDraw(function () {
                 view.destroy();
                 expectDestroySpyToBeCalledAndDecoratorToBeOutOfTheDom(spy);
             });
@@ -307,10 +307,10 @@ describe('view-layer', function () {
             var spy = jasmine.createSpy();
             decorator.getDiv().addEventListener('decorator-destroy', spy);
             grid.decorators.add(decorator);
-            core.onDraw(function () {
+            helper.onDraw(function () {
                 grid.decorators.remove(decorator); //remove implicitly calls draw
             });
-            core.onDraw(function () {
+            helper.onDraw(function () {
                 expectDestroySpyToBeCalledAndDecoratorToBeOutOfTheDom(spy);
             });
 
@@ -324,7 +324,7 @@ describe('view-layer', function () {
         }
 
         function expectBoundingBoxSize(top, left, height, width, nextFn) {
-            core.onDraw(function () {
+            helper.onDraw(function () {
                 var $boundingBox = $(decorator.boundingBox);
                 expect($boundingBox.position().top).toBe(top);
                 expect($boundingBox.position().left).toBe(left);
@@ -386,13 +386,13 @@ describe('view-layer', function () {
         it('should not move on scroll', function () {
             viewBeforeEach(false, false, 1, 0);
             grid.cellScrollModel.scrollTo(1, 0);
-            core.onDraw(function () {
+            helper.onDraw(function () {
                 expectFirstCellText('0-0');
                 viewBeforeEach(false, false, 0, 1);
                 grid.cellScrollModel.scrollTo(0, 1);
             });
 
-            core.onDraw(function () {
+            helper.onDraw(function () {
                 expectFirstCellText('0-0');
             });
         });
@@ -400,7 +400,7 @@ describe('view-layer', function () {
         it('should affect positioning of unfixed', function () {
             viewBeforeEach(false, false, 1, 0);
             grid.cellScrollModel.scrollTo(1, 0);
-            core.onDraw(function () {
+            helper.onDraw(function () {
                 findGridCells(container);
             });
         });
@@ -410,12 +410,12 @@ describe('view-layer', function () {
         it('should draw the classes only  when dirty', function () {
             grid.cellClasses.add(grid.cellClasses.create(1, 1, ''));
             var spy = spyOn(grid.cellClasses, 'getAll').andCallThrough();
-            core.onDraw(function () {
+            helper.onDraw(function () {
                 expect(spy).toHaveBeenCalled();
                 spy.reset();
                 view.draw();
             });
-            core.onDraw(function () {
+            helper.onDraw(function () {
                 expect(spy).not.toHaveBeenCalled();
             });
         });
@@ -424,7 +424,7 @@ describe('view-layer', function () {
             var cellClass = 'myCellClasssss';
             var descriptor = grid.cellClasses.create(0, 0, cellClass);
             grid.cellClasses.add(descriptor);
-            core.onDraw(function () {
+            helper.onDraw(function () {
                 expect(findGridCells().first()).toHaveClass(cellClass);
             });
         });
@@ -433,7 +433,7 @@ describe('view-layer', function () {
             var cellClass = 'myRangedClass';
             var descriptor = grid.cellClasses.create(0, 0, cellClass, 2, 3);
             grid.cellClasses.add(descriptor);
-            core.onDraw(function () {
+            helper.onDraw(function () {
                 expectOnlyRangeToHaveClass(0, 0, 2, 3, cellClass);
             });
         });
@@ -443,11 +443,11 @@ describe('view-layer', function () {
             var descriptor = grid.cellClasses.create(0, 0, cellClass, Infinity, 2);
 
             grid.cellClasses.add(descriptor);
-            core.onDraw(function () {
+            helper.onDraw(function () {
                 expectOnlyRangeToHaveClass(0, 0, viewRows, 2, cellClass);
                 grid.cellScrollModel.scrollTo(5, 0);
             });
-            core.onDraw(function () {
+            helper.onDraw(function () {
                 expectOnlyRangeToHaveClass(0, 0, viewRows, 2, cellClass);
             });
         });
@@ -457,11 +457,11 @@ describe('view-layer', function () {
             var secondClass = 'totallyNewClass';
             var descriptor = grid.cellClasses.create(0, 0, cellClass);
             grid.cellClasses.add(descriptor);
-            core.onDraw(function () {
+            helper.onDraw(function () {
 
                 descriptor.class = secondClass;
             });
-            core.onDraw(function () {
+            helper.onDraw(function () {
                 expect(findCellByRowCol(0, 0)).toHaveClass(secondClass);
                 expect(findCellByRowCol(0, 0)).not.toHaveClass(cellClass);
             });
@@ -474,7 +474,7 @@ describe('view-layer', function () {
             var descriptor2 = grid.cellClasses.create(0, 0, cellClass2);
             grid.cellClasses.add(descriptor);
             grid.cellClasses.add(descriptor2);
-            core.onDraw(function () {
+            helper.onDraw(function () {
                 var cell = findCellByRowCol(1, 1);
                 expect(cell).toHaveClass(cellClass);
                 var cell2 = findCellByRowCol(0, 0);
@@ -483,7 +483,7 @@ describe('view-layer', function () {
                 grid.cellScrollModel.scrollTo(1, 1);
             });
 
-            core.onDraw(function () {
+            helper.onDraw(function () {
                 expect(findGridCells().first()).toHaveClass(cellClass);
                 expect(findGridCells().first()).not.toHaveClass(cellClass2);
             });

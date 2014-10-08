@@ -1,33 +1,33 @@
 describe('view port', function () {
 
-    var core = require('@grid/grid-spec-helper')();
+    var helper = require('@grid/grid-spec-helper')();
     var viewPort;
     var grid;
 
     var beforeEachFunction = function (varyHeights, varyWidths, frows, fcols) {
-        grid = core.buildSimpleGrid(100, 10, varyHeights, varyWidths, frows, fcols);
+        grid = helper.buildSimpleGrid(100, 10, varyHeights, varyWidths, frows, fcols);
         viewPort = grid.viewLayer.viewPort;
-        viewPort.sizeToContainer(core.container);
+        viewPort.sizeToContainer(helper.container);
     };
     beforeEach(beforeEachFunction);
 
     it('should accurately calculate the width and height of the container', function () {
-        expect(viewPort.width).toEqual(core.CONTAINER_WIDTH);
-        expect(viewPort.height).toEqual(core.CONTAINER_HEIGHT);
+        expect(viewPort.width).toEqual(helper.CONTAINER_WIDTH);
+        expect(viewPort.height).toEqual(helper.CONTAINER_HEIGHT);
     });
 
     it('should fire an event when sized', function () {
         var spy = jasmine.createSpy();
         grid.eventLoop.bind('grid-viewport-change', spy);
-        viewPort.sizeToContainer(core.container);
+        viewPort.sizeToContainer(helper.container);
         expect(spy).toHaveBeenCalled();
     });
 
     it('should calculate the max number of cells that could fit in the screen', function () {
         //basic test for default heights and widths
 
-        var cols = Math.floor(core.CONTAINER_WIDTH / 100) + 1;
-        var rows = Math.floor(core.CONTAINER_HEIGHT / 30) + 1;
+        var cols = Math.floor(helper.CONTAINER_WIDTH / 100) + 1;
+        var rows = Math.floor(helper.CONTAINER_HEIGHT / 30) + 1;
 
         expect(viewPort.cols).toEqual(cols);
         expect(viewPort.rows).toEqual(rows);
@@ -84,9 +84,9 @@ describe('view port', function () {
 
     it('should clamp pixels to the viewport', function () {
         expect(viewPort.clampY(-1)).toBe(0);
-        expect(viewPort.clampY(100000000)).toBe(core.CONTAINER_HEIGHT);
+        expect(viewPort.clampY(100000000)).toBe(helper.CONTAINER_HEIGHT);
         expect(viewPort.clampX(-1)).toBe(0);
-        expect(viewPort.clampX(100000000)).toBe(core.CONTAINER_WIDTH);
+        expect(viewPort.clampX(100000000)).toBe(helper.CONTAINER_WIDTH);
     });
 
 
@@ -178,45 +178,45 @@ describe('view port', function () {
         }
 
         it('should return the same range for ranges totally in the view', function () {
-            var range = core.makeFakeRange(0, 0, 2, 3);
+            var range = helper.makeFakeRange(0, 0, 2, 3);
             expectRangeToHave(viewPort.intersect(range), 0, 0, 2, 3);
         });
 
         it('should return null for ranges whos top is too high', function () {
-            var range = core.makeFakeRange(10000, 0, 2, 3);
+            var range = helper.makeFakeRange(10000, 0, 2, 3);
             expect(viewPort.intersect(range)).toBe(null);
         });
 
         it('should return null for ranges whos top plus height is below the minimum', function () {
-            var range = core.makeFakeRange(0, 0, 2, 3);
+            var range = helper.makeFakeRange(0, 0, 2, 3);
             grid.cellScrollModel.scrollTo(5, 0);
             expect(viewPort.intersect(range)).toBe(null);
         });
 
         it('should return null for ranges whos left is too high', function () {
-            var range = core.makeFakeRange(0, 10000, 2, 3);
+            var range = helper.makeFakeRange(0, 10000, 2, 3);
             expect(viewPort.intersect(range)).toBe(null);
         });
 
         it('should return null for ranges whos left plus width is below the minimum', function () {
-            var range = core.makeFakeRange(0, 0, 2, 3);
+            var range = helper.makeFakeRange(0, 0, 2, 3);
             grid.cellScrollModel.scrollTo(0, 5);
             expect(viewPort.intersect(range)).toBe(null);
         });
 
         it('should be able to intersect single cell ranges', function () {
-            var range = core.makeFakeRange(0, 0, 1, 1);
+            var range = helper.makeFakeRange(0, 0, 1, 1);
             expectRangeToHave(viewPort.intersect(range), 0, 0, 1, 1);
         });
 
         it('should return just the intersected piece for ranges that do intersect', function () {
-            var range = core.makeFakeRange(5, 5, 10000, 10000);
+            var range = helper.makeFakeRange(5, 5, 10000, 10000);
             expectRangeToHave(viewPort.intersect(range), 5, 5, viewPort.rows - 5, viewPort.cols - 5);
 
-            range = core.makeFakeRange(5, 5, Infinity, Infinity);
+            range = helper.makeFakeRange(5, 5, Infinity, Infinity);
             expectRangeToHave(viewPort.intersect(range), 5, 5, viewPort.rows - 5, viewPort.cols - 5);
 
-            range = core.makeFakeRange(0, 0, 5, 6);
+            range = helper.makeFakeRange(0, 0, 5, 6);
             grid.cellScrollModel.scrollTo(3, 3);
             expectRangeToHave(viewPort.intersect(range), 0, 0, 2, 3);
 
@@ -224,48 +224,48 @@ describe('view port', function () {
 
         it('should be able to return ranges that cross the fixed boundary when scrolled', function () {
             beforeEachFunction(false, false, 1, 2);
-            var range = core.makeFakeRange(0, 0, 5, 5);
+            var range = helper.makeFakeRange(0, 0, 5, 5);
             grid.cellScrollModel.scrollTo(2, 3);
             expectRangeToHave(viewPort.intersect(range), 0, 0, 3, 2);
         });
 
         it('should be able to return ranges that only intersect the fixed area', function () {
             beforeEachFunction(false, false, 3, 3);
-            var range = core.makeFakeRange(0, 0, 1, 1);
+            var range = helper.makeFakeRange(0, 0, 1, 1);
             grid.cellScrollModel.scrollTo(2, 3);
             expectRangeToHave(viewPort.intersect(range), 0, 0, 1, 1);
         });
 
         it('should be able to intersect single cell ranges just past the fixed area', function () {
             beforeEachFunction(false, false, 1, 1);
-            var range = core.makeFakeRange(1, 1, 1, 1);
+            var range = helper.makeFakeRange(1, 1, 1, 1);
             expectRangeToHave(viewPort.intersect(range), 1, 1, 1, 1);
         });
 
         it('should return null for ranges that should be scrolled out of view that would otherwise lie in the fixed area', function () {
             beforeEachFunction(false, false, 1, 3);
             grid.cellScrollModel.scrollTo(1, 0);
-            var range = core.makeFakeRange(1, 1, 1, 1);
+            var range = helper.makeFakeRange(1, 1, 1, 1);
             expect(viewPort.intersect(range)).toBe(null);
         });
 
         it('should be able to return ranges that intersect exactly the fixed area', function () {
             beforeEachFunction(false, false, 3, 3);
-            var range = core.makeFakeRange(0, 0, 3, 3);
+            var range = helper.makeFakeRange(0, 0, 3, 3);
             grid.cellScrollModel.scrollTo(2, 3);
             expectRangeToHave(viewPort.intersect(range), 0, 0, 3, 3);
         });
 
         it('should be able to return ranges that only intersect the scrollable area', function () {
             beforeEachFunction(false, false, 1, 2);
-            var range = core.makeFakeRange(5, 5, 10000, 10000);
+            var range = helper.makeFakeRange(5, 5, 10000, 10000);
             grid.cellScrollModel.scrollTo(1, 1);
             expectRangeToHave(viewPort.intersect(range), 4, 4, viewPort.rows - 4, viewPort.cols - 4);
         });
 
         it('should be able to return a range for the entire virtual space', function () {
             beforeEachFunction(false, false, 1, 1);
-            var range = core.makeFakeRange(0, 0, Infinity, Infinity);
+            var range = helper.makeFakeRange(0, 0, Infinity, Infinity);
             expectRangeToHave(viewPort.intersect(range), 0, 0, viewPort.rows, viewPort.cols);
         });
     });

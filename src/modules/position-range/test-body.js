@@ -1,14 +1,14 @@
 function testPositionRange(context) {
     describe('position-range', function () {
         var range;
-        var core;
+        var helper;
         var parent;
         var dirtyPropsCtx = {props: ['top', 'left', 'height', 'width', 'units', 'space']};
         beforeEach(function () {
             range = context.range;
-            core = context.core;
+            helper = context.helper;
             parent = context.parent;
-            dirtyPropsCtx.core = core;
+            dirtyPropsCtx.helper = helper;
             dirtyPropsCtx.obj = range;
             dirtyPropsCtx.parent = parent;
         });

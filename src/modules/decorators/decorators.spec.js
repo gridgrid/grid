@@ -1,20 +1,20 @@
 describe('decorators', function () {
-    var core = require('@grid/grid-spec-helper')();
+    var helper = require('@grid/grid-spec-helper')();
     var decorators;
     var grid;
     beforeEach(function () {
-        grid = core.buildSimpleGrid();
+        grid = helper.buildSimpleGrid();
         decorators = grid.decorators;
         //clear any other decorators
         decorators.remove(grid.decorators.getAlive());
         decorators.popAllDead();
         spyOn(grid, 'requestDraw'); //mock the method to prevent draw
-        core.resetAllDirties(); //set everything clean to start
+        helper.resetAllDirties(); //set everything clean to start
     });
 
     describe('should create decorators', function () {
         var decorator;
-        var ctx = {core: core};
+        var ctx = {helper: helper};
         beforeEach(function () {
             decorator = decorators.create();
             ctx.range = decorator;
@@ -33,7 +33,7 @@ describe('decorators', function () {
 
     it('should let me add a decorator and request draw', function () {
         var dec = decorators.create();
-        core.resetAllDirties();
+        helper.resetAllDirties();
         expect(decorators).not.toBeDirty();
         decorators.add(dec);
         expect(decorators).toBeDirty();
@@ -42,10 +42,10 @@ describe('decorators', function () {
 
     it('should let me remove a decorator', function () {
         var dec = decorators.create();
-        core.resetAllDirties();
+        helper.resetAllDirties();
         expect(decorators).not.toBeDirty();
         decorators.add(dec);
-        core.resetAllDirties();
+        helper.resetAllDirties();
         expect(decorators).not.toBeDirty();
         decorators.remove(dec);
         expect(decorators).toBeDirty();

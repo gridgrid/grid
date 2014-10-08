@@ -1,10 +1,10 @@
 module.exports = function (context) {
-    var core;
+    var helper;
     var obj;
     var parent;
     var props;
     beforeEach(function () {
-        core = context.core;
+        helper = context.helper;
         obj = context.obj;
         parent = context.parent;
         props = context.props;
@@ -12,7 +12,7 @@ module.exports = function (context) {
 
     describe('add-dirty-props', function () {
         function setPropAndCheckDirty(prop, val) {
-            core.resetAllDirties();
+            helper.resetAllDirties();
             expect(obj).not.toBeDirty();
             if (parent) {
                 expect(parent).not.toBeDirty();

@@ -1,10 +1,10 @@
 (function () {
     var makeDirtyClean = require('@grid/dirty-clean');
-    var core = require('@grid/grid-spec-helper')();
+    var helper = require('@grid/grid-spec-helper')();
 
-    var ctx = {core: core, props: ['random', 'props', 'are', 'func']};
+    var ctx = {helper: helper, props: ['random', 'props', 'are', 'func']};
     beforeEach(function () {
-        var grid = core.buildSimpleGrid();
+        var grid = helper.buildSimpleGrid();
         var parentDirtyClean = makeDirtyClean(grid);
         var parent = {isDirty: parentDirtyClean.isDirty};
         var dirtyClean = makeDirtyClean(grid);

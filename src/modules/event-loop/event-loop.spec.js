@@ -1,10 +1,10 @@
 describe('event-loop', function () {
-    var core = require('@grid/grid-spec-helper')();
+    var helper = require('@grid/grid-spec-helper')();
     var mockEvent = require('@grid/custom-event');
     var loop;
     var grid;
     beforeEach(inject(function () {
-        grid = core.buildSimpleGrid();
+        grid = helper.buildSimpleGrid();
         loop = grid.eventLoop;
     }));
 
@@ -104,7 +104,7 @@ describe('event-loop', function () {
 
         it('should let me bind, fire and unbind a dom event to the grid container and be in loop during', function () {
             var spy = jasmine.createSpy();
-            var container = core.container;
+            var container = helper.container;
             grid.eventLoop.setContainer(container);
             var div = document.createElement('div');
             container.appendChild(div);

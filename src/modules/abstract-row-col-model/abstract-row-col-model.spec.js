@@ -1,9 +1,9 @@
 function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
-    var core = require('@grid/grid-spec-helper')();
+    var helper = require('@grid/grid-spec-helper')();
     var model;
     var grid;
     beforeEach(function () {
-        grid = core.buildSimpleGrid();
+        grid = helper.buildSimpleGrid();
         model = modelCreatorFn(grid, name, lengthName, defaultLength);
     });
 

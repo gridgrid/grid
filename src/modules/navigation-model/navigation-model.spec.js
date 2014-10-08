@@ -2,11 +2,11 @@ var mockEvent = require('@grid/custom-event');
 var key = require('key');
 
 describe('navigation-model', function () {
-    var core = require('@grid/grid-spec-helper')();
+    var helper = require('@grid/grid-spec-helper')();
     var model;
     var grid;
     beforeEach(function () {
-        grid = core.buildSimpleGrid();
+        grid = helper.buildSimpleGrid();
         model = grid.navigationModel;
     });
 
