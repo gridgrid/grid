@@ -36,5 +36,10 @@ module.exports = function () {
         }
     });
 
+    grid.build = function (_container) {
+        grid.viewLayer.build(_container);
+        grid.eventLoop.setContainer(_container);
+    };
+
     return grid;
 };

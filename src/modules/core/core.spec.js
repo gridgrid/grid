@@ -18,6 +18,14 @@ describe('grid-core', function () {
         expect(grid).toHaveField('pixelScrollModel');
     });
 
+    it('should have a main build function', function () {
+        var viewBuild = spyOn(grid.viewLayer, 'build');
+        var loopBuild = spyOn(grid.eventLoop, 'setContainer');
+        grid.build(document.createElement('div'));
+        expect(viewBuild).toHaveBeenCalled();
+        expect(loopBuild).toHaveBeenCalled();
+    });
+
     function spyOnDraw() {
         return spyOn(grid.viewLayer, 'draw');
     }
