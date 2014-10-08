@@ -61,9 +61,7 @@ describe('view-layer', function () {
     it('should add style classes to the cell on draw', function () {
         view.draw();
         core.onDraw(function () {
-            var gridCells = findGridCells(container);
-            expect(gridCells).toHaveClass('grid-cell');
-
+            expectOnlyRangeToHaveClass(0, 0, viewRows, viewCols, 'grid-cell');
         });
     });
 
@@ -137,6 +135,22 @@ describe('view-layer', function () {
     function findCellByRowCol(r, c) {
         return $(findGridCells(container)[r * viewCols + c]);
     }
+
+    function expectOnlyRangeToHaveClass(t, l, h, w, cellClass) {
+        for (var r = 0; r < viewRows; r++) {
+            for (var c = 0; c < viewCols; c++) {
+                var cell = findCellByRowCol(r, c);
+                var expectCell = expect(cell);
+                if (r < t || r >= t + h || c < l || c >= l + w) {
+                    expectCell.not.toHaveClass(cellClass);
+                } else {
+                    expectCell.toHaveClass(cellClass);
+                }
+
+            }
+        }
+    }
+
 
     it('should write varied widths and heights', function () {
         viewBeforeEach([20, 30, 40], [99, 100, 101]);
@@ -415,33 +429,26 @@ describe('view-layer', function () {
             });
         });
 
-        function expectRangeToHaveClass(t, l, h, w, cellClass) {
-            for (var r = 0; r < h; r++) {
-                for (var c = 0; c < w; c++) {
-                    expect(findCellByRowCol(t + r, l + c)).toHaveClass(cellClass);
-                }
-            }
-        }
-
         it('should add a class to a range of cells cell', function () {
             var cellClass = 'myRangedClass';
             var descriptor = grid.cellClasses.create(0, 0, cellClass, 2, 3);
             grid.cellClasses.add(descriptor);
             core.onDraw(function () {
-                expectRangeToHaveClass(0, 0, 2, 3, cellClass);
+                expectOnlyRangeToHaveClass(0, 0, 2, 3, cellClass);
             });
         });
 
         it('should add a class to infinite ranges', function () {
             var cellClass = 'myRangedClass';
             var descriptor = grid.cellClasses.create(0, 0, cellClass, Infinity, 2);
+
             grid.cellClasses.add(descriptor);
             core.onDraw(function () {
-                expectRangeToHaveClass(0, 0, viewRows, 2, cellClass);
-                grid.cellScrollModel.scrollTo(viewRows, viewCols);
+                expectOnlyRangeToHaveClass(0, 0, viewRows, 2, cellClass);
+                grid.cellScrollModel.scrollTo(5, 0);
             });
             core.onDraw(function () {
-                expectRangeToHaveClass(0, 0, viewRows, 2, cellClass);
+                expectOnlyRangeToHaveClass(0, 0, viewRows, 2, cellClass);
             });
         });
 

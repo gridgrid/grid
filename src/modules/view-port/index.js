@@ -1,4 +1,5 @@
 var util = require('@grid/util');
+var rangeUtil = require('@grid/range-util');
 var capitalize = require('capitalize');
 
 module.exports = function (_grid) {
@@ -130,19 +131,21 @@ module.exports = function (_grid) {
     };
 
     function intersectRowsOrCols(intersection, range, topOrLeft, rowOrCol, heightOrWidth) {
-        var virtualBegin = range[topOrLeft];
-        var rangeBegin = getRealRowColUnsafe(virtualBegin, rowOrCol);
-        var rangeLength = range[heightOrWidth];
-        var rangeEnd = getRealRowColUnsafe(virtualBegin + rangeLength - 1, rowOrCol);
-        var viewPortMax = viewPort[rowOrCol + 's'];
-        var noIntersection = rangeBegin >= viewPortMax || (rangeEnd < 0);
-        if (noIntersection) {
+        var numFixed = fixed[rowOrCol + 's'];
+        var fixedRange = [0, numFixed];
+
+        var virtualRange = [range[topOrLeft], range[heightOrWidth]];
+        var fixedIntersection = rangeUtil.intersect(fixedRange, virtualRange);
+        var scrollRange = [numFixed, viewPort[rowOrCol + 's'] - numFixed];
+        virtualRange[0] -= grid.cellScrollModel[rowOrCol];
+        var scrollIntersection = rangeUtil.intersect(scrollRange, virtualRange);
+        var resultRange = rangeUtil.union(fixedIntersection, scrollIntersection);
+        if (!resultRange) {
             return null;
         }
 
-
-        intersection[topOrLeft] = util.clamp(rangeBegin, 0, viewPortMax - 1);
-        intersection[heightOrWidth] = Math.min(viewPortMax - intersection.top, rangeEnd + 1);
+        intersection[topOrLeft] = resultRange[0];
+        intersection[heightOrWidth] = resultRange[1];
         return intersection;
     }
 

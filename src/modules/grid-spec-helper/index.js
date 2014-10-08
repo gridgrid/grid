@@ -19,6 +19,9 @@ module.exports = function () {
         },
         resetAllDirties: function () {
             core.grid.eventLoop.fire('grid-draw');
+        },
+        makeFakeRange: function (t, l, h, w) {
+            return {top: t, left: l, height: h, width: w};
         }
     };
 

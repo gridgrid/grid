@@ -217,23 +217,26 @@ module.exports = function (_grid) {
             cells[r][c].className = '';
         });
         grid.cellClasses.getAll().forEach(function (descriptor) {
-            viewLayer.viewPort.iterateCells(function (r, c) {
-                //if the height or width is infinite we'll just apply the class
-                var row = descriptor.height === Infinity ? r : viewLayer.viewPort.toRealRow(descriptor.top + r);
-                var col = descriptor.width === Infinity ? c : viewLayer.viewPort.toRealCol(descriptor.left + c);
+            var intersection = viewLayer.viewPort.intersect(descriptor);
+            if (intersection) {
+                rowloop:
+                    for (var r = 0; r < intersection.height; r++) {
+                        for (var c = 0; c < intersection.width; c++) {
+                            var row = intersection.top + r;
+                            var col = intersection.left + c;
 
-                var cellRow = cells[row];
-                if (!cellRow) {
-                    return;
-                }
-                var cell = cellRow[col];
-                if (!cell) {
-                    return;
-                }
-                cell.className = (cell.className ? cell.className + ' ' : '') + descriptor.class;
-            }, function (r) {
-
-            }, descriptor.height, descriptor.width); //these are the short circuit
+                            var cellRow = cells[row];
+                            if (!cellRow) {
+                                continue rowloop;
+                            }
+                            var cell = cellRow[col];
+                            if (!cell) {
+                                continue;
+                            }
+                            cell.className = (cell.className ? cell.className + ' ' : '') + descriptor.class;
+                        }
+                    }
+            }
         });
     }
 
