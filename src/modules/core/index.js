@@ -64,6 +64,14 @@ module.exports = function () {
         container = _container;
         textarea = createFocusTextArea();
         container.appendChild(textarea);
+        if (!container.getAttribute('tabIndex')) {
+            container.tabIndex = 0;
+        }
+        container.addEventListener('focus', function () {
+            if (textarea) {
+                textarea.focus();
+            }
+        });
         grid.viewLayer.build(container);
         grid.eventLoop.setContainer(container);
 

@@ -50,15 +50,36 @@ describe('grid-core', function () {
         expect(draw).toHaveBeenCalled();
     });
 
+    function findTextArea() {
+        return $(helper.container).find('textarea');
+    }
+
     it('should have a focusable text area on build', function () {
         grid.build(helper.container);
-        expect($(helper.container).find('textarea')).toBeAnElement();
+        expect(findTextArea()).toBeAnElement();
     });
 
     it('should add a class to the container on focus', function () {
         grid.build(helper.container);
         $(helper.container).find('textarea').focus();
         expect(helper.container).toHaveClass('focus');
+    });
+
+    it('should not change the containers tabindex if it already has a value', function () {
+        helper.container.tabIndex = 1;
+        grid.build(helper.container);
+        expect(helper.container.tabIndex).toBe(1);
+    });
+
+    it('should give the container a tabindex if it doesnt already have one', function () {
+        grid.build(helper.container);
+        expect(helper.container.tabIndex).toBe(0);
+    });
+
+    it('should focus the text area if the grid is focused', function () {
+        grid.build(helper.container);
+        $(helper.container).focus();
+        expect(document.activeElement).toEqual(findTextArea()[0]);
     });
 
 });

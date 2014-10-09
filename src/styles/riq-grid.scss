@@ -6,6 +6,10 @@
   bottom: 0;
 }
 
+.overflow-hidden {
+  overflow: hidden;
+}
+
 .grid-row:nth-of-type(odd) {
   .grid-cell {
     background: transparent;

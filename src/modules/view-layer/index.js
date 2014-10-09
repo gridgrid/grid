@@ -14,7 +14,7 @@ module.exports = function (_grid) {
 
     var GRID_CELL_CONTAINER_BASE_CLASS = 'grid-cells';
     var GRID_VIEW_ROOT_CLASS = 'js-grid-view-root';
-
+    var CELL_CLASS = 'grid-cell';
 
     var cells; //matrix of rendered cell elements;
     var rows; //array of all rendered rows
@@ -22,7 +22,8 @@ module.exports = function (_grid) {
     viewLayer.viewPort = require('@grid/view-port')(grid);
 
     //add the cell classes through the standard way
-    grid.cellClasses.add(grid.cellClasses.create(0, 0, 'grid-cell', Infinity, Infinity));
+
+    grid.cellClasses.add(grid.cellClasses.create(0, 0, CELL_CLASS, Infinity, Infinity));
 
     viewLayer.build = function (elem) {
         container = elem;
@@ -56,9 +57,12 @@ module.exports = function (_grid) {
         }
         var jsGridCell = cells[0] && cells[0][0];
         if (jsGridCell) {
+            var oldClass = jsGridCell.className;
+            jsGridCell.className = CELL_CLASS;
             var computedStyle = getComputedStyle(jsGridCell);
             var borderWidthProp = computedStyle.getPropertyValue('border-left-width');
             borderWidth = parseInt(borderWidthProp);
+            jsGridCell.className = oldClass;
         }
         borderWidth = isNaN(borderWidth) || !borderWidth ? undefined : borderWidth;
         return borderWidth;

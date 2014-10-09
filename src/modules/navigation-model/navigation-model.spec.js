@@ -31,13 +31,13 @@ describe('navigation-model', function () {
     }
 
     it('should move around by one on keydowns', function () {
-        makeAndFireKeyDown(key.code.arrow.down);
+        makeAndFireKeyDown(key.code.arrow.down.code);
         expectRowCol(1, 0);
-        makeAndFireKeyDown(key.code.arrow.right);
+        makeAndFireKeyDown(key.code.arrow.right.code);
         expectRowCol(1, 1);
-        makeAndFireKeyDown(key.code.arrow.up);
+        makeAndFireKeyDown(key.code.arrow.up.code);
         expectRowCol(0, 1);
-        makeAndFireKeyDown(key.code.arrow.left);
+        makeAndFireKeyDown(key.code.arrow.left.code);
         expectRowCol(0, 0);
     });
 
@@ -59,5 +59,19 @@ describe('navigation-model', function () {
         model.navTo(2, 3);
         expect(descriptor).topToBe(2);
         expect(descriptor).leftToBe(3);
+    });
+
+    it('should have a min and max row and col that it respects', function () {
+        model.minRow = 1;
+        model.minCol = 1;
+        model.maxRow = 4;
+        model.maxCol = 3;
+        model.navTo(0, 0);
+        expect(model).rowToBe(1);
+        expect(model).colToBe(1);
+
+        model.navTo(10, 10);
+        expect(model).rowToBe(4);
+        expect(model).colToBe(3);
     });
 });
