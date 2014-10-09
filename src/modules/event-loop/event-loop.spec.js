@@ -1,12 +1,13 @@
+var mockEvent = require('@grid/custom-event');
+
 describe('event-loop', function () {
     var helper = require('@grid/grid-spec-helper')();
-    var mockEvent = require('@grid/custom-event');
     var loop;
     var grid;
-    beforeEach(inject(function () {
+    beforeEach(function () {
         grid = helper.buildSimpleGrid();
         loop = grid.eventLoop;
-    }));
+    });
 
     it('should bind event listeners to a container', function () {
         var div = document.createElement('div');
@@ -30,8 +31,7 @@ describe('event-loop', function () {
         loop.bind('test-event', function () {
             interceptorCalledFirst = interceptorCalled;
         });
-        //using mousewheel to get some other handler, we know will be there
-        loop.fire({type: 'testevent'});
+        loop.fire('testevent');
         expect(interceptorCalledFirst).toBe(true);
 
     });

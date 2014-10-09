@@ -43,14 +43,6 @@ var api = {
     normalize: normalizeWheelEvent
 };
 
-function returnFalse() {
-    return false;
-}
-
-function returnTrue() {
-    return true;
-}
-
 function normalizeWheelEvent(e) {
     var deltaX = api.getDelta(e, true);
     var deltaY = api.getDelta(e);
@@ -61,13 +53,8 @@ function normalizeWheelEvent(e) {
             type: {value: 'mousewheel'}
         });
 
-    newEvent.isDefaultPrevented = returnFalse;
-
     newEvent.preventDefault = function () {
-
-
-        newEvent.isDefaultPrevented = returnTrue;
-
+        newEvent.defaultPrevented = true;
         if (e && e.preventDefault) {
             e.preventDefault();
         }

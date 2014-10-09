@@ -97,7 +97,7 @@ describe('pixel-scroll-model', function () {
 
     it('should prevent default on events', function () {
         var event = sendMouseWheelToModel(0, 0);
-        expect(event.isDefaultPrevented()).toBe(true);
+        expect(event.defaultPrevented).toBe(true);
     });
 
     it('should set its width and height on creation', function () {

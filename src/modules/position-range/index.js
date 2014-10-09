@@ -1,3 +1,4 @@
+var addDirtyProps = require('@grid/add-dirty-props');
 module.exports = function (range, dirtyClean, parentDirtyClean) {
     range = range || {}; //allow mixin functionality
     range.isDirty = dirtyClean.isDirty;
@@ -7,7 +8,7 @@ module.exports = function (range, dirtyClean, parentDirtyClean) {
     if (parentDirtyClean) {
         dirtyCleans.push(parentDirtyClean);
     }
-    var addDirtyProps = require('@grid/add-dirty-props');
+
     addDirtyProps(range, watchedProperties, dirtyCleans);
     //defaults
     range.units = 'cell';

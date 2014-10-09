@@ -10,7 +10,7 @@ module.exports = function (_grid) {
     var aliveDecorators = [];
     var deadDecorators = [];
 
-    var api = {
+    var decorators = {
         add: function (decorator) {
             aliveDecorators.push(decorator);
             dirtyClean.setDirty();
@@ -52,5 +52,5 @@ module.exports = function (_grid) {
     };
 
 
-    return api;
+    return decorators;
 };

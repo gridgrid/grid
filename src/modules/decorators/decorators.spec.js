@@ -64,7 +64,7 @@ describe('decorators', function () {
         expect(decorators.popAllDead()).toEqual([dec1, dec2]);
     });
 
-    it('should give me alive and dead decorators and all', function () {
+    it('should give me alive and pop all dead decorators', function () {
         var dec = decorators.create();
         decorators.add(dec);
         var dec2 = decorators.create();
