@@ -67,7 +67,7 @@ module.exports = function (_grid) {
 
     grid.eventLoop.bind('mousedown', function (e) {
         //assume the event has been annotated by the cell mouse model interceptor
-        api.navTo(e.gridRow, e.gridCol);
+        api.navTo(e.row, e.col);
     });
 
     var focusClass = grid.cellClasses.create(0, 0, 'focus');
