@@ -87,6 +87,8 @@ module.exports = function (_grid) {
         };
 
         decorator.units = 'px';
+        decorator.space = 'real';
+        
         return decorator;
     }
 

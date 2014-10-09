@@ -43,7 +43,13 @@ module.exports = function (_grid) {
 
             //they can override but we should have an empty default to prevent npes
             decorator.render = function () {
-                return document.createElement('div');
+                var div = document.createElement('div');
+                div.style.position = 'absolute';
+                div.style.top = '0px';
+                div.style.left = '0px';
+                div.style.bottom = '0px';
+                div.style.right = '0px';
+                return div;
             };
             return decorator;
 

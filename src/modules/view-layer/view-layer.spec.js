@@ -335,7 +335,7 @@ describe('view-layer', function () {
             });
         }
 
-        xit('should position a virtual cell range decorator', function () {
+        it('should position a virtual cell range decorator', function () {
             setDecoratorPosition(5, 6, 3, 3);
             grid.decorators.add(decorator);
 
@@ -361,7 +361,7 @@ describe('view-layer', function () {
         it('should position a real pixel range decorator', function () {
             setDecoratorPosition(5, 6, 2, 4);
             decorator.units = 'px';
-            decorator.space = 'virtual';
+            decorator.space = 'real';
             grid.cellScrollModel.scrollTo(1, 1); //scroll should have no effect on the position;
             grid.decorators.add(decorator);
             expectBoundingBoxSize(5, 6, 2, 4);
@@ -371,6 +371,7 @@ describe('view-layer', function () {
         it('should reposition if decorators box changes', function () {
             setDecoratorPosition(5, 6, 2, 3);
             decorator.units = 'px';
+            decorator.space = 'real';
             grid.decorators.add(decorator);
             expectBoundingBoxSize(5, 6, 2, 3, function next() {
                 setDecoratorPosition(1, 6, 6, 3);

@@ -290,4 +290,15 @@ describe('view port', function () {
         });
     });
 
+    describe('toPx', function () {
+        it('should convert a real cell range to a real pixel range', function () {
+            var cellRange = helper.makeFakeRange(2, 3, 5, 5);
+            var range = viewPort.toPx(cellRange);
+            expect(range).topToBe(2 * 30);
+            expect(range).leftToBe(3 * 100);
+            expect(range).heightToBe(5 * 30);
+            expect(range).widthToBe(5 * 100);
+        });
+    });
+
 });

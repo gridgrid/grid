@@ -32,7 +32,11 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
 
     //basically height or width
     api[lengthName] = function (index) {
-        return descriptors[index][lengthName] || DEFAULT_LENGTH;
+        if (!descriptors[index]) {
+            return NaN;
+        }
+        
+        return descriptors[index] && descriptors[index][lengthName] || DEFAULT_LENGTH;
     };
 
     return api;

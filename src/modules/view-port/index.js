@@ -119,6 +119,18 @@ module.exports = function (_grid) {
     viewPort.getColLeft = function (viewPortCol) {
         return getTopOrLeft(viewPortCol, 'col', 'width');
     };
+
+    viewPort.toPx = function (realCellRange) {
+        var virtualRow = viewPort.toVirtualRow(realCellRange.top);
+        var virtualCol = viewPort.toVirtualCol(realCellRange.left);
+        return {
+            top: viewPort.getRowTop(realCellRange.top),
+            left: viewPort.getColLeft(realCellRange.left),
+            height: grid.virtualPixelCellModel.height(virtualRow, virtualRow + realCellRange.height - 1),
+            width: grid.virtualPixelCellModel.width(virtualCol, virtualCol + realCellRange.width - 1)
+        };
+    };
+
     function getVirtualRowOrColFromPosition(pos, rowOrCol, heightOrWidth) {
         //we could do this slighly faster with binary search to get log(n) instead of n, but will only do it if we actually need to optimize this
         var rowOrColCap = capitalize(rowOrCol);

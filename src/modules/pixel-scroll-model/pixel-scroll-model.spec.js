@@ -114,7 +114,9 @@ describe('pixel-scroll-model', function () {
 
         it('should register a vertical and horizontal decorator', function () {
             expect(model.vertScrollBar.units).toBe('px');
+            expect(model.vertScrollBar.space).toBe('real');
             expect(model.horzScrollBar.units).toBe('px');
+            expect(model.horzScrollBar.space).toBe('real');
             expect(grid.decorators.getAlive()).toContain(model.vertScrollBar);
             expect(grid.decorators.getAlive()).toContain(model.horzScrollBar);
         });
@@ -249,7 +251,7 @@ describe('pixel-scroll-model', function () {
             var top = sendScrollToBar(vertBar, [4, 6, 3, 2, -1], 0);
             sendScrollToBar(vertBar, [2, 5, 6], top);
 
-            
+
             var horzBar = renderBar(model.horzScrollBar);
             //send two scrolls to ensure it doesn't reset in between (cause that was a bug)
             var left = sendScrollToBar(horzBar, [2, 8, -1, 3, 2], 0, true);

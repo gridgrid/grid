@@ -179,7 +179,7 @@ module.exports = function (_grid) {
                 }
             }
 
-            if (decorator.isDirty()) {
+            if (decorator.isDirty() && decorator.space === 'real') {
                 switch (decorator.units) {
                     case 'px':
                         setPosition(boundingBox, decorator.top, decorator.left, decorator.height, decorator.width);
@@ -191,6 +191,19 @@ module.exports = function (_grid) {
                         break;
                     /* jshint +W018 */
                 }
+            } else if ((decorator.isDirty() || grid.cellScrollModel.isDirty()) && decorator.space === 'virtual') {
+                switch (decorator.units) {
+                    case 'px':
+                        break;
+                    case 'cell':
+                    /* jshint -W086 */
+                    default:
+                        var intersection = grid.viewPort.toPx(grid.viewPort.intersect(decorator));
+                        setPosition(boundingBox, intersection.top, intersection.left, intersection.height, intersection.width);
+                        break;
+                    /* jshint +W018 */
+                }
+
             }
         });
 

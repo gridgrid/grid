@@ -60,6 +60,12 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
             model.add({fixed: true});
         }).toThrow();
     });
+
+    it('should handle weird queries', function () {
+        expect(model[lengthName](-1)).toBeNaN();
+        expect(model[lengthName](10000)).toBeNaN();
+        expect(model[lengthName](undefined)).toBeNaN();
+    });
 }
 
 

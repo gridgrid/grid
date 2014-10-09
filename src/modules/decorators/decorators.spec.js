@@ -2,6 +2,7 @@ describe('decorators', function () {
     var helper = require('@grid/grid-spec-helper')();
     var decorators;
     var grid;
+    var ctx = {helper : helper};
     beforeEach(function () {
         grid = helper.buildSimpleGrid();
         decorators = grid.decorators;
@@ -12,22 +13,13 @@ describe('decorators', function () {
         helper.resetAllDirties(); //set everything clean to start
     });
 
-    describe('should create decorators', function () {
-        var decorator;
-        var ctx = {helper: helper};
+    describe('should satisfy', function () {
+        
         beforeEach(function () {
-            decorator = decorators.create();
-            ctx.range = decorator;
-            ctx.parent = decorators;
+            ctx.decorator = decorators.create();
         });
-
-        it('with the right defaults', function () {
-            expect(decorator.render).toBeAFunction();
-        });
-
-        describe('that satisify', function () {
-            require('@grid/position-range/test-body')(ctx);
-        });
+        
+        require('@grid/decorators/decorator-test-body')(ctx);
     });
 
 
