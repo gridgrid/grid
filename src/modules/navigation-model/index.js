@@ -6,12 +6,30 @@ module.exports = function (_grid) {
 
     var api = {
         row: 0,
-        col: 0,
-        minRow: 0,
-        minCol: 0,
-        maxRow: Infinity,
-        maxCol: Infinity
+        col: 0
     };
+
+    function defineLimitProp(prop, defaultValue) {
+        var val = defaultValue;
+        Object.defineProperty(api, prop, {
+            enumerable: true,
+            get: function () {
+                return val;
+            }, set: function (_val) {
+                var isChanged = _val !== val;
+                val = _val;
+                
+                if (isChanged) {
+                    api.navTo(api.row, api.col);
+                }
+            }
+        });
+    }
+
+    defineLimitProp('minRow', 0);
+    defineLimitProp('minCol', 0);
+    defineLimitProp('maxRow', Infinity);
+    defineLimitProp('maxCol', Infinity);
 
 
     api.navTo = function navTo(row, col) {

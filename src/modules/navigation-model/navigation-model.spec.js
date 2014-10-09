@@ -74,4 +74,20 @@ describe('navigation-model', function () {
         expect(model).rowToBe(4);
         expect(model).colToBe(3);
     });
+
+    it('should reflect min on set', function () {
+        model.navTo(0, 0);
+        model.minRow = 1;
+        expect(model).rowToBe(1);
+        model.minCol = 1;
+        expect(model).colToBe(1);
+    });
+
+    it('should reflect max on set', function () {
+        model.navTo(Infinity, Infinity);
+        model.maxRow = 1;
+        expect(model).rowToBe(1);
+        model.maxCol = 1;
+        expect(model).colToBe(1);
+    });
 });
