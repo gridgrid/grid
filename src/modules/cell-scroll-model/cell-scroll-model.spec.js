@@ -6,11 +6,12 @@ describe('cell-scroll-model', function () {
     var numCols = 10;
     var grid;
 
-    beforeEach(function () {
+    var beforeEachFunction = function (fixedR, fixedC) {
 
-        grid = helper.buildSimpleGrid(numRows, numCols);
-        model = require('@grid/cell-scroll-model')(grid);
-    });
+        grid = helper.buildSimpleGrid(numRows, numCols, false, false, fixedR, fixedC);
+        model = grid.cellScrollModel;
+    };
+    beforeEach(beforeEachFunction);
 
     it('should have a row and col value that start at 0', function () {
         expect(model.row).toEqual(0);
@@ -69,5 +70,31 @@ describe('cell-scroll-model', function () {
         model.scrollTo(0, 0);
         expect(request).not.toHaveBeenCalled();
         expect(model).not.toBeDirty();
+    });
+
+    describe('scroll into view', function () {
+        it('should scroll a cell into view from above', function () {
+            model.scrollTo(1, 1);
+            model.scrollIntoView(0, 0);
+            expect(model).rowToBe(0);
+            expect(model).colToBe(0);
+        });
+
+        it('should scroll a cell into view from above with fixed rows and cols', function () {
+            beforeEachFunction(3, 3);
+            model.scrollTo(2, 2);
+            model.scrollIntoView(3, 3);
+            expect(model).rowToBe(0);
+            expect(model).colToBe(0);
+        });
+
+        it('should scroll a cell into view from below', function () {
+            //mock viewport size
+            grid.viewLayer.viewPort.rows = 10;
+            grid.viewLayer.viewPort.cols = 5;
+            model.scrollIntoView(95, 9);
+            expect(model).rowToBe(95 - grid.viewLayer.viewPort.rows);
+            expect(model).colToBe(9 - grid.viewLayer.viewPort.cols);
+        });
     });
 });

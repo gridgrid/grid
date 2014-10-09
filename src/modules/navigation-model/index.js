@@ -18,7 +18,7 @@ module.exports = function (_grid) {
             }, set: function (_val) {
                 var isChanged = _val !== val;
                 val = _val;
-                
+
                 if (isChanged) {
                     api.navTo(api.row, api.col);
                 }
@@ -39,6 +39,7 @@ module.exports = function (_grid) {
         api.col = col;
         focusClass.top = row;
         focusClass.left = col;
+        grid.cellScrollModel.scrollIntoView(row, col);
     };
 
     grid.eventLoop.bind('keydown', function (e) {

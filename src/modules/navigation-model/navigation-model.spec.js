@@ -90,4 +90,10 @@ describe('navigation-model', function () {
         model.maxCol = 1;
         expect(model).colToBe(1);
     });
+
+    it('should try to scroll the cell into view on nav', function () {
+        var spy = spyOn(grid.cellScrollModel, 'scrollIntoView');
+        model.navTo(1, 1);
+        expect(spy).toHaveBeenCalledWith(1, 1);
+    });
 });

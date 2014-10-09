@@ -1,6 +1,6 @@
 var util = require('@grid/util');
 
-module.exports = (function (_grid) {
+module.exports = function (_grid) {
     var grid = _grid;
     var dirtyClean = require('@grid/dirty-clean')(grid);
 
@@ -31,6 +31,32 @@ module.exports = (function (_grid) {
         }
     };
 
+    function convertVirtualToScroll(virtualCoord, rowOrCol) {
+        return virtualCoord - grid[rowOrCol + 'Model'].numFixed();
+    }
+
+    function getScrollToRowOrCol(virtualCoord, rowOrCol) {
+        var currentScroll = model[rowOrCol];
+        var scrollTo = currentScroll;
+        var targetScroll = convertVirtualToScroll(virtualCoord, rowOrCol);
+        var viewPortLength = grid.viewLayer.viewPort[rowOrCol + 's'];
+        if (targetScroll < currentScroll) {
+            scrollTo = targetScroll;
+        } else if (targetScroll > currentScroll + viewPortLength) {
+            scrollTo = targetScroll - viewPortLength;
+        }
+
+        return scrollTo;
+    }
+
+    model.scrollIntoView = function (vr, vc) {
+        vr = grid.virtualPixelCellModel.clampRow(vr);
+        vc = grid.virtualPixelCellModel.clampCol(vc);
+        var newRow = getScrollToRowOrCol(vr, 'row');
+        var newCol = getScrollToRowOrCol(vc, 'col');
+        model.scrollTo(newRow, newCol);
+    };
+
 
     return model;
-})
+};
