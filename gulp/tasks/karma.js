@@ -14,3 +14,11 @@ gulp.task('karma', function () {
             action: 'run'
         }));
 });
+
+gulp.task('karma-watch', function () {
+    return gulp.src(karmaConf.files)
+        .pipe(karma({
+            configFile: 'karma.conf.js',
+            action: 'watch'
+        }));
+});

@@ -5,7 +5,7 @@ var debounce = require('debounce');
 module.exports = function (_grid) {
     var viewLayer = {};
 
-    
+
     var grid = _grid;
     var container;
     var root;
@@ -20,15 +20,12 @@ module.exports = function (_grid) {
     var cells; //matrix of rendered cell elements;
     var rows; //array of all rendered rows
 
-    viewLayer.viewPort = require('@grid/view-port')(grid);
-
     //add the cell classes through the standard way
 
     grid.cellClasses.add(grid.cellClasses.create(0, 0, CELL_CLASS, Infinity, Infinity));
 
     viewLayer.build = function (elem) {
         container = elem;
-        viewLayer.viewPort.sizeToContainer(container);
 
 
         cleanup();
@@ -93,26 +90,26 @@ module.exports = function (_grid) {
     /* CELL LOGIC */
     function drawCells() {
         var borderWidth = measureBorderWidth() || 1;
-        viewLayer.viewPort.iterateCells(function drawCell(r, c) {
+        grid.viewPort.iterateCells(function drawCell(r, c) {
             var cell = cells[r][c];
-            var width = viewLayer.viewPort.getColWidth(c);
+            var width = grid.viewPort.getColWidth(c);
             cell.style.width = width + borderWidth + 'px';
 
-            var left = viewLayer.viewPort.getColLeft(c);
+            var left = grid.viewPort.getColLeft(c);
             cell.style.left = left + 'px';
 
             while (cell.firstChild) {
                 cell.removeChild(cell.firstChild);
             }
-            var virtualRow = viewLayer.viewPort.toVirtualRow(r);
-            var virtualCol = viewLayer.viewPort.toVirtualCol(c);
+            var virtualRow = grid.viewPort.toVirtualRow(r);
+            var virtualCol = grid.viewPort.toVirtualCol(c);
             var formattedData = grid.dataModel.getFormatted(virtualRow, virtualCol);
             cell.appendChild(document.createTextNode(formattedData));
         }, function drawRow(r) {
-            var height = viewLayer.viewPort.getRowHeight(r); //maybe faster to do this only on row iterations but meh
+            var height = grid.viewPort.getRowHeight(r); //maybe faster to do this only on row iterations but meh
             var row = rows[r];
             row.style.height = height + borderWidth + 'px';
-            var top = viewLayer.viewPort.getRowTop(r);
+            var top = grid.viewPort.getRowTop(r);
             row.style.top = top + 'px';
         });
 
@@ -127,7 +124,7 @@ module.exports = function (_grid) {
         cells = [];
         rows = [];
         var row;
-        viewLayer.viewPort.iterateCells(function (r, c) {
+        grid.viewPort.iterateCells(function (r, c) {
             var cell = buildDivCell();
             cells[r][c] = cell;
             row.appendChild(cell);
@@ -221,11 +218,11 @@ module.exports = function (_grid) {
 
     /* CELL CLASSES LOGIC */
     function drawCellClasses() {
-        viewLayer.viewPort.iterateCells(function (r, c) {
+        grid.viewPort.iterateCells(function (r, c) {
             cells[r][c].className = '';
         });
         grid.cellClasses.getAll().forEach(function (descriptor) {
-            var intersection = viewLayer.viewPort.intersect(descriptor);
+            var intersection = grid.viewPort.intersect(descriptor);
             if (intersection) {
                 rowloop:
                     for (var r = 0; r < intersection.height; r++) {

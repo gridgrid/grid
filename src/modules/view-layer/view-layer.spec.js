@@ -1,5 +1,3 @@
-var viewLayer = require('@grid/view-layer');
-
 describe('view-layer', function () {
 
     var helper = require('@grid/grid-spec-helper')();
@@ -14,10 +12,10 @@ describe('view-layer', function () {
         grid = helper.buildSimpleGrid(100, 20, varyHeight, varyWidth, frows, fcols);
         view = grid.viewLayer;
         //mock the view port
-        view.viewPort.sizeToContainer = function () {
+        grid.viewPort.sizeToContainer = function () {
         };
-        view.viewPort.rows = viewRows;
-        view.viewPort.cols = viewCols;
+        grid.viewPort.rows = viewRows;
+        grid.viewPort.cols = viewCols;
         container = helper.viewBuild();
     }
 

@@ -96,4 +96,15 @@ describe('navigation-model', function () {
         model.navTo(1, 1);
         expect(spy).toHaveBeenCalledWith(1, 1);
     });
+
+    it('should navigate on mousedown', function () {
+        var mouseDown = mockEvent('mousedown');
+        var col = 3;
+        var row = 4;
+        mouseDown.clientX = col * 100 + 1;
+        mouseDown.clientY = row * 30 + 1;
+        grid.eventLoop.fire(mouseDown);
+        expect(model).rowToBe(row);
+        expect(model).colToBe(col);
+    });
 });

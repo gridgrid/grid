@@ -84,6 +84,7 @@ module.exports = function (_grid) {
     });
 
     function loop(e, bodyFn) {
+        
         var isOuterLoopRunning = eloop.isRunning;
         eloop.isRunning = true;
         interceptors.notify(e);

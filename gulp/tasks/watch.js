@@ -14,5 +14,5 @@ module.exports = gulp.task('watch', function () {
     watch({glob: [config.paths.src.index]}, ['index']);
     watch({glob: [config.paths.src.templates, config.paths.src.templatesHTML]}, ['templates']);
     watch({glob: [config.paths.src.stylesGlob]}, ['styles']);
-    watch({glob: ['test-assets/bundle-tests.js']}, ['karma']);
+    //watch({glob: ['test-assets/bundle-tests.js']}, ['karma']);
 });

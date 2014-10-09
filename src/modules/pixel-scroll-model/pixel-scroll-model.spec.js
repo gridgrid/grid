@@ -42,8 +42,8 @@ describe('pixel-scroll-model', function () {
 
     it('should not let you scroll above the current view', function () {
         model.setScrollSize(100, 200);
-        grid.viewLayer.viewPort.width = 10;
-        grid.viewLayer.viewPort.height = 5;
+        grid.viewPort.width = 10;
+        grid.viewPort.height = 5;
 
         model.scrollTo(1000, 10);
         expect(model.top).toEqual(95);
@@ -109,7 +109,7 @@ describe('pixel-scroll-model', function () {
         var viewWidth = 531;
         var viewHeight = 233;
         beforeEach(function () {
-            grid.viewLayer.viewPort.sizeToContainer({offsetWidth: viewWidth, offsetHeight: viewHeight});
+            grid.viewPort.sizeToContainer({offsetWidth: viewWidth, offsetHeight: viewHeight});
         });
 
         it('should register a vertical and horizontal decorator', function () {

@@ -4,7 +4,11 @@ var capitalize = require('capitalize');
 
 module.exports = function (_grid) {
     var grid = _grid;
-    var viewPort = {};
+    var viewPort = {
+        rows: 0,
+        cols: 0
+
+    };
     var fixed = {rows: 0, cols: 0};
 
     function getFixed(rowOrCol) {
@@ -36,16 +40,11 @@ module.exports = function (_grid) {
         return coord + (coordIsVirtual ? -1 : 1) * grid.cellScrollModel[rowOrCol];
     }
 
-    // converts a viewport row or column to a real row or column 
-    // clamps it if the column would be outside the range
+// converts a viewport row or column to a real row or column 
+// clamps it if the column would be outside the range
     function getVirtualRowColUnsafe(realCoord, rowOrCol) {
         return convertRealToVirtual(realCoord, rowOrCol);
     }
-
-    function getRealRowColUnsafe(virtualCoord, rowOrCol) {
-        return convertRealToVirtual(virtualCoord, rowOrCol, true);
-    }
-
 
     function getVirtualRowColClamped(viewCoord, rowOrCol) {
         var virtualRowCol = getVirtualRowColUnsafe(viewCoord, rowOrCol);
@@ -70,7 +69,7 @@ module.exports = function (_grid) {
     }
 
 
-    //default unclamped cause that seems to be the more likely use case converting this direction
+//default unclamped cause that seems to be the more likely use case converting this direction
     viewPort.toRealRow = function (virtualRow) {
         return getRealRowColClamped(virtualRow, 'row');
     };
@@ -120,7 +119,32 @@ module.exports = function (_grid) {
     viewPort.getColLeft = function (viewPortCol) {
         return getTopOrLeft(viewPortCol, 'col', 'width');
     };
+    function getVirtualRowOrColFromPosition(pos, rowOrCol, heightOrWidth) {
+        //we could do this slighly faster with binary search to get log(n) instead of n, but will only do it if we actually need to optimize this
+        var rowOrColCap = capitalize(rowOrCol);
+        var viewMax = viewPort[rowOrCol + 's'];
+        var toVirtual = viewPort['toVirtual' + rowOrColCap];
+        var lengthFn = grid.virtualPixelCellModel[heightOrWidth];
+        var summedLength = 0;
+        for (var i = 0; i < viewMax; i++) {
+            var virtual = toVirtual(i);
+            var length = lengthFn(virtual);
+            var newSum = summedLength + length;
+            if (newSum > pos) {
+                return virtual;
+            }
+            summedLength = newSum;
+        }
+        return NaN;
+    }
 
+    viewPort.getVirtualRowByTop = function (top) {
+        return getVirtualRowOrColFromPosition(top, 'row', 'height');
+    };
+
+    viewPort.getVirtualColByLeft = function (left) {
+        return getVirtualRowOrColFromPosition(left, 'col', 'width');
+    };
 
     viewPort.getRowHeight = function (viewPortRow) {
         return grid.virtualPixelCellModel.height(viewPort.toVirtualRow(viewPort.clampRow(viewPortRow)));

@@ -90,11 +90,11 @@ describe('cell-scroll-model', function () {
 
         it('should scroll a cell into view from below', function () {
             //mock viewport size
-            grid.viewLayer.viewPort.rows = 10;
-            grid.viewLayer.viewPort.cols = 5;
+            grid.viewPort.rows = 10;
+            grid.viewPort.cols = 5;
             model.scrollIntoView(95, 9);
-            expect(model).rowToBe(95 - grid.viewLayer.viewPort.rows);
-            expect(model).colToBe(9 - grid.viewLayer.viewPort.cols);
+            expect(model).rowToBe(95 - grid.viewPort.rows);
+            expect(model).colToBe(9 - grid.viewPort.cols);
         });
     });
 });

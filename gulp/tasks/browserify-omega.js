@@ -46,7 +46,7 @@
             paths: config.paths.browserify
         });
 
-        if (options.istanbul) {
+        if (options.istanbul && false) {
             //only do this when testing
             bundler.transform(istanbul({
                 ignore: ['**/bower_components/**', '**/templates.js', '**/proto/**', '**/grid-spec-helper/**', '**/*.spec.js', '**/node_modules/!(@grid)/**'],

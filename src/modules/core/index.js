@@ -13,8 +13,10 @@ module.exports = function () {
     grid.dataModel = require('@grid/simple-data-model')(grid);
     grid.virtualPixelCellModel = require('@grid/virtual-pixel-cell-model')(grid);
     grid.cellScrollModel = require('@grid/cell-scroll-model')(grid);
+    grid.cellMouseModel = require('@grid/cell-mouse-model')(grid);
     grid.navigationModel = require('@grid/navigation-model')(grid);
 
+    grid.viewPort = require('@grid/view-port')(grid);
     grid.viewLayer = require('@grid/view-layer')(grid);
     grid.pixelScrollModel = require('@grid/pixel-scroll-model')(grid);
 
@@ -69,6 +71,7 @@ module.exports = function () {
 
     grid.build = function (container) {
         createFocusTextArea(container);
+        grid.viewPort.sizeToContainer(container);
         grid.viewLayer.build(container);
         grid.eventLoop.setContainer(container);
     };

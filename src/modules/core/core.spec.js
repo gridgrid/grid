@@ -15,15 +15,19 @@ describe('grid-core', function () {
         expect(grid).toHaveField('dataModel');
         expect(grid).toHaveField('virtualPixelCellModel');
         expect(grid).toHaveField('cellScrollModel');
+        expect(grid).toHaveField('cellMouseModel');
         expect(grid).toHaveField('navigationModel');
+        expect(grid).toHaveField('viewPort');
         expect(grid).toHaveField('viewLayer');
         expect(grid).toHaveField('pixelScrollModel');
     });
 
     it('should have a main build function', function () {
+        var viewPortSize = spyOn(grid.viewPort, 'sizeToContainer');
         var viewBuild = spyOn(grid.viewLayer, 'build');
         var loopBuild = spyOn(grid.eventLoop, 'setContainer');
         grid.build(helper.container);
+        expect(viewPortSize).toHaveBeenCalled();
         expect(viewBuild).toHaveBeenCalled();
         expect(loopBuild).toHaveBeenCalled();
     });

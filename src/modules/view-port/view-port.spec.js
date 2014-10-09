@@ -6,7 +6,7 @@ describe('view port', function () {
 
     var beforeEachFunction = function (varyHeights, varyWidths, frows, fcols) {
         grid = helper.buildSimpleGrid(100, 10, varyHeights, varyWidths, frows, fcols);
-        viewPort = grid.viewLayer.viewPort;
+        viewPort = grid.viewPort;
         viewPort.sizeToContainer(helper.container);
     };
     beforeEach(beforeEachFunction);
@@ -99,6 +99,26 @@ describe('view port', function () {
         grid.cellScrollModel.scrollTo(0, 1);
         expect(viewPort.getRowTop(2)).toEqual(30 * 2);
         expect(viewPort.getColLeft(0)).toEqual(0);
+    });
+
+    it('should give me a virtual cell coordinate for a pixel value', function () {
+        expect(viewPort.getVirtualRowByTop(20)).toBe(0);
+        expect(viewPort.getVirtualColByLeft(20)).toBe(0);
+    });
+
+    it('should give me a virtual cell coordinate for a pixel value when scrolled', function () {
+        grid.cellScrollModel.scrollTo(1, 1);
+        expect(viewPort.getVirtualRowByTop(20)).toBe(1);
+        expect(viewPort.getVirtualColByLeft(20)).toBe(1);
+    });
+
+    it('should give me a virtual cell coordinate for a pixel value when scrolled and fixed', function () {
+        beforeEachFunction(false, false, 1, 3);
+        grid.cellScrollModel.scrollTo(1, 1);
+        expect(viewPort.getVirtualRowByTop(20)).toBe(0);
+        expect(viewPort.getVirtualColByLeft(20)).toBe(0);
+        expect(viewPort.getVirtualRowByTop(40)).toBe(2);
+        expect(viewPort.getVirtualColByLeft(350)).toBe(4);
     });
 
     it('should calculate the width and height value of a viewport cell', function () {

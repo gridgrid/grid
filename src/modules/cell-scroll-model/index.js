@@ -39,7 +39,7 @@ module.exports = function (_grid) {
         var currentScroll = model[rowOrCol];
         var scrollTo = currentScroll;
         var targetScroll = convertVirtualToScroll(virtualCoord, rowOrCol);
-        var viewPortLength = grid.viewLayer.viewPort[rowOrCol + 's'];
+        var viewPortLength = grid.viewPort[rowOrCol + 's'];
         if (targetScroll < currentScroll) {
             scrollTo = targetScroll;
         } else if (targetScroll > currentScroll + viewPortLength) {

@@ -65,6 +65,11 @@ module.exports = function (_grid) {
         api.navTo(navToRow, navToCol);
     });
 
+    grid.eventLoop.bind('mousedown', function (e) {
+        //assume the event has been annotated by the cell mouse model interceptor
+        api.navTo(e.gridRow, e.gridCol);
+    });
+
     var focusClass = grid.cellClasses.create(0, 0, 'focus');
     grid.cellClasses.add(focusClass);
 
