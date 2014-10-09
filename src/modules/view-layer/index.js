@@ -5,6 +5,7 @@ var debounce = require('debounce');
 module.exports = function (_grid) {
     var viewLayer = {};
 
+    
     var grid = _grid;
     var container;
     var root;

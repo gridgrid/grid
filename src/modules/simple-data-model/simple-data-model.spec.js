@@ -1,8 +1,8 @@
 describe('simple-data-model', function () {
     var dataModel;
-    beforeEach(inject(function () {
+    beforeEach(function () {
         dataModel = require('@grid/simple-data-model')();
-    }));
+    });
 
     it('should be able to set and get back data', function () {
         var datum = {};

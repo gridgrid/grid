@@ -38,10 +38,7 @@ module.exports = function () {
         }
     });
 
-    var textarea;
-    var container;
-
-    function createFocusTextArea() {
+    function createFocusTextArea(container) {
         var textarea = document.createElement('textarea');
         textarea.style.position = 'fixed';
         textarea.style.left = '-100000px';
@@ -57,12 +54,6 @@ module.exports = function () {
             }
         });
 
-        return textarea;
-    }
-
-    grid.build = function (_container) {
-        container = _container;
-        textarea = createFocusTextArea();
         container.appendChild(textarea);
         if (!container.getAttribute('tabIndex')) {
             container.tabIndex = 0;
@@ -72,9 +63,14 @@ module.exports = function () {
                 textarea.focus();
             }
         });
+
+        return textarea;
+    }
+
+    grid.build = function (container) {
+        createFocusTextArea(container);
         grid.viewLayer.build(container);
         grid.eventLoop.setContainer(container);
-
     };
 
     return grid;

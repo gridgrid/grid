@@ -1,6 +1,6 @@
 var util = require('@grid/util');
 
-module.exports = (function (_grid) {
+module.exports = function (_grid) {
     var grid = _grid;
     var model = {};
 
@@ -90,4 +90,4 @@ module.exports = (function (_grid) {
     grid.eventLoop.bind('grid-row-change', sizeChangeListener);
 
     return model;
-});
+};
