@@ -156,33 +156,51 @@ describe('pixel-scroll-model', function () {
             expect(model.horzScrollBar.left).toBe(23 / grid.virtualPixelCellModel.totalWidth() * viewWidth);
         });
 
-        it('should bind mousedown events on render', function () {
+        it('should bind a drag event on render', function () {
             var spy = spyOn(grid.eventLoop, 'bind');
             model.vertScrollBar.render();
-            expect(spy.argsForCall[0][0]).toEqual('mousedown');
-            expect(spy.argsForCall[0][1]).toBeAnElement();
-            expect(spy.argsForCall[0][2]).toBeAFunction();
+            expect(spy.argsForCall[0][0]).toEqual('grid-drag-start');
+            expect(spy.argsForCall[0][1]).toBeAFunction();
         });
 
-        it('should bind mousedown and mouseup to the window on mousedown and prevent default', function () {
-            var bar = model.vertScrollBar.render();
-            var mousedown = mockEvent('mousedown');
-            var bind = spyOn(grid.eventLoop, 'bind').andCallThrough();
-            var preventDefault = spyOn(mousedown, 'preventDefault').andCallThrough();
-            bar.dispatchEvent(mousedown);
-            expect(bind.argsForCall[0][0]).toEqual('mousemove');
-            expect(bind.argsForCall[0][1]).toBe(window);
-            expect(bind.argsForCall[0][2]).toBeAFunction();
-            expect(bind.argsForCall[1][0]).toEqual('mouseup');
-            expect(bind.argsForCall[1][1]).toBe(window);
-            expect(bind.argsForCall[1][2]).toBeAFunction();
+        function renderBar(barDecorator) {
+            var bar = barDecorator.render();
+            helper.container.appendChild(bar);
+            return bar;
+        }
 
-            expect(preventDefault).toHaveBeenCalled();
+        function fireDragStart(bar, dragStart) {
+            bar.dispatchEvent(dragStart);
+            grid.eventLoop.fire(dragStart);
+        }
+
+        function renderBarAndFireDragStart(preFireFn) {
+            var bar = renderBar(model.vertScrollBar);
+            var dragStart = mockEvent('grid-drag-start', true);
+            if (preFireFn) {
+                preFireFn();
+            }
+            //he dispatch is just to set the target the grid doesnt actually listend for these so we still have to manually fire it
+            fireDragStart(bar, dragStart);
+        }
+
+        it('should bind drag and drag-end on drag-start', function () {
+            var bind;
+            renderBarAndFireDragStart(function () {
+                bind = spyOn(grid.eventLoop, 'bind').andCallThrough();
+            });
+            //these start at 2 because the mousemodel binds first
+            expect(bind).toHaveBeenCalled();
+            expect(bind.argsForCall[0][0]).toEqual('grid-drag');
+            expect(bind.argsForCall[0][1]).toBeAFunction();
+            expect(bind.argsForCall[1][0]).toEqual('grid-drag-end');
+            expect(bind.argsForCall[1][1]).toBeAFunction();
+
 
         });
 
         function scrollBy(mouseDownClient, scrollAmount, screenOffset, previousScroll, scrollBarOffset, isHorz) {
-            var move = mockEvent('mousemove', true);
+            var move = mockEvent('grid-drag', true);
             var scrollClient = mouseDownClient + scrollAmount;
 
             move.clientY = scrollClient;
@@ -190,7 +208,7 @@ describe('pixel-scroll-model', function () {
             move.screenY = scrollClient + screenOffset;
             move.screenX = scrollClient + screenOffset;
             //expect(model.top).toBe(previousScroll / viewHeight * grid.virtualPixelCellModel.totalHeight());
-            document.body.dispatchEvent(move);
+            grid.eventLoop.fire(move);
 
             var actualScroll = isHorz ? model.left : model.top;
             var view = isHorz ? viewWidth : viewHeight;
@@ -200,20 +218,20 @@ describe('pixel-scroll-model', function () {
 
 
         function sendScrollToBar(bar, scrolls, scrollBarPosition, isHorz) {
-            var down = mockEvent('mousedown');
+            var start = mockEvent('grid-drag-start');
             var scrollBarOffset = Math.floor(isHorz ? getScrollBarWidth() : getScrollBarHeight() / 2);
             var mouseDownClient = scrollBarPosition + scrollBarOffset;
             var screenYOffset = 11;
-            down.clientY = mouseDownClient;
-            down.clientX = mouseDownClient;
-            down.layerY = scrollBarOffset;
-            down.layerX = scrollBarOffset;
+            start.clientY = mouseDownClient;
+            start.clientX = mouseDownClient;
+            start.layerY = scrollBarOffset;
+            start.layerX = scrollBarOffset;
             var mouseDownScreen = mouseDownClient + screenYOffset;
-            down.screenY = mouseDownScreen;
-            down.screenX = mouseDownScreen;
+            start.screenY = mouseDownScreen;
+            start.screenX = mouseDownScreen;
             //x shouldn't matter
 
-            bar.dispatchEvent(down);
+            fireDragStart(bar, start);
 
             scrolls.forEach(function (scroll, i) {
                 var newScroll = scrollBarPosition + scroll;
@@ -226,34 +244,35 @@ describe('pixel-scroll-model', function () {
         }
 
         it('should scroll with mousemove', function () {
-            var vertBar = model.vertScrollBar.render();
+            var vertBar = renderBar(model.vertScrollBar);
             //send two scrolls to ensure it doesn't reset in between (cause that was a bug)
             var top = sendScrollToBar(vertBar, [4, 6, 3, 2, -1], 0);
             sendScrollToBar(vertBar, [2, 5, 6], top);
 
-            var horzBar = model.horzScrollBar.render();
+            
+            var horzBar = renderBar(model.horzScrollBar);
             //send two scrolls to ensure it doesn't reset in between (cause that was a bug)
             var left = sendScrollToBar(horzBar, [2, 8, -1, 3, 2], 0, true);
             sendScrollToBar(horzBar, [5, 2, 9], left, true);
         });
 
-        function fireMouseUp(bar) {
+        function fireMouseUp() {
 
-            var up = mockEvent('mouseup');
-            window.dispatchEvent(up);
+            var end = mockEvent('grid-drag-end');
+            grid.eventLoop.fire(end);
         }
 
         it('should unbind on mouseup', function () {
-            var bar = model.vertScrollBar.render();
-            var unbind = jasmine.createSpy();
-            var bind = grid.eventLoop.bind;
-            grid.eventLoop.bind = function () {
-                bind.apply(bind, arguments);
-                return unbind;
-            };
-            var mousedown = mockEvent('mousedown');
-            bar.dispatchEvent(mousedown);
-            fireMouseUp(bar);
+            var unbind;
+            renderBarAndFireDragStart(function () {
+                unbind = jasmine.createSpy();
+                var bind = grid.eventLoop.bind;
+                grid.eventLoop.bind = function () {
+                    bind.apply(bind, arguments);
+                    return unbind;
+                };
+            });
+            fireMouseUp();
             expect(unbind).toHaveBeenCalled();
             expect(unbind.callCount).toBe(2);
         });

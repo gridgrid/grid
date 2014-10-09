@@ -8,6 +8,7 @@ module.exports = function () {
         buildSimpleGrid: function (numRows, numCols, varyHeight, varyWidths, fixedRows, fixedCols) {
             helper.grid = require('@grid/simple-grid')(numRows || 100, numCols || 10, varyHeight, varyWidths, fixedRows, fixedCols);
             helper.grid.viewPort.sizeToContainer(helper.container);
+            helper.grid.eventLoop.setContainer(helper.container);
             return helper.grid;
         },
         viewBuild: function () {

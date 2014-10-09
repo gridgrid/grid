@@ -59,14 +59,16 @@ module.exports = function (_grid) {
             var scrollBarElem = document.createElement('div');
             scrollBarElem.setAttribute('class', 'grid-scroll-bar');
 
-            grid.eventLoop.bind('mousedown', scrollBarElem, function (e) {
-
+            grid.eventLoop.bind('grid-drag-start', function (e) {
+                if (e.target !== scrollBarElem) {
+                    return;
+                }
                 var screenClientOffset = e[screenCoordField] - e[clientCoordField];
                 var scrollBarOffset = e[layerCoordField];
 
-                var unbindMove = grid.eventLoop.bind('mousemove', window, function (e) {
+                var unbindDrag = grid.eventLoop.bind('grid-drag', function (e) {
                     var screenCoord = e[screenCoordField];
-                    var clientCoord = viewPortClampFn(screenCoord - screenClientOffset);
+                    var clientCoord = viewPortClampFn(e[clientCoordField]);
                     var scrollCoord = realPxToVirtualPx(clientCoord - scrollBarOffset, widthOrHeight);
                     if (isHorz) {
                         model.scrollTo(model.top, scrollCoord);
@@ -75,13 +77,10 @@ module.exports = function (_grid) {
                     }
                 });
 
-                var unbindUp = grid.eventLoop.bind('mouseup', window, function (e) {
-                    unbindMove();
-                    unbindUp();
+                var unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function (e) {
+                    unbindDrag();
+                    unbindDragEnd();
                 });
-
-                //keep it from doing weird crap
-                e.preventDefault();
             });
 
             return scrollBarElem;

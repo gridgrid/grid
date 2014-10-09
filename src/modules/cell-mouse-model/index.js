@@ -1,3 +1,11 @@
+var extend = require('@grid/extend');
+var customEvent = require('@grid/custom-event');
+
+function createFakeEvent(type, e) {
+    var dragStart = extend({}, e);
+    dragStart.type = type;
+    return dragStart;
+}
 module.exports = function (_grid) {
     var grid = _grid;
 
@@ -29,24 +37,17 @@ module.exports = function (_grid) {
                     var moveY = e.clientY;
                     var moveX = e.clientX;
                     if (moveY !== downY || moveX !== downX) {
-                        var dragStart = Object.create(e, {
-                            type: {value: 'grid-drag-start'}
-                        });
-
+                        var dragStart = createFakeEvent('grid-drag-start', e);
                         //row, col, x, and y should inherit
                         grid.eventLoop.fire(dragStart);
 
-                        var drag = Object.create(e, {
-                            type: {value: 'grid-drag'}
-                        });
+                        var drag = createFakeEvent('grid-drag', e);
 
                         //row, col, x, and y should inherit
                         grid.eventLoop.fire(drag);
 
                         if (e.row !== lastDragRow || e.col !== lastDragCol) {
-                            var cellDrag = Object.create(e, {
-                                type: {value: 'grid-cell-drag'}
-                            });
+                            var cellDrag = createFakeEvent('grid-cell-drag', e);
 
                             //row, col, x, and y should inherit
                             grid.eventLoop.fire(cellDrag);
@@ -60,9 +61,7 @@ module.exports = function (_grid) {
                     unbindMove();
                     unbindUp();
 
-                    var dragEnd = Object.create(e, {
-                        type: {value: 'grid-drag-end'}
-                    });
+                    var dragEnd = createFakeEvent('grid-drag-end', e);
 
                     //row, col, x, and y should inherit
                     grid.eventLoop.fire(dragEnd);
