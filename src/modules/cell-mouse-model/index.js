@@ -29,32 +29,31 @@ module.exports = function (_grid) {
     grid.eventLoop.bind('mousedown', function (e) {
         switch (e.type) {
             case 'mousedown':
-                var downY = e.clientY;
-                var downX = e.clientX;
                 var lastDragRow = e.row;
                 var lastDragCol = e.col;
+                var dragStarted = false;
                 var unbindMove = grid.eventLoop.bind('mousemove', window, function (e) {
-                    var moveY = e.clientY;
-                    var moveX = e.clientX;
-                    if (moveY !== downY || moveX !== downX) {
+                    if (!dragStarted) {
                         var dragStart = createFakeEvent('grid-drag-start', e);
                         //row, col, x, and y should inherit
                         grid.eventLoop.fire(dragStart);
+                        dragStarted = true;
+                    }
 
-                        var drag = createFakeEvent('grid-drag', e);
+                    var drag = createFakeEvent('grid-drag', e);
+
+                    //row, col, x, and y should inherit
+                    grid.eventLoop.fire(drag);
+
+                    if (e.row !== lastDragRow || e.col !== lastDragCol) {
+                        var cellDrag = createFakeEvent('grid-cell-drag', e);
 
                         //row, col, x, and y should inherit
-                        grid.eventLoop.fire(drag);
-
-                        if (e.row !== lastDragRow || e.col !== lastDragCol) {
-                            var cellDrag = createFakeEvent('grid-cell-drag', e);
-
-                            //row, col, x, and y should inherit
-                            grid.eventLoop.fire(cellDrag);
-                            lastDragRow = e.row;
-                            lastDragCol = e.col;
-                        }
+                        grid.eventLoop.fire(cellDrag);
+                        lastDragRow = e.row;
+                        lastDragCol = e.col;
                     }
+
                 });
 
                 var unbindUp = grid.eventLoop.bind('mouseup', window, function (e) {

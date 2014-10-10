@@ -16,7 +16,6 @@ describe('pixel-scroll-model', function () {
     it('should have a top and left value that start at 0', function () {
         expect(model.top).toEqual(0);
         expect(model.left).toEqual(0);
-
     });
 
     it('should let you "scroll" to a pixel', function () {
@@ -73,7 +72,7 @@ describe('pixel-scroll-model', function () {
 
     it('should call a scroll listener on scrollTo', function () {
         var spy = jasmine.createSpy();
-        var unbind = grid.eventLoop.bind('grid-pixel-scroll', spy);
+        grid.eventLoop.bind('grid-pixel-scroll', spy);
         model.scrollTo(5, 6);
         expect(spy).toHaveBeenCalled();
     });
@@ -87,7 +86,7 @@ describe('pixel-scroll-model', function () {
 
     it('should call a scroll listener asynchronously on mousewheel', function () {
         var spy = jasmine.createSpy();
-        var unbind = grid.eventLoop.bind('grid-pixel-scroll', spy);
+        grid.eventLoop.bind('grid-pixel-scroll', spy);
         sendMouseWheelToModel(40, 30);
         waits(10);
         runs(function () {
@@ -171,9 +170,10 @@ describe('pixel-scroll-model', function () {
             return bar;
         }
 
-        function fireDragStart(bar, dragStart) {
+        function fireDragStart(bar, dragStart, decorator) {
             bar.dispatchEvent(dragStart);
-            grid.eventLoop.fire(dragStart);
+            //call the handler directly or we get all kinds of crazy
+            decorator._onDragStart(dragStart);
         }
 
         function renderBarAndFireDragStart(preFireFn) {
@@ -183,7 +183,7 @@ describe('pixel-scroll-model', function () {
                 preFireFn();
             }
             //he dispatch is just to set the target the grid doesnt actually listend for these so we still have to manually fire it
-            fireDragStart(bar, dragStart);
+            fireDragStart(bar, dragStart, model.vertScrollBar);
         }
 
         it('should bind drag and drag-end on drag-start', function () {
@@ -219,7 +219,7 @@ describe('pixel-scroll-model', function () {
         }
 
 
-        function sendScrollToBar(bar, scrolls, scrollBarPosition, isHorz) {
+        function sendScrollToBar(bar, scrolls, scrollBarPosition, isHorz, decorator) {
             var start = mockEvent('grid-drag-start');
             var scrollBarOffset = Math.floor(isHorz ? getScrollBarWidth() : getScrollBarHeight() / 2);
             var mouseDownClient = scrollBarPosition + scrollBarOffset;
@@ -233,7 +233,7 @@ describe('pixel-scroll-model', function () {
             start.screenX = mouseDownScreen;
             //x shouldn't matter
 
-            fireDragStart(bar, start);
+            fireDragStart(bar, start, decorator);
 
             scrolls.forEach(function (scroll, i) {
                 var newScroll = scrollBarPosition + scroll;
@@ -248,14 +248,14 @@ describe('pixel-scroll-model', function () {
         it('should scroll with mousemove', function () {
             var vertBar = renderBar(model.vertScrollBar);
             //send two scrolls to ensure it doesn't reset in between (cause that was a bug)
-            var top = sendScrollToBar(vertBar, [4, 6, 3, 2, -1], 0);
-            sendScrollToBar(vertBar, [2, 5, 6], top);
+            var top = sendScrollToBar(vertBar, [4, 6, 3, 2, -1], 0, false, model.vertScrollBar);
+            sendScrollToBar(vertBar, [2, 5, 6], top, false, model.vertScrollBar);
 
 
             var horzBar = renderBar(model.horzScrollBar);
             //send two scrolls to ensure it doesn't reset in between (cause that was a bug)
-            var left = sendScrollToBar(horzBar, [2, 8, -1, 3, 2], 0, true);
-            sendScrollToBar(horzBar, [5, 2, 9], left, true);
+            var left = sendScrollToBar(horzBar, [2, 8, -1, 3, 2], 0, true, model.horzScrollBar);
+            sendScrollToBar(horzBar, [5, 2, 9], left, true, model.horzScrollBar);
         });
 
         function fireMouseUp() {
@@ -267,12 +267,7 @@ describe('pixel-scroll-model', function () {
         it('should unbind on mouseup', function () {
             var unbind;
             renderBarAndFireDragStart(function () {
-                unbind = jasmine.createSpy();
-                var bind = grid.eventLoop.bind;
-                grid.eventLoop.bind = function () {
-                    bind.apply(bind, arguments);
-                    return unbind;
-                };
+                unbind = helper.spyOnUnbind();
             });
             fireMouseUp();
             expect(unbind).toHaveBeenCalled();

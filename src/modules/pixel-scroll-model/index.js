@@ -58,8 +58,7 @@ module.exports = function (_grid) {
         decorator.render = function () {
             var scrollBarElem = document.createElement('div');
             scrollBarElem.setAttribute('class', 'grid-scroll-bar');
-
-            grid.eventLoop.bind('grid-drag-start', function (e) {
+            decorator._onDragStart = function (e) {
                 if (e.target !== scrollBarElem) {
                     return;
                 }
@@ -81,7 +80,9 @@ module.exports = function (_grid) {
                     unbindDrag();
                     unbindDragEnd();
                 });
-            });
+            };
+
+            grid.eventLoop.bind('grid-drag-start', decorator._onDragStart);
 
             return scrollBarElem;
         };

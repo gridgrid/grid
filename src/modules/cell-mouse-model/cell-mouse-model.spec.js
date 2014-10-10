@@ -61,6 +61,23 @@ describe('cell-mouse-model', function () {
         expect(dragEvent.clientX).toBe(111);
     });
 
+    it('should only fire grid-drag-start at the beginning', function () {
+        var dragSpy = jasmine.createSpy();
+        var startSpy = jasmine.createSpy();
+        grid.eventLoop.bind('grid-drag-start', startSpy);
+        grid.eventLoop.bind('grid-drag', dragSpy);
+        startDrag();
+        expect(startSpy).toHaveBeenCalled();
+        expect(dragSpy).toHaveBeenCalled();
+        startSpy.reset();
+        dragSpy.reset();
+        var mousemove = createEventWithXY('mousemove', 111, 41);
+        window.dispatchEvent(mousemove);
+        expect(startSpy).not.toHaveBeenCalled();
+        expect(dragSpy).toHaveBeenCalled();
+
+    });
+
     function startDrag(postDownFn) {
         var mousedown = createEventWithXY('mousedown', 110, 40);
         grid.eventLoop.fire(mousedown);

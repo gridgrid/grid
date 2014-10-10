@@ -76,3 +76,10 @@
   background: rgba(0, 0, 0, .5);
   z-index: 10;
 }
+
+.grid-selection {
+  $darkYellow: darken(yellow, 10);
+  border: 2px solid $darkYellow;
+  background: transparentize($darkYellow, .5);
+
+}

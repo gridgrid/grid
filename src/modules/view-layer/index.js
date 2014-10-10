@@ -88,12 +88,17 @@ module.exports = function (_grid) {
     }, 1);
 
     /* CELL LOGIC */
+    function getBorderWidth() {
+        return borderWidth || 1;
+    }
+
     function drawCells() {
-        var borderWidth = measureBorderWidth() || 1;
+        measureBorderWidth()
+        var bWidth = getBorderWidth();
         grid.viewPort.iterateCells(function drawCell(r, c) {
             var cell = cells[r][c];
             var width = grid.viewPort.getColWidth(c);
-            cell.style.width = width + borderWidth + 'px';
+            cell.style.width = width + bWidth + 'px';
 
             var left = grid.viewPort.getColLeft(c);
             cell.style.left = left + 'px';
@@ -108,7 +113,7 @@ module.exports = function (_grid) {
         }, function drawRow(r) {
             var height = grid.viewPort.getRowHeight(r); //maybe faster to do this only on row iterations but meh
             var row = rows[r];
-            row.style.height = height + borderWidth + 'px';
+            row.style.height = height + bWidth + 'px';
             var top = grid.viewPort.getRowTop(r);
             row.style.top = top + 'px';
         });
@@ -164,6 +169,10 @@ module.exports = function (_grid) {
         style.position = 'absolute';
     }
 
+    function positionDecorator(bounding, t, l, h, w) {
+        setPosition(bounding, t, l, h + getBorderWidth(), w + getBorderWidth());
+    }
+
     function drawDecorators() {
         var aliveDecorators = grid.decorators.getAlive();
         aliveDecorators.forEach(function (decorator) {
@@ -182,10 +191,11 @@ module.exports = function (_grid) {
             if (decorator.isDirty() && decorator.space === 'real') {
                 switch (decorator.units) {
                     case 'px':
-                        setPosition(boundingBox, decorator.top, decorator.left, decorator.height, decorator.width);
+                        positionDecorator(boundingBox, decorator.top, decorator.left, decorator.height, decorator.width);
                         break;
                     case 'cell':
                     /* jshint -W086 */
+
                     default:
 
                         break;
@@ -198,8 +208,13 @@ module.exports = function (_grid) {
                     case 'cell':
                     /* jshint -W086 */
                     default:
-                        var intersection = grid.viewPort.toPx(grid.viewPort.intersect(decorator));
-                        setPosition(boundingBox, intersection.top, intersection.left, intersection.height, intersection.width);
+                        var realCellRange = grid.viewPort.intersect(decorator);
+                        if (realCellRange) {
+                            var intersection = grid.viewPort.toPx(realCellRange);
+                            positionDecorator(boundingBox, intersection.top, intersection.left, intersection.height, intersection.width);
+                        } else {
+                            positionDecorator(boundingBox, -1, -1, -1, -1);
+                        }
                         break;
                     /* jshint +W018 */
                 }

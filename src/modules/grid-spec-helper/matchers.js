@@ -10,6 +10,15 @@
     }
 
     var $ = require('jquery');
+
+    function expectedObjectWithNot(obj) {
+        return 'Expected ' + JSON.stringify(obj || this.actual) + (this.isNot ? ' not' : '');
+    }
+
+    function makeFakeRange(t, l, h, w) {
+        return {top: t, left: l, height: h, width: w};
+    }
+
     var matchers = {
         toBeDisplayNone: function () {
             var elem = this.actual;
@@ -101,21 +110,27 @@
         toBeDirty: function () {
             var isDirty = this.actual.isDirty();
             this.message = function () {
-                return 'Expected ' + JSON.stringify(this.actual) + (this.isNot ? ' not' : '') + ' to be dirty but instead isDirty() was ' + isDirty;
+                return expectedObjectWithNot.call(this) + ' to be dirty but instead isDirty() was ' + isDirty;
             };
             return isDirty;
         },
         toBeClean: function () {
             this.message = function () {
-                return 'Expected ' + JSON.stringify(this.actual) + (this.isNot ? ' not' : '') + ' to be clean';
+                return expectedObjectWithNot.call(this) + ' to be clean';
             };
             return this.actual.isClean();
         },
         toHaveField: function (fieldName) {
             this.message = function () {
-                return 'Expected ' + JSON.stringify(this.actual) + (this.isNot ? ' not' : '') + 'to have field: ' + fieldName;
+                return expectedObjectWithNot.call(this) + ' to have field: ' + fieldName;
             };
             return fieldName in this.actual;
+        },
+        toBeRange: function (t, l, h, w) {
+            this.message = function () {
+                return expectedObjectWithNot.call(this, makeFakeRange(this.actual.top, this.actual.left, this.actual.height, this.actual.width)) + ' to be ' + JSON.stringify(makeFakeRange(t, l, h, w));
+            };
+            return this.actual.top === t && this.actual.left === l && this.actual.height === h && this.actual.width === w;
         }
     };
 

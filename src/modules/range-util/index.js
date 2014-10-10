@@ -1,4 +1,5 @@
 module.exports = {
+    //takes a point and a length as the ranges in array form
     intersect: function (range1, range2) {
         var range2Start = range2[0];
         var range1Start = range1[0];
@@ -14,6 +15,7 @@ module.exports = {
             resultEnd - resultStart + 1
         ];
     },
+    //takes a point and a length as the ranges in array form
     union: function (range1, range2) {
         if (!range1) {
             return range2;
@@ -30,6 +32,27 @@ module.exports = {
             resultStart,
             (range1End > range2End ? range1End : range2End) - resultStart + 1
         ];
+    },
+
+    //takes two row, col points and creates a normal position range
+    createFromPoints: function (r1, c1, r2, c2) {
+        var range = {};
+        if (r1 < r2) {
+            range.top = r1;
+            range.height = r2 - r1 + 1;
+        } else {
+            range.top = r2;
+            range.height = r1 - r2 + 1;
+        }
+
+        if (c1 < c2) {
+            range.left = c1;
+            range.width = c2 - c1 + 1;
+        } else {
+            range.left = c2;
+            range.width = c1 - c2 + 1;
+        }
+        return range;
     }
 };
 

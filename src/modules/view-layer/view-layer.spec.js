@@ -338,8 +338,18 @@ describe('view-layer', function () {
         it('should position a virtual cell range decorator', function () {
             setDecoratorPosition(5, 6, 3, 3);
             grid.decorators.add(decorator);
+            // the plus one is so it overlaps the borders
+            expectBoundingBoxSize(5 * 30, 6 * 100, 3 * 30 + 1, 3 * 100 + 1);
+        });
 
-            expectBoundingBoxSize(5 * 30, 6 * 100, 3 * 30, 3 * 100);
+        it('should handle virtual cell ranges that are not in view', function () {
+            setDecoratorPosition(1, 1, 1, 1);
+            grid.cellScrollModel.scrollTo(2, 2);
+            grid.decorators.add(decorator);
+
+            helper.onDraw(function () {
+                expect($(decorator.boundingBox).is(':visible')).toBe(false);
+            });
         });
 
         xit('should position a virtual pixel range decorator', function () {
@@ -355,7 +365,8 @@ describe('view-layer', function () {
             decorator.space = 'real';
             grid.cellScrollModel.scrollTo(1, 1); //scroll should have no effect on the position;
             grid.decorators.add(decorator);
-            expectBoundingBoxSize(5 * 30, 6 * 100, 3 * 30, 3 * 100);
+            // the plus one is so it overlaps the borders
+            expectBoundingBoxSize(5 * 30, 6 * 100, 3 * 30 + 1, 3 * 100 + 1);
         });
 
         it('should position a real pixel range decorator', function () {
@@ -364,7 +375,8 @@ describe('view-layer', function () {
             decorator.space = 'real';
             grid.cellScrollModel.scrollTo(1, 1); //scroll should have no effect on the position;
             grid.decorators.add(decorator);
-            expectBoundingBoxSize(5, 6, 2, 4);
+            // the plus one is so it overlaps the borders
+            expectBoundingBoxSize(5, 6, 2 + 1, 4 + 1);
 
         });
 
@@ -373,11 +385,12 @@ describe('view-layer', function () {
             decorator.units = 'px';
             decorator.space = 'real';
             grid.decorators.add(decorator);
-            expectBoundingBoxSize(5, 6, 2, 3, function next() {
+            // the plus one is so it overlaps the borders
+            expectBoundingBoxSize(5, 6, 2 + 1, 3 + 1, function next() {
                 setDecoratorPosition(1, 6, 6, 3);
             });
 
-            expectBoundingBoxSize(1, 6, 6, 3);
+            expectBoundingBoxSize(1, 6, 6 + 1, 3 + 1);
         });
     });
 

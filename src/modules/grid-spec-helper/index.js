@@ -24,6 +24,15 @@ module.exports = function () {
         },
         makeFakeRange: function (t, l, h, w) {
             return {top: t, left: l, height: h, width: w};
+        },
+        spyOnUnbind: function () {
+            var unbind = jasmine.createSpy();
+            var bind = helper.grid.eventLoop.bind;
+            helper.grid.eventLoop.bind = function () {
+                bind.apply(bind, arguments);
+                return unbind;
+            };
+            return unbind;
         }
     };
 
