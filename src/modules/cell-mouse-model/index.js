@@ -15,6 +15,7 @@ module.exports = function (_grid) {
             case 'mousedown':
             case 'mousemove':
             case 'mouseup':
+            case 'click':
                 var x = e.clientX;
                 var y = e.clientY;
                 e.row = grid.viewPort.getVirtualRowByTop(y);

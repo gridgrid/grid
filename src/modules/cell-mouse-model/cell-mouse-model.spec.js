@@ -23,10 +23,14 @@ describe('cell-mouse-model', function () {
     }
 
     it('should annotate mouse events with the cell they are on', function () {
-        var mousedown = createEventWithXY('mousedown', 110, 40);
-        grid.eventLoop.fire(mousedown);
-        expect(mousedown.row).toBe(1);
-        expect(mousedown.col).toBe(1);
+        var annotatedEvents = ['mousedown', 'mousemove', 'mouseup', 'click'];
+        annotatedEvents.forEach(function (type) {
+            var mousedown = createEventWithXY(type, 110, 40);
+            grid.eventLoop.fire(mousedown);
+            expect(mousedown).rowToBe(1);
+            expect(mousedown).colToBe(1);
+        });
+
     });
 
     it('should fire grid-drag-start on mousedown and then move', function () {

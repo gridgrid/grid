@@ -2,7 +2,7 @@
     function addFieldMatcher(matchers, fieldName) {
         matchers[fieldName + 'ToBe'] = function (val) {
             this.message = function () {
-                return 'Expected ' + fieldName + (this.isNot ? ' not' : '') + ' to be ' + val + ' but it was ' + actualVal;
+                return expectedObjectWithNot.call(this) + ' \nto have ' + fieldName + ' value of ' + val + ' but it was ' + actualVal + '\n';
             };
             var actualVal = this.actual[fieldName];
             return actualVal === val;
