@@ -9,13 +9,18 @@ module.exports = function (_grid) {
 
     var model = {};
 
+    var wasDragged = false;
+
     grid.eventLoop.addInterceptor(function (e) {
         //hmm, is this the easiest way to do something for all mouse events, seems easier than a big if statement
         switch (e.type) {
+            case 'click':
+                e.wasDragged = wasDragged;
+            /* jshint -W086 */
             case 'mousedown':
+            /* jshint +W086 */
             case 'mousemove':
             case 'mouseup':
-            case 'click':
                 var x = e.clientX;
                 var y = e.clientY;
                 e.row = grid.viewPort.getVirtualRowByTop(y);
@@ -45,11 +50,13 @@ module.exports = function (_grid) {
     }
 
     grid.eventLoop.bind('mousedown', function (downEvent) {
+        wasDragged = false;
         var lastDragRow = downEvent.row;
         var lastDragCol = downEvent.col;
         var dragStarted = false;
         var unbindMove = grid.eventLoop.bind('mousemove', window, function (e) {
             if (!dragStarted) {
+                wasDragged = true;
                 createAndFireDragEvent('grid-drag-start', downEvent);
                 dragStarted = true;
             }

@@ -33,6 +33,21 @@ describe('cell-mouse-model', function () {
 
     });
 
+
+    it('should note when a click has not been dragged', function () {
+        var click = createEventWithXY('click', 110, 40);
+        grid.eventLoop.fire(click);
+        expect(click.wasDragged).toBe(false);
+    });
+
+    it('should note when a click has been dragged', function () {
+        startDrag();
+        window.dispatchEvent(createEventWithXY('mouseup', 111, 41));
+        var click = createEventWithXY('click', 110, 40);
+        grid.eventLoop.fire(click);
+        expect(click.wasDragged).toBe(true);
+    });
+
     it('should fire grid-drag-start on mousedown and then move', function () {
         var spy = jasmine.createSpy();
         grid.eventLoop.bind('grid-drag-start', spy);
@@ -123,4 +138,5 @@ describe('cell-mouse-model', function () {
         expect(dragEvent.clientY).toBe(41);
         expect(dragEvent.clientX).toBe(111);
     });
+
 });

@@ -199,7 +199,7 @@ module.exports = function (_grid) {
                     default:
 
                         break;
-                    /* jshint +W018 */
+                    /* jshint +W086 */
                 }
             } else if ((decorator.isDirty() || grid.cellScrollModel.isDirty()) && decorator.space === 'virtual') {
                 switch (decorator.units) {
@@ -216,7 +216,7 @@ module.exports = function (_grid) {
                             positionDecorator(boundingBox, -1, -1, -1, -1);
                         }
                         break;
-                    /* jshint +W018 */
+                    /* jshint +W086 */
                 }
 
             }
