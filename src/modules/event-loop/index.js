@@ -2,7 +2,11 @@ var mousewheel = require('@grid/mousewheel');
 var util = require('@grid/util');
 var listeners = require('@grid/listeners');
 
-module.exports = function (_grid) {
+var EVENTS = ['click', 'mousedown', 'mouseup', 'mousemove', 'dblclick', 'keydown', 'keypress', 'keyup'];
+
+var GRID_EVENTS = ['grid-drag-start', 'grid-drag', 'grid-cell-drag', 'grid-drag-end'];
+
+var eventLoop = function (_grid) {
     var grid = _grid;
     var eloop = {
         isRunning: false
@@ -12,9 +16,13 @@ module.exports = function (_grid) {
 
     eloop.setContainer = function (container) {
         var unbindMouseWheelFn = mousewheel.bind(container, mainLoop);
-        var EVENTS = ['click', 'mousedown', 'mouseup', 'mousemove', 'dblclick', 'keydown', 'keypress', 'keyup'];
+
         EVENTS.forEach(function (name) {
             container.addEventListener(name, mainLoop);
+        });
+
+        GRID_EVENTS.forEach(function (name) {
+            window.addEventListener(name, mainLoop);
         });
     };
 
@@ -99,3 +107,7 @@ module.exports = function (_grid) {
 
     return eloop;
 };
+
+eventLoop.EVENTS = EVENTS;
+eventLoop.GRID_EVENTS = GRID_EVENTS;
+module.exports = eventLoop;

@@ -1,11 +1,9 @@
 var extend = require('@grid/extend');
 var customEvent = require('@grid/custom-event');
 
-function createFakeEvent(type, e) {
-    var dragStart = extend({}, e);
-    dragStart.type = type;
-    return dragStart;
-}
+var PROPS_TO_COPY_FROM_MOUSE_EVENTS = ['clientX', 'clientY', 'layerX', 'layerY', 'row', 'col'];
+
+
 module.exports = function (_grid) {
     var grid = _grid;
 
@@ -26,50 +24,58 @@ module.exports = function (_grid) {
         }
     });
 
-    grid.eventLoop.bind('mousedown', function (e) {
-        switch (e.type) {
-            case 'mousedown':
-                var lastDragRow = e.row;
-                var lastDragCol = e.col;
-                var dragStarted = false;
-                var unbindMove = grid.eventLoop.bind('mousemove', window, function (e) {
-                    if (!dragStarted) {
-                        var dragStart = createFakeEvent('grid-drag-start', e);
-                        //row, col, x, and y should inherit
-                        grid.eventLoop.fire(dragStart);
-                        dragStarted = true;
-                    }
+    function createDragEventFromMouseEvent(type, e) {
+        var event = customEvent(type, true, true);
+        PROPS_TO_COPY_FROM_MOUSE_EVENTS.forEach(function (prop) {
+            event[prop] = e[prop];
+        });
+        event.originalEvent = e;
+        return event;
+    }
 
-                    var drag = createFakeEvent('grid-drag', e);
-
-                    //row, col, x, and y should inherit
-                    grid.eventLoop.fire(drag);
-
-                    if (e.row !== lastDragRow || e.col !== lastDragCol) {
-                        var cellDrag = createFakeEvent('grid-cell-drag', e);
-
-                        //row, col, x, and y should inherit
-                        grid.eventLoop.fire(cellDrag);
-                        lastDragRow = e.row;
-                        lastDragCol = e.col;
-                    }
-
-                });
-
-                var unbindUp = grid.eventLoop.bind('mouseup', window, function (e) {
-                    unbindMove();
-                    unbindUp();
-
-                    var dragEnd = createFakeEvent('grid-drag-end', e);
-
-                    //row, col, x, and y should inherit
-                    grid.eventLoop.fire(dragEnd);
-                });
-
-                //keep it from doing weird crap
-                //e.preventDefault();
-                break;
+    function createAndFireDragEvent(type, e) {
+        var drag = createDragEventFromMouseEvent(type, e);
+        if (e.target) {
+            e.target.dispatchEvent(drag);
+        } else {
+            grid.eventLoop.fire(drag);
         }
+        return drag;
+    }
+
+    grid.eventLoop.bind('mousedown', function (downEvent) {
+        var lastDragRow = downEvent.row;
+        var lastDragCol = downEvent.col;
+        var dragStarted = false;
+        var unbindMove = grid.eventLoop.bind('mousemove', window, function (e) {
+            if (!dragStarted) {
+                createAndFireDragEvent('grid-drag-start', downEvent);
+                dragStarted = true;
+            }
+
+            createAndFireDragEvent('grid-drag', e);
+
+            if (e.row !== lastDragRow || e.col !== lastDragCol) {
+                createAndFireDragEvent('grid-cell-drag', e);
+
+                lastDragRow = e.row;
+                lastDragCol = e.col;
+            }
+
+        });
+
+        var unbindUp = grid.eventLoop.bind('mouseup', window, function (e) {
+            unbindMove();
+            unbindUp();
+
+            var dragEnd = createDragEventFromMouseEvent('grid-drag-end', e);
+
+            //row, col, x, and y should inherit
+            grid.eventLoop.fire(dragEnd);
+        });
+
+        //keep it from doing weird crap
+        //e.preventDefault();
     });
 
 

@@ -65,7 +65,7 @@ module.exports = function (_grid) {
                 var screenClientOffset = e[screenCoordField] - e[clientCoordField];
                 var scrollBarOffset = e[layerCoordField];
 
-                var unbindDrag = grid.eventLoop.bind('grid-drag', function (e) {
+                decorator._unbindDrag = grid.eventLoop.bind('grid-drag', function (e) {
                     var screenCoord = e[screenCoordField];
                     var clientCoord = viewPortClampFn(e[clientCoordField]);
                     var scrollCoord = realPxToVirtualPx(clientCoord - scrollBarOffset, widthOrHeight);
@@ -76,20 +76,22 @@ module.exports = function (_grid) {
                     }
                 });
 
-                var unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function (e) {
-                    unbindDrag();
-                    unbindDragEnd();
+                decorator._unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function (e) {
+                    decorator._unbindDrag();
+                    decorator._unbindDragEnd();
                 });
+
+                e.stopPropagation();
             };
 
-            grid.eventLoop.bind('grid-drag-start', decorator._onDragStart);
+            grid.eventLoop.bind('grid-drag-start', scrollBarElem, decorator._onDragStart);
 
             return scrollBarElem;
         };
 
         decorator.units = 'px';
         decorator.space = 'real';
-        
+
         return decorator;
     }
 

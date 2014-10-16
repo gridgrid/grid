@@ -32,23 +32,6 @@ describe('cell-mouse-model', function () {
     it('should fire grid-drag-start on mousedown and then move', function () {
         var spy = jasmine.createSpy();
         grid.eventLoop.bind('grid-drag-start', spy);
-        var mousedown = createEventWithXY('mousedown', 110, 40);
-        grid.eventLoop.fire(mousedown);
-        expect(spy).not.toHaveBeenCalled();
-        var mousemove = createEventWithXY('mousemove', 111, 41);
-        window.dispatchEvent(mousemove);
-        expect(spy).toHaveBeenCalled();
-        var dragEvent = spy.argsForCall[0][0];
-        expect(dragEvent.type).toBe('grid-drag-start');
-        expect(dragEvent).rowToBe(1);
-        expect(dragEvent).colToBe(1);
-        expect(dragEvent.clientY).toBe(41);
-        expect(dragEvent.clientX).toBe(111);
-    });
-
-    it('should fire grid-drag-start on mousedown and then move', function () {
-        var spy = jasmine.createSpy();
-        grid.eventLoop.bind('grid-drag-start', spy);
         startDrag(function postDownFn() {
             expect(spy).not.toHaveBeenCalled();
         });
@@ -57,13 +40,13 @@ describe('cell-mouse-model', function () {
         expect(dragEvent.type).toBe('grid-drag-start');
         expect(dragEvent).rowToBe(1);
         expect(dragEvent).colToBe(1);
-        expect(dragEvent.clientY).toBe(41);
-        expect(dragEvent.clientX).toBe(111);
+        expect(dragEvent.clientY).toBe(40);
+        expect(dragEvent.clientX).toBe(110);
     });
 
     it('should only fire grid-drag-start at the beginning', function () {
-        var dragSpy = jasmine.createSpy();
-        var startSpy = jasmine.createSpy();
+        var dragSpy = jasmine.createSpy('drag');
+        var startSpy = jasmine.createSpy('drag start');
         grid.eventLoop.bind('grid-drag-start', startSpy);
         grid.eventLoop.bind('grid-drag', dragSpy);
         startDrag();
@@ -80,7 +63,7 @@ describe('cell-mouse-model', function () {
 
     function startDrag(postDownFn) {
         var mousedown = createEventWithXY('mousedown', 110, 40);
-        grid.eventLoop.fire(mousedown);
+        helper.container.dispatchEvent(mousedown);
         if (postDownFn) {
             postDownFn();
         }

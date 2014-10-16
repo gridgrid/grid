@@ -1,4 +1,5 @@
 var mockEvent = require('@grid/custom-event');
+var eventLoopFn = require('@grid/event-loop');
 
 describe('event-loop', function () {
     var helper = require('@grid/grid-spec-helper')();
@@ -7,6 +8,26 @@ describe('event-loop', function () {
     beforeEach(function () {
         grid = helper.buildSimpleGrid();
         loop = grid.eventLoop;
+    });
+
+    it('should bind a handler for all the events we care about', function () {
+        eventLoopFn.EVENTS.forEach(function (type) {
+            var spy = jasmine.createSpy(type);
+            //use interceptor in case something else tries to stop propagation
+            grid.eventLoop.addInterceptor(spy);
+            helper.container.dispatchEvent(mockEvent(type, true, true));
+            expect(spy).toHaveBeenCalled();
+        });
+    });
+
+    it('should bind a handler for all the events we care about', function () {
+        eventLoopFn.GRID_EVENTS.forEach(function (type) {
+            var spy = jasmine.createSpy(type);
+            //use interceptor in case something else tries to stop propagation
+            grid.eventLoop.addInterceptor(spy);
+            window.dispatchEvent(mockEvent(type, true, true));
+            expect(spy).toHaveBeenCalled();
+        });
     });
 
     it('should bind event listeners to a container', function () {

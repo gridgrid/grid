@@ -159,9 +159,10 @@ describe('pixel-scroll-model', function () {
 
         it('should bind a drag event on render', function () {
             var spy = spyOn(grid.eventLoop, 'bind');
-            model.vertScrollBar.render();
+            var scrollBar = model.vertScrollBar.render();
             expect(spy.argsForCall[0][0]).toEqual('grid-drag-start');
-            expect(spy.argsForCall[0][1]).toBeAFunction();
+            expect(spy.argsForCall[0][1]).toBe(scrollBar);
+            expect(spy.argsForCall[0][2]).toBeAFunction();
         });
 
         function renderBar(barDecorator) {
@@ -266,12 +267,12 @@ describe('pixel-scroll-model', function () {
 
         it('should unbind on mouseup', function () {
             var unbind;
-            renderBarAndFireDragStart(function () {
-                unbind = helper.spyOnUnbind();
-            });
+            renderBarAndFireDragStart();
+            var dragSpy = spyOn(model.vertScrollBar, '_unbindDrag');
+            var endSpy = spyOn(model.vertScrollBar, '_unbindDragEnd');
             fireMouseUp();
-            expect(unbind).toHaveBeenCalled();
-            expect(unbind.callCount).toBe(2);
+            expect(dragSpy).toHaveBeenCalled();
+            expect(endSpy).toHaveBeenCalled();
         });
     });
 
