@@ -39,6 +39,9 @@
 .grid-cell {
   border: 1px solid #eee;
   padding: 3px 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
   &.focus {
     border: 2px solid green;
