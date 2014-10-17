@@ -44,9 +44,13 @@
   text-overflow: ellipsis;
 
   &.focus {
-    border: 2px solid green;
-    z-index: 1;
+    background: white !important;
   }
+}
+
+.grid-focus-decorator {
+  border: 2px solid green;
+  z-index: 1;
 }
 
 .grid-row {

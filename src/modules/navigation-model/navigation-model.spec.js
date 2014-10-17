@@ -59,6 +59,34 @@ describe('navigation-model', function () {
             expect(descriptor).classToBe('focus');
         });
 
+        describe('decorator', function () {
+            var decorator;
+            beforeEach(function () {
+                decorator = model.focusDecorator;
+            });
+            it('should be added', function () {
+                expect(grid.decorators.getAlive()).toContain(decorator);
+            });
+
+            it('should have a style class', function () {
+                expect(decorator.render()).toHaveClass('grid-focus-decorator');
+            });
+
+            describe('should satisfy:', function () {
+                var ctx = {helper: helper};
+                beforeEach(function () {
+                    ctx.decorator = decorator;
+                });
+                require('@grid/decorators/decorator-test-body')(ctx);
+            });
+
+            it('should move when focus changes', function () {
+                model.setFocus(2, 3);
+                expect(decorator).topToBe(2);
+                expect(decorator).leftToBe(3);
+            });
+        });
+
         it('should move the cell class on navigation', function () {
             var spy = spyOn(grid.cellClasses, 'add');
             var model = require('@grid/navigation-model')(grid);

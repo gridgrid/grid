@@ -180,6 +180,7 @@ module.exports = function (_grid) {
             var boundingBox = decorator.boundingBox;
             if (!boundingBox) {
                 boundingBox = document.createElement('div');
+                boundingBox.style.pointerEvents = 'none';
                 decorator.boundingBox = boundingBox;
                 var decElement = decorator.render();
                 if (decElement) {

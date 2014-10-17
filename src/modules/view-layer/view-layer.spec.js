@@ -281,6 +281,7 @@ describe('view-layer', function () {
             helper.onDraw(function () {
                 expect(decorator.getDiv().parentElement).toBeTruthy();
                 expect($(decorator.getDiv()).parents('[dts=grid-decorators]').length).toBe(1);
+                expect(decorator.boundingBox.style.pointerEvents).toBe('none');
             });
         });
 

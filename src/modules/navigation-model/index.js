@@ -15,6 +15,16 @@ module.exports = function (_grid) {
     var focusClass = grid.cellClasses.create(0, 0, 'focus');
     grid.cellClasses.add(focusClass);
 
+    model.focusDecorator = grid.decorators.create();
+    model.focusDecorator.height = 1;
+    model.focusDecorator.width = 1;
+    model.focusDecorator.render = function () {
+        var div = defaultRender();
+        div.setAttribute('class', 'grid-focus-decorator');
+        return div;
+    };
+    grid.decorators.add(model.focusDecorator);
+
     function defineLimitProp(prop, defaultValue) {
         var val = defaultValue;
         Object.defineProperty(model, prop, {
@@ -45,6 +55,8 @@ module.exports = function (_grid) {
         model.focus.col = col;
         focusClass.top = row;
         focusClass.left = col;
+        model.focusDecorator.top = row;
+        model.focusDecorator.left = col;
         grid.cellScrollModel.scrollIntoView(row, col);
         //focus changes always clear the selection
         clearSelection();
