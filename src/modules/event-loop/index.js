@@ -62,6 +62,10 @@ var eventLoop = function (_grid) {
         } else {
             var listener = loopWith(handler);
             elem.addEventListener(name, listener);
+            //make sure the elem can receive events
+            if (elem.style) {
+                elem.style.pointerEvents = 'all';
+            }
             return function () {
                 elem.removeEventListener(name, listener);
             };

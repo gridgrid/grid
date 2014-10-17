@@ -20,7 +20,7 @@ describe('event-loop', function () {
         });
     });
 
-    it('should bind a handler for all the events we care about', function () {
+    it('should bind a handler for all the grid events we care about', function () {
         eventLoopFn.GRID_EVENTS.forEach(function (type) {
             var spy = jasmine.createSpy(type);
             //use interceptor in case something else tries to stop propagation
@@ -121,6 +121,14 @@ describe('event-loop', function () {
             unbind();
             div.dispatchEvent(click);
             expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('should set pointer events all on an element to which im binding', function () {
+            var div = document.createElement('div');
+            grid.eventLoop.bind('click', div, function () {
+
+            });
+            expect(div.style.pointerEvents).toBe('all');
         });
 
         it('should let me bind, fire and unbind a dom event to the grid container and be in loop during', function () {
