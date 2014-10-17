@@ -15,7 +15,6 @@ module.exports = function () {
     grid.cellScrollModel = require('@grid/cell-scroll-model')(grid);
     grid.cellMouseModel = require('@grid/cell-mouse-model')(grid);
     grid.navigationModel = require('@grid/navigation-model')(grid);
-    grid.selectionModel = require('@grid/selection-model')(grid);
 
     grid.viewPort = require('@grid/view-port')(grid);
     grid.viewLayer = require('@grid/view-layer')(grid);

@@ -12,7 +12,6 @@ module.exports = function (_grid) {
     var wasDragged = false;
 
     grid.eventLoop.addInterceptor(function (e) {
-        //hmm, is this the easiest way to do something for all mouse events, seems easier than a big if statement
         switch (e.type) {
             case 'click':
                 e.wasDragged = wasDragged;

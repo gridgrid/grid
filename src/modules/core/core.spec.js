@@ -17,7 +17,6 @@ describe('grid-core', function () {
         expect(grid).toHaveField('cellScrollModel');
         expect(grid).toHaveField('cellMouseModel');
         expect(grid).toHaveField('navigationModel');
-        expect(grid).toHaveField('selectionModel');
         expect(grid).toHaveField('viewPort');
         expect(grid).toHaveField('viewLayer');
         expect(grid).toHaveField('pixelScrollModel');
