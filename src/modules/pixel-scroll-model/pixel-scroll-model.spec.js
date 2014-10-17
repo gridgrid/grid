@@ -114,11 +114,15 @@ describe('pixel-scroll-model', function () {
     });
     describe('scroll bars', function () {
         //weird numbers so we don't get confused by even division
-        var viewWidth = 531;
-        var viewHeight = 233;
-        var scrollBeforeEachFn = function () {
+        var viewWidth;
+        var viewHeight;
+
+        function scrollBeforeEachFn(h, w) {
+            viewWidth = w || 631;
+            viewHeight = h || 333;
             grid.viewPort.sizeToContainer({offsetWidth: viewWidth, offsetHeight: viewHeight});
-        };
+        }
+
         beforeEach(scrollBeforeEachFn);
 
         it('should register a vertical and horizontal decorator', function () {
@@ -149,7 +153,7 @@ describe('pixel-scroll-model', function () {
         }
 
         function getScrollHeight() {
-            return grid.virtualPixelCellModel.totalHeight() - grid.virtualPixelCellModel.fixedHeight();
+            return grid.virtualPixelCellModel.totalHeight();
         }
 
         function getScrollBarHeight() {
@@ -157,7 +161,7 @@ describe('pixel-scroll-model', function () {
         }
 
         function getScrollWidth() {
-            return grid.virtualPixelCellModel.totalWidth() - grid.virtualPixelCellModel.fixedWidth();
+            return grid.virtualPixelCellModel.totalWidth();
         }
 
         function getScrollBarWidth() {
@@ -165,7 +169,6 @@ describe('pixel-scroll-model', function () {
         }
 
         it('should size to the right percentage of the view', function () {
-
             expect(model.vertScrollBar).heightToBe(getScrollBarHeight());
             expect(model.vertScrollBar).widthToBe(10);
             expect(model.horzScrollBar).widthToBe(getScrollBarWidth());
@@ -179,6 +182,22 @@ describe('pixel-scroll-model', function () {
             expect(model.vertScrollBar).widthToBe(10);
             expect(model.horzScrollBar).widthToBe(getScrollBarWidth());
             expect(model.horzScrollBar).heightToBe(10);
+        });
+
+        it('should have a min width or height', function () {
+            scrollBeforeEachFn(30, 90);
+            expect(model.vertScrollBar).heightToBe(20);
+            expect(model.vertScrollBar).widthToBe(10);
+            expect(model.horzScrollBar).widthToBe(20);
+            expect(model.horzScrollBar).heightToBe(10);
+        });
+
+        it('should consider the min height when positioning', function () {
+            scrollBeforeEachFn(30, 90);
+            model.scrollTo(Infinity, Infinity);
+            expect(model.vertScrollBar).topToBe(30 - 20);
+
+            expect(model.horzScrollBar).leftToBe(90 - 20);
         });
 
         it('should position at the edges of the view', function () {
@@ -249,43 +268,51 @@ describe('pixel-scroll-model', function () {
 
         });
 
-        function scrollBy(mouseDownClient, scrollAmount, screenOffset, previousScroll, scrollBarOffset, isHorz) {
+        function scrollBy(mouseDownClient, scrollAmount, scrollBarOffset, isHorz) {
             var move = mockEvent('grid-drag', true);
             var scrollClient = mouseDownClient + scrollAmount;
-
+            var fixed = isHorz ? grid.virtualPixelCellModel.fixedWidth() : grid.virtualPixelCellModel.fixedHeight();
             move.clientY = scrollClient;
             move.clientX = scrollClient;
-            move.screenY = scrollClient + screenOffset;
-            move.screenX = scrollClient + screenOffset;
             //expect(model.top).toBe(previousScroll / viewHeight * grid.virtualPixelCellModel.totalHeight());
             grid.eventLoop.fire(move);
 
-            var actualScroll = isHorz ? model.left : model.top;
             var view = isHorz ? viewWidth : viewHeight;
             var total = isHorz ? grid.virtualPixelCellModel.totalWidth() : grid.virtualPixelCellModel.totalHeight();
-            expect(actualScroll).toBe((scrollClient - scrollBarOffset) / view * total);
+            var scrollBarRealPosition = (scrollClient - scrollBarOffset);
+            var scrollableView = view - fixed;
+            var barSize = isHorz ? getScrollBarWidth() : getScrollBarHeight();
+            var scrollBarMax = scrollableView - barSize;
+
+            var scrollBarPosition = scrollBarRealPosition - fixed;
+            var scrollRatio = scrollBarPosition / scrollBarMax;
+            var expectedScroll = scrollRatio * (total - fixed - scrollableView);
+            if (isHorz) {
+                expect(model).leftToBe(expectedScroll);
+            } else {
+                expect(model).topToBe(expectedScroll);
+            }
+
         }
 
 
         function sendScrollToBar(bar, scrolls, scrollBarPosition, isHorz, decorator) {
             var start = mockEvent('grid-drag-start');
             var scrollBarOffset = Math.floor(isHorz ? getScrollBarWidth() : getScrollBarHeight() / 2);
-            var mouseDownClient = scrollBarPosition + scrollBarOffset;
-            var screenYOffset = 11;
+            var fixed = isHorz ? grid.virtualPixelCellModel.fixedWidth() : grid.virtualPixelCellModel.fixedHeight();
+            var mouseDownClient = scrollBarPosition + scrollBarOffset + fixed;
+
             start.clientY = mouseDownClient;
             start.clientX = mouseDownClient;
             start.layerY = scrollBarOffset;
             start.layerX = scrollBarOffset;
-            var mouseDownScreen = mouseDownClient + screenYOffset;
-            start.screenY = mouseDownScreen;
-            start.screenX = mouseDownScreen;
-            //x shouldn't matter
 
             fireDragStart(bar, start, decorator);
 
             scrolls.forEach(function (scroll, i) {
                 var newScroll = scrollBarPosition + scroll;
-                scrollBy(mouseDownClient, newScroll, screenYOffset, scrolls[i - 1] || scrollBarPosition, scrollBarOffset, isHorz);
+                scrollBy(mouseDownClient, newScroll, scrollBarOffset, isHorz);
+
                 scrollBarPosition += scroll;
             });
 
@@ -293,7 +320,23 @@ describe('pixel-scroll-model', function () {
             return scrollBarPosition;
         }
 
+        //i'm so so sorry if you have to try to debug these test failures. it's bad. 
         it('should scroll with mousemove', function () {
+            var vertBar = renderBar(model.vertScrollBar);
+            //send two scrolls to ensure it doesn't reset in between (cause that was a bug)
+            var top = sendScrollToBar(vertBar, [4, 6, 3, 2, -1], 0, false, model.vertScrollBar);
+            sendScrollToBar(vertBar, [2, 5, 6], top, false, model.vertScrollBar);
+
+
+            var horzBar = renderBar(model.horzScrollBar);
+            //send two scrolls to ensure it doesn't reset in between (cause that was a bug)
+            var left = sendScrollToBar(horzBar, [2, 8, -1, 3, 2], 0, true, model.horzScrollBar);
+            sendScrollToBar(horzBar, [5, 2, 9], left, true, model.horzScrollBar);
+        });
+
+        it('should scroll with mousemove when fixed', function () {
+            beforeEachFn(false, false, 1, 1);
+            scrollBeforeEachFn(1500, 500);
             var vertBar = renderBar(model.vertScrollBar);
             //send two scrolls to ensure it doesn't reset in between (cause that was a bug)
             var top = sendScrollToBar(vertBar, [4, 6, 3, 2, -1], 0, false, model.vertScrollBar);

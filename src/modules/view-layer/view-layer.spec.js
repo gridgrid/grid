@@ -376,8 +376,7 @@ describe('view-layer', function () {
             decorator.space = 'real';
             grid.cellScrollModel.scrollTo(1, 1); //scroll should have no effect on the position;
             grid.decorators.add(decorator);
-            // the plus one is so it overlaps the borders
-            expectBoundingBoxSize(5, 6, 2 + 1, 4 + 1);
+            expectBoundingBoxSize(5, 6, 2, 4);
 
         });
 
@@ -386,12 +385,11 @@ describe('view-layer', function () {
             decorator.units = 'px';
             decorator.space = 'real';
             grid.decorators.add(decorator);
-            // the plus one is so it overlaps the borders
-            expectBoundingBoxSize(5, 6, 2 + 1, 3 + 1, function next() {
+            expectBoundingBoxSize(5, 6, 2, 3, function next() {
                 setDecoratorPosition(1, 6, 6, 3);
             });
 
-            expectBoundingBoxSize(1, 6, 6 + 1, 3 + 1);
+            expectBoundingBoxSize(1, 6, 6, 3);
         });
     });
 

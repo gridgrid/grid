@@ -170,7 +170,7 @@ module.exports = function (_grid) {
     }
 
     function positionDecorator(bounding, t, l, h, w) {
-        setPosition(bounding, t, l, h + getBorderWidth(), w + getBorderWidth());
+        setPosition(bounding, t, l, h, w);
     }
 
     function drawDecorators() {
@@ -212,7 +212,7 @@ module.exports = function (_grid) {
                         var realCellRange = grid.viewPort.intersect(decorator);
                         if (realCellRange) {
                             var intersection = grid.viewPort.toPx(realCellRange);
-                            positionDecorator(boundingBox, intersection.top, intersection.left, intersection.height, intersection.width);
+                            positionDecorator(boundingBox, intersection.top, intersection.left, intersection.height + getBorderWidth(), intersection.width + getBorderWidth());
                         } else {
                             positionDecorator(boundingBox, -1, -1, -1, -1);
                         }

@@ -38,8 +38,8 @@ module.exports = function (_grid) {
     var debouncedNotify = debounce(notifyListeners, 1);
 
     model.scrollTo = function (top, left, dontNotify) {
-        model.top = util.clamp(top, 0, model.height - getViewScrollHeight());
-        model.left = util.clamp(left, 0, model.width - getViewScrollWidth());
+        model.top = util.clamp(top, 0, model.height - getScrollableViewHeight());
+        model.left = util.clamp(left, 0, model.width - getScrollableViewWidth());
 
         positionScrollBars();
 
@@ -50,11 +50,18 @@ module.exports = function (_grid) {
 
 
     /* SCROLL BAR LOGIC */
+    function getScrollPositionFromReal(scrollBarRealClickCoord, heightWidth, vertHorz) {
+        var scrollBarTopClick = scrollBarRealClickCoord - grid.virtualPixelCellModel['fixed' + capitalize(heightWidth)]();
+        var scrollRatio = scrollBarTopClick / getMaxScrollBarCoord(heightWidth, vertHorz);
+        var scrollCoord = scrollRatio * getMaxScroll(heightWidth);
+        return scrollCoord;
+    }
+
     function makeScrollBarDecorator(isHorz) {
-        var xOrY = isHorz ? 'X' : 'Y';
-        var widthOrHeight = isHorz ? 'width' : 'height';
         var decorator = grid.decorators.create();
-        var screenCoordField = 'screen' + xOrY;
+        var xOrY = isHorz ? 'X' : 'Y';
+        var heightWidth = isHorz ? 'width' : 'height';
+        var vertHorz = isHorz ? 'horz' : 'vert';
         var clientCoordField = 'client' + xOrY;
         var layerCoordField = 'layer' + xOrY;
         var viewPortClampFn = grid.viewPort['clamp' + xOrY];
@@ -66,13 +73,12 @@ module.exports = function (_grid) {
                 if (e.target !== scrollBarElem) {
                     return;
                 }
-                var screenClientOffset = e[screenCoordField] - e[clientCoordField];
                 var scrollBarOffset = e[layerCoordField];
 
                 decorator._unbindDrag = grid.eventLoop.bind('grid-drag', function (e) {
-                    var screenCoord = e[screenCoordField];
                     var clientCoord = viewPortClampFn(e[clientCoordField]);
-                    var scrollCoord = realPxToVirtualScrollPx(clientCoord - scrollBarOffset, widthOrHeight);
+                    var scrollBarRealClickCoord = clientCoord - scrollBarOffset;
+                    var scrollCoord = getScrollPositionFromReal(scrollBarRealClickCoord, heightWidth, vertHorz);
                     if (isHorz) {
                         model.scrollTo(model.top, scrollCoord);
                     } else {
@@ -104,44 +110,64 @@ module.exports = function (_grid) {
     model.vertScrollBar.width = scrollBarWidth;
     model.horzScrollBar.height = scrollBarWidth;
 
-    function virtualScrollPxToRealPx(virtualPx, heightWidth) {
-        return virtualPx / model[heightWidth] * getViewScrollHeightOrWidth(heightWidth);
+    function getMaxScroll(heightWidth) {
+        return model[heightWidth] - getViewScrollHeightOrWidth(heightWidth);
     }
 
-    function realPxToVirtualScrollPx(realPx, heightWidth) {
-        return realPx / getViewScrollHeightOrWidth(heightWidth) * model[heightWidth];
+    function getScrollRatioFromVirtualScrollCoords(scroll, heightWidth) {
+        var maxScroll = getMaxScroll(heightWidth);
+        var scrollRatio = scroll / maxScroll;
+        return scrollRatio;
     }
 
-    function calcScrollBarTop() {
-        return virtualScrollPxToRealPx(model.top, 'height') + grid.virtualPixelCellModel.fixedHeight();
+    function getMaxScrollBarCoord(heightWidth, vertHorz) {
+        return getViewScrollHeightOrWidth(heightWidth) - model[vertHorz + 'ScrollBar'][heightWidth];
     }
 
-    function calcScrollBarLeft() {
-        return virtualScrollPxToRealPx(model.left, 'width') + grid.virtualPixelCellModel.fixedWidth();
+    function getRealScrollBarPosition(scroll, heightWidth, vertHorz) {
+        var scrollRatio = getScrollRatioFromVirtualScrollCoords(scroll, heightWidth);
+        var maxScrollBarScroll = getMaxScrollBarCoord(heightWidth, vertHorz);
+        //in scroll bar coords
+        var scrollBarCoord = scrollRatio * maxScrollBarScroll;
+        //add the fixed height to translate back into real coords
+        return scrollBarCoord + grid.virtualPixelCellModel['fixed' + capitalize(heightWidth)]();
+    }
+
+    model._getRealScrollBarPosition = getRealScrollBarPosition;
+    model._getScrollPositionFromReal = getScrollPositionFromReal;
+
+    function calcScrollBarRealTop() {
+        return getRealScrollBarPosition(model.top, 'height', 'vert');
+    }
+
+    function calcScrollBarRealLeft() {
+        return getRealScrollBarPosition(model.left, 'width', 'horz');
     }
 
     function positionScrollBars() {
-        model.vertScrollBar.top = calcScrollBarTop();
-        model.horzScrollBar.left = calcScrollBarLeft();
+        model.vertScrollBar.top = calcScrollBarRealTop();
+        model.horzScrollBar.left = calcScrollBarRealLeft();
     }
 
     function getViewScrollHeightOrWidth(heightWidth) {
         return grid.viewPort[heightWidth] - grid.virtualPixelCellModel['fixed' + capitalize(heightWidth)]();
     }
 
-    function getViewScrollWidth() {
+    function getScrollableViewWidth() {
         return getViewScrollHeightOrWidth('width');
     }
 
-    function getViewScrollHeight() {
+    function getScrollableViewHeight() {
         return getViewScrollHeightOrWidth('height');
     }
 
     function sizeScrollBars() {
         model.vertScrollBar.left = grid.viewPort.width - scrollBarWidth;
         model.horzScrollBar.top = grid.viewPort.height - scrollBarWidth;
-        model.vertScrollBar.height = virtualScrollPxToRealPx(getViewScrollHeight(), 'height');
-        model.horzScrollBar.width = virtualScrollPxToRealPx(getViewScrollWidth(), 'width');
+        var scrollableViewHeight = getScrollableViewHeight();
+        var scrollableViewWidth = getScrollableViewWidth();
+        model.vertScrollBar.height = Math.max(scrollableViewHeight / grid.virtualPixelCellModel.totalHeight() * scrollableViewHeight, 20);
+        model.horzScrollBar.width = Math.max(scrollableViewWidth / grid.virtualPixelCellModel.totalWidth() * scrollableViewWidth, 20);
         positionScrollBars();
     }
 
