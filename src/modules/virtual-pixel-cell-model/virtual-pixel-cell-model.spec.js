@@ -6,11 +6,13 @@ describe('virtual-pixel-cell-model', function () {
     var numCols = 10;
     var grid;
 
-    beforeEach(function () {
-        grid = helper.buildSimpleGrid(numRows, numCols);
+    function beforeEachFn(varyH, varyW, fixedR, fixedC) {
+        grid = helper.buildSimpleGrid(numRows, numCols, varyH, varyW, fixedR, fixedC);
         model = grid.virtualPixelCellModel;
 
-    });
+    }
+
+    beforeEach(beforeEachFn);
 
     it('should tell me the data row of a virtual top location', function () {
         expect(model.getRow(91)).toBe(3);
@@ -85,5 +87,11 @@ describe('virtual-pixel-cell-model', function () {
 
     it('should tell me the total width', function () {
         expect(model.totalWidth()).toBe(10 * 100);
+    });
+
+    it('should tell me fixed height', function () {
+        beforeEachFn(false, false, 2, 3);
+        expect(model.fixedHeight()).toBe(60);
+        expect(model.fixedWidth()).toBe(300);
     });
 });

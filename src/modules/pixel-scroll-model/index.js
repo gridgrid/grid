@@ -1,5 +1,6 @@
 var util = require('@grid/util');
 var debounce = require('debounce');
+var capitalize = require('capitalize')
 
 module.exports = function (_grid) {
     var grid = _grid;
@@ -7,9 +8,12 @@ module.exports = function (_grid) {
     var scrollBarWidth = 10;
 
     grid.eventLoop.bind('grid-virtual-pixel-cell-change', function () {
-        model.setScrollSize(grid.virtualPixelCellModel.totalHeight(), grid.virtualPixelCellModel.totalWidth());
+        var scrollHeight = grid.virtualPixelCellModel.totalHeight() - grid.virtualPixelCellModel.fixedHeight();
+        var scrollWidth = grid.virtualPixelCellModel.totalWidth() - grid.virtualPixelCellModel.fixedWidth();
+        model.setScrollSize(scrollHeight, scrollWidth);
         sizeScrollBars();
     });
+
 
     grid.eventLoop.bind('grid-viewport-change', sizeScrollBars);
     //assumes a standardized wheel event that we create through the mousewheel package
@@ -34,10 +38,10 @@ module.exports = function (_grid) {
     var debouncedNotify = debounce(notifyListeners, 1);
 
     model.scrollTo = function (top, left, dontNotify) {
-        model.top = util.clamp(top, 0, model.height - grid.viewPort.height);
-        model.left = util.clamp(left, 0, model.width - grid.viewPort.width);
+        model.top = util.clamp(top, 0, model.height - getViewScrollHeight());
+        model.left = util.clamp(left, 0, model.width - getViewScrollWidth());
 
-        moveScrollBars();
+        positionScrollBars();
 
         if (!dontNotify) {
             notifyListeners();
@@ -68,7 +72,7 @@ module.exports = function (_grid) {
                 decorator._unbindDrag = grid.eventLoop.bind('grid-drag', function (e) {
                     var screenCoord = e[screenCoordField];
                     var clientCoord = viewPortClampFn(e[clientCoordField]);
-                    var scrollCoord = realPxToVirtualPx(clientCoord - scrollBarOffset, widthOrHeight);
+                    var scrollCoord = realPxToVirtualScrollPx(clientCoord - scrollBarOffset, widthOrHeight);
                     if (isHorz) {
                         model.scrollTo(model.top, scrollCoord);
                     } else {
@@ -100,36 +104,45 @@ module.exports = function (_grid) {
     model.vertScrollBar.width = scrollBarWidth;
     model.horzScrollBar.height = scrollBarWidth;
 
-    function virtualPxToRealPx(virtualPx, heightWidth) {
-        return virtualPx / model[heightWidth] * grid.viewPort[heightWidth];
+    function virtualScrollPxToRealPx(virtualPx, heightWidth) {
+        return virtualPx / model[heightWidth] * getViewScrollHeightOrWidth(heightWidth);
     }
 
-    function realPxToVirtualPx(realPx, heightWidth) {
-        return realPx / grid.viewPort[heightWidth] * model[heightWidth];
+    function realPxToVirtualScrollPx(realPx, heightWidth) {
+        return realPx / getViewScrollHeightOrWidth(heightWidth) * model[heightWidth];
     }
 
     function calcScrollBarTop() {
-        return virtualPxToRealPx(model.top, 'height');
+        return virtualScrollPxToRealPx(model.top, 'height') + grid.virtualPixelCellModel.fixedHeight();
     }
 
     function calcScrollBarLeft() {
-        return virtualPxToRealPx(model.left, 'width');
+        return virtualScrollPxToRealPx(model.left, 'width') + grid.virtualPixelCellModel.fixedWidth();
     }
 
-    function moveScrollBars() {
+    function positionScrollBars() {
         model.vertScrollBar.top = calcScrollBarTop();
         model.horzScrollBar.left = calcScrollBarLeft();
     }
 
-    function calcScrollBarHeight() {
-        return grid.viewPort.height / model.height * grid.viewPort.height;
+    function getViewScrollHeightOrWidth(heightWidth) {
+        return grid.viewPort[heightWidth] - grid.virtualPixelCellModel['fixed' + capitalize(heightWidth)]();
+    }
+
+    function getViewScrollWidth() {
+        return getViewScrollHeightOrWidth('width');
+    }
+
+    function getViewScrollHeight() {
+        return getViewScrollHeightOrWidth('height');
     }
 
     function sizeScrollBars() {
         model.vertScrollBar.left = grid.viewPort.width - scrollBarWidth;
         model.horzScrollBar.top = grid.viewPort.height - scrollBarWidth;
-        model.vertScrollBar.height = calcScrollBarHeight();
-        model.horzScrollBar.width = grid.viewPort.width / model.width * grid.viewPort.width;
+        model.vertScrollBar.height = virtualScrollPxToRealPx(getViewScrollHeight(), 'height');
+        model.horzScrollBar.width = virtualScrollPxToRealPx(getViewScrollWidth(), 'width');
+        positionScrollBars();
     }
 
     grid.decorators.add(model.vertScrollBar);

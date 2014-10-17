@@ -81,6 +81,14 @@ module.exports = function (_grid) {
         return model.width(0, grid.colModel.length() - 1);
     };
 
+    model.fixedHeight = function () {
+        return model.height(0, grid.rowModel.numFixed() - 1);
+    };
+
+    model.fixedWidth = function () {
+        return model.width(0, grid.colModel.numFixed() - 1);
+    };
+
     function sizeChangeListener() {
         //for now we don't cache anything about this so we just notify
         grid.eventLoop.fire('grid-virtual-pixel-cell-change');

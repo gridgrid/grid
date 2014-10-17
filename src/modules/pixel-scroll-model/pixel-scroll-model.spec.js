@@ -8,10 +8,12 @@ describe('pixel-scroll-model', function () {
     var numCols = 10;
     var grid;
 
-    beforeEach(function () {
-        grid = helper.buildSimpleGrid(numRows, numCols);
+    function beforeEachFn(varyH, varyW, fixedR, fixedC) {
+        grid = helper.buildSimpleGrid(numRows, numCols, varyH, varyW, fixedR, fixedC);
         model = grid.pixelScrollModel;
-    });
+    }
+
+    beforeEach(beforeEachFn);
 
     it('should have a top and left value that start at 0', function () {
         expect(model.top).toEqual(0);
@@ -28,6 +30,13 @@ describe('pixel-scroll-model', function () {
         model.setScrollSize(100, 200);
         expect(model.height).toEqual(100);
         expect(model.width).toEqual(200);
+    });
+
+    it('should not include fixed width or height in its scroll size', function () {
+        beforeEachFn(false, false, 2, 3);
+        grid.eventLoop.fire('grid-virtual-pixel-cell-change');
+        expect(model).heightToBe(numRows * 30 - 2 * 30);
+        expect(model).widthToBe(numCols * 100 - 3 * 100);
     });
 
     it('should not let you scroll below 0', function () {
@@ -107,9 +116,10 @@ describe('pixel-scroll-model', function () {
         //weird numbers so we don't get confused by even division
         var viewWidth = 531;
         var viewHeight = 233;
-        beforeEach(function () {
+        var scrollBeforeEachFn = function () {
             grid.viewPort.sizeToContainer({offsetWidth: viewWidth, offsetHeight: viewHeight});
-        });
+        };
+        beforeEach(scrollBeforeEachFn);
 
         it('should register a vertical and horizontal decorator', function () {
             expect(model.vertScrollBar.units).toBe('px');
@@ -130,20 +140,45 @@ describe('pixel-scroll-model', function () {
             expectRenderToBeAScrollBar(model.horzScrollBar.render());
         });
 
+        function getViewHeight() {
+            return viewHeight - grid.virtualPixelCellModel.fixedHeight();
+        }
+
+        function getViewWidth() {
+            return viewWidth - grid.virtualPixelCellModel.fixedWidth();
+        }
+
+        function getScrollHeight() {
+            return grid.virtualPixelCellModel.totalHeight() - grid.virtualPixelCellModel.fixedHeight();
+        }
+
         function getScrollBarHeight() {
-            return viewHeight / grid.virtualPixelCellModel.totalHeight() * viewHeight;
+            return getViewHeight() / getScrollHeight() * getViewHeight();
+        }
+
+        function getScrollWidth() {
+            return grid.virtualPixelCellModel.totalWidth() - grid.virtualPixelCellModel.fixedWidth();
         }
 
         function getScrollBarWidth() {
-            return viewWidth / grid.virtualPixelCellModel.totalWidth() * viewWidth;
+            return getViewWidth() / getScrollWidth() * getViewWidth();
         }
 
         it('should size to the right percentage of the view', function () {
 
-            expect(model.vertScrollBar.height).toBe(getScrollBarHeight());
-            expect(model.vertScrollBar.width).toBe(10);
-            expect(model.horzScrollBar.width).toBe(getScrollBarWidth());
-            expect(model.horzScrollBar.height).toBe(10);
+            expect(model.vertScrollBar).heightToBe(getScrollBarHeight());
+            expect(model.vertScrollBar).widthToBe(10);
+            expect(model.horzScrollBar).widthToBe(getScrollBarWidth());
+            expect(model.horzScrollBar).heightToBe(10);
+        });
+
+        it('should size to the right percentage of the view accounting for fixed width and height', function () {
+            beforeEachFn(false, false, 2, 3);
+            scrollBeforeEachFn();
+            expect(model.vertScrollBar).heightToBe(getScrollBarHeight());
+            expect(model.vertScrollBar).widthToBe(10);
+            expect(model.horzScrollBar).widthToBe(getScrollBarWidth());
+            expect(model.horzScrollBar).heightToBe(10);
         });
 
         it('should position at the edges of the view', function () {
@@ -151,10 +186,22 @@ describe('pixel-scroll-model', function () {
             expect(model.horzScrollBar.top).toBe(viewHeight - 10);
         });
 
+        it('should start out at the top and left', function () {
+            expect(model.vertScrollBar).topToBe(0);
+            expect(model.horzScrollBar).leftToBe(0);
+        });
+
+        it('should start out at the top and left of the unfixed area', function () {
+            beforeEachFn(false, false, 2, 3);
+            expect(model.vertScrollBar).topToBe(2 * 30);
+            expect(model.horzScrollBar).leftToBe(3 * 100);
+        });
+
+
         it('should change top and left positions on scroll', function () {
             model.scrollTo(13, 23);
-            expect(model.vertScrollBar.top).toBe(13 / grid.virtualPixelCellModel.totalHeight() * viewHeight);
-            expect(model.horzScrollBar.left).toBe(23 / grid.virtualPixelCellModel.totalWidth() * viewWidth);
+            expect(model.vertScrollBar).topToBe(13 / grid.virtualPixelCellModel.totalHeight() * viewHeight);
+            expect(model.horzScrollBar).leftToBe(23 / grid.virtualPixelCellModel.totalWidth() * viewWidth);
         });
 
         it('should bind a drag event on render', function () {
