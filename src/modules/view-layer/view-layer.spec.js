@@ -349,7 +349,18 @@ describe('view-layer', function () {
             grid.decorators.add(decorator);
 
             helper.onDraw(function () {
-                expect($(decorator.boundingBox).is(':visible')).toBe(false);
+                expect(decorator.boundingBox.style.width).toBe('0px');
+                expect(decorator.boundingBox.style.height).toBe('0px');
+            });
+        });
+
+        it('should handle virtual cell ranges that are not valid', function () {
+            setDecoratorPosition(-1, -1, -1, -1);
+            grid.decorators.add(decorator);
+
+            helper.onDraw(function () {
+                expect(decorator.boundingBox.style.width).toBe('0px');
+                expect(decorator.boundingBox.style.height).toBe('0px');
             });
         });
 

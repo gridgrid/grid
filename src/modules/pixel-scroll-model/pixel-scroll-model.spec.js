@@ -356,7 +356,6 @@ describe('pixel-scroll-model', function () {
         }
 
         it('should unbind on mouseup', function () {
-            var unbind;
             renderBarAndFireDragStart();
             var dragSpy = spyOn(model.vertScrollBar, '_unbindDrag');
             var endSpy = spyOn(model.vertScrollBar, '_unbindDragEnd');

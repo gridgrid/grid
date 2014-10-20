@@ -235,7 +235,7 @@ describe('navigation-model', function () {
             expect(selection).toBeRange(-1, -1, -1, -1);
         });
 
-        it('should expand and shrink selection on key nav', function () {
+        it('should expand and shrink selection on key nav up', function () {
             model.setFocus(1, 1);
             makeAndFireKeyDown(key.code.arrow.up.code, true);
             expect(selection).toBeRange(0, 1, 2, 1);

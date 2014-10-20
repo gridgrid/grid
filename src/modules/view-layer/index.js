@@ -1,5 +1,6 @@
 var customEvent = require('@grid/custom-event');
 var debounce = require('debounce');
+var util = require('@grid/util');
 
 
 module.exports = function (_grid) {
@@ -170,7 +171,7 @@ module.exports = function (_grid) {
     }
 
     function positionDecorator(bounding, t, l, h, w) {
-        setPosition(bounding, t, l, h, w);
+        setPosition(bounding, t, l, util.clamp(h, 0, Infinity), util.clamp(w, 0, Infinity));
     }
 
     function drawDecorators() {
