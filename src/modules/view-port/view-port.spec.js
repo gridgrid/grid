@@ -1,3 +1,5 @@
+var mockEvent = require('@grid/custom-event');
+
 describe('view port', function () {
 
     var helper = require('@grid/grid-spec-helper')();
@@ -67,6 +69,17 @@ describe('view port', function () {
         expect(spyFn).toHaveBeenCalledWith(5, 2);
         expect(spyFn).not.toHaveBeenCalledWith(viewPort.rows - 1, viewPort.cols - 1);
         expect(spyFn.callCount).toEqual(3 * viewPort.rows);
+    });
+
+    describe('should satisfy', function () {
+        var ctx = {};
+        beforeEach(function () {
+            ctx.obj = viewPort;
+            ctx.helper = helper;
+            ctx.props = ['rows', 'cols', 'width', 'height'];
+            ctx.dirtyObjs = [viewPort];
+        });
+        require('@grid/add-dirty-props/test-body')(ctx);
     });
 
     describe('cell coordinate conversion', function () {
@@ -290,5 +303,11 @@ describe('view port', function () {
             expect(range).widthToBe(5 * 100);
         });
     });
+
+    //it('should sizeToContainer on window resize', function () {
+    //    var sizeSpy = spyOn(viewPort, 'sizeToContainer');
+    //    window.dispatchEvent(mockEvent('resize'));
+    //    expect(sizeSpy).toHaveBeenCalled();
+    //});
 
 });

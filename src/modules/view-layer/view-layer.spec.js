@@ -46,14 +46,39 @@ describe('view-layer', function () {
 
 
     it('should create a container for the cells', function () {
-        var cellContainer = findCellContainer(container);
+        var cellContainer = findCellContainer();
         expect(cellContainer.length).toBe(1);
         expect(cellContainer.hasClass('grid-cells')).toBe(true);
     });
 
     it('should create rows x cols cells', function () {
-        var gridCells = findGridCells(container);
-        expect(gridCells.length).toBe(viewCols * viewRows);
+        view.draw();
+        helper.onDraw(function () {
+            var gridCells = findGridCells(container);
+            expect(gridCells.length).toBe(viewCols * viewRows);
+        });
+    });
+
+    it('should clear the cell container before rebuilding the cells', function () {
+        view.draw();
+        helper.onDraw(function () {
+            var gridCells = findGridCells(container);
+            expect(gridCells.length).toBe(viewCols * viewRows);
+            view.draw();
+        });
+        helper.onDraw(function () {
+            var gridCells = findGridCells(container);
+            expect(gridCells.length).toBe(viewCols * viewRows);
+        });
+    });
+
+    it('shouldnt call build cells if viewport isnt dirty', function () {
+        helper.resetAllDirties();
+        var spy = spyOn(view, '_buildCells').andCallThrough();
+        view.draw();
+        helper.onDraw(function () {
+            expect(spy).not.toHaveBeenCalled();
+        });
     });
 
     it('should add style classes to the cell on draw', function () {
@@ -64,9 +89,12 @@ describe('view-layer', function () {
     });
 
     it('should wrap rows in a div', function () {
-        var rows = findGridRows();
-        expect(rows.length).toBe(viewRows);
-        expect(rows.hasClass('grid-row'));
+        view.draw();
+        helper.onDraw(function () {
+            var rows = findGridRows();
+            expect(rows.length).toBe(viewRows);
+            expect(rows.hasClass('grid-row'));
+        });
     });
 
     it('should add a class to indicate the scroll top is odd', function () {
@@ -97,8 +125,6 @@ describe('view-layer', function () {
     });
 
     it('should write widths and heights to the cells on draw', function () {
-        expect(findGridCells(container).first().width()).toEqual(0);
-        expect(findGridCells(container).first().height()).toEqual(0);
         view.draw();
         helper.onDraw(function () {
             //we want the heights and widths to be rendered at 1 higher than their virtual value in order to collapse the borders 
@@ -152,8 +178,6 @@ describe('view-layer', function () {
 
     it('should write varied widths and heights', function () {
         viewBeforeEach([20, 30, 40], [99, 100, 101]);
-        expect(findGridCells(container).first().width()).toEqual(0);
-        expect(findGridCells(container).first().height()).toEqual(0);
         view.draw();
         helper.onDraw(function () {
             //we want the heights and widths to be rendered at 1 higher than their virtual value in order to collapse the borders 
@@ -167,9 +191,7 @@ describe('view-layer', function () {
     });
 
     function expectFirstCellText(text) {
-
         expect(findGridCells(container).first().text()).toEqual(text);
-
     }
 
     it('should write offset values to the cells if scrolled', function () {

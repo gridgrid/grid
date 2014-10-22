@@ -10,24 +10,70 @@ describe('event-loop', function () {
         loop = grid.eventLoop;
     });
 
-    it('should bind a handler for all the events we care about', function () {
-        eventLoopFn.EVENTS.forEach(function (type) {
+    function spyAndFireAllNormalEvents(not) {
+        var events = eventLoopFn.EVENTS;
+        //include mousewheel for tests because it's not bound the normal way
+        events.push('mousewheel');
+        events.forEach(function (type) {
             var spy = jasmine.createSpy(type);
             //use interceptor in case something else tries to stop propagation
             grid.eventLoop.addInterceptor(spy);
             helper.container.dispatchEvent(mockEvent(type, true, true));
-            expect(spy).toHaveBeenCalled();
+            var spyExpect = expect(spy);
+            if (not) {
+                spyExpect = spyExpect.not;
+            }
+            spyExpect.toHaveBeenCalled();
         });
+    }
+
+    it('should bind a handler for all the events we care about', function () {
+        spyAndFireAllNormalEvents();
     });
 
-    it('should bind a handler for all the grid events we care about', function () {
+    function spyAndFireAllGridEvents(not) {
         eventLoopFn.GRID_EVENTS.forEach(function (type) {
             var spy = jasmine.createSpy(type);
             //use interceptor in case something else tries to stop propagation
             grid.eventLoop.addInterceptor(spy);
             window.dispatchEvent(mockEvent(type, true, true));
-            expect(spy).toHaveBeenCalled();
+            var expectSpy = expect(spy);
+            if (not) {
+                expectSpy = expectSpy.not;
+            }
+            expectSpy.toHaveBeenCalled();
         });
+    }
+
+    it('should bind a handler for all the grid events we care about', function () {
+        spyAndFireAllGridEvents();
+    });
+
+    it('should unbind all normal events on grid-destroy', function () {
+        loop.fire('grid-destroy');
+        spyAndFireAllNormalEvents(true);
+    });
+
+    it('should unbind all grid events on grid-destroy', function () {
+        loop.fire('grid-destroy');
+        spyAndFireAllGridEvents(true);
+    });
+
+    it('should unbind any events bound to dom elements through bind', function () {
+        var div = document.createElement('div');
+        var spy = jasmine.createSpy('click handler');
+        loop.bind('click', div, spy);
+        loop.fire('grid-destroy');
+        div.dispatchEvent(mockEvent('click'));
+        expect(spy).not.toHaveBeenCalled();
+    });
+
+    it('should unbind any events bound to the window through bind', function () {
+        var spy = jasmine.createSpy('click handler');
+        loop.bind('click', window, spy);
+        loop.fire('grid-destroy');
+        window.dispatchEvent(mockEvent('click'));
+        expect(spy).not.toHaveBeenCalled();
     });
 
     it('should bind event listeners to a container', function () {

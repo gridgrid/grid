@@ -10,7 +10,7 @@
         var dirtyClean = makeDirtyClean(grid);
         ctx.obj = require('@grid/add-dirty-props')({}, ctx.props, [dirtyClean, parentDirtyClean]);
         ctx.obj.isDirty = dirtyClean.isDirty;
-        ctx.parent = parent;
+        ctx.dirtyObjs = [ctx.obj, parent];
     });
 
     require('@grid/add-dirty-props/test-body')(ctx);

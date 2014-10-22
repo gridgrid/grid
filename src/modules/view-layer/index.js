@@ -33,7 +33,6 @@ module.exports = function (_grid) {
         cellContainer = document.createElement('div');
         cellContainer.setAttribute('dts', 'grid-cells');
         cellContainer.setAttribute('class', GRID_CELL_CONTAINER_BASE_CLASS);
-        buildCells(cellContainer);
 
         decoratorContainer = document.createElement('div');
         decoratorContainer.setAttribute('dts', 'grid-decorators');
@@ -73,6 +72,10 @@ module.exports = function (_grid) {
         if (!container) {
             return;
         }
+        if (grid.viewPort.isDirty()) {
+            viewLayer._buildCells(cellContainer);
+        }
+
         if (grid.cellClasses.isDirty() || grid.cellScrollModel.isDirty()) {
             drawCellClasses();
         }
@@ -127,6 +130,11 @@ module.exports = function (_grid) {
     }
 
     function buildCells(cellContainer) {
+        while (cellContainer.firstChild) {
+            cellContainer.removeChild(cellContainer.firstChild);
+        }
+
+
         cells = [];
         rows = [];
         var row;
@@ -146,6 +154,8 @@ module.exports = function (_grid) {
             cellContainer.appendChild(row);
         });
     }
+
+    viewLayer._buildCells = buildCells;
 
     function buildDivCell() {
         var cell = document.createElement('div');

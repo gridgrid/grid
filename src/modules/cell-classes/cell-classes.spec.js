@@ -16,7 +16,7 @@ describe('cell-classes', function () {
             ctx.range = descriptor = classes.create();
             ctx.parent = classes;
             addDirtyCtx.obj = descriptor;
-            addDirtyCtx.parent = classes;
+            addDirtyCtx.dirtyObjs = [descriptor, classes];
         });
 
         it('should have the right defaults', function () {

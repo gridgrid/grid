@@ -16,7 +16,7 @@ module.exports = function () {
             return helper.container;
         },
         onDraw: function (fn) {
-            waits(2);
+            waits(10);
             runs(fn);
         },
         resetAllDirties: function () {
@@ -47,6 +47,9 @@ module.exports = function () {
 
     afterEach(function () {
         $(helper.container).remove();
+        if (helper.grid) {
+            helper.grid.eventLoop.fire('grid-destroy');
+        }
     });
 
     return helper;

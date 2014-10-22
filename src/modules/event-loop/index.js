@@ -13,17 +13,29 @@ var eventLoop = function (_grid) {
     };
 
     var handlersByName = {};
+    var domUnbindFns = [];
+
+    var unbindAll;
 
     eloop.setContainer = function (container) {
         var unbindMouseWheelFn = mousewheel.bind(container, mainLoop);
 
         EVENTS.forEach(function (name) {
-            container.addEventListener(name, mainLoop);
+            bindToDomElement(container, name, mainLoop);
         });
 
         GRID_EVENTS.forEach(function (name) {
-            window.addEventListener(name, mainLoop);
+            bindToDomElement(window, name, mainLoop);
         });
+
+        unbindAll = function () {
+            unbindMouseWheelFn();
+
+            //have to copy the array since the unbind will actually remove itself from the array which modifies it mid iteration
+            domUnbindFns.slice(0).forEach(function (unbind) {
+                unbind();
+            });
+        };
     };
 
     function getHandlers(name) {
@@ -32,6 +44,16 @@ var eventLoop = function (_grid) {
             handlers = handlersByName[name] = [];
         }
         return handlers;
+    }
+
+    function bindToDomElement(elem, name, listener) {
+        elem.addEventListener(name, listener);
+        var unbindFn = function () {
+            elem.removeEventListener(name, listener);
+            domUnbindFns.splice(domUnbindFns.indexOf(unbindFn), 1);
+        };
+        domUnbindFns.push(unbindFn);
+        return unbindFn;
     }
 
     eloop.bind = function () {
@@ -61,14 +83,11 @@ var eventLoop = function (_grid) {
             };
         } else {
             var listener = loopWith(handler);
-            elem.addEventListener(name, listener);
             //make sure the elem can receive events
             if (elem.style) {
                 elem.style.pointerEvents = 'all';
             }
-            return function () {
-                elem.removeEventListener(name, listener);
-            };
+            return bindToDomElement(elem, name, listener);
         }
     };
 
@@ -109,8 +128,13 @@ var eventLoop = function (_grid) {
         }
     }
 
+    eloop.bind('grid-destroy', function () {
+        unbindAll();
+    });
+
     return eloop;
 };
+
 
 eventLoop.EVENTS = EVENTS;
 eventLoop.GRID_EVENTS = GRID_EVENTS;

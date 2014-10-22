@@ -1,14 +1,19 @@
 var util = require('@grid/util');
 var rangeUtil = require('@grid/range-util');
 var capitalize = require('capitalize');
+var addDirtyProps = require('@grid/add-dirty-props');
 
 module.exports = function (_grid) {
     var grid = _grid;
-    var viewPort = {
-        rows: 0,
-        cols: 0
+    var dirtyClean = require('@grid/dirty-clean')(grid);
+    var container;
 
-    };
+    var viewPort = addDirtyProps({}, ['rows', 'cols', 'width', 'height'], [dirtyClean]);
+    viewPort.rows = 0;
+    viewPort.cols = 0;
+    viewPort.isDirty = dirtyClean.isDirty;
+
+
     var fixed = {rows: 0, cols: 0};
 
     function getFixed(rowOrCol) {
@@ -16,12 +21,19 @@ module.exports = function (_grid) {
     }
 
     viewPort.sizeToContainer = function (elem) {
+        container = elem;
         viewPort.width = elem.offsetWidth;
         viewPort.height = elem.offsetHeight;
         viewPort.rows = calculateMaxLengths(viewPort.height, grid.rowModel);
         viewPort.cols = calculateMaxLengths(viewPort.width, grid.colModel);
         grid.eventLoop.fire('grid-viewport-change');
     };
+
+    //grid.eventLoop.bind('resize', window, function () {
+    //    if (container) {
+    //        viewPort.sizeToContainer(container);
+    //    }
+    //});
 
     grid.eventLoop.bind('grid-row-change', function () {
         fixed.rows = grid.rowModel.numFixed();

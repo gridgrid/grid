@@ -10,7 +10,7 @@ function testPositionRange(context) {
             parent = context.parent;
             dirtyPropsCtx.helper = helper;
             dirtyPropsCtx.obj = range;
-            dirtyPropsCtx.parent = parent;
+            dirtyPropsCtx.dirtyObjs = [range, parent];
         });
 
         it('should have the right defaults', function () {

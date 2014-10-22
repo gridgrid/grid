@@ -1,27 +1,25 @@
 module.exports = function (context) {
     var helper;
     var obj;
-    var parent;
     var props;
+    var dirtyObjs;
     beforeEach(function () {
         helper = context.helper;
         obj = context.obj;
-        parent = context.parent;
+        dirtyObjs = context.dirtyObjs;
         props = context.props;
     });
 
     describe('add-dirty-props', function () {
         function setPropAndCheckDirty(prop, val) {
             helper.resetAllDirties();
-            expect(obj).not.toBeDirty();
-            if (parent) {
-                expect(parent).not.toBeDirty();
-            }
+            dirtyObjs.forEach(function (dirtyObj) {
+                expect(dirtyObj).not.toBeDirty();
+            });
             obj[prop] = val;
-            expect(obj).toBeDirty();
-            if (parent) {
-                expect(parent).toBeDirty();
-            }
+            dirtyObjs.forEach(function (dirtyObj) {
+                expect(dirtyObj).toBeDirty();
+            });
         }
 
         it('should get marked dirty on relevant property changes', function () {
