@@ -74,10 +74,24 @@ describe('view-layer', function () {
 
     it('shouldnt call build cells if viewport isnt dirty', function () {
         helper.resetAllDirties();
-        var spy = spyOn(view, '_buildCells').andCallThrough();
+        var spy = spyOn(view, '_buildCells');
         view.draw();
         helper.onDraw(function () {
             expect(spy).not.toHaveBeenCalled();
+        });
+    });
+
+    it('should redraw everything if viewPort is dirty', function () {
+        helper.resetAllDirties();
+        var drawMethods = ['_buildCells', '_drawCells', '_drawCellClasses', '_drawDecorators'];
+        var spies = drawMethods.map(function (method) {
+            return spyOn(view, method);
+        });
+        grid.viewPort.width = 1;
+        helper.onDraw(function () {
+            spies.forEach(function (spy) {
+                expect(spy).toHaveBeenCalled();
+            });
         });
     });
 
@@ -204,7 +218,7 @@ describe('view-layer', function () {
     it('shouldnt call draw cells if cell scroll model isnt dirty', function () {
 
         helper.resetAllDirties();
-        var spy = spyOn(grid.dataModel, 'getFormatted');
+        var spy = spyOn(view, '_drawCells');
         view.draw();
         helper.onDraw(function () {
             expect(spy).not.toHaveBeenCalled();
@@ -278,7 +292,7 @@ describe('view-layer', function () {
         });
 
         it('should draw only when dirty', function () {
-            var spy = spyOn(grid.decorators, 'getAlive').andCallThrough(); //treat this as the test that its going to draw
+            var spy = spyOn(view, '_drawDecorators'); //treat this as the test that its going to draw
             grid.decorators.add(decorator);
             helper.onDraw(function () {
                 expect(spy).toHaveBeenCalled();
@@ -453,7 +467,7 @@ describe('view-layer', function () {
     describe('cell classes', function () {
         it('should draw the classes only  when dirty', function () {
             grid.cellClasses.add(grid.cellClasses.create(1, 1, ''));
-            var spy = spyOn(grid.cellClasses, 'getAll').andCallThrough();
+            var spy = spyOn(view, '_drawCellClasses');
             helper.onDraw(function () {
                 expect(spy).toHaveBeenCalled();
                 spy.reset();

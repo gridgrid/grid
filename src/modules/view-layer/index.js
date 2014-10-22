@@ -72,20 +72,22 @@ module.exports = function (_grid) {
         if (!container) {
             return;
         }
-        if (grid.viewPort.isDirty()) {
+        var viewPortDirty = grid.viewPort.isDirty();
+        if (viewPortDirty) {
             viewLayer._buildCells(cellContainer);
         }
 
-        if (grid.cellClasses.isDirty() || grid.cellScrollModel.isDirty()) {
-            drawCellClasses();
+        var cellScrollDirty = grid.cellScrollModel.isDirty();
+        if (viewPortDirty || grid.cellClasses.isDirty() || cellScrollDirty) {
+            viewLayer._drawCellClasses();
         }
 
-        if (grid.cellScrollModel.isDirty()) {
-            drawCells();
+        if (viewPortDirty || cellScrollDirty) {
+            viewLayer._drawCells();
         }
 
-        if (grid.decorators.isDirty()) {
-            drawDecorators();
+        if (viewPortDirty || grid.decorators.isDirty()) {
+            viewLayer._drawDecorators();
         }
 
         grid.eventLoop.fire('grid-draw');
@@ -96,7 +98,7 @@ module.exports = function (_grid) {
         return borderWidth || 1;
     }
 
-    function drawCells() {
+    viewLayer._drawCells = function () {
         measureBorderWidth()
         var bWidth = getBorderWidth();
         grid.viewPort.iterateCells(function drawCell(r, c) {
@@ -184,7 +186,7 @@ module.exports = function (_grid) {
         setPosition(bounding, t, l, util.clamp(h, 0, Infinity), util.clamp(w, 0, Infinity));
     }
 
-    function drawDecorators() {
+    viewLayer._drawDecorators = function () {
         var aliveDecorators = grid.decorators.getAlive();
         aliveDecorators.forEach(function (decorator) {
 
@@ -257,7 +259,7 @@ module.exports = function (_grid) {
     /* END DECORATOR LOGIC */
 
     /* CELL CLASSES LOGIC */
-    function drawCellClasses() {
+    viewLayer._drawCellClasses = function () {
         grid.viewPort.iterateCells(function (r, c) {
             cells[r][c].className = '';
         });

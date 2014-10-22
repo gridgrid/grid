@@ -2,6 +2,7 @@ var util = require('@grid/util');
 var rangeUtil = require('@grid/range-util');
 var capitalize = require('capitalize');
 var addDirtyProps = require('@grid/add-dirty-props');
+var debounce = require('debounce');
 
 module.exports = function (_grid) {
     var grid = _grid;
@@ -29,11 +30,16 @@ module.exports = function (_grid) {
         grid.eventLoop.fire('grid-viewport-change');
     };
 
-    //grid.eventLoop.bind('resize', window, function () {
-    //    if (container) {
-    //        viewPort.sizeToContainer(container);
-    //    }
-    //});
+    viewPort._onResize = debounce(function () {
+        if (container) {
+            viewPort.sizeToContainer(container);
+        }
+    }, 200);
+
+    grid.eventLoop.bind('resize', window, function () {
+        //we don't bind the handler directly so that tests can mock it out
+        viewPort._onResize();
+    });
 
     grid.eventLoop.bind('grid-row-change', function () {
         fixed.rows = grid.rowModel.numFixed();

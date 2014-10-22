@@ -304,10 +304,14 @@ describe('view port', function () {
         });
     });
 
-    //it('should sizeToContainer on window resize', function () {
-    //    var sizeSpy = spyOn(viewPort, 'sizeToContainer');
-    //    window.dispatchEvent(mockEvent('resize'));
-    //    expect(sizeSpy).toHaveBeenCalled();
-    //});
+    it('should sizeToContainer on window resize', function () {
+        helper.resizeSpy.andCallThrough();
+        var sizeSpy = spyOn(viewPort, 'sizeToContainer');
+        window.dispatchEvent(mockEvent('resize'));
+        waits(201);
+        runs(function () {
+            expect(sizeSpy).toHaveBeenCalled();
+        });
+    });
 
 });

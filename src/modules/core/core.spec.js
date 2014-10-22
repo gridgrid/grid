@@ -44,12 +44,13 @@ describe('grid-core', function () {
 
     it('should not draw on request if in event loop but should draw after', function () {
         var draw = spyOnDraw();
-        grid.eventLoop.addInterceptor(inLoopFn);
-        grid.eventLoop.fire({});
-        function inLoopFn() {
-            grid.requestDraw();
-            expect(draw).not.toHaveBeenCalled();
-        }
+        grid.eventLoop.addInterceptor(function inLoopFn(e) {
+            if (e.type === 'test-event') {
+                grid.requestDraw();
+                expect(draw).not.toHaveBeenCalled();
+            }
+        });
+        grid.eventLoop.fire('test-event');
 
         expect(draw).toHaveBeenCalled();
     });
