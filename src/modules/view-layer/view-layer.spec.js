@@ -449,6 +449,18 @@ describe('view-layer', function () {
 
             expectBoundingBoxSize(1, 6, 6, 3);
         });
+
+        it('should reposition if decorators units changes', function () {
+            setDecoratorPosition(5, 6, 2, 3);
+            decorator.units = 'cell';
+            decorator.space = 'real';
+            grid.decorators.add(decorator);
+            expectBoundingBoxSize(5 * 30, 6 * 100, 2 * 30 + 1, 3 * 100 + 1, function next() {
+                decorator.units = 'px';
+            });
+
+            expectBoundingBoxSize(5, 6, 2, 3);
+        });
     });
 
     describe('fixed rows and cols', function () {

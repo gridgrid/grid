@@ -1,3 +1,5 @@
+var mockEvent = require('@grid/custom-event');
+
 describe('col-resize', function () {
     var $ = require('jquery');
 
@@ -47,6 +49,7 @@ describe('col-resize', function () {
                 document.body.removeChild(style);
             });
         });
+
     });
 
     function expectCorrectDecorators() {
