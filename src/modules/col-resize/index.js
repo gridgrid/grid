@@ -13,6 +13,16 @@ module.exports = function (_grid) {
             decorator._dragLine.postRender = function (div) {
                 div.setAttribute('class', 'grid-drag-line');
             };
+
+            decorator._unbindDrag = grid.eventLoop.bind('grid-drag', function (e) {
+                decorator._dragLine.left = e.gridX;
+            });
+
+            decorator._unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function (e) {
+                grid.decorators.remove(decorator._dragLine);
+                decorator._unbindDrag();
+                decorator._unbindDragEnd();
+            });
         };
 
         decorator.postRender = function (div) {

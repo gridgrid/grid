@@ -82,9 +82,32 @@ describe('col-resize', function () {
             it('should render with a styleable class', function () {
                 expect(dragCtx.decorator.render()).toHaveClass('grid-drag-line');
             });
-            
+
             it('should start out at the gridX of the drag start', function () {
                 expect(dragCtx.decorator).leftToBe(dragStart);
+            });
+
+            it('should move the left on grid drag', function () {
+                var drag = mockEvent('grid-drag');
+                var gridX = dragStart + 10;
+                drag.gridX = gridX;
+                grid.eventLoop.fire(drag);
+                expect(dragCtx.decorator).leftToBe(gridX);
+            });
+
+            it('should min out at decorator left + 10', function () {
+                var drag = mockEvent('grid-drag');
+                var decoratorLeft;
+                var gridX = decoratorLeft;
+                drag.gridX = gridX;
+                grid.eventLoop.fire(drag);
+                expect(dragCtx.decorator).leftToBe(decoratorLeft + 10);
+            });
+
+            it('should remove the decorator on drag end', function () {
+                var dragEnd = mockEvent('grid-drag-end');
+                grid.eventLoop.fire(dragEnd);
+                expect(grid.decorators.popAllDead()).toContain(dragCtx.decorator);
             });
 
             describe('should satisfy', function () {
