@@ -40,6 +40,13 @@ describe('decorators', function () {
             expect($(decoratorElem).height()).toBe(35);
         });
 
+        it('should call a postrender if available on render', function () {
+            var postRender = jasmine.createSpy('post render');
+            ctx.decorator.postRender = postRender;
+            ctx.decorator.render();
+            expect(postRender).toHaveBeenCalled();
+            
+        });
 
         require('@grid/decorators/decorator-test-body')(ctx);
     });

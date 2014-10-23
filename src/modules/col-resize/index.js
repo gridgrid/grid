@@ -6,14 +6,16 @@ module.exports = function (_grid) {
     function makeResizeDecorator(col) {
         var decorator = grid.decorators.create(0, col, 1, 1, 'cell', 'real');
 
-        decorator._onDragStart = function () {
-            decorator._dragLine = grid.decorators.create();
+        decorator._onDragStart = function (e) {
+            decorator._dragLine = grid.decorators.create(0, undefined, Infinity, 1, 'px', 'real');
             grid.decorators.add(decorator._dragLine);
+            decorator._dragLine.left = e.gridX;
+            decorator._dragLine.postRender = function (div) {
+                div.setAttribute('class', 'grid-drag-line');
+            };
         };
 
-        var origRender = decorator.render;
-        decorator.render = function () {
-            var div = origRender();
+        decorator.postRender = function (div) {
             div.style.transform = 'translateX(50%)';
             div.style.webkitTransform = 'translateX(50%)';
 
@@ -21,9 +23,8 @@ module.exports = function (_grid) {
             div.setAttribute('class', 'col-resize');
 
             grid.eventLoop.bind('grid-drag-start', div, decorator._onDragStart);
-
-            return div;
         };
+
         return decorator;
     }
 

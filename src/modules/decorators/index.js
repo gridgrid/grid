@@ -55,6 +55,9 @@ module.exports = function (_grid) {
                 div.style.left = '0px';
                 div.style.bottom = '0px';
                 div.style.right = '0px';
+                if (decorator.postRender) {
+                    decorator.postRender(div);
+                }
                 return div;
             };
             return decorator;

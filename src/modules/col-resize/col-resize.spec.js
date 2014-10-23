@@ -58,18 +58,33 @@ describe('col-resize', function () {
 
         describe('drag', function () {
             var dragCtx = {};
+            var dragStart = 100;
             beforeEach(function () {
                 dragCtx.helper = helper;
-                ctx.decorator._onDragStart(mockEvent('grid-drag-start', true));
+                var e = mockEvent('grid-drag-start', true);
+                e.gridX = dragStart;
+                ctx.decorator._onDragStart(e);
                 dragCtx.decorator = ctx.decorator._dragLine;
             });
 
             it('should add a decorator', function () {
                 expect(grid.decorators.getAlive()).toContain(ctx.decorator._dragLine);
             });
+
+            it('should be 1px wide and as tall as teh view', function () {
+                expect(dragCtx.decorator).topToBe(0);
+                expect(dragCtx.decorator).widthToBe(1);
+                expect(dragCtx.decorator).heightToBe(Infinity);
+                expect(dragCtx.decorator).unitsToBe('px');
+                expect(dragCtx.decorator).spaceToBe('real');
+            });
+
+            it('should render with a styleable class', function () {
+                expect(dragCtx.decorator.render()).toHaveClass('grid-drag-line');
+            });
             
-            it('should start out at the gridX of the drag start', function(){
-                
+            it('should start out at the gridX of the drag start', function () {
+                expect(dragCtx.decorator).leftToBe(dragStart);
             });
 
             describe('should satisfy', function () {

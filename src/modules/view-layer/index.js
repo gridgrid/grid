@@ -187,7 +187,7 @@ module.exports = function (_grid) {
     }
 
     function positionDecorator(bounding, t, l, h, w) {
-        setPosition(bounding, t, l, util.clamp(h, 0, Infinity), util.clamp(w, 0, Infinity));
+        setPosition(bounding, t, l, util.clamp(h, 0, grid.viewPort.height), util.clamp(w, 0, grid.viewPort.width));
     }
 
     function positionCellDecoratorFromRealCellRange(realCellRange, boundingBox) {

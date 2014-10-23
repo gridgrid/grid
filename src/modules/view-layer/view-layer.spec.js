@@ -461,6 +461,14 @@ describe('view-layer', function () {
 
             expectBoundingBoxSize(5, 6, 2, 3);
         });
+
+        it('should clamp a decorators height and width to the viewport', function () {
+            setDecoratorPosition(5, 6, Infinity, Infinity);
+            decorator.space = 'real';
+            decorator.units = 'px';
+            grid.decorators.add(decorator);
+            expectBoundingBoxSize(5, 6, grid.viewPort.height, grid.viewPort.width);
+        });
     });
 
     describe('fixed rows and cols', function () {
