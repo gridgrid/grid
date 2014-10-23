@@ -207,6 +207,16 @@ describe('event-loop', function () {
             expect(grid.eventLoop.isRunning).toBe(false);
         });
 
+        it('should allow unbinding from within a handler', function () {
+            var unbind = grid.eventLoop.bind('test-event', function () {
+                unbind();
+            });
+            var spy = jasmine.createSpy('second binding');
+            grid.eventLoop.bind('test-event', spy);
+            grid.eventLoop.fire('test-event');
+            expect(spy).toHaveBeenCalled();
+        });
+
     });
 
 });

@@ -59,6 +59,7 @@ module.exports = function (_grid) {
         var unbindMove = grid.eventLoop.bind('mousemove', window, function (e) {
             if (dragStarted && !e.which) {
                 //got a move event without mouse down which means we somehow missed the mouseup
+                console.log('mousemove unbind, how on earth do these happen?');
                 handleMouseUp(e);
                 return;
             }

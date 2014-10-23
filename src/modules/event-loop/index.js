@@ -109,7 +109,8 @@ var eventLoop = function (_grid) {
     }
 
     var mainLoop = loopWith(function (e) {
-        getHandlers(e.type).forEach(function (handler) {
+        //have to copy the array because handlers can unbind themselves which modifies the array
+        getHandlers(e.type).slice(0).forEach(function (handler) {
             handler(e);
         });
     });

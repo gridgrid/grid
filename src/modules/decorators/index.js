@@ -20,9 +20,12 @@ module.exports = function (_grid) {
                 decorators = [decorators];
             }
             decorators.forEach(function (decorator) {
-                aliveDecorators.splice(aliveDecorators.indexOf(decorator), 1);
-                deadDecorators.push(decorator);
-                dirtyClean.setDirty();
+                var index = aliveDecorators.indexOf(decorator);
+                if (index !== -1) {
+                    aliveDecorators.splice(index, 1);
+                    deadDecorators.push(decorator);
+                    dirtyClean.setDirty();
+                }
             });
         },
         getAlive: function () {

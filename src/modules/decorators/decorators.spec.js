@@ -45,7 +45,7 @@ describe('decorators', function () {
             ctx.decorator.postRender = postRender;
             ctx.decorator.render();
             expect(postRender).toHaveBeenCalled();
-            
+
         });
 
         require('@grid/decorators/decorator-test-body')(ctx);
@@ -82,6 +82,16 @@ describe('decorators', function () {
         expect(decorators).toBeDirty();
         expect(decorators.getAlive()).toEqual([]);
         expect(decorators.popAllDead()).toEqual([dec]);
+    });
+
+    it('should do nothing if removing an already removed decorator', function () {
+        decorators.add(decorators.create());
+        var removed = decorators.create();
+        decorators.add(removed);
+        decorators.remove(removed);
+        decorators.remove(removed);
+        expect(decorators.getAlive().length).toBe(1);
+        expect(decorators.popAllDead().length).toBe(1);
     });
 
     it('should let me remove multiple decorators', function () {

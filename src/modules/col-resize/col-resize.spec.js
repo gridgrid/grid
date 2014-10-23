@@ -83,10 +83,6 @@ describe('col-resize', function () {
                 expect(dragCtx.decorator.render()).toHaveClass('grid-drag-line');
             });
 
-            it('should start out at the gridX of the drag start', function () {
-                expect(dragCtx.decorator).leftToBe(dragStart);
-            });
-
             it('should move the left on grid drag', function () {
                 var drag = mockEvent('grid-drag');
                 var gridX = dragStart + 10;

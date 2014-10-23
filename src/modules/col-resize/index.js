@@ -6,14 +6,15 @@ module.exports = function (_grid) {
     function makeResizeDecorator(col) {
         var decorator = grid.decorators.create(0, col, 1, 1, 'cell', 'real');
 
+        decorator._dragLine = grid.decorators.create(0, undefined, Infinity, 1, 'px', 'real');
+
+        decorator._dragLine.postRender = function (div) {
+            div.setAttribute('class', 'grid-drag-line');
+        };
+
+
         decorator._onDragStart = function (e) {
-            decorator._dragLine = grid.decorators.create(0, undefined, Infinity, 1, 'px', 'real');
-
-            decorator._dragLine.left = e.gridX;
-            decorator._dragLine.postRender = function (div) {
-                div.setAttribute('class', 'grid-drag-line');
-            };
-
+            
             grid.decorators.add(decorator._dragLine);
 
             decorator._unbindDrag = grid.eventLoop.bind('grid-drag', function (e) {
