@@ -41,13 +41,19 @@ module.exports = function () {
         helper.container = document.createElement('div');
         $(helper.container).css({
             width: helper.CONTAINER_WIDTH + 'px',
-            height: helper.CONTAINER_HEIGHT + 'px'
-        });
+            height: helper.CONTAINER_HEIGHT + 'px',
+            position: 'absolute',
+            top: '0px',
+            left: '0px',
+            bottom: '0px',
+            right: '0px'
+        }).addClass('js-grid-container');
+        $('.js-grid-container').remove();
         $('body').append(helper.container);
     });
 
     afterEach(function () {
-        $(helper.container).remove();
+        $('.js-grid-container').remove();
         if (helper.grid) {
             helper.grid.eventLoop.fire('grid-destroy');
         }

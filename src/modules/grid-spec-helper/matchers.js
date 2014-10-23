@@ -150,10 +150,17 @@
                 $(this.actual).css('right') === maybeAddPx(r) &&
                 $(this.actual).css('bottom') === maybeAddPx(b) &&
                 $(this.actual).css('position') === 'absolute';
+        },
+        toHaveBeenBoundWith: function (name, elem) {
+            var spy = this.actual;
+            var hasName = spy.argsForCall[0][0] === name;
+            var hasElem = !elem || spy.argsForCall[0][1] === elem;
+            var isFunction = hasElem && angular.isFunction(spy.argsForCall[0][2]) || angular.isFunction(spy.argsForCall[0][1]);
+            return hasName && hasElem && isFunction;
         }
     };
 
-    var commonFields = ['row', 'col', 'top', 'left', 'width', 'height', 'units', 'space', 'class'];
+    var commonFields = ['row', 'col', 'top', 'left', 'width', 'height', 'units', 'space', 'class', 'gridX', 'gridY'];
     commonFields.forEach(function (fieldName) {
         addFieldMatcher(matchers, fieldName);
     });

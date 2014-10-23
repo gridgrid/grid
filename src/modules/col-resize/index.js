@@ -5,6 +5,12 @@ module.exports = function (_grid) {
 
     function makeResizeDecorator(col) {
         var decorator = grid.decorators.create(0, col, 1, 1, 'cell', 'real');
+
+        decorator._onDragStart = function () {
+            decorator._dragLine = grid.decorators.create();
+            grid.decorators.add(decorator._dragLine);
+        };
+
         var origRender = decorator.render;
         decorator.render = function () {
             var div = origRender();
@@ -14,10 +20,7 @@ module.exports = function (_grid) {
             div.style.removeProperty('left');
             div.setAttribute('class', 'col-resize');
 
-            grid.eventLoop.bind('grid-drag-start', div, function () {
-                var left = parseInt(decorator.boundingBox.style.left);
-                var width = parseInt(decorator.boundingBox.style.width);
-            });
+            grid.eventLoop.bind('grid-drag-start', div, decorator._onDragStart);
 
             return div;
         };

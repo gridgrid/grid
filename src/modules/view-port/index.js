@@ -14,6 +14,20 @@ module.exports = function (_grid) {
     viewPort.cols = 0;
     viewPort.isDirty = dirtyClean.isDirty;
 
+    //these probably trigger reflow so we may need to think about caching the value and updating it at on draws or something
+    Object.defineProperty(viewPort, 'top', {
+        enumerable: true,
+        get: function () {
+            return container && container.getClientRects()[0].top || 0;
+        }
+    });
+
+    Object.defineProperty(viewPort, 'left', {
+        enumerable: true,
+        get: function () {
+            return container && container.getClientRects()[0].left || 0;
+        }
+    });
 
     var fixed = {rows: 0, cols: 0};
 

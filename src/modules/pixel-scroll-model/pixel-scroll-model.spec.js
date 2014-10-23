@@ -226,9 +226,7 @@ describe('pixel-scroll-model', function () {
         it('should bind a drag event on render', function () {
             var spy = spyOn(grid.eventLoop, 'bind');
             var scrollBar = model.vertScrollBar.render();
-            expect(spy.argsForCall[0][0]).toEqual('grid-drag-start');
-            expect(spy.argsForCall[0][1]).toBe(scrollBar);
-            expect(spy.argsForCall[0][2]).toBeAFunction();
+            expect(spy).toHaveBeenBoundWith('grid-drag-start', scrollBar);
         });
 
         function renderBar(barDecorator) {
@@ -272,8 +270,8 @@ describe('pixel-scroll-model', function () {
             var move = mockEvent('grid-drag', true);
             var scrollClient = mouseDownClient + scrollAmount;
             var fixed = isHorz ? grid.virtualPixelCellModel.fixedWidth() : grid.virtualPixelCellModel.fixedHeight();
-            move.clientY = scrollClient;
-            move.clientX = scrollClient;
+            move.gridY = scrollClient;
+            move.gridX = scrollClient;
             //expect(model.top).toBe(previousScroll / viewHeight * grid.virtualPixelCellModel.totalHeight());
             grid.eventLoop.fire(move);
 
@@ -302,8 +300,8 @@ describe('pixel-scroll-model', function () {
             var fixed = isHorz ? grid.virtualPixelCellModel.fixedWidth() : grid.virtualPixelCellModel.fixedHeight();
             var mouseDownClient = scrollBarPosition + scrollBarOffset + fixed;
 
-            start.clientY = mouseDownClient;
-            start.clientX = mouseDownClient;
+            start.gridY = mouseDownClient;
+            start.gridX = mouseDownClient;
             start.layerY = scrollBarOffset;
             start.layerX = scrollBarOffset;
 

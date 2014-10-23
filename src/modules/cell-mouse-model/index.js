@@ -1,7 +1,7 @@
 var extend = require('@grid/extend');
 var customEvent = require('@grid/custom-event');
 
-var PROPS_TO_COPY_FROM_MOUSE_EVENTS = ['clientX', 'clientY', 'layerX', 'layerY', 'row', 'col'];
+var PROPS_TO_COPY_FROM_MOUSE_EVENTS = ['clientX', 'clientY', 'gridX', 'gridY', 'layerX', 'layerY', 'row', 'col'];
 
 
 module.exports = function (_grid) {
@@ -20,10 +20,12 @@ module.exports = function (_grid) {
             /* jshint +W086 */
             case 'mousemove':
             case 'mouseup':
-                var x = e.clientX;
-                var y = e.clientY;
+                var x = e.clientX - grid.viewPort.left;
+                var y = e.clientY - grid.viewPort.top;
                 e.row = grid.viewPort.getVirtualRowByTop(y);
                 e.col = grid.viewPort.getVirtualColByLeft(x);
+                e.gridX = x;
+                e.gridY = y;
                 break;
 
         }

@@ -22,15 +22,37 @@ describe('cell-mouse-model', function () {
         return mousedown;
     }
 
+    var annotatedEvents = ['mousedown', 'mousemove', 'mouseup', 'click'];
+
     it('should annotate mouse events with the cell they are on', function () {
-        var annotatedEvents = ['mousedown', 'mousemove', 'mouseup', 'click'];
         annotatedEvents.forEach(function (type) {
             var mousedown = createEventWithXY(type, 110, 40);
             grid.eventLoop.fire(mousedown);
             expect(mousedown).rowToBe(1);
             expect(mousedown).colToBe(1);
         });
+    });
 
+    it('should annotate mouse events with the cell they are on considereing offset', function () {
+        helper.container.style.marginTop = '10px';
+        helper.container.style.marginLeft = '5px';
+        annotatedEvents.forEach(function (type) {
+            var mousedown = createEventWithXY(type, 104, 39);
+            grid.eventLoop.fire(mousedown);
+            expect(mousedown).rowToBe(0);
+            expect(mousedown).colToBe(0);
+        });
+    });
+
+    it('should annotate mouse events with the gridX and gridY', function () {
+        helper.container.style.marginLeft = '5px';
+        helper.container.style.marginTop = '10px';
+        annotatedEvents.forEach(function (type) {
+            var mousedown = createEventWithXY(type, 110, 40);
+            grid.eventLoop.fire(mousedown);
+            expect(mousedown).gridXToBe(105);
+            expect(mousedown).gridYToBe(30);
+        });
     });
 
 
@@ -101,6 +123,9 @@ describe('cell-mouse-model', function () {
         expect(dragEvent).colToBe(1);
         expect(dragEvent.clientY).toBe(41);
         expect(dragEvent.clientX).toBe(111);
+        expect(dragEvent.gridY).toBe(41);
+        expect(dragEvent.gridX).toBe(111);
+        
     });
 
     it('should fire grid-cell-drag event on move only when changing cells', function () {
@@ -117,6 +142,8 @@ describe('cell-mouse-model', function () {
         expect(dragEvent).colToBe(2);
         expect(dragEvent.clientY).toBe(41);
         expect(dragEvent.clientX).toBe(201);
+        expect(dragEvent.gridY).toBe(41);
+        expect(dragEvent.gridX).toBe(201);
         spy.reset();
         mousemove = createEventWithXY('mousemove', 202, 41);
         window.dispatchEvent(mousemove);
@@ -137,6 +164,8 @@ describe('cell-mouse-model', function () {
         expect(dragEvent).colToBe(1);
         expect(dragEvent.clientY).toBe(41);
         expect(dragEvent.clientX).toBe(111);
+        expect(dragEvent.gridY).toBe(41);
+        expect(dragEvent.gridX).toBe(111);
     });
 
 });

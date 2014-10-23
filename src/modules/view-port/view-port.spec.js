@@ -314,4 +314,11 @@ describe('view port', function () {
         });
     });
 
+    it('should have top and left values for the client offset of the grid container', function () {
+        helper.container.style.marginTop = '10px';
+        helper.container.style.marginLeft = '5px';
+        expect(viewPort.top).toBe(10);
+        expect(viewPort.left).toBe(5);
+    });
+
 });

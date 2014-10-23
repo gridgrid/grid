@@ -62,7 +62,7 @@ module.exports = function (_grid) {
         var xOrY = isHorz ? 'X' : 'Y';
         var heightWidth = isHorz ? 'width' : 'height';
         var vertHorz = isHorz ? 'horz' : 'vert';
-        var clientCoordField = 'client' + xOrY;
+        var gridCoordField = 'grid' + xOrY;
         var layerCoordField = 'layer' + xOrY;
         var viewPortClampFn = grid.viewPort['clamp' + xOrY];
 
@@ -76,8 +76,8 @@ module.exports = function (_grid) {
                 var scrollBarOffset = e[layerCoordField];
 
                 decorator._unbindDrag = grid.eventLoop.bind('grid-drag', function (e) {
-                    var clientCoord = viewPortClampFn(e[clientCoordField]);
-                    var scrollBarRealClickCoord = clientCoord - scrollBarOffset;
+                    var gridCoord = viewPortClampFn(e[gridCoordField]);
+                    var scrollBarRealClickCoord = gridCoord - scrollBarOffset;
                     var scrollCoord = getScrollPositionFromReal(scrollBarRealClickCoord, heightWidth, vertHorz);
                     if (isHorz) {
                         model.scrollTo(model.top, scrollCoord);

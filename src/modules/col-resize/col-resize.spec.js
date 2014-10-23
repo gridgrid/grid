@@ -50,6 +50,33 @@ describe('col-resize', function () {
             });
         });
 
+        it('should bind a drag event on render', function () {
+            var spy = spyOn(grid.eventLoop, 'bind');
+            var dragElem = ctx.decorator.render();
+            expect(spy).toHaveBeenBoundWith('grid-drag-start', dragElem);
+        });
+
+        describe('drag', function () {
+            var dragCtx = {};
+            beforeEach(function () {
+                dragCtx.helper = helper;
+                ctx.decorator._onDragStart(mockEvent('grid-drag-start', true));
+                dragCtx.decorator = ctx.decorator._dragLine;
+            });
+
+            it('should add a decorator', function () {
+                expect(grid.decorators.getAlive()).toContain(ctx.decorator._dragLine);
+            });
+            
+            it('should start out at the gridX of the drag start', function(){
+                
+            });
+
+            describe('should satisfy', function () {
+                require('@grid/decorators/decorator-test-body')(dragCtx);
+            });
+        });
+
     });
 
     function expectCorrectDecorators() {
