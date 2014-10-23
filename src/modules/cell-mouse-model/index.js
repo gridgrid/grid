@@ -20,8 +20,8 @@ module.exports = function (_grid) {
             /* jshint +W086 */
             case 'mousemove':
             case 'mouseup':
-                var x = e.clientX - grid.viewPort.left;
-                var y = e.clientY - grid.viewPort.top;
+                var x = grid.viewPort.toGridX(e.clientX);
+                var y = grid.viewPort.toGridY(e.clientY);
                 e.row = grid.viewPort.getVirtualRowByTop(y);
                 e.col = grid.viewPort.getVirtualColByLeft(x);
                 e.gridX = x;

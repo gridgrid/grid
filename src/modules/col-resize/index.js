@@ -8,14 +8,17 @@ module.exports = function (_grid) {
 
         decorator._onDragStart = function (e) {
             decorator._dragLine = grid.decorators.create(0, undefined, Infinity, 1, 'px', 'real');
-            grid.decorators.add(decorator._dragLine);
+
             decorator._dragLine.left = e.gridX;
             decorator._dragLine.postRender = function (div) {
                 div.setAttribute('class', 'grid-drag-line');
             };
 
+            grid.decorators.add(decorator._dragLine);
+
             decorator._unbindDrag = grid.eventLoop.bind('grid-drag', function (e) {
-                decorator._dragLine.left = e.gridX;
+                var minX = decorator.boundingBox && decorator.boundingBox.getClientRects()[0].left + 10 || 0;
+                decorator._dragLine.left = Math.max(e.gridX, minX);
             });
 
             decorator._unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function (e) {

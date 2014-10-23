@@ -15,7 +15,7 @@ describe('col-resize', function () {
         var ctx = {};
         beforeEach(function () {
             ctx.helper = helper;
-            ctx.decorator = colResize._decorators[0];
+            ctx.decorator = colResize._decorators[1];
         });
 
         describe('should satisfy', function () {
@@ -96,12 +96,16 @@ describe('col-resize', function () {
             });
 
             it('should min out at decorator left + 10', function () {
-                var drag = mockEvent('grid-drag');
-                var decoratorLeft;
-                var gridX = decoratorLeft;
-                drag.gridX = gridX;
-                grid.eventLoop.fire(drag);
-                expect(dragCtx.decorator).leftToBe(decoratorLeft + 10);
+                helper.viewBuild();
+                helper.onDraw(function () {
+                    var drag = mockEvent('grid-drag');
+                    var decoratorLeft = ctx.decorator.boundingBox.getClientRects()[0].left;
+                    var gridX = decoratorLeft;
+                    drag.gridX = gridX;
+                    grid.eventLoop.fire(drag);
+                    expect(dragCtx.decorator).leftToBe(decoratorLeft + 10);
+                });
+
             });
 
             it('should remove the decorator on drag end', function () {

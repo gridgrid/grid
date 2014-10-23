@@ -29,6 +29,15 @@ module.exports = function (_grid) {
         }
     });
 
+    viewPort.toGridX = function (clientX) {
+        return clientX - viewPort.left;
+    };
+
+    viewPort.toGridY = function (clientY) {
+        return clientY - viewPort.top;
+    };
+
+
     var fixed = {rows: 0, cols: 0};
 
     function getFixed(rowOrCol) {

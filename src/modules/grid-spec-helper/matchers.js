@@ -12,7 +12,13 @@
     var $ = require('jquery');
 
     function expectedObjectWithNot(obj) {
-        return 'Expected ' + JSON.stringify(obj || this.actual) + (this.isNot ? ' not' : '');
+        var actual = 'actual';
+        try {
+            actual = JSON.stringify(obj || this.actual);
+        } catch (e) {
+            //nothing
+        }
+        return 'Expected ' + actual + (this.isNot ? ' not' : '');
     }
 
     function makeFakeRange(t, l, h, w) {

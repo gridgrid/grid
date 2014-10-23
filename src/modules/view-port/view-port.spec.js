@@ -321,4 +321,11 @@ describe('view port', function () {
         expect(viewPort.left).toBe(5);
     });
 
+    it('should have convert from client to grid', function () {
+        helper.container.style.marginTop = '10px';
+        helper.container.style.marginLeft = '5px';
+        expect(viewPort.toGridX(100)).toBe(95);
+        expect(viewPort.toGridY(40)).toBe(30);
+    });
+
 });
