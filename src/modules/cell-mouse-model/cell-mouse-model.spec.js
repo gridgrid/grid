@@ -15,11 +15,12 @@ describe('cell-mouse-model', function () {
     beforeEach(beforeEachFunction);
 
     function createEventWithXY(name, x, y) {
-        var mousedown = mockEvent(name);
+        var mouseEvent = mockEvent(name);
         //somewhere in the first cell hopefully
-        mousedown.clientX = x;
-        mousedown.clientY = y;
-        return mousedown;
+        mouseEvent.clientX = x;
+        mouseEvent.clientY = y;
+        mouseEvent.which = 1;
+        return mouseEvent;
     }
 
     var annotatedEvents = ['mousedown', 'mousemove', 'mouseup', 'click'];
@@ -125,7 +126,7 @@ describe('cell-mouse-model', function () {
         expect(dragEvent.clientX).toBe(111);
         expect(dragEvent.gridY).toBe(41);
         expect(dragEvent.gridX).toBe(111);
-        
+
     });
 
     it('should fire grid-cell-drag event on move only when changing cells', function () {
@@ -166,6 +167,16 @@ describe('cell-mouse-model', function () {
         expect(dragEvent.clientX).toBe(111);
         expect(dragEvent.gridY).toBe(41);
         expect(dragEvent.gridX).toBe(111);
+    });
+
+    it('should fire drag end if gets a mousemove without the mouse button down', function () {
+        var spy = jasmine.createSpy();
+        grid.eventLoop.bind('grid-drag-end', spy);
+        startDrag();
+        var mousemove = createEventWithXY('mousemove', 111, 41);
+        mousemove.which = 0;
+        window.dispatchEvent(mousemove);
+        expect(spy).toHaveBeenCalled();
     });
 
 });

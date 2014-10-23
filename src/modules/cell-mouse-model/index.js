@@ -50,12 +50,19 @@ module.exports = function (_grid) {
         return drag;
     }
 
+
     grid.eventLoop.bind('mousedown', function (downEvent) {
         wasDragged = false;
         var lastDragRow = downEvent.row;
         var lastDragCol = downEvent.col;
         var dragStarted = false;
         var unbindMove = grid.eventLoop.bind('mousemove', window, function (e) {
+            if (dragStarted && !e.which) {
+                //got a move event without mouse down which means we somehow missed the mouseup
+                handleMouseUp(e);
+                return;
+            }
+
             if (!dragStarted) {
                 wasDragged = true;
                 createAndFireDragEvent('grid-drag-start', downEvent);
@@ -73,7 +80,9 @@ module.exports = function (_grid) {
 
         });
 
-        var unbindUp = grid.eventLoop.bind('mouseup', window, function (e) {
+        var unbindUp = grid.eventLoop.bind('mouseup', window, handleMouseUp);
+
+        function handleMouseUp(e) {
             unbindMove();
             unbindUp();
 
@@ -81,7 +90,7 @@ module.exports = function (_grid) {
 
             //row, col, x, and y should inherit
             grid.eventLoop.fire(dragEnd);
-        });
+        }
 
         //keep it from doing weird crap
         //e.preventDefault();
