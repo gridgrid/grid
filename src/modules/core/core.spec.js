@@ -20,6 +20,7 @@ describe('grid-core', function () {
         expect(grid).toHaveField('viewPort');
         expect(grid).toHaveField('viewLayer');
         expect(grid).toHaveField('pixelScrollModel');
+        expect(grid).toHaveField('colResize');
     });
 
     it('should have a main build function', function () {

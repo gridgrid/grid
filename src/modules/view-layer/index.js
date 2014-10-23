@@ -33,9 +33,13 @@ module.exports = function (_grid) {
         cellContainer = document.createElement('div');
         cellContainer.setAttribute('dts', 'grid-cells');
         cellContainer.setAttribute('class', GRID_CELL_CONTAINER_BASE_CLASS);
+        util.position(cellContainer, 0, 0, 0, 0);
+        cellContainer.style.zIndex = 0;
 
         decoratorContainer = document.createElement('div');
         decoratorContainer.setAttribute('dts', 'grid-decorators');
+        util.position(decoratorContainer, 0, 0, 0, 0);
+        decoratorContainer.style.zIndex = 0;
 
         root = document.createElement('div');
         root.setAttribute('class', GRID_VIEW_ROOT_CLASS);
@@ -129,7 +133,7 @@ module.exports = function (_grid) {
         } else {
             cellContainer.className = GRID_CELL_CONTAINER_BASE_CLASS;
         }
-    }
+    };
 
     function buildCells(cellContainer) {
         while (cellContainer.firstChild) {
@@ -186,6 +190,11 @@ module.exports = function (_grid) {
         setPosition(bounding, t, l, util.clamp(h, 0, Infinity), util.clamp(w, 0, Infinity));
     }
 
+    function positionCellDecoratorFromRealCellRange(realCellRange, boundingBox) {
+        var realPxRange = grid.viewPort.toPx(realCellRange);
+        positionDecorator(boundingBox, realPxRange.top, realPxRange.left, realPxRange.height + getBorderWidth(), realPxRange.width + getBorderWidth());
+    }
+
     viewLayer._drawDecorators = function () {
         var aliveDecorators = grid.decorators.getAlive();
         aliveDecorators.forEach(function (decorator) {
@@ -208,12 +217,8 @@ module.exports = function (_grid) {
                         positionDecorator(boundingBox, decorator.top, decorator.left, decorator.height, decorator.width);
                         break;
                     case 'cell':
-                    /* jshint -W086 */
-
-                    default:
-
+                        positionCellDecoratorFromRealCellRange(decorator, boundingBox);
                         break;
-                    /* jshint +W086 */
                 }
             } else if ((decorator.isDirty() || grid.cellScrollModel.isDirty()) && decorator.space === 'virtual') {
                 switch (decorator.units) {
@@ -224,8 +229,7 @@ module.exports = function (_grid) {
                     default:
                         var realCellRange = grid.viewPort.intersect(decorator);
                         if (realCellRange) {
-                            var intersection = grid.viewPort.toPx(realCellRange);
-                            positionDecorator(boundingBox, intersection.top, intersection.left, intersection.height + getBorderWidth(), intersection.width + getBorderWidth());
+                            positionCellDecoratorFromRealCellRange(realCellRange, boundingBox);
                         } else {
                             positionDecorator(boundingBox, -1, -1, -1, -1);
                         }

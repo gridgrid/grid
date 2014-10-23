@@ -18,5 +18,13 @@ module.exports = {
     },
     isArray: function (value) {
         return Object.prototype.toString.call(value) === '[object Array]';
+    },
+    position: function (elem, t, l, b, r) {
+        elem.style.top = t + 'px';
+        elem.style.left = l + 'px';
+        elem.style.bottom = b + 'px';
+        elem.style.right = r + 'px';
+        elem.style.position = 'absolute';
+        
     }
 };

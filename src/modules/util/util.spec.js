@@ -30,5 +30,13 @@ describe('util', function () {
         });
     });
 
+    describe('position', function () {
+        it('should position an element absolutely', function () {
+            var div = document.createElement('div');
+            util.position(div, 2, 3, 4, 5);
+            expect(div).toBePositioned(2, 3, 4, 5);
+        });
+    });
+
 
 });

@@ -34,12 +34,18 @@ module.exports = function (_grid) {
             return oldDead;
         },
         isDirty: dirtyClean.isDirty,
-        create: function () {
+        create: function (t, l, h, w, u, s) {
             var decorator = {};
             var thisDirtyClean = makeDirtyClean(grid);
 
             //mixin the position range functionality
             positionRange(decorator, thisDirtyClean, dirtyClean);
+            decorator.top = t;
+            decorator.left = l;
+            decorator.height = h;
+            decorator.width = w;
+            decorator.units = u || decorator.units;
+            decorator.space = s || decorator.space;
 
             //they can override but we should have an empty default to prevent npes
             decorator.render = function () {

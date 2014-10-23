@@ -19,8 +19,8 @@ function testPositionRange(context) {
             expect('left' in range).toBe(true);
             expect('height' in range).toBe(true);
             expect('width' in range).toBe(true);
-            expect(range.units).toBe('cell');
-            expect(range.space).toBe('virtual');
+            expect('units' in range).toBe(true);
+            expect('space' in range).toBe(true);
         });
 
         describe('should satisfy', function () {

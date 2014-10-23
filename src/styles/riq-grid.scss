@@ -76,6 +76,10 @@
   }
 }
 
+.grid-decorators {
+  z-index: 1;
+}
+
 .grid-scroll-bar {
   //the decorator will take care of the sizing
   @extend .pin-to-edges;
@@ -88,5 +92,9 @@
   $darkYellow: darken(yellow, 10);
   border: 2px solid $darkYellow;
   background: transparentize($darkYellow, .5);
+}
 
+.col-resize {
+  width: 6px;
+  background-color: blue;
 }

@@ -1,8 +1,9 @@
 describe('decorators', function () {
+    var $ = require('jquery');
     var helper = require('@grid/grid-spec-helper')();
     var decorators;
     var grid;
-    var ctx = {helper : helper};
+    var ctx = {helper: helper};
     beforeEach(function () {
         grid = helper.buildSimpleGrid();
         decorators = grid.decorators;
@@ -14,12 +15,43 @@ describe('decorators', function () {
     });
 
     describe('should satisfy', function () {
-        
+
         beforeEach(function () {
             ctx.decorator = decorators.create();
         });
-        
+
+        it('single decorator default render an element that fills the bounding box', function () {
+            var div = document.createElement('div');
+            div.style.position = 'absolute';
+            div.style.top = '5px';
+            div.style.left = '6px';
+            div.style.width = '25px';
+            div.style.height = '35px';
+
+            var decoratorElem = ctx.decorator.render();
+            div.appendChild(decoratorElem);
+            document.body.appendChild(div);
+            expect($(decoratorElem).offset()).toEqual({
+                top: 5,
+                left: 6
+            });
+
+            expect($(decoratorElem).width()).toBe(25);
+            expect($(decoratorElem).height()).toBe(35);
+        });
+
+
         require('@grid/decorators/decorator-test-body')(ctx);
+    });
+
+    it('should let me create a decorator with values', function () {
+        var d = decorators.create(2, 3, 4, 5, 'px', 'real');
+        expect(d).topToBe(2);
+        expect(d).leftToBe(3);
+        expect(d).heightToBe(4);
+        expect(d).widthToBe(5);
+        expect(d).unitsToBe('px');
+        expect(d).spaceToBe('real');
     });
 
 

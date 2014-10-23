@@ -51,6 +51,12 @@ describe('view-layer', function () {
         expect(cellContainer.hasClass('grid-cells')).toBe(true);
     });
 
+    it('should position the cell container pinned with zindex 0', function () {
+        var cellContainer = findCellContainer();
+        expect(cellContainer).toBePositioned(0, 0, 0, 0);
+        expect(cellContainer.css('zIndex')).toBe('0');
+    });
+
     it('should create rows x cols cells', function () {
         view.draw();
         helper.onDraw(function () {
@@ -311,6 +317,11 @@ describe('view-layer', function () {
             expect(decoratorContainer.prevAll('[dts=grid-cells]').length).toBe(1);
         });
 
+        it('should be positioned pinned to the edges with zindex', function () {
+            var decoratorContainer = $(container).find('[dts="grid-decorators"]');
+            expect(decoratorContainer).toBePositioned(0, 0, 0, 0);
+            expect(decoratorContainer.css('zIndex')).toBe('0');
+        });
 
         it('should render a decorator into a container with pointer events none', function () {
             grid.decorators.add(decorator);
@@ -408,7 +419,7 @@ describe('view-layer', function () {
             expectBoundingBoxSize(35, 106, 2, 3);
         });
 
-        xit('should position a real cell range decorator', function () {
+        it('should position a real cell range decorator', function () {
             setDecoratorPosition(5, 6, 3, 3);
             decorator.space = 'real';
             grid.cellScrollModel.scrollTo(1, 1); //scroll should have no effect on the position;

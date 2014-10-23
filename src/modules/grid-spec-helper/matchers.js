@@ -19,6 +19,10 @@
         return {top: t, left: l, height: h, width: w};
     }
 
+    function maybeAddPx(v) {
+        return typeof v === 'string' ? v : v + 'px';
+    }
+
     var matchers = {
         toBeDisplayNone: function () {
             var elem = this.actual;
@@ -131,6 +135,21 @@
                 return expectedObjectWithNot.call(this, makeFakeRange(this.actual.top, this.actual.left, this.actual.height, this.actual.width)) + ' to be ' + JSON.stringify(makeFakeRange(t, l, h, w));
             };
             return this.actual.top === t && this.actual.left === l && this.actual.height === h && this.actual.width === w;
+        },
+        toContainAll: function (array) {
+            array.forEach(function (item) {
+                if (this.actual.indexOf(item) === -1) {
+                    return false;
+                }
+            });
+            return true;
+        },
+        toBePositioned: function (t, l, b, r) {
+            return $(this.actual).css('top') === maybeAddPx(t) &&
+                $(this.actual).css('left') === maybeAddPx(l) &&
+                $(this.actual).css('right') === maybeAddPx(r) &&
+                $(this.actual).css('bottom') === maybeAddPx(b) &&
+                $(this.actual).css('position') === 'absolute';
         }
     };
 

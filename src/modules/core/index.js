@@ -19,6 +19,7 @@ module.exports = function () {
     grid.viewPort = require('@grid/view-port')(grid);
     grid.viewLayer = require('@grid/view-layer')(grid);
     grid.pixelScrollModel = require('@grid/pixel-scroll-model')(grid);
+    grid.colResize = require('@grid/col-resize')(grid);
 
 
     var drawRequested = false;
