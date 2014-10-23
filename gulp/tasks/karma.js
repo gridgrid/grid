@@ -16,6 +16,7 @@ gulp.task('karma', function () {
 });
 
 gulp.task('karma-watch', function () {
+    console.log('starting karma watch');
     return gulp.src(karmaConf.files)
         .pipe(karma({
             configFile: 'karma.conf.js',

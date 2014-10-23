@@ -17,7 +17,6 @@ module.exports = function (config) {
             files: [
                 'bower_components/angular/angular.js',
                 'bower_components/angular-mocks/angular-mocks.js',
-                //'node_modules/sugar/release/sugar-full.development.js',
                 'test-assets/bundle-tests.js'
             ],
 
