@@ -1,22 +1,41 @@
 var mockEvent = require('@grid/custom-event');
 
-describe('col-resize', function () {
+describe('col-reorder', function () {
     var $ = require('jquery');
 
     var helper = require('@grid/grid-spec-helper')();
     var grid;
-    var colResize;
+    var colReorder;
     beforeEach(function () {
         grid = helper.buildSimpleGrid();
-        colResize = grid.colResize;
+        colReorder = grid.colReorder;
+    });
+
+
+    function expectCorrectDecorators() {
+        for (var c = 0; c < grid.viewPort.cols; c++) {
+            var decorator = colReorder._decorators[c];
+            expect(decorator).toBeDefined();
+            expect(decorator.left).toBe(c);
+            expect(grid.decorators.getAlive()).toContain(decorator);
+        }
+    }
+
+    it('should make viewport cols decorators', function () {
+        expectCorrectDecorators();
+    });
+
+    it('should still have the right number of decorators after viewport changes', function () {
+        grid.viewPort.sizeToContainer({offsetWidth: 200, offsetHeight: 300});
+        expectCorrectDecorators();
     });
 
     describe('decorator', function () {
         var ctx = {};
-        var viewCol = 1;
+        var col = 1;
         beforeEach(function () {
             ctx.helper = helper;
-            ctx.decorator = colResize._decorators[viewCol];
+            ctx.decorator = colReorder._decorators[col];
         });
 
         describe('should satisfy', function () {
@@ -34,6 +53,7 @@ describe('col-resize', function () {
         it('should have a styleable class', function () {
             expect(ctx.decorator.render()).toHaveClass('col-resize');
         });
+
 
         it('should center on the right side of its bounding box', function () {
             helper.viewBuild();
@@ -122,16 +142,7 @@ describe('col-resize', function () {
             it('should set the col width on drag-end', function () {
                 fireDrag(dragStart + 10);
                 grid.eventLoop.fire(mockEvent('grid-drag-end'));
-                var colObj = grid.colModel.get(viewCol);
-                expect(colObj).widthToBe(dragStart + 10);
-            });
-
-            it('should set the correct width if scrolled', function () {
-                var colScroll = 1;
-                grid.cellScrollModel.scrollTo(0, colScroll);
-                fireDrag(dragStart + 10);
-                grid.eventLoop.fire(mockEvent('grid-drag-end'));
-                var colObj = grid.colModel.get(viewCol + colScroll);
+                var colObj = grid.colModel.get(col);
                 expect(colObj).widthToBe(dragStart + 10);
             });
 
@@ -140,24 +151,6 @@ describe('col-resize', function () {
             });
         });
 
-    });
-
-    function expectCorrectDecorators() {
-        for (var c = 0; c < grid.viewPort.cols; c++) {
-            var decorator = colResize._decorators[c];
-            expect(decorator).toBeDefined();
-            expect(decorator.left).toBe(c);
-            expect(grid.decorators.getAlive()).toContain(decorator);
-        }
-    }
-
-    it('should make viewport cols decorators', function () {
-        expectCorrectDecorators();
-    });
-
-    it('should still have the right number of decorators after viewport changes', function () {
-        grid.viewPort.sizeToContainer({offsetWidth: 200, offsetHeight: 300});
-        expectCorrectDecorators();
     });
 
 

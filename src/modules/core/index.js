@@ -14,12 +14,15 @@ module.exports = function () {
     grid.virtualPixelCellModel = require('@grid/virtual-pixel-cell-model')(grid);
     grid.cellScrollModel = require('@grid/cell-scroll-model')(grid);
     grid.cellMouseModel = require('@grid/cell-mouse-model')(grid);
-    grid.navigationModel = require('@grid/navigation-model')(grid);
 
     grid.viewPort = require('@grid/view-port')(grid);
     grid.viewLayer = require('@grid/view-layer')(grid);
+
+    //things with logic that also register decorators (slightly less core than the other models)
+    grid.navigationModel = require('@grid/navigation-model')(grid);
     grid.pixelScrollModel = require('@grid/pixel-scroll-model')(grid);
     grid.colResize = require('@grid/col-resize')(grid);
+    grid.colReorder = require('@grid/col-reorder')(grid);
 
 
     var drawRequested = false;

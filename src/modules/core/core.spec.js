@@ -21,6 +21,7 @@ describe('grid-core', function () {
         expect(grid).toHaveField('viewLayer');
         expect(grid).toHaveField('pixelScrollModel');
         expect(grid).toHaveField('colResize');
+        expect(grid).toHaveField('colReorder');
     });
 
     it('should have a main build function', function () {

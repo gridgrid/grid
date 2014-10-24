@@ -6,16 +6,16 @@ module.exports = function (_grid) {
     function makeResizeDecorator(col) {
         var decorator = grid.decorators.create(0, col, 1, 1, 'cell', 'real');
 
+
+        function getDecoratorLeft() {
+            return decorator.boundingBox && decorator.boundingBox.getClientRects()[0].left || 0;
+        }
+
         decorator._dragLine = grid.decorators.create(0, undefined, Infinity, 1, 'px', 'real');
 
         decorator._dragLine.postRender = function (div) {
             div.setAttribute('class', 'grid-drag-line');
         };
-
-
-        function getDecoratorLeft() {
-            return decorator.boundingBox && decorator.boundingBox.getClientRects()[0].left || 0;
-        }
 
         decorator._onDragStart = function (e) {
 
@@ -27,7 +27,7 @@ module.exports = function (_grid) {
             });
 
             decorator._unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function (e) {
-                grid.colModel.get(col).width = decorator._dragLine.left - getDecoratorLeft();
+                grid.colModel.get(grid.viewPort.toVirtualCol(col)).width = decorator._dragLine.left - getDecoratorLeft();
                 grid.decorators.remove(decorator._dragLine);
                 decorator._unbindDrag();
                 decorator._unbindDragEnd();
