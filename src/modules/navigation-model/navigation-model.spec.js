@@ -18,6 +18,24 @@ describe('navigation-model', function () {
         grid.eventLoop.fire(moveDown);
     }
 
+
+    function makeAndFireMouseDownForCell(r, c, shiftKey) {
+        var mouseDown = mockEvent('mousedown');
+        var col = c;
+        var row = r;
+        mouseDown.shiftKey = shiftKey;
+        mouseDown.clientX = col * 100 + 1;
+        mouseDown.clientY = row * 30 + 1;
+        grid.eventLoop.fire(mouseDown);
+    }
+
+    function setMinMax(minR, minC, maxR, maxC) {
+        model.minRow = minR;
+        model.minCol = minC;
+        model.maxRow = maxR;
+        model.maxCol = maxC;
+    }
+
     describe('focus', function () {
         var focus;
         beforeEach(function () {
@@ -99,10 +117,7 @@ describe('navigation-model', function () {
 
 
         it('should have a min and max row and col that it respects', function () {
-            model.minRow = 1;
-            model.minCol = 1;
-            model.maxRow = 4;
-            model.maxCol = 3;
+            setMinMax(1, 1, 4, 3);
             model.setFocus(0, 0);
             expect(focus).rowToBe(1);
             expect(focus).colToBe(1);
@@ -144,6 +159,17 @@ describe('navigation-model', function () {
             expect(focus).rowToBe(row);
             expect(focus).colToBe(col);
         });
+
+        it('should reflect min and max on mousedown', function () {
+            model.setFocus(2, 3);
+            setMinMax(1, 1, 4, 4);
+            makeAndFireMouseDownForCell(0, 0);
+            expect(focus).rowToBe(2);
+            expect(focus).colToBe(3);
+            makeAndFireMouseDownForCell(5, 5);
+            expect(focus).rowToBe(2);
+            expect(focus).colToBe(3);
+        });
     });
 
     describe('selection', function () {
@@ -168,10 +194,13 @@ describe('navigation-model', function () {
             expect(grid.decorators.getAlive()).toContain(selection);
         });
 
-        function selectCells() {
-            var dragStart = {type: 'grid-drag-start', row: 1, col: 2};
+        function selectCells(sr, sc, er, ec, dontSetFocus) {
+            if (!dontSetFocus) {
+                model.setFocus(sr, sc); //simulate the mousedown effect
+            }
+            var dragStart = {type: 'grid-drag-start', row: sr, col: sc};
             grid.eventLoop.fire(dragStart);
-            var drag = {type: 'grid-cell-drag', row: 3, col: 4};
+            var drag = {type: 'grid-cell-drag', row: er, col: ec};
             grid.eventLoop.fire(drag);
         }
 
@@ -181,13 +210,29 @@ describe('navigation-model', function () {
 
         it('should select a range of cells on grid drag', function () {
             model.setFocus(1, 2);
-            selectCells();
+            selectCells(1, 2, 3, 4);
             expect(selection).toBeRange(1, 2, 3, 3);
         });
 
         it('should expand the selection from focus even if that isnt the initial mousedown', function () {
-            selectCells();
+            selectCells(1, 2, 3, 4, true);
             expect(selection).toBeRange(0, 0, 4, 5);
+        });
+
+        it('should not select if drag begins out of max min', function () {
+            setMinMax(1, 1, 4, 4);
+            selectCells(0, 0, 3, 3);
+            expect(selection).toBeRange(-1, -1, -1, -1);
+            selectCells(5, 5, 3, 3);
+            expect(selection).toBeRange(-1, -1, -1, -1);
+        });
+
+        it('selection should clamp to min max', function () {
+            setMinMax(1, 1, 4, 4);
+            selectCells(1, 1, 0, 0);
+            expect(selection).toBeRange(1, 1, 1, 1);
+            selectCells(1, 1, 5, 5);
+            expect(selection).toBeRange(1, 1, 4, 4);
         });
 
         it('should unbind on drag end', function () {
@@ -203,24 +248,29 @@ describe('navigation-model', function () {
         });
 
         it('should clear on mousedown', function () {
-            selectCells();
+            selectCells(1, 2, 3, 4);
             grid.eventLoop.fire(mockEvent('mousedown'));
             expect(selection).toBeRange(-1, -1, -1, -1);
         });
 
         it('should clear key nav if shift is not down', function () {
-            selectCells();
+            selectCells(1, 2, 3, 4);
             makeAndFireKeyDown(key.code.arrow.down.code);
             expect(selection).toBeRange(-1, -1, -1, -1);
         });
 
         it('should set on mousedown if shift is held', function () {
-            var mousedown = mockEvent('mousedown');
-            mousedown.shiftKey = true;
-            mousedown.clientX = 230;
-            mousedown.clientY = 65;
-            grid.eventLoop.fire(mousedown);
+            makeAndFireMouseDownForCell(2, 2, true);
             expect(selection).toBeRange(0, 0, 3, 3);
+        });
+
+        it('should not set on mousedown out of min max range if shift is held', function () {
+            model.setFocus(1, 1);
+            setMinMax(1, 1, 4, 4);
+            makeAndFireMouseDownForCell(0, 0, true);
+            expect(selection).toBeRange(-1, -1, -1, -1);
+            makeAndFireMouseDownForCell(5, 5, true);
+            expect(selection).toBeRange(-1, -1, -1, -1);
         });
 
         it('should expand and shrink selection on key nav', function () {

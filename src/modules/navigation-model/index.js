@@ -48,9 +48,18 @@ module.exports = function (_grid) {
     defineLimitProp('maxCol', Infinity);
 
 
-    model.setFocus = function setFocus(row, col, optionalEvent) {
+    function clampRowToMinMax(row) {
         row = util.clamp(row, Math.max(model.minRow, 0), Math.min(model.maxRow, grid.rowModel.length() - 1));
-        col = util.clamp(col, Math.max(model.minCol, 0), Math.min(model.maxCol, grid.colModel.length() - 1));
+        return row;
+    }
+
+    function clampColToMinMax(col) {
+        return util.clamp(col, Math.max(model.minCol, 0), Math.min(model.maxCol, grid.colModel.length() - 1));
+    }
+
+    model.setFocus = function setFocus(row, col, optionalEvent) {
+        row = clampRowToMinMax(row);
+        col = clampColToMinMax(col);
         model.focus.row = row;
         model.focus.col = col;
         focusClass.top = row;
@@ -149,12 +158,21 @@ module.exports = function (_grid) {
         }
     });
 
+    function outsideMinMax(row, col) {
+        return row < model.minRow || row > model.maxRow || col < model.minCol || col > model.maxCol;
+    }
+
     grid.eventLoop.bind('mousedown', function (e) {
         //assume the event has been annotated by the cell mouse model interceptor
+        var row = e.row;
+        var col = e.col;
+        if (outsideMinMax(row, col)) {
+            return;
+        }
         if (!e.shiftKey) {
-            model.setFocus(e.row, e.col, e);
+            model.setFocus(row, col, e);
         } else {
-            setSelectionFromPoints(model.focus.row, model.focus.col, e.row, e.col);
+            setSelectionFromPoints(model.focus.row, model.focus.col, row, col);
         }
     });
 
@@ -181,11 +199,14 @@ module.exports = function (_grid) {
     }
 
     function setSelectionFromPoints(fromRow, fromCol, toRow, toCol) {
-        var newSelection = rangeUtil.createFromPoints(fromRow, fromCol, toRow, toCol);
+        var newSelection = rangeUtil.createFromPoints(fromRow, fromCol, clampRowToMinMax(toRow), clampColToMinMax(toCol));
         model.setSelection(newSelection);
     }
 
     selection._onDragStart = function (e) {
+        if (outsideMinMax(e.row, e.col)) {
+            return;
+        }
         var fromRow = model.focus.row;
         var fromCol = model.focus.col;
         var unbindDrag = grid.eventLoop.bind('grid-cell-drag', function (e) {
