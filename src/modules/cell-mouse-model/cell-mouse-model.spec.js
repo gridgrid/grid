@@ -26,22 +26,29 @@ describe('cell-mouse-model', function () {
     var annotatedEvents = ['mousedown', 'mousemove', 'mouseup', 'click'];
 
     it('should annotate mouse events with the cell they are on', function () {
+        grid.cellScrollModel.scrollTo(1, 1);
         annotatedEvents.forEach(function (type) {
             var mousedown = createEventWithXY(type, 110, 40);
             grid.eventLoop.fire(mousedown);
-            expect(mousedown).rowToBe(1);
-            expect(mousedown).colToBe(1);
+            expect(mousedown).rowToBe(2);
+            expect(mousedown).colToBe(2);
+            expect(mousedown.realRow).toBe(1);
+            expect(mousedown.realCol).toBe(1);
         });
     });
 
     it('should annotate mouse events with the cell they are on considereing offset', function () {
+        grid.cellScrollModel.scrollTo(1, 1);
         helper.container.style.marginTop = '10px';
         helper.container.style.marginLeft = '5px';
         annotatedEvents.forEach(function (type) {
             var mousedown = createEventWithXY(type, 104, 39);
             grid.eventLoop.fire(mousedown);
-            expect(mousedown).rowToBe(0);
-            expect(mousedown).colToBe(0);
+            expect(mousedown).rowToBe(1);
+            expect(mousedown).colToBe(1);
+            expect(mousedown.realRow).toBe(0);
+            expect(mousedown.realCol).toBe(0);
+            
         });
     });
 

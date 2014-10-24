@@ -134,6 +134,27 @@ describe('view port', function () {
         expect(viewPort.getVirtualColByLeft(350)).toBe(4);
     });
 
+
+    it('should give me a  cell coordinate for a pixel value', function () {
+        expect(viewPort.getRowByTop(20)).toBe(0);
+        expect(viewPort.getColByLeft(20)).toBe(0);
+    });
+
+    it('should give me a cell coordinate for a pixel value when scrolled', function () {
+        grid.cellScrollModel.scrollTo(1, 1);
+        expect(viewPort.getRowByTop(20)).toBe(0);
+        expect(viewPort.getColByLeft(20)).toBe(0);
+    });
+
+    it('should give me a cell coordinate for a pixel value when scrolled and fixed', function () {
+        beforeEachFunction(false, false, 1, 3);
+        grid.cellScrollModel.scrollTo(1, 1);
+        expect(viewPort.getRowByTop(20)).toBe(0);
+        expect(viewPort.getColByLeft(20)).toBe(0);
+        expect(viewPort.getRowByTop(40)).toBe(1);
+        expect(viewPort.getColByLeft(350)).toBe(3);
+    });
+
     it('should calculate the width and height value of a viewport cell', function () {
         beforeEachFunction([20, 30], [99, 100]);
         expect(viewPort.getRowHeight(0)).toEqual(20);

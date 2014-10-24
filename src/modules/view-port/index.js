@@ -68,7 +68,7 @@ module.exports = function (_grid) {
         }
     };
 
-    var shortDebouncedResize = debounce(function () {   
+    var shortDebouncedResize = debounce(function () {
         viewPort._resize();
     }, 1);
 
@@ -188,7 +188,7 @@ module.exports = function (_grid) {
         };
     };
 
-    function getVirtualRowOrColFromPosition(pos, rowOrCol, heightOrWidth) {
+    function getRowOrColFromPosition(pos, rowOrCol, heightOrWidth, returnVirtual) {
         //we could do this slighly faster with binary search to get log(n) instead of n, but will only do it if we actually need to optimize this
         var rowOrColCap = capitalize(rowOrCol);
         var viewMax = viewPort[rowOrCol + 's'];
@@ -200,7 +200,7 @@ module.exports = function (_grid) {
             var length = lengthFn(virtual);
             var newSum = summedLength + length;
             if (newSum > pos) {
-                return virtual;
+                return returnVirtual ? virtual : i;
             }
             summedLength = newSum;
         }
@@ -208,11 +208,19 @@ module.exports = function (_grid) {
     }
 
     viewPort.getVirtualRowByTop = function (top) {
-        return getVirtualRowOrColFromPosition(top, 'row', 'height');
+        return getRowOrColFromPosition(top, 'row', 'height', true);
     };
 
     viewPort.getVirtualColByLeft = function (left) {
-        return getVirtualRowOrColFromPosition(left, 'col', 'width');
+        return getRowOrColFromPosition(left, 'col', 'width', true);
+    };
+
+    viewPort.getRowByTop = function (top) {
+        return getRowOrColFromPosition(top, 'row', 'height');
+    };
+
+    viewPort.getColByLeft = function (left) {
+        return getRowOrColFromPosition(left, 'col', 'width');
     };
 
     viewPort.getRowHeight = function (viewPortRow) {

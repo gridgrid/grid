@@ -76,6 +76,7 @@ describe('col-reorder', function () {
                 var drag = mockEvent('grid-drag');
                 var gridX = x;
                 drag.gridX = gridX;
+                drag.realCol = grid.viewPort.getColByLeft(gridX);
                 grid.eventLoop.fire(drag);
                 return gridX;
             }
@@ -88,10 +89,33 @@ describe('col-reorder', function () {
             });
 
             it('should move the left on grid drag', function () {
-                var gridX = fireDrag(dragStart + 5);
-                var colLeft = 0
+                fireDrag(dragStart + 5);
+                var colLeft = 0;
                 expect(dragCtx.decorator).leftToBe(colLeft + 5);
             });
+
+            describe('target col', function () {
+                var targetCtx = {};
+                beforeEach(function () {
+                    targetCtx.helper = helper;
+                    fireDrag(105);
+                    targetCtx.decorator = dragCtx.decorator._targetCol;
+                });
+
+                describe('should satisfy', function () {
+                    require('@grid/decorators/decorator-test-body')(targetCtx);
+                });
+
+                it('should set the target column to the one youre hovering', function () {
+                    expect(targetCtx.decorator).leftToBe(1);
+                    expect(targetCtx.decorator).widthToBe(1);
+                    expect(targetCtx.decorator).topToBe(0);
+                    expect(targetCtx.decorator).heightToBe(Infinity);
+                    expect(targetCtx.decorator).unitsToBe('cell');
+                    expect(targetCtx.decorator).spaceToBe('real');
+                });
+            });
+
 
             it('should remove the decorator on drag end', function () {
                 grid.eventLoop.fire(mockEvent('grid-drag-end'));

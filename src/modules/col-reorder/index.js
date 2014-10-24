@@ -18,8 +18,13 @@ module.exports = function (_grid) {
             headerDecorator._dragRect.width = grid.viewPort.getColWidth(col);
             var colOffset = e.gridX - headerDecorator.getDecoratorLeft();
 
+            headerDecorator._dragRect._targetCol = grid.decorators.create(0, undefined, Infinity, 1, 'cell', 'real');
+
             headerDecorator._unbindDrag = grid.eventLoop.bind('grid-drag', function (e) {
                 headerDecorator._dragRect.left = e.gridX - colOffset;
+                headerDecorator._dragRect._targetCol.left = e.realCol;
+
+
             });
 
             headerDecorator._unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function (e) {
