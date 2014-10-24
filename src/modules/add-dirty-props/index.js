@@ -1,7 +1,8 @@
 module.exports = function (obj, props, dirtyCleans) {
     props.forEach(function (prop) {
         var val;
-        Object.defineProperty(obj, prop, {
+        var name = prop.name || prop;
+        Object.defineProperty(obj, name, {
             enumerable: true,
             get: function () {
                 return val;
@@ -10,6 +11,9 @@ module.exports = function (obj, props, dirtyCleans) {
                     dirtyCleans.forEach(function (dirtyClean) {
                         dirtyClean.setDirty();
                     });
+                    if (prop.onDirty) {
+                        prop.onDirty();
+                    }
                 }
                 val = _val;
             }

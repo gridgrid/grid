@@ -3,7 +3,7 @@ describe('grid-core', function () {
     var $ = require('jquery');
     var grid;
     beforeEach(function () {
-        grid = require('@grid/core')();
+        grid = helper.buildSimpleGrid();
     });
 
     it('should have the right models', function () {

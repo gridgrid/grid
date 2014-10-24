@@ -16,7 +16,7 @@ module.exports = function (context) {
             dirtyObjs.forEach(function (dirtyObj) {
                 expect(dirtyObj).not.toBeDirty();
             });
-            obj[prop] = val;
+            obj[prop.name || prop] = val;
             dirtyObjs.forEach(function (dirtyObj) {
                 expect(dirtyObj).toBeDirty();
             });

@@ -1,5 +1,5 @@
 var customEvent = require('@grid/custom-event');
-var debounce = require('debounce');
+var debounce = require('@grid/debounce');
 var util = require('@grid/util');
 
 
@@ -297,12 +297,20 @@ module.exports = function (_grid) {
 
     function cleanup() {
         removeDecorators(grid.decorators.getAlive().concat(grid.decorators.popAllDead()));
+        if (!container) {
+            return;
+        }
         var querySelectorAll = container.querySelectorAll('.' + GRID_VIEW_ROOT_CLASS);
         for (var i = 0; i < querySelectorAll.length; ++i) {
             var root = querySelectorAll[i];
             container.removeChild(root);
         }
     }
+
+    grid.eventLoop.bind('grid-destroy', function () {
+        viewLayer.destroy();
+        clearTimeout(viewLayer.draw.timeout);
+    });
 
     return viewLayer;
 };

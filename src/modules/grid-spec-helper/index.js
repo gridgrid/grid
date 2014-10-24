@@ -6,10 +6,13 @@ module.exports = function () {
         CONTAINER_HEIGHT: 500,
         container: undefined,
         buildSimpleGrid: function (numRows, numCols, varyHeight, varyWidths, fixedRows, fixedCols) {
-            helper.grid = require('@grid/simple-grid')(numRows || 100, numCols || 10, varyHeight, varyWidths, fixedRows, fixedCols);
+            maybeDestroyGrid();
+            helper.grid = require('@grid/simple-grid')(numRows || 100, numCols || 10, varyHeight, varyWidths, fixedRows, fixedCols, function (grid) {
+                helper.resizeSpy = spyOn(grid.viewPort, '_resize');
+            });
             helper.grid.viewPort.sizeToContainer(helper.container);
             helper.grid.eventLoop.setContainer(helper.container);
-            helper.resizeSpy = spyOn(helper.grid.viewPort, '_onResize');
+
             return helper.grid;
         },
         viewBuild: function () {
@@ -50,13 +53,19 @@ module.exports = function () {
         }).addClass('js-grid-container');
         $('.js-grid-container').remove();
         $('body').append(helper.container);
+
     });
+
+    function maybeDestroyGrid() {
+        if (helper.grid) {
+            helper.grid.eventLoop.fire('grid-destroy');
+            helper.grid = undefined;
+        }
+    }
 
     afterEach(function () {
         $('.js-grid-container').remove();
-        if (helper.grid) {
-            helper.grid.eventLoop.fire('grid-destroy');
-        }
+        maybeDestroyGrid();
     });
 
     return helper;

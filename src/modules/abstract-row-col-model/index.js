@@ -1,11 +1,15 @@
+var addDirtyProps = require('@grid/add-dirty-props');
+
 module.exports = function (_grid, name, lengthName, defaultLength) {
     var grid = _grid;
 
     var DEFAULT_LENGTH = defaultLength;
     var descriptors = [];
     var numFixed = 0;
+    var dirtyClean = require('@grid/dirty-clean')(grid);
 
     var api = {
+        isDirty: dirtyClean.isDirty,
         add: function (descriptor) {
             //if the column is fixed and the last one added is fixed (we only allow fixed at the beginning for now)
             if (descriptor.fixed) {
@@ -17,6 +21,7 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
             }
             descriptors.push(descriptor);
             grid.eventLoop.fire('grid-' + name + '-change');
+            dirtyClean.setDirty();
         },
         get: function (index) {
             return descriptors[index];
@@ -27,6 +32,16 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
 
         numFixed: function () {
             return numFixed;
+        },
+        create: function () {
+            return addDirtyProps({}, [
+                {
+                    name: lengthName,
+                    onDirty: function () {
+                        grid.eventLoop.fire('grid-' + name + '-change');
+                    }
+                }
+            ], [dirtyClean]);
         }
     };
 
@@ -35,7 +50,7 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
         if (!descriptors[index]) {
             return NaN;
         }
-        
+
         return descriptors[index] && descriptors[index][lengthName] || DEFAULT_LENGTH;
     };
 

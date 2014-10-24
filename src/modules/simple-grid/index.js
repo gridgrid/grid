@@ -1,8 +1,12 @@
 var util = require('@grid/util');
 
-module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows, fixedCols) {
+module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows, fixedCols, preSetupFn) {
 
     var grid = require('@grid/core')();
+
+    if (preSetupFn) {
+        preSetupFn(grid);
+    }
 
     if (numRows) {
         for (var r = 0; r < numRows; r++) {

@@ -12,6 +12,12 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
         expect(model.get(0)).toBeDefined();
     });
 
+    it('should be dirty on add', function () {
+        helper.resetAllDirties();
+        model.add({});
+        expect(model).toBeDirty();
+    });
+
     it('should tell you the number of ' + name + 's', function () {
         model.add({});
         model.add({});
@@ -65,6 +71,29 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
         expect(model[lengthName](-1)).toBeNaN();
         expect(model[lengthName](10000)).toBeNaN();
         expect(model[lengthName](undefined)).toBeNaN();
+    });
+
+
+    describe('descriptor', function () {
+        describe('should satisfy', function () {
+            var ctx = {};
+            beforeEach(function () {
+                ctx.helper = helper;
+                ctx.obj = model.create();
+                ctx.dirtyObjs = [model];
+                ctx.props = [lengthName];
+            });
+
+            require('@grid/add-dirty-props/test-body')(ctx);
+        });
+
+        it('should fire change on ' + lengthName + ' set', function () {
+            model.add(model.create());
+            var spy = jasmine.createSpy();
+            grid.eventLoop.bind('grid-' + name + '-change', spy);
+            model.get(0)[lengthName] = 5;
+            expect(spy).toHaveBeenCalled();
+        });
     });
 }
 

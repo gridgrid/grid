@@ -1,6 +1,6 @@
 var util = require('@grid/util');
-var debounce = require('debounce');
-var capitalize = require('capitalize')
+var debounce = require('@grid/debounce');
+var capitalize = require('capitalize');
 
 module.exports = function (_grid) {
     var grid = _grid;

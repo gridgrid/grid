@@ -13,16 +13,21 @@ module.exports = function (_grid) {
         };
 
 
+        function getDecoratorLeft() {
+            return decorator.boundingBox && decorator.boundingBox.getClientRects()[0].left || 0;
+        }
+
         decorator._onDragStart = function (e) {
-            
+
             grid.decorators.add(decorator._dragLine);
 
             decorator._unbindDrag = grid.eventLoop.bind('grid-drag', function (e) {
-                var minX = decorator.boundingBox && decorator.boundingBox.getClientRects()[0].left + 10 || 0;
+                var minX = getDecoratorLeft() + 10;
                 decorator._dragLine.left = Math.max(e.gridX, minX);
             });
 
             decorator._unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function (e) {
+                grid.colModel.get(col).width = decorator._dragLine.left - getDecoratorLeft();
                 grid.decorators.remove(decorator._dragLine);
                 decorator._unbindDrag();
                 decorator._unbindDragEnd();

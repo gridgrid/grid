@@ -314,6 +314,26 @@ describe('view port', function () {
         });
     });
 
+    it('should size to container on col change', function () {
+        helper.resizeSpy.andCallThrough();
+        var sizeSpy = spyOn(viewPort, 'sizeToContainer');
+        grid.eventLoop.fire('grid-col-change');
+        waits(2);
+        runs(function () {
+            expect(sizeSpy).toHaveBeenCalled();
+        });
+    });
+
+    it('should size to container on col change', function () {
+        helper.resizeSpy.andCallThrough();
+        var sizeSpy = spyOn(viewPort, 'sizeToContainer');
+        grid.eventLoop.fire('grid-row-change');
+        waits(2);
+        runs(function () {
+            expect(sizeSpy).toHaveBeenCalled();
+        });
+    });
+
     it('should have top and left values for the client offset of the grid container', function () {
         helper.container.style.marginTop = '10px';
         helper.container.style.marginLeft = '5px';

@@ -2,7 +2,7 @@ var util = require('@grid/util');
 var rangeUtil = require('@grid/range-util');
 var capitalize = require('capitalize');
 var addDirtyProps = require('@grid/add-dirty-props');
-var debounce = require('debounce');
+var debounce = require('@grid/debounce');
 
 module.exports = function (_grid) {
     var grid = _grid;
@@ -54,10 +54,25 @@ module.exports = function (_grid) {
     };
 
     viewPort._onResize = debounce(function () {
+        viewPort._resize();
+    }, 200);
+
+    grid.eventLoop.bind('grid-destroy', function () {
+        clearTimeout(viewPort._onResize.timeout);
+        clearTimeout(shortDebouncedResize.timeout);
+    });
+
+    viewPort._resize = function () {
+        console.log('resize');
         if (container) {
             viewPort.sizeToContainer(container);
         }
-    }, 200);
+    };
+
+    var shortDebouncedResize = debounce(function () {
+        viewPort._resize();
+    }, 1);
+
 
     grid.eventLoop.bind('resize', window, function () {
         //we don't bind the handler directly so that tests can mock it out
@@ -66,10 +81,12 @@ module.exports = function (_grid) {
 
     grid.eventLoop.bind('grid-row-change', function () {
         fixed.rows = grid.rowModel.numFixed();
+        shortDebouncedResize();
     });
 
     grid.eventLoop.bind('grid-col-change', function () {
         fixed.cols = grid.colModel.numFixed();
+        shortDebouncedResize();
     });
 
     function convertRealToVirtual(coord, rowOrCol, coordIsVirtual) {

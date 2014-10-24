@@ -13,9 +13,10 @@ describe('col-resize', function () {
 
     describe('decorator', function () {
         var ctx = {};
+        var col = 1;
         beforeEach(function () {
             ctx.helper = helper;
-            ctx.decorator = colResize._decorators[1];
+            ctx.decorator = colResize._decorators[col];
         });
 
         describe('should satisfy', function () {
@@ -83,19 +84,28 @@ describe('col-resize', function () {
                 expect(dragCtx.decorator.render()).toHaveClass('grid-drag-line');
             });
 
-            it('should move the left on grid drag', function () {
+            function fireDrag(x) {
                 var drag = mockEvent('grid-drag');
-                var gridX = dragStart + 10;
+                var gridX = x;
                 drag.gridX = gridX;
                 grid.eventLoop.fire(drag);
+                return gridX;
+            }
+
+            it('should move the left on grid drag', function () {
+                var gridX = fireDrag(dragStart + 10);
                 expect(dragCtx.decorator).leftToBe(gridX);
             });
+
+            function getDecoratorLeft() {
+                return ctx.decorator.boundingBox.getClientRects()[0].left;
+            }
 
             it('should min out at decorator left + 10', function () {
                 helper.viewBuild();
                 helper.onDraw(function () {
                     var drag = mockEvent('grid-drag');
-                    var decoratorLeft = ctx.decorator.boundingBox.getClientRects()[0].left;
+                    var decoratorLeft = getDecoratorLeft();
                     var gridX = decoratorLeft;
                     drag.gridX = gridX;
                     grid.eventLoop.fire(drag);
@@ -105,9 +115,15 @@ describe('col-resize', function () {
             });
 
             it('should remove the decorator on drag end', function () {
-                var dragEnd = mockEvent('grid-drag-end');
-                grid.eventLoop.fire(dragEnd);
+                grid.eventLoop.fire(mockEvent('grid-drag-end'));
                 expect(grid.decorators.popAllDead()).toContain(dragCtx.decorator);
+            });
+
+            it('should set the col width on drag-end', function () {
+                fireDrag(dragStart + 10);
+                grid.eventLoop.fire(mockEvent('grid-drag-end'));
+                var colObj = grid.colModel.get(col);
+                expect(colObj).widthToBe(dragStart + 10);
             });
 
             describe('should satisfy', function () {
