@@ -63,13 +63,12 @@ module.exports = function (_grid) {
     });
 
     viewPort._resize = function () {
-        console.log('resize');
         if (container) {
             viewPort.sizeToContainer(container);
         }
     };
 
-    var shortDebouncedResize = debounce(function () {
+    var shortDebouncedResize = debounce(function () {   
         viewPort._resize();
     }, 1);
 

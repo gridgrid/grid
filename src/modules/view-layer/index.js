@@ -80,18 +80,21 @@ module.exports = function (_grid) {
         if (viewPortDirty) {
             viewLayer._buildCells(cellContainer);
         }
-
+        var colModelDirty = grid.colModel.isDirty();
         var cellScrollDirty = grid.cellScrollModel.isDirty();
-        if (viewPortDirty || grid.cellClasses.isDirty() || cellScrollDirty) {
+        var cellsPositionOrSizeChanged = colModelDirty || cellScrollDirty;
+
+        if (viewPortDirty || grid.cellClasses.isDirty() || cellsPositionOrSizeChanged) {
             viewLayer._drawCellClasses();
         }
 
-        if (viewPortDirty || cellScrollDirty) {
+        if (viewPortDirty || cellsPositionOrSizeChanged) {
             viewLayer._drawCells();
         }
 
-        if (viewPortDirty || grid.decorators.isDirty()) {
-            viewLayer._drawDecorators();
+
+        if (grid.decorators.isDirty() || viewPortDirty || cellsPositionOrSizeChanged) {
+            viewLayer._drawDecorators(cellsPositionOrSizeChanged);
         }
 
         grid.eventLoop.fire('grid-draw');
@@ -195,7 +198,7 @@ module.exports = function (_grid) {
         positionDecorator(boundingBox, realPxRange.top, realPxRange.left, realPxRange.height + getBorderWidth(), realPxRange.width + getBorderWidth());
     }
 
-    viewLayer._drawDecorators = function () {
+    viewLayer._drawDecorators = function (cellsPositionOrSizeChanged) {
         var aliveDecorators = grid.decorators.getAlive();
         aliveDecorators.forEach(function (decorator) {
 
@@ -211,7 +214,7 @@ module.exports = function (_grid) {
                 }
             }
 
-            if (decorator.isDirty() && decorator.space === 'real') {
+            if ((decorator.isDirty() || cellsPositionOrSizeChanged) && decorator.space === 'real') {
                 switch (decorator.units) {
                     case 'px':
                         positionDecorator(boundingBox, decorator.top, decorator.left, decorator.height, decorator.width);
@@ -220,7 +223,7 @@ module.exports = function (_grid) {
                         positionCellDecoratorFromRealCellRange(decorator, boundingBox);
                         break;
                 }
-            } else if ((decorator.isDirty() || grid.cellScrollModel.isDirty()) && decorator.space === 'virtual') {
+            } else if ((decorator.isDirty() || cellsPositionOrSizeChanged) && decorator.space === 'virtual') {
                 switch (decorator.units) {
                     case 'px':
                         break;

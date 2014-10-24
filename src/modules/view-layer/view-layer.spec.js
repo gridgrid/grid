@@ -87,17 +87,29 @@ describe('view-layer', function () {
         });
     });
 
-    it('should redraw everything if viewPort is dirty', function () {
+    function expectRedraw(methods, thingToTriggerRedraw) {
         helper.resetAllDirties();
-        var drawMethods = ['_buildCells', '_drawCells', '_drawCellClasses', '_drawDecorators'];
+        var drawMethods = methods;
         var spies = drawMethods.map(function (method) {
             return spyOn(view, method);
         });
-        grid.viewPort.width = 1;
+        thingToTriggerRedraw();
         helper.onDraw(function () {
             spies.forEach(function (spy) {
                 expect(spy).toHaveBeenCalled();
             });
+        });
+    }
+
+    it('should redraw everything if viewPort is dirty', function () {
+        expectRedraw(['_buildCells', '_drawCells', '_drawCellClasses', '_drawDecorators'], function () {
+            grid.viewPort.width = 1;
+        });
+    });
+
+    it('should redraw everything if col model is dirty', function () {
+        expectRedraw(['_drawCells', '_drawCellClasses', '_drawDecorators'], function () {
+            grid.colModel.add({});
         });
     });
 
@@ -468,6 +480,10 @@ describe('view-layer', function () {
             decorator.units = 'px';
             grid.decorators.add(decorator);
             expectBoundingBoxSize(5, 6, grid.viewPort.height, grid.viewPort.width);
+        });
+        
+        it('should reposition if scrolled or col dirty', function(){
+            
         });
     });
 
