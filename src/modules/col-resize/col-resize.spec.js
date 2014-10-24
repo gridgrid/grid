@@ -11,24 +11,23 @@ describe('col-resize', function () {
         colResize = grid.colResize;
     });
 
+    describe('should satisfy', function () {
+        var ctx = {};
+        beforeEach(function () {
+            ctx.helper = helper;
+            ctx.headerDecorators = colResize;
+        });
+
+        //covers the decorator interface
+        require('@grid/header-decorators/header-decorators.spec')(ctx);
+    });
+
     describe('decorator', function () {
         var ctx = {};
         var viewCol = 1;
         beforeEach(function () {
             ctx.helper = helper;
             ctx.decorator = colResize._decorators[viewCol];
-        });
-
-        describe('should satisfy', function () {
-            require('@grid/decorators/decorator-test-body')(ctx);
-        });
-
-        it('should have the right range', function () {
-            expect(ctx.decorator).topToBe(0);
-            expect(ctx.decorator).heightToBe(1);
-            expect(ctx.decorator).widthToBe(1);
-            expect(ctx.decorator).unitsToBe('cell');
-            expect(ctx.decorator).spaceToBe('real');
         });
 
         it('should have a styleable class', function () {
@@ -98,10 +97,11 @@ describe('col-resize', function () {
             });
 
             function getDecoratorLeft() {
-                return ctx.decorator.boundingBox.getClientRects()[0].left;
+                return grid.viewPort.toGridX(ctx.decorator.boundingBox.getClientRects()[0].left);
             }
 
             it('should min out at decorator left + 10', function () {
+                $(helper.container).css({'margin-left': '10px'});
                 helper.viewBuild();
                 helper.onDraw(function () {
                     var drag = mockEvent('grid-drag');
@@ -141,24 +141,5 @@ describe('col-resize', function () {
         });
 
     });
-
-    function expectCorrectDecorators() {
-        for (var c = 0; c < grid.viewPort.cols; c++) {
-            var decorator = colResize._decorators[c];
-            expect(decorator).toBeDefined();
-            expect(decorator.left).toBe(c);
-            expect(grid.decorators.getAlive()).toContain(decorator);
-        }
-    }
-
-    it('should make viewport cols decorators', function () {
-        expectCorrectDecorators();
-    });
-
-    it('should still have the right number of decorators after viewport changes', function () {
-        grid.viewPort.sizeToContainer({offsetWidth: 200, offsetHeight: 300});
-        expectCorrectDecorators();
-    });
-
 
 });

@@ -99,6 +99,7 @@
   width: 15px;
   text-align: center;
   cursor: col-resize;
+  z-index: 20;
 
   &:hover:after {
     visibility: visible;
@@ -117,4 +118,8 @@
 
 .grid-drag-line {
   background: black;
+}
+
+.grid-drag-rect {
+  background: rgba(0, 0, 0, 0.4);
 }

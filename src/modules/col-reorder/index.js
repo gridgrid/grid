@@ -1,61 +1,43 @@
 module.exports = function (_grid) {
     var grid = _grid;
 
-    var api = {_decorators: []};
-    //
-    //function makeReorderDecorator(col) {
-    //    var decorator = grid.decorators.create(0, col, 1, 1, 'cell', 'real');
-    //
-    //    decorator._dragLine = grid.decorators.create(0, undefined, Infinity, 1, 'px', 'real');
-    //
-    //    decorator._dragLine.postRender = function (div) {
-    //        div.setAttribute('class', 'grid-drag-line');
-    //    };
-    //
-    //
-    //    function getDecoratorLeft() {
-    //        return decorator.boundingBox && decorator.boundingBox.getClientRects()[0].left || 0;
-    //    }
-    //
-    //    decorator._onDragStart = function (e) {
-    //
-    //        grid.decorators.add(decorator._dragLine);
-    //
-    //        decorator._unbindDrag = grid.eventLoop.bind('grid-drag', function (e) {
-    //            var minX = getDecoratorLeft() + 10;
-    //            decorator._dragLine.left = Math.max(e.gridX, minX);
-    //        });
-    //
-    //        decorator._unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function (e) {
-    //            grid.colModel.get(col).width = decorator._dragLine.left - getDecoratorLeft();
-    //            grid.decorators.remove(decorator._dragLine);
-    //            decorator._unbindDrag();
-    //            decorator._unbindDragEnd();
-    //        });
-    //    };
-    //
-    //    decorator.postRender = function (div) {
-    //        div.style.transform = 'translateX(50%)';
-    //        div.style.webkitTransform = 'translateX(50%)';
-    //
-    //        div.style.removeProperty('left');
-    //        div.setAttribute('class', 'col-resize');
-    //
-    //        grid.eventLoop.bind('grid-drag-start', div, decorator._onDragStart);
-    //    };
-    //
-    //    return decorator;
-    //}
-    //
-    //grid.eventLoop.bind('grid-viewport-change', function () {
-    //    for (var c = 0; c < grid.viewPort.cols; c++) {
-    //        if (!api._decorators[c]) {
-    //            var decorator = makeReorderDecorator(c);
-    //            api._decorators[c] = decorator;
-    //            grid.decorators.add(decorator);
-    //        }
-    //    }
-    //});
+    var api = {annotateDecorator: makeReorderDecorator};
+
+    function makeReorderDecorator(decorator) {
+        var col = decorator.left;
+        decorator._dragRect = grid.decorators.create(0, undefined, Infinity, undefined, 'px', 'real');
+
+        decorator._dragRect.postRender = function (div) {
+            div.setAttribute('class', 'grid-drag-rect');
+        };
+
+        decorator._onDragStart = function (e) {
+
+            grid.decorators.add(decorator._dragRect);
+
+            decorator._dragRect.width = grid.viewPort.getColWidth(col);
+            var colOffset = e.gridX - decorator.getDecoratorLeft();
+
+            decorator._unbindDrag = grid.eventLoop.bind('grid-drag', function (e) {
+                decorator._dragRect.left = e.gridX - colOffset;
+            });
+
+            decorator._unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function (e) {
+                grid.decorators.remove(decorator._dragRect);
+                decorator._unbindDrag();
+                decorator._unbindDragEnd();
+            });
+        };
+
+        decorator.postRender = function (div) {
+            div.setAttribute('class', 'grid-col-reorder');
+            grid.eventLoop.bind('grid-drag-start', div, decorator._onDragStart);
+        };
+
+        return decorator;
+    }
+
+    require('@grid/header-decorators')(grid, api);
 
     return api;
 };
