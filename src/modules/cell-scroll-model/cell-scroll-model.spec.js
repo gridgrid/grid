@@ -6,9 +6,9 @@ describe('cell-scroll-model', function () {
     var numCols = 10;
     var grid;
 
-    var beforeEachFunction = function (fixedR, fixedC) {
+    var beforeEachFunction = function (fixedR, fixedC, vary) {
 
-        grid = helper.buildSimpleGrid(numRows, numCols, false, false, fixedR, fixedC);
+        grid = helper.buildSimpleGrid(numRows, numCols, false, vary, fixedR, fixedC);
         model = grid.cellScrollModel;
     };
     beforeEach(beforeEachFunction);
@@ -93,8 +93,15 @@ describe('cell-scroll-model', function () {
             grid.viewPort.rows = 10;
             grid.viewPort.cols = 5;
             model.scrollIntoView(95, 9);
-            expect(model).rowToBe(95 - grid.viewPort.rows);
-            expect(model).colToBe(9 - grid.viewPort.cols);
+            expect(model).rowToBe(80);
+            expect(model).colToBe(2);
+        });
+
+        it('should scroll a cell into view with varied sizes', function () {
+            beforeEachFunction(3, 3, [40, 100, 400, 90]);
+            model.scrollIntoView(0, 6);
+            expect(model).rowToBe(0);
+            expect(model).colToBe(3);
         });
     });
 });

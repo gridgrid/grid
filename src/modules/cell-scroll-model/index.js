@@ -1,4 +1,5 @@
 var util = require('@grid/util');
+var capitalize = require('capitalize');
 
 module.exports = function (_grid) {
     var grid = _grid;
@@ -35,15 +36,28 @@ module.exports = function (_grid) {
         return virtualCoord - grid[rowOrCol + 'Model'].numFixed();
     }
 
-    function getScrollToRowOrCol(virtualCoord, rowOrCol) {
+    function getScrollToRowOrCol(virtualCoord, rowOrCol, heightWidth) {
         var currentScroll = model[rowOrCol];
         var scrollTo = currentScroll;
+        if (grid.viewPort[rowOrCol + 'IsInView'](virtualCoord)) {
+            return scrollTo;
+        }
+
         var targetScroll = convertVirtualToScroll(virtualCoord, rowOrCol);
-        var viewPortLength = grid.viewPort[rowOrCol + 's'];
         if (targetScroll < currentScroll) {
             scrollTo = targetScroll;
-        } else if (targetScroll > currentScroll + viewPortLength) {
-            scrollTo = targetScroll - viewPortLength;
+        } else if (targetScroll > currentScroll) {
+
+            var lengthToCell = grid.virtualPixelCellModel[heightWidth](0, virtualCoord);
+            var numFixed = grid[rowOrCol + 'Model'].numFixed();
+            scrollTo = 0;
+            for (var i = numFixed; i < virtualCoord; i++) {
+                lengthToCell -= grid.virtualPixelCellModel[heightWidth](i);
+                scrollTo = i - (numFixed - 1);
+                if (lengthToCell <= grid.viewPort[heightWidth]) {
+                    break;
+                }
+            }
         }
 
         return scrollTo;
@@ -52,8 +66,8 @@ module.exports = function (_grid) {
     model.scrollIntoView = function (vr, vc) {
         vr = grid.virtualPixelCellModel.clampRow(vr);
         vc = grid.virtualPixelCellModel.clampCol(vc);
-        var newRow = getScrollToRowOrCol(vr, 'row');
-        var newCol = getScrollToRowOrCol(vc, 'col');
+        var newRow = getScrollToRowOrCol(vr, 'row', 'height');
+        var newCol = getScrollToRowOrCol(vc, 'col', 'width');
         model.scrollTo(newRow, newCol);
     };
 

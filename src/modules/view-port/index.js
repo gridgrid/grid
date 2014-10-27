@@ -125,6 +125,16 @@ module.exports = function (_grid) {
         return util.clamp(virtualCoord - grid.cellScrollModel[rowOrCol], numFixed, maxViewPortIndex, true);
     }
 
+    viewPort.rowIsInView = function (virtualRow) {
+        var realRow = viewPort.toRealRow(virtualRow);
+        return !isNaN(realRow) && getLengthBetweenViewCoords(0, realRow, 'row', 'height', true) < viewPort.height;
+    };
+
+    viewPort.colIsInView = function (virtualCol) {
+        var realCol = viewPort.toRealCol(virtualCol);
+        return !isNaN(realCol) && getLengthBetweenViewCoords(0, realCol, 'col', 'width', true) < viewPort.width;
+    };
+
 
 //default unclamped cause that seems to be the more likely use case converting this direction
     viewPort.toRealRow = function (virtualRow) {
@@ -184,8 +194,6 @@ module.exports = function (_grid) {
     };
 
     viewPort.toPx = function (realCellRange) {
-        var virtualRow = viewPort.toVirtualRow(realCellRange.top);
-        var virtualCol = viewPort.toVirtualCol(realCellRange.left);
         return {
             top: viewPort.getRowTop(realCellRange.top),
             left: viewPort.getColLeft(realCellRange.left),

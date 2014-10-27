@@ -324,7 +324,7 @@ describe('view port', function () {
             expect(range).widthToBe(5 * 100);
         });
 
-        
+
         it('should work across the fixed range when scrolled', function () {
             beforeEachFn(false, false, 2, 2);
             grid.cellScrollModel.scrollTo(2, 2);
@@ -379,6 +379,15 @@ describe('view port', function () {
         helper.container.style.marginLeft = '5px';
         expect(viewPort.toGridX(100)).toBe(95);
         expect(viewPort.toGridY(40)).toBe(30);
+    });
+
+    it('should tell me if a row or col is in view', function () {
+        grid.cellScrollModel.scrollTo(1, 1);
+        expect(viewPort.rowIsInView(0)).toBe(false);
+        expect(viewPort.colIsInView(0)).toBe(false);
+
+        expect(viewPort.rowIsInView(800 / 30 + 1)).toBe(false);
+        expect(viewPort.colIsInView(500 / 30 + 1)).toBe(false);
     });
 
 });
