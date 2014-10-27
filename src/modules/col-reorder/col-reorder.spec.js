@@ -2,15 +2,15 @@ var mockEvent = require('@grid/custom-event');
 
 
 describe('col-reorder', function () {
-    var $ = require('jquery');
 
     var helper = require('@grid/grid-spec-helper')();
     var grid;
     var colReorder;
-    beforeEach(function () {
-        grid = helper.buildSimpleGrid();
+    var beforeEachFn = function (fixedR, fixedC) {
+        grid = helper.buildSimpleGrid(undefined, undefined, undefined, undefined, fixedR, fixedC);
         colReorder = grid.colReorder;
-    });
+    };
+    beforeEach(beforeEachFn);
 
     describe('should satisfy', function () {
         var ctx = {};
@@ -41,15 +41,28 @@ describe('col-reorder', function () {
             expect(spy).toHaveBeenBoundWith('grid-drag-start', dragElem);
         });
 
+        var dragStart = 105;
+
+        function startDrag() {
+            var e = mockEvent('grid-drag-start', true);
+            e.gridX = dragStart;
+            e.realCol = grid.viewPort.getColByLeft(dragStart);
+            ctx.decorator._onDragStart(e);
+
+        }
+
+        function fireDrag(x) {
+            var drag = mockEvent('grid-drag');
+            var gridX = x;
+            drag.gridX = gridX;
+            drag.realCol = grid.viewPort.getColByLeft(gridX);
+            grid.eventLoop.fire(drag);
+            return gridX;
+        }
+
         describe('drag', function () {
             var dragCtx = {};
-            var dragStart = 105;
 
-            function startDrag() {
-                var e = mockEvent('grid-drag-start', true);
-                e.gridX = dragStart;
-                ctx.decorator._onDragStart(e);
-            }
 
             beforeEach(function () {
                 dragCtx.helper = helper;
@@ -71,15 +84,6 @@ describe('col-reorder', function () {
             it('should render with a styleable class', function () {
                 expect(dragCtx.decorator.render()).toHaveClass('grid-drag-rect');
             });
-
-            function fireDrag(x) {
-                var drag = mockEvent('grid-drag');
-                var gridX = x;
-                drag.gridX = gridX;
-                drag.realCol = grid.viewPort.getColByLeft(gridX);
-                grid.eventLoop.fire(drag);
-                return gridX;
-            }
 
             it('should set width on drag start', function () {
                 expect(dragCtx.decorator).widthToBe(100);
@@ -162,6 +166,26 @@ describe('col-reorder', function () {
 
             describe('should satisfy', function () {
                 require('@grid/decorators/decorator-test-body')(dragCtx);
+            });
+        });
+
+        describe('fixed cols', function () {
+            beforeEach(function () {
+                beforeEachFn(1, 3);
+                ctx.decorator = colReorder._decorators[col];
+            });
+
+            it('should not drag fixed columns', function () {
+                startDrag();
+                expect(grid.decorators.getAlive()).not.toContain(ctx.decorator._dragRect);
+            });
+
+            it('should not allow me to drag into the fixed range', function () {
+                dragStart = 305;
+                startDrag();
+                fireDrag(105);
+                expect(ctx.decorator._dragRect._targetCol).leftToBe(3);
+                expect(ctx.decorator._dragRect).leftToBe(grid.viewPort.getColLeft(3));
             });
         });
 

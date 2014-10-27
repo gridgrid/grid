@@ -1,4 +1,5 @@
 var elementClass = require('element-class');
+var util = require('@grid/util');
 
 
 module.exports = function (_grid) {
@@ -15,6 +16,10 @@ module.exports = function (_grid) {
         };
 
         headerDecorator._onDragStart = function (e) {
+            if (e.realCol < grid.colModel.numFixed()) {
+                return;
+            }
+
 
             grid.decorators.add(headerDecorator._dragRect);
 
@@ -29,8 +34,8 @@ module.exports = function (_grid) {
             grid.decorators.add(headerDecorator._dragRect._targetCol);
 
             headerDecorator._unbindDrag = grid.eventLoop.bind('grid-drag', function (e) {
-                headerDecorator._dragRect.left = e.gridX - colOffset;
-                headerDecorator._dragRect._targetCol.left = e.realCol;
+                headerDecorator._dragRect.left = util.clamp(e.gridX - colOffset, grid.viewPort.getColLeft(grid.colModel.numFixed()), Infinity);
+                headerDecorator._dragRect._targetCol.left = util.clamp(e.realCol, grid.colModel.numFixed(), Infinity);
                 if (e.realCol > col) {
                     elementClass(headerDecorator._dragRect._targetCol._renderedElem).add('right');
                 } else {
@@ -42,7 +47,7 @@ module.exports = function (_grid) {
 
             headerDecorator._unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function (e) {
                 var targetCol = headerDecorator._dragRect._targetCol.left;
-                
+
                 grid.colModel.move(grid.viewPort.toVirtualCol(col), grid.viewPort.toVirtualCol(targetCol));
                 grid.decorators.remove([headerDecorator._dragRect._targetCol, headerDecorator._dragRect]);
                 headerDecorator._unbindDrag();
