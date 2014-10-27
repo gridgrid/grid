@@ -40,6 +40,7 @@ module.exports = function (_grid) {
         decoratorContainer.setAttribute('dts', 'grid-decorators');
         util.position(decoratorContainer, 0, 0, 0, 0);
         decoratorContainer.style.zIndex = 0;
+        decoratorContainer.style.pointerEvents = 'none';
 
         root = document.createElement('div');
         root.setAttribute('class', GRID_VIEW_ROOT_CLASS);

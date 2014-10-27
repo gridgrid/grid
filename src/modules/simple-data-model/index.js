@@ -10,8 +10,8 @@ module.exports = function (_grid) {
             cellData[r][c] = datum;
         },
         get: function (r, c) {
-            var dataRow = cellData[r];
-            return dataRow && dataRow[c];
+            var dataRow = cellData[grid.rowModel.get(r).dataRow];
+            return dataRow && dataRow[grid.colModel.get(c).dataCol];
         },
         getFormatted: function (r, c) {
             var datum = api.get(r, c);

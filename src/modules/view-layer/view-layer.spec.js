@@ -329,10 +329,11 @@ describe('view-layer', function () {
             expect(decoratorContainer.prevAll('[dts=grid-cells]').length).toBe(1);
         });
 
-        it('should be positioned pinned to the edges with zindex', function () {
+        it('should be positioned pinned to the edges with zindex and pointer events none', function () {
             var decoratorContainer = $(container).find('[dts="grid-decorators"]');
             expect(decoratorContainer).toBePositioned(0, 0, 0, 0);
             expect(decoratorContainer.css('zIndex')).toBe('0');
+            expect(decoratorContainer.css('pointerEvents')).toBe('none');
         });
 
         it('should render a decorator into a container with pointer events none', function () {
@@ -481,9 +482,9 @@ describe('view-layer', function () {
             grid.decorators.add(decorator);
             expectBoundingBoxSize(5, 6, grid.viewPort.height, grid.viewPort.width);
         });
-        
-        it('should reposition if scrolled or col dirty', function(){
-            
+
+        it('should reposition if scrolled or col dirty', function () {
+
         });
     });
 

@@ -43,7 +43,7 @@ describe('col-reorder', function () {
 
         describe('drag', function () {
             var dragCtx = {};
-            var dragStart = 90;
+            var dragStart = 105;
 
             function startDrag() {
                 var e = mockEvent('grid-drag-start', true);
@@ -98,21 +98,58 @@ describe('col-reorder', function () {
                 var targetCtx = {};
                 beforeEach(function () {
                     targetCtx.helper = helper;
-                    fireDrag(105);
                     targetCtx.decorator = dragCtx.decorator._targetCol;
+                    targetCtx.decorator.render(); //mock the render so we don't have to wait for the entire view in test
+                    fireDrag(205);
                 });
 
                 describe('should satisfy', function () {
                     require('@grid/decorators/decorator-test-body')(targetCtx);
                 });
 
+                it('should add a decorator', function () {
+                    expect(grid.decorators.getAlive()).toContain(targetCtx.decorator);
+                });
+
                 it('should set the target column to the one youre hovering', function () {
-                    expect(targetCtx.decorator).leftToBe(1);
+                    expect(targetCtx.decorator).leftToBe(2);
                     expect(targetCtx.decorator).widthToBe(1);
                     expect(targetCtx.decorator).topToBe(0);
                     expect(targetCtx.decorator).heightToBe(Infinity);
                     expect(targetCtx.decorator).unitsToBe('cell');
                     expect(targetCtx.decorator).spaceToBe('real');
+                });
+
+                it('should have a style class', function () {
+                    expect(targetCtx.decorator._renderedElem).toHaveClass('grid-reorder-target');
+                });
+
+                it('should have a right class if to the right of the start col', function () {
+                    expect(targetCtx.decorator._renderedElem).toHaveClass('right');
+                });
+
+                it('should have remove the right class if on the elem', function () {
+                    fireDrag(105);
+                    expect(targetCtx.decorator._renderedElem).not.toHaveClass('right');
+                });
+
+                it('should have remove the right class if left of the elem', function () {
+                    fireDrag(95);
+                    expect(targetCtx.decorator._renderedElem).not.toHaveClass('right');
+                });
+
+                it('should move the column to the target column on drag end', function () {
+                    var colScroll = 1;
+                    grid.cellScrollModel.scrollTo(0, colScroll);
+                    var originalCol = grid.colModel.get(col + colScroll);
+                    grid.eventLoop.fire(mockEvent('grid-drag-end'));
+                    expect(grid.colModel.get(2 + colScroll)).toBe(originalCol);
+                });
+
+
+                it('should remove the decorator on drag end', function () {
+                    grid.eventLoop.fire(mockEvent('grid-drag-end'));
+                    expect(grid.decorators.popAllDead()).toContain(targetCtx.decorator);
                 });
             });
 

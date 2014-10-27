@@ -1,7 +1,10 @@
 describe('simple-data-model', function () {
+    var helper = require('@grid/grid-spec-helper')();
+    var grid;
     var dataModel;
     beforeEach(function () {
-        dataModel = require('@grid/simple-data-model')();
+        grid = helper.buildSimpleGrid();
+        dataModel = grid.dataModel;
     });
 
     it('should be able to set and get back data', function () {

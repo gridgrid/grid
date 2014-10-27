@@ -11,6 +11,7 @@ module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows,
     if (numRows) {
         for (var r = 0; r < numRows; r++) {
             var row = grid.rowModel.create();
+            row.dataRow = r;
             if (r < fixedRows) { //returns false for undefined luckily
                 row.fixed = true;
             }
@@ -22,6 +23,7 @@ module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows,
                 for (var c = 0; c < numCols || 0; c++) {
                     if (r === 0) {
                         var col = grid.colModel.create();
+                        col.dataCol = c;
                         if (c < fixedCols) {
                             col.fixed = true;
                         }

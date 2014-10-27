@@ -1,3 +1,6 @@
+var elementClass = require('element-class');
+
+
 module.exports = function (_grid) {
     var grid = _grid;
 
@@ -19,16 +22,29 @@ module.exports = function (_grid) {
             var colOffset = e.gridX - headerDecorator.getDecoratorLeft();
 
             headerDecorator._dragRect._targetCol = grid.decorators.create(0, undefined, Infinity, 1, 'cell', 'real');
+            headerDecorator._dragRect._targetCol.postRender = function (div) {
+                div.setAttribute('class', 'grid-reorder-target');
+                headerDecorator._dragRect._targetCol._renderedElem = div;
+            };
+            grid.decorators.add(headerDecorator._dragRect._targetCol);
 
             headerDecorator._unbindDrag = grid.eventLoop.bind('grid-drag', function (e) {
                 headerDecorator._dragRect.left = e.gridX - colOffset;
                 headerDecorator._dragRect._targetCol.left = e.realCol;
+                if (e.realCol > col) {
+                    elementClass(headerDecorator._dragRect._targetCol._renderedElem).add('right');
+                } else {
+                    elementClass(headerDecorator._dragRect._targetCol._renderedElem).remove('right');
+                }
 
 
             });
 
             headerDecorator._unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function (e) {
-                grid.decorators.remove(headerDecorator._dragRect);
+                var targetCol = headerDecorator._dragRect._targetCol.left;
+                
+                grid.colModel.move(grid.viewPort.toVirtualCol(col), grid.viewPort.toVirtualCol(targetCol));
+                grid.decorators.remove([headerDecorator._dragRect._targetCol, headerDecorator._dragRect]);
                 headerDecorator._unbindDrag();
                 headerDecorator._unbindDragEnd();
             });

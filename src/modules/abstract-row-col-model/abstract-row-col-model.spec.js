@@ -73,6 +73,20 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
         expect(model[lengthName](undefined)).toBeNaN();
     });
 
+    it('should allow me to move a descriptor to a new index', function () {
+        var orig = model.get(0);
+        model.move(0, 3);
+        expect(model.get(3)).toBe(orig);
+    });
+
+    it('should fire change on move', function () {
+        var spy = jasmine.createSpy();
+        grid.eventLoop.bind('grid-' + name + '-change', spy);
+        model.move(0, 3);
+        expect(spy).toHaveBeenCalled();
+        expect(model.isDirty()).toBe(true);
+    });
+
 
     describe('descriptor', function () {
         describe('should satisfy', function () {

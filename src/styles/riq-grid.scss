@@ -123,3 +123,11 @@
 .grid-drag-rect {
   background: rgba(0, 0, 0, 0.4);
 }
+
+.grid-reorder-target {
+  border-left: 1px solid black;
+  &.right {
+    border-right: 1px solid black;
+    border-left: none;
+  }
+}

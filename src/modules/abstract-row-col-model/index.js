@@ -8,6 +8,11 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
     var numFixed = 0;
     var dirtyClean = require('@grid/dirty-clean')(grid);
 
+    function setDescriptorsDirty() {
+        grid.eventLoop.fire('grid-' + name + '-change');
+        dirtyClean.setDirty();
+    }
+
     var api = {
         isDirty: dirtyClean.isDirty,
         add: function (descriptor) {
@@ -20,8 +25,7 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
                 }
             }
             descriptors.push(descriptor);
-            grid.eventLoop.fire('grid-' + name + '-change');
-            dirtyClean.setDirty();
+            setDescriptorsDirty();
         },
         get: function (index) {
             return descriptors[index];
@@ -29,7 +33,10 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
         length: function () {
             return descriptors.length;
         },
-
+        move: function (start, target) {
+            descriptors.splice(target, 0, descriptors.splice(start, 1)[0]);
+            setDescriptorsDirty();
+        },
         numFixed: function () {
             return numFixed;
         },
