@@ -151,22 +151,28 @@ module.exports = function (_grid) {
         return util.clamp(x, 0, viewPort.width);
     };
 
-    function getTopOrLeft(viewPortCoord, rowOrCol, heightOrWidth) {
+    function getLengthBetweenViewCoords(startCoord, endCoord, rowOrCol, heightOrWidth, inclusive) {
         var rowOrColCap = capitalize(rowOrCol);
         var toVirtual = viewPort['toVirtual' + rowOrColCap];
         var lengthFn = grid.virtualPixelCellModel[heightOrWidth];
         var clampFn = viewPort['clamp' + rowOrColCap];
         var pos = 0;
-        var crossesFixed;
         var numFixed = getFixed(rowOrCol);
-        if (numFixed) {
-            crossesFixed = viewPortCoord >= numFixed;
-            pos += lengthFn(0, (crossesFixed ? numFixed : viewPortCoord) - 1);
+        var isInNonfixedArea = endCoord >= numFixed;
+        var isInFixedArea = startCoord < numFixed;
+        var exclusiveOffset = (inclusive ? 0 : 1);
+        if (isInFixedArea) {
+            var fixedEndCoord = (isInNonfixedArea ? numFixed - 1 : endCoord - exclusiveOffset);
+            pos += lengthFn(startCoord, fixedEndCoord);
         }
-        if (crossesFixed || !numFixed) {
-            pos += lengthFn(toVirtual(numFixed), toVirtual(clampFn(viewPortCoord)) - 1);
+        if (isInNonfixedArea) {
+            pos += lengthFn((isInFixedArea ? toVirtual(numFixed) : toVirtual(startCoord)), toVirtual(clampFn(endCoord)) - exclusiveOffset);
         }
         return pos;
+    }
+
+    function getTopOrLeft(endCoord, rowOrCol, heightOrWidth) {
+        return getLengthBetweenViewCoords(0, endCoord, rowOrCol, heightOrWidth);
     }
 
     viewPort.getRowTop = function (viewPortCoord) {
@@ -183,8 +189,8 @@ module.exports = function (_grid) {
         return {
             top: viewPort.getRowTop(realCellRange.top),
             left: viewPort.getColLeft(realCellRange.left),
-            height: grid.virtualPixelCellModel.height(virtualRow, virtualRow + realCellRange.height - 1),
-            width: grid.virtualPixelCellModel.width(virtualCol, virtualCol + realCellRange.width - 1)
+            height: getLengthBetweenViewCoords(realCellRange.top, realCellRange.top + realCellRange.height - 1, 'row', 'height', true),
+            width: getLengthBetweenViewCoords(realCellRange.left, realCellRange.left + realCellRange.width - 1, 'col', 'width', true)
         };
     };
 
