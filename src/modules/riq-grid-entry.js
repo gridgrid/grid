@@ -1,4 +1,8 @@
 'use strict';
 
-require('@grid/riq-grid');
+angular.module('riq-grid', []).
+    factory('RiqGridSrvc', function () {
+        return require('@grid/core');
+    })
+;
 
