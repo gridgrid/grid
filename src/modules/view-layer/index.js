@@ -107,7 +107,7 @@ module.exports = function (_grid) {
     }
 
     viewLayer._drawCells = function () {
-        measureBorderWidth()
+        measureBorderWidth();
         var bWidth = getBorderWidth();
         grid.viewPort.iterateCells(function drawCell(r, c) {
             var cell = cells[r][c];
@@ -245,7 +245,7 @@ module.exports = function (_grid) {
         });
 
         removeDecorators(grid.decorators.popAllDead());
-    }
+    };
 
     function removeDecorators(decorators) {
         decorators.forEach(function (decorator) {
@@ -293,7 +293,7 @@ module.exports = function (_grid) {
                     }
             }
         });
-    }
+    };
 
     /* END CELL CLASSES LOGIC*/
 
