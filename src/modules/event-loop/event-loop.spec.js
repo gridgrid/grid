@@ -219,4 +219,30 @@ describe('event-loop', function () {
 
     });
 
+    describe('stop bubbling', function () {
+        it('should cause an event not to dispatch to other bound handlers', function () {
+            var spy = jasmine.createSpy('post stop bubbling binding');
+            grid.eventLoop.bind('test-event', function (e) {
+                grid.eventLoop.stopBubbling(e);
+            });
+            grid.eventLoop.bind('test-event', spy);
+            grid.eventLoop.fire('test-event');
+            expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('should not prevent an event from getting to interceptors', function () {
+            var spy = jasmine.createSpy('post stop bubbling interceptor');
+            grid.eventLoop.addInterceptor(spy);
+            grid.eventLoop.fire(grid.eventLoop.stopBubbling(mockEvent('test-event')));
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should not prevent an event from getting to exit listeners', function () {
+            var spy = jasmine.createSpy('post stop bubbling exit listener');
+            grid.eventLoop.addExitListener(spy);
+            grid.eventLoop.fire(grid.eventLoop.stopBubbling(mockEvent('test-event')));
+            expect(spy).toHaveBeenCalled();
+        });
+    });
+
 });

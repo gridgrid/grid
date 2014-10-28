@@ -30,29 +30,13 @@ module.exports = function (_grid) {
                 break;
 
         }
+
+        if (e.type === 'mousedown') {
+            setupDragEventForMouseDown(e);
+        }
     });
 
-    function createDragEventFromMouseEvent(type, e) {
-        var event = customEvent(type, true, true);
-        PROPS_TO_COPY_FROM_MOUSE_EVENTS.forEach(function (prop) {
-            event[prop] = e[prop];
-        });
-        event.originalEvent = e;
-        return event;
-    }
-
-    function createAndFireDragEvent(type, e) {
-        var drag = createDragEventFromMouseEvent(type, e);
-        if (e.target) {
-            e.target.dispatchEvent(drag);
-        } else {
-            grid.eventLoop.fire(drag);
-        }
-        return drag;
-    }
-
-
-    grid.eventLoop.bind('mousedown', function (downEvent) {
+    function setupDragEventForMouseDown(downEvent) {
         wasDragged = false;
         var lastDragRow = downEvent.row;
         var lastDragCol = downEvent.col;
@@ -93,11 +77,26 @@ module.exports = function (_grid) {
             //row, col, x, and y should inherit
             grid.eventLoop.fire(dragEnd);
         }
+    }
 
-        //keep it from doing weird crap
-        //e.preventDefault();
-    });
+    function createDragEventFromMouseEvent(type, e) {
+        var event = customEvent(type, true, true);
+        PROPS_TO_COPY_FROM_MOUSE_EVENTS.forEach(function (prop) {
+            event[prop] = e[prop];
+        });
+        event.originalEvent = e;
+        return event;
+    }
 
+    function createAndFireDragEvent(type, e) {
+        var drag = createDragEventFromMouseEvent(type, e);
+        if (e.target) {
+            e.target.dispatchEvent(drag);
+        } else {
+            grid.eventLoop.fire(drag);
+        }
+        return drag;
+    }
 
     return model;
 };

@@ -110,8 +110,12 @@ var eventLoop = function (_grid) {
 
     var mainLoop = loopWith(function (e) {
         //have to copy the array because handlers can unbind themselves which modifies the array
-        getHandlers(e.type).slice(0).forEach(function (handler) {
+        //we use some so that we can break out of the loop if need be
+        getHandlers(e.type).slice(0).some(function (handler) {
             handler(e);
+            if (e.gridStopBubbling) {
+                return true;
+            }
         });
     });
 
@@ -120,8 +124,9 @@ var eventLoop = function (_grid) {
         var isOuterLoopRunning = eloop.isRunning;
         eloop.isRunning = true;
         interceptors.notify(e);
-
-        bodyFn(e);
+        if (!e.gridStopBubbling) {
+            bodyFn(e);
+        }
 
         if (!isOuterLoopRunning) {
             eloop.isRunning = false;
@@ -132,6 +137,11 @@ var eventLoop = function (_grid) {
     eloop.bind('grid-destroy', function () {
         unbindAll();
     });
+
+    eloop.stopBubbling = function (e) {
+        e.gridStopBubbling = true;
+        return e;
+    };
 
     return eloop;
 };

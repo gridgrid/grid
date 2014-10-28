@@ -88,7 +88,7 @@ describe('pixel-scroll-model', function () {
 
     it('should not call a scroll listener synchronously on mousewheel', function () {
         var spy = jasmine.createSpy();
-        var unbind = grid.eventLoop.bind('grid-pixel-scroll', spy);
+        grid.eventLoop.bind('grid-pixel-scroll', spy);
         sendMouseWheelToModel(40, 30);
         expect(spy).not.toHaveBeenCalled();
     });
@@ -124,6 +124,12 @@ describe('pixel-scroll-model', function () {
         }
 
         beforeEach(scrollBeforeEachFn);
+
+        it('should stopbubbling mousedowns', function () {
+            var event = mockEvent('mousedown', true, true);
+            model.vertScrollBar.render().dispatchEvent(event);
+            expect(event.gridStopBubbling).toBe(true);
+        });
 
         it('should register a vertical and horizontal decorator', function () {
             expect(model.vertScrollBar.units).toBe('px');

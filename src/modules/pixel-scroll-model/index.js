@@ -95,6 +95,9 @@ module.exports = function (_grid) {
             };
 
             grid.eventLoop.bind('grid-drag-start', scrollBarElem, decorator._onDragStart);
+            grid.eventLoop.bind('mousedown', scrollBarElem, function (e) {
+                grid.eventLoop.stopBubbling(e);
+            });
 
             return scrollBarElem;
         };
