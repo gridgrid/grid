@@ -20,6 +20,7 @@ module.exports = function (_grid) {
 
     var cells; //matrix of rendered cell elements;
     var rows; //array of all rendered rows
+    var builtCols;
 
     //add the cell classes through the standard way
 
@@ -81,9 +82,14 @@ module.exports = function (_grid) {
         if (!container) {
             return;
         }
-        var rebuilt = grid.viewPort.isDirty() || grid.colBuilders.isDirty();
+        var rebuilt = grid.viewPort.isDirty();
         if (rebuilt) {
             viewLayer._buildCells(cellContainer);
+        }
+
+        var builtColsDirty = grid.colBuilders.isDirty();
+        if (rebuilt || builtColsDirty) {
+            viewLayer._buildCols();
         }
 
         var cellsPositionOrSizeChanged = grid.colModel.isDirty() || grid.rowModel.isDirty() || grid.cellScrollModel.isDirty();
@@ -92,7 +98,7 @@ module.exports = function (_grid) {
             viewLayer._drawCellClasses();
         }
 
-        if (rebuilt || cellsPositionOrSizeChanged) {
+        if (rebuilt || cellsPositionOrSizeChanged || builtColsDirty) {
             viewLayer._drawCells();
         }
 
@@ -125,7 +131,21 @@ module.exports = function (_grid) {
             var virtualRow = grid.viewPort.toVirtualRow(r);
             var virtualCol = grid.viewPort.toVirtualCol(c);
             var formattedData = grid.dataModel.getFormatted(virtualRow, virtualCol);
-            cell.appendChild(document.createTextNode(formattedData));
+            var builder = grid.colBuilders.get(virtualCol);
+            var cellChild;
+            if (builder) {
+                var builtElem = builtCols[virtualCol][r];
+                cellChild = builder.update(builtElem, {
+                    virtualCol: virtualCol,
+                    virtualRow: virtualRow,
+                    data: formattedData
+                });
+            }
+            //if we didn't get a child from the builder use a regular text node
+            if (!cellChild) {
+                cellChild = document.createTextNode(formattedData);
+            }
+            cell.appendChild(cellChild);
         }, function drawRow(r) {
             var height = grid.viewPort.getRowHeight(r); //maybe faster to do this only on row iterations but meh
             var row = rows[r];
@@ -141,7 +161,8 @@ module.exports = function (_grid) {
         }
     };
 
-    function buildCells(cellContainer) {
+
+    viewLayer._buildCells = function buildCells(cellContainer) {
         while (cellContainer.firstChild) {
             cellContainer.removeChild(cellContainer.firstChild);
         }
@@ -165,9 +186,7 @@ module.exports = function (_grid) {
             rows[r] = row;
             cellContainer.appendChild(row);
         });
-    }
-
-    viewLayer._buildCells = buildCells;
+    };
 
     function buildDivCell() {
         var cell = document.createElement('div');
@@ -181,6 +200,21 @@ module.exports = function (_grid) {
     }
 
     /* END CELL LOGIC */
+
+    /* COL BUILDER LOGIC */
+    viewLayer._buildCols = function () {
+        builtCols = {};
+        for (var c = 0; c < grid.colModel.length(); c++) {
+            var builder = grid.colBuilders.get(c);
+            if (builder) {
+                builtCols[c] = [];
+                for (var realRow = 0; realRow < grid.viewPort.rows; realRow++) {
+                    builtCols[c][realRow] = builder.render();
+                }
+            }
+        }
+    };
+    /* END COL BUILDER LOGIC */
 
     /* DECORATOR LOGIC */
     function setPosition(boundingBox, top, left, height, width) {

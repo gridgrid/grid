@@ -3,9 +3,10 @@
 var grid = require('@grid/riq-grid');
 
 require('angular');
+var debounce = require('@grid/debounce');
 
 angular.module('riqGridApp', [])
-    .directive('riqGridApp', function () {
+    .directive('riqGridApp', function ($compile) {
         return {
             restrict: 'E',
             replace: true,
@@ -18,6 +19,22 @@ angular.module('riqGridApp', [])
                 var grid = require('@grid/simple-grid')(numRows, numCols, [30], [40, 100, 400, 90], 1, 3);
                 grid.build(elem);
                 grid.navigationModel.minRow = 1;
+
+                var debouncedApply = debounce(function () {
+                    $scope.$digest();
+                }, 1);
+                var builder = grid.colBuilders.create(function () {
+                    return $compile('<a>{{data}}</a>')($scope.$new())[0];
+                }, function (elem, ctx) {
+                    var scope = angular.element(elem).scope();
+                    scope.data = ctx.data;
+                    scope.$digest();
+                    return elem;
+                });
+                grid.colBuilders.set(0, builder);
+                grid.colBuilders.set(1, builder);
+                grid.colBuilders.set(2, builder);
+                debouncedApply();
 
                 //this really shouldn't be necessary but just to make sure
                 grid.requestDraw();

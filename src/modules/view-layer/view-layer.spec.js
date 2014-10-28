@@ -102,13 +102,13 @@ describe('view-layer', function () {
     }
 
     it('should redraw everything if viewPort is dirty', function () {
-        expectRedraw(['_buildCells', '_drawCells', '_drawCellClasses', '_drawDecorators'], function () {
+        expectRedraw(['_buildCells', '_buildCols', '_drawCells', '_drawCellClasses', '_drawDecorators'], function () {
             grid.viewPort.width = 1;
         });
     });
 
-    it('should redraw everything if col builders are dirty', function () {
-        expectRedraw(['_buildCells', '_drawCells', '_drawCellClasses', '_drawDecorators'], function () {
+    it('should rebuild colbuilders and draw cells if col builders are dirty', function () {
+        expectRedraw(['_buildCols', '_drawCells'], function () {
             grid.colBuilders.set(0, grid.colBuilders.create());
         });
     });
@@ -192,8 +192,8 @@ describe('view-layer', function () {
 
     });
 
-    function findColCellByIndex(index) {
-        return $(findGridCells(container)[index]);
+    function findColCellsByIndex(index) {
+        return $(container).find('[dts="grid-cell"]:nth-child(' + (index + 1) + ')');
     }
 
     function findRowCellByIndex(index) {
@@ -225,9 +225,9 @@ describe('view-layer', function () {
         view.draw();
         helper.onDraw(function () {
             //we want the heights and widths to be rendered at 1 higher than their virtual value in order to collapse the borders 
-            expect(findColCellByIndex(0).width()).toEqual(100);
-            expect(findColCellByIndex(1).width()).toEqual(101);
-            expect(findColCellByIndex(2).width()).toEqual(102);
+            expect(findColCellsByIndex(0).width()).toEqual(100);
+            expect(findColCellsByIndex(1).width()).toEqual(101);
+            expect(findColCellsByIndex(2).width()).toEqual(102);
             expect(findRowCellByIndex(0).height()).toEqual(21);
             expect(findRowCellByIndex(1).height()).toEqual(31);
             expect(findRowCellByIndex(2).height()).toEqual(41);
@@ -609,12 +609,110 @@ describe('view-layer', function () {
     });
 
     describe('col builders', function () {
-        it('should rebuild the cells for new col builders', function () {
-            var spy = spyOn(view, '_buildCells').andCallThrough();
-            helper.resetAllDirties();
-            grid.colBuilders.set(0, grid.colBuilders.create());
+        it('should call render for each view row on build', function () {
+            var builder = grid.colBuilders.create();
+            var renderSpy = spyOn(builder, 'render');
+            grid.colBuilders.set(0, builder);
             helper.onDraw(function () {
-                expect(spy).toHaveBeenCalled();
+                expect(renderSpy).toHaveBeenCalled();
+                expect(renderSpy.callCount).toBe(grid.viewPort.rows);
+            });
+        });
+
+        it('should put the returned element into the cells for that col', function () {
+            var builder = grid.colBuilders.create(function () {
+                return document.createElement('a');
+            }, function (elem) {
+                return elem;
+            });
+            grid.colBuilders.set(0, builder);
+            helper.onDraw(function () {
+                findColCellsByIndex(0).each(function () {
+                    var firstChild = this.firstChild;
+                    expect(firstChild.tagName).toBe('A');
+                });
+            });
+        });
+
+        it('should use a text node if the update doesnt return an element', function () {
+            var builder = grid.colBuilders.create(function () {
+                return document.createElement('a');
+            }, function (elem, ctx) {
+                if (ctx.virtualRow === 1) {
+                    return undefined;
+                }
+                return elem;
+            });
+            grid.colBuilders.set(0, builder);
+            helper.onDraw(function () {
+                findColCellsByIndex(0).each(function (index) {
+                    var firstChild = this.firstChild;
+                    if (index === 1) {
+                        expect(firstChild.nodeType).toBe(3);
+                    } else {
+                        expect(firstChild.tagName).toBe('A');
+                    }
+                });
+            });
+        });
+
+        it('should call update for each view row on draw', function () {
+            var builder = grid.colBuilders.create();
+            var updateSpy = spyOn(builder, 'update');
+            grid.colBuilders.set(1, builder);
+            helper.onDraw(function () {
+                expect(updateSpy).toHaveBeenCalled();
+                expect(updateSpy.callCount).toBe(grid.viewPort.rows);
+                updateSpy.reset();
+                grid.cellScrollModel.scrollTo(1, 1);
+            });
+            helper.onDraw(function () {
+                expect(updateSpy).toHaveBeenCalled();
+                expect(updateSpy.callCount).toBe(grid.viewPort.rows);
+            });
+        });
+
+        it('should not call update for cols out of the view', function () {
+            var builder = grid.colBuilders.create();
+            var updateSpy = spyOn(builder, 'update');
+            grid.colBuilders.set(0, builder);
+            grid.cellScrollModel.scrollTo(1, 1);
+            helper.onDraw(function () {
+                expect(updateSpy).not.toHaveBeenCalled();
+            });
+        });
+
+        it('should pass back the rendered element to the update function', function () {
+            var aTags = [];
+            var updateSpy = jasmine.createSpy('update');
+            var builder = grid.colBuilders.create(function () {
+                var aTag = document.createElement('a');
+                aTags.push(aTag);
+                return aTag;
+            }, updateSpy);
+            grid.colBuilders.set(0, builder);
+            helper.onDraw(function () {
+                expect(aTags.length).toBe(grid.viewPort.rows);
+                aTags.forEach(function (aTag, i) {
+                    expect(updateSpy.argsForCall[i][0]).toBe(aTag);
+                });
+            });
+        });
+
+        it('should call update with a context obj', function () {
+            var updateSpy = jasmine.createSpy('update');
+            var builder = grid.colBuilders.create(undefined, updateSpy);
+            grid.colBuilders.set(1, builder);
+            grid.cellScrollModel.scrollTo(1, 1);
+            helper.onDraw(function () {
+                for (var r = 0; r < grid.viewPort.rows; r++) {
+                    expect(updateSpy.argsForCall[r][1]).toEqual({
+                        virtualRow: r + 1,
+                        virtualCol: 1,
+                        data: (r + 1) + '-1'
+                    });
+                }
+
             });
         });
     });
