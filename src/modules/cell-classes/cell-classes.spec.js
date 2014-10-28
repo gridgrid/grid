@@ -1,6 +1,6 @@
-var helper = require('@grid/grid-spec-helper')();
 
 describe('cell-classes', function () {
+    var helper = require('@grid/grid-spec-helper')();
     var classes;
     beforeEach(function () {
         var grid = helper.buildSimpleGrid();

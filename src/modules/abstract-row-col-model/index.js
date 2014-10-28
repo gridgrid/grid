@@ -1,4 +1,5 @@
 var addDirtyProps = require('@grid/add-dirty-props');
+var util = require('@grid/util');
 
 module.exports = function (_grid, name, lengthName, defaultLength) {
     var grid = _grid;
@@ -15,16 +16,22 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
 
     var api = {
         isDirty: dirtyClean.isDirty,
-        add: function (descriptor) {
-            //if the column is fixed and the last one added is fixed (we only allow fixed at the beginning for now)
-            if (descriptor.fixed) {
-                if (!descriptors.length || descriptors[descriptors.length - 1].fixed) {
-                    numFixed++;
-                } else {
-                    throw 'Cannot add a fixed column after an unfixed one';
-                }
+        add: function (toAdd) {
+            if (!util.isArray(toAdd)) {
+                toAdd = [toAdd];
             }
-            descriptors.push(descriptor);
+            toAdd.forEach(function (descriptor) {
+                //if the column is fixed and the last one added is fixed (we only allow fixed at the beginning for now)
+                if (descriptor.fixed) {
+                    if (!descriptors.length || descriptors[descriptors.length - 1].fixed) {
+                        numFixed++;
+                    } else {
+                        throw 'Cannot add a fixed column after an unfixed one';
+                    }
+                }
+                descriptors.push(descriptor);
+            });
+
             setDescriptorsDirty();
         },
         get: function (index) {

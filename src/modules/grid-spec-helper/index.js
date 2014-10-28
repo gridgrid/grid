@@ -12,7 +12,6 @@ module.exports = function () {
             });
             helper.grid.viewPort.sizeToContainer(helper.container);
             helper.grid.eventLoop.setContainer(helper.container);
-
             return helper.grid;
         },
         viewBuild: function () {

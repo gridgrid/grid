@@ -73,6 +73,10 @@ module.exports = function (_grid) {
 
     //only draw once per js turn, may need to create a synchronous version
     viewLayer.draw = debounce(function () {
+        viewLayer._draw();
+    }, 1);
+
+    viewLayer._draw = function () {
         //return if we haven't built yet
         if (!container) {
             return;
@@ -97,7 +101,7 @@ module.exports = function (_grid) {
         }
 
         grid.eventLoop.fire('grid-draw');
-    }, 1);
+    };
 
     /* CELL LOGIC */
     function getBorderWidth() {

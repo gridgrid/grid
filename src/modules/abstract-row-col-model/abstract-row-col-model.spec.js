@@ -2,14 +2,24 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
     var helper = require('@grid/grid-spec-helper')();
     var model;
     var grid;
+
     beforeEach(function () {
         grid = helper.buildSimpleGrid();
         model = modelCreatorFn(grid, name, lengthName, defaultLength);
     });
 
     it('should be able to add and get back a ' + name + ' object', function () {
-        model.add({});
-        expect(model.get(0)).toBeDefined();
+        var obj = {};
+        model.add(obj);
+        expect(model.get(0)).toBe(obj);
+    });
+
+    it('should let me add multiple', function () {
+        var ob1 = {};
+        var ob2 = {};
+        model.add([ob1, ob2]);
+        expect(model.get(0)).toBe(ob1);
+        expect(model.get(1)).toBe(ob2);
     });
 
     it('should be dirty on add', function () {
@@ -109,6 +119,7 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
             expect(spy).toHaveBeenCalled();
         });
     });
+
 }
 
 

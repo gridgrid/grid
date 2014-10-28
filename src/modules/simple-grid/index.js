@@ -9,6 +9,8 @@ module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows,
     }
 
     if (numRows) {
+        var rows = [];
+        var cols = [];
         for (var r = 0; r < numRows; r++) {
             var row = grid.rowModel.create();
             row.dataRow = r;
@@ -18,7 +20,7 @@ module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows,
             if (util.isArray(varyHeights)) {
                 row.height = varyHeights[r % varyHeights.length];
             }
-            grid.rowModel.add(row);
+            rows.push(row);
             if (numCols) {
                 for (var c = 0; c < numCols || 0; c++) {
                     if (r === 0) {
@@ -35,12 +37,14 @@ module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows,
                             }
 
                         }
-                        grid.colModel.add(col);
+                        cols.push(col);
                     }
                     grid.dataModel.set(r, c, {value: r + '-' + c});
                 }
             }
         }
+        grid.rowModel.add(rows);
+        grid.colModel.add(cols);
     }
 
     return grid;
