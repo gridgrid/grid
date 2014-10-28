@@ -83,8 +83,6 @@ module.exports = function (container) {
         var yDelta = mousewheel.getDelta(event);
         var xDelta = mousewheel.getDelta(event, true);
         grid.updateScroll(grid.rowPixelRange.clamp(grid.scrollTop - yDelta), grid.colPixelRange.clamp(grid.scrollLeft - xDelta));
-        //console.log('delta: ', xDelta, yDelta);
-        //console.log('scroll: ', grid.scrollLeft, grid.scrollTop);
         calcOffsetAndDraw();
     };
     $container.on('mousewheel', onMouseWheel);
