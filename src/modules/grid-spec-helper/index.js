@@ -20,7 +20,15 @@ module.exports = function () {
             return helper.container;
         },
         onDraw: function (fn) {
-            waits(10);
+            var hasBeenDrawn = false;
+            runs(function () {
+                helper.grid.eventLoop.bind('grid-draw', function () {
+                    hasBeenDrawn = true;
+                });
+            });
+            waitsFor(function () {
+                return hasBeenDrawn;
+            }, 'the view draw', 20);
             runs(fn);
         },
         resetAllDirties: function () {

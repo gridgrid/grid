@@ -107,9 +107,21 @@ describe('view-layer', function () {
         });
     });
 
+    it('should redraw everything if col builders are dirty', function () {
+        expectRedraw(['_buildCells', '_drawCells', '_drawCellClasses', '_drawDecorators'], function () {
+            grid.colBuilders.set(0, grid.colBuilders.create());
+        });
+    });
+
     it('should redraw everything if col model is dirty', function () {
         expectRedraw(['_drawCells', '_drawCellClasses', '_drawDecorators'], function () {
             grid.colModel.add({});
+        });
+    });
+
+    it('should redraw everything if row model is dirty', function () {
+        expectRedraw(['_drawCells', '_drawCellClasses', '_drawDecorators'], function () {
+            grid.rowModel.add({});
         });
     });
 
@@ -592,6 +604,17 @@ describe('view-layer', function () {
             helper.onDraw(function () {
                 expect(findGridCells().first()).toHaveClass(cellClass);
                 expect(findGridCells().first()).not.toHaveClass(cellClass2);
+            });
+        });
+    });
+
+    describe('col builders', function () {
+        it('should rebuild the cells for new col builders', function () {
+            var spy = spyOn(view, '_buildCells').andCallThrough();
+            helper.resetAllDirties();
+            grid.colBuilders.set(0, grid.colBuilders.create());
+            helper.onDraw(function () {
+                expect(spy).toHaveBeenCalled();
             });
         });
     });

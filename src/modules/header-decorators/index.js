@@ -2,7 +2,7 @@ module.exports = function (_grid, model) {
     var grid = _grid;
 
     var api = model || {};
-    api._decorators = [];
+    api._decorators = {};
 
     function makeDecorator(col) {
         var decorator = grid.decorators.create(0, col, 1, 1, 'cell', 'real');

@@ -77,24 +77,22 @@ module.exports = function (_grid) {
         if (!container) {
             return;
         }
-        var viewPortDirty = grid.viewPort.isDirty();
-        if (viewPortDirty) {
+        var rebuilt = grid.viewPort.isDirty() || grid.colBuilders.isDirty();
+        if (rebuilt) {
             viewLayer._buildCells(cellContainer);
         }
-        var colModelDirty = grid.colModel.isDirty();
-        var cellScrollDirty = grid.cellScrollModel.isDirty();
-        var cellsPositionOrSizeChanged = colModelDirty || cellScrollDirty;
 
-        if (viewPortDirty || grid.cellClasses.isDirty() || cellsPositionOrSizeChanged) {
+        var cellsPositionOrSizeChanged = grid.colModel.isDirty() || grid.rowModel.isDirty() || grid.cellScrollModel.isDirty();
+
+        if (grid.cellClasses.isDirty() || rebuilt || cellsPositionOrSizeChanged) {
             viewLayer._drawCellClasses();
         }
 
-        if (viewPortDirty || cellsPositionOrSizeChanged) {
+        if (rebuilt || cellsPositionOrSizeChanged) {
             viewLayer._drawCells();
         }
 
-
-        if (grid.decorators.isDirty() || viewPortDirty || cellsPositionOrSizeChanged) {
+        if (grid.decorators.isDirty() || rebuilt || cellsPositionOrSizeChanged) {
             viewLayer._drawDecorators(cellsPositionOrSizeChanged);
         }
 
