@@ -87,41 +87,49 @@ describe('view-layer', function () {
         });
     });
 
-    function expectRedraw(methods, thingToTriggerRedraw) {
-        helper.resetAllDirties();
-        var drawMethods = methods;
-        var spies = drawMethods.map(function (method) {
-            return spyOn(view, method);
-        });
-        thingToTriggerRedraw();
-        helper.onDraw(function () {
-            spies.forEach(function (spy) {
-                expect(spy).toHaveBeenCalled();
+    describe('redraw', function () {
+        function expectRedraw(methods, thingToTriggerRedraw) {
+            helper.resetAllDirties();
+            var drawMethods = methods;
+            var spies = drawMethods.map(function (method) {
+                return spyOn(view, method);
+            });
+            thingToTriggerRedraw();
+            helper.onDraw(function () {
+                spies.forEach(function (spy) {
+                    expect(spy).toHaveBeenCalled();
+                });
+            });
+        }
+
+        it('should redraw everything if viewPort is dirty', function () {
+            expectRedraw(['_buildCells', '_buildCols', '_drawCells', '_drawCellClasses', '_drawDecorators'], function () {
+                grid.viewPort.width = 1;
             });
         });
-    }
 
-    it('should redraw everything if viewPort is dirty', function () {
-        expectRedraw(['_buildCells', '_buildCols', '_drawCells', '_drawCellClasses', '_drawDecorators'], function () {
-            grid.viewPort.width = 1;
+        it('should rebuild colbuilders and draw cells if col builders are dirty', function () {
+            expectRedraw(['_buildCols', '_drawCells'], function () {
+                grid.colBuilders.set(0, grid.colBuilders.create());
+            });
         });
-    });
 
-    it('should rebuild colbuilders and draw cells if col builders are dirty', function () {
-        expectRedraw(['_buildCols', '_drawCells'], function () {
-            grid.colBuilders.set(0, grid.colBuilders.create());
+        it('should redraw everything if col model is dirty', function () {
+            expectRedraw(['_drawCells', '_drawCellClasses', '_drawDecorators'], function () {
+                grid.colModel.add({});
+            });
         });
-    });
 
-    it('should redraw everything if col model is dirty', function () {
-        expectRedraw(['_drawCells', '_drawCellClasses', '_drawDecorators'], function () {
-            grid.colModel.add({});
+        it('should redraw everything if row model is dirty', function () {
+            expectRedraw(['_drawCells', '_drawCellClasses', '_drawDecorators'], function () {
+                grid.rowModel.add({});
+            });
         });
-    });
 
-    it('should redraw everything if row model is dirty', function () {
-        expectRedraw(['_drawCells', '_drawCellClasses', '_drawDecorators'], function () {
-            grid.rowModel.add({});
+        it('should redraw cells if data model is dirty', function () {
+            expectRedraw(['_drawCells'], function () {
+                grid.dataModel.toggleSort();
+            });
         });
     });
 

@@ -98,7 +98,7 @@ module.exports = function (_grid) {
             viewLayer._drawCellClasses();
         }
 
-        if (rebuilt || cellsPositionOrSizeChanged || builtColsDirty) {
+        if (rebuilt || cellsPositionOrSizeChanged || builtColsDirty || grid.dataModel.isDirty()) {
             viewLayer._drawCells();
         }
 

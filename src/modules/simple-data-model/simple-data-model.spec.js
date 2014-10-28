@@ -19,4 +19,10 @@ describe('simple-data-model', function () {
         expect(dataModel.getFormatted(0, 0)).toEqual(value);
     });
 
+    it('should be able to sort by a col', function () {
+        dataModel.toggleSort(0);
+        dataModel.toggleSort(0);
+        expect(dataModel.getFormatted(0, 0)).toBe('99-0');
+    });
+
 });
