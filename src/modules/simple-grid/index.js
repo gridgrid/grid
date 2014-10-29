@@ -39,7 +39,7 @@ module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows,
                         }
                         cols.push(col);
                     }
-                    grid.dataModel.set(r, c, {value: r + '-' + c});
+                    grid.dataModel.set(r, c, {value: [r, c]});
                 }
             }
         }

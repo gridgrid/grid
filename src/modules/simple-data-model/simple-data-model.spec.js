@@ -7,22 +7,19 @@ describe('simple-data-model', function () {
         dataModel = grid.dataModel;
     });
 
-    it('should be able to set and get back data', function () {
-        var datum = {};
-        dataModel.set(0, 0, datum);
-        expect(dataModel.get(0, 0)).toBe(datum);
+    it('should be able to get back data', function () {
+        expect(dataModel.get(0, 0).value).toBeDefined();
     });
 
     it('should be able to get back a formatted string', function () {
-        var value = 'formatted value';
-        dataModel.set(0, 0, {value: value});
-        expect(dataModel.getFormatted(0, 0)).toEqual(value);
+        expect(dataModel.getFormatted(0, 0)).toBeAString();
     });
 
     it('should be able to sort by a col', function () {
+        var last = dataModel.getFormatted(99, 0);
         dataModel.toggleSort(0);
         dataModel.toggleSort(0);
-        expect(dataModel.getFormatted(0, 0)).toBe('99-0');
+        expect(dataModel.getFormatted(0, 0)).toBe(last);
     });
 
 });

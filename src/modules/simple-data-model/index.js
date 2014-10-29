@@ -20,7 +20,7 @@ module.exports = function (_grid) {
         },
         getFormatted: function (r, c) {
             var datum = api.get(r, c);
-            return datum && datum.value || '';
+            return datum && datum.value && datum.value.join('-') || '';
         },
         toggleSort: function (c) {
             var retVal = -1;
