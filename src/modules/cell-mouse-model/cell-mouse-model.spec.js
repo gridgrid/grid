@@ -37,7 +37,7 @@ describe('cell-mouse-model', function () {
         });
     });
 
-    it('should annotate mouse events with the cell they are on considereing offset', function () {
+    it('should annotate mouse events with the cell they are on considering offset', function () {
         grid.cellScrollModel.scrollTo(1, 1);
         helper.container.style.marginTop = '10px';
         helper.container.style.marginLeft = '5px';
@@ -48,7 +48,7 @@ describe('cell-mouse-model', function () {
             expect(mousedown).colToBe(1);
             expect(mousedown.realRow).toBe(0);
             expect(mousedown.realCol).toBe(0);
-            
+
         });
     });
 
