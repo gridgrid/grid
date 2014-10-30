@@ -26,6 +26,27 @@ module.exports = function (_grid) {
 
     grid.cellClasses.add(grid.cellClasses.create(0, 0, CELL_CLASS, Infinity, Infinity));
 
+    var rowHeaderClasses = grid.cellClasses.create(0, 0, 'grid-header grid-row-header', Infinity, 0);
+    var colHeaderClasses = grid.cellClasses.create(0, 0, 'grid-header grid-col-header', 0, Infinity);
+    var fixedColClasses = grid.cellClasses.create(0, -1, 'grid-last-fixed-col', Infinity, 1);
+    var fixedRowClasses = grid.cellClasses.create(-1, 0, 'grid-last-fixed-row', 1, Infinity);
+    grid.cellClasses.add(rowHeaderClasses);
+    grid.cellClasses.add(colHeaderClasses);
+    grid.cellClasses.add(fixedRowClasses);
+    grid.cellClasses.add(fixedColClasses);
+
+
+    grid.eventLoop.bind('grid-col-change', function () {
+        fixedColClasses.left = grid.colModel.numFixed() - 1;
+        rowHeaderClasses.width = grid.colModel.numHeaders();
+    });
+
+    grid.eventLoop.bind('grid-row-change', function () {
+        fixedRowClasses.top = grid.rowModel.numFixed() - 1;
+        colHeaderClasses.height = grid.rowModel.numHeaders();
+    });
+
+
     viewLayer.build = function (elem) {
         container = elem;
 

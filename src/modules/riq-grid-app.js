@@ -15,8 +15,8 @@ angular.module('riqGridApp', [])
 
                 var numRows = 1000;
                 var numCols = 100;
-
-                var grid = makeSimpleGrid(numRows, numCols, [30], [40, 100, 400, 90], 1, 3);
+                
+                var grid = makeSimpleGrid(numRows, numCols, [30], [40, 100, 400, 90], 1, 3, undefined, 1, 1);
                 grid.colModel.get(2).width = 40;
                 grid.build(elem);
                 grid.navigationModel.minRow = 1;

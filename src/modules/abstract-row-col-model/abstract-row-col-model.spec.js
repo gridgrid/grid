@@ -97,6 +97,47 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
         expect(model.isDirty()).toBe(true);
     });
 
+    describe('headers', function () {
+
+        it('headers should be considered fixed', function () {
+            var descriptor = model.create();
+            descriptor.header = true;
+            expect(descriptor.fixed).toBe(true);
+        });
+
+        it('should be able to add a header', function () {
+            var descriptor = model.create();
+            model.addHeaders(descriptor);
+            expect(model.getHeader(0)).toBe(descriptor);
+        });
+
+        it('should tell me the number of headers', function () {
+            var descriptor = model.create();
+            model.addHeaders(descriptor);
+            expect(model.numHeaders()).toBe(1);
+        });
+
+        it('should add headers at the beginning', function () {
+            var descriptor = model.create();
+            model.addHeaders(descriptor);
+            expect(model.get(0)).toBe(descriptor);
+        });
+
+        it('should add headers after previous headers but before the rest of the cols', function () {
+            model.addHeaders(model.create());
+            model.add(model.create());
+            var descriptor = model.create();
+            model.addHeaders(descriptor);
+            expect(model.get(1)).toBe(descriptor);
+        });
+
+        it('should be included in num fixed', function () {
+            model.addHeaders(model.create());
+            expect(model.numFixed()).toBe(1);
+        });
+
+    });
+
 
     describe('descriptor', function () {
         describe('should satisfy', function () {

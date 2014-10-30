@@ -1,6 +1,6 @@
 var util = require('@grid/util');
 
-module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows, fixedCols, preSetupFn) {
+module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows, fixedCols, preSetupFn, headerRows, headerCols) {
 
     var grid = require('@grid/core')();
 
@@ -8,13 +8,19 @@ module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows,
         preSetupFn(grid);
     }
 
+    headerRows = headerRows || 0;
+    headerCols = headerCols || 0;
+
     if (numRows) {
         var rows = [];
         var cols = [];
-        for (var r = 0; r < numRows; r++) {
+        for (var r = 0; r < numRows + headerRows; r++) {
             var row = grid.rowModel.create();
             row.dataRow = r;
-            if (r < fixedRows) { //returns false for undefined luckily
+            if (r < headerRows) {
+                row.header = true;
+            }
+            else if (r < fixedRows + headerRows) { //returns false for undefined luckily
                 row.fixed = true;
             }
             if (util.isArray(varyHeights)) {
@@ -22,11 +28,13 @@ module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows,
             }
             rows.push(row);
             if (numCols) {
-                for (var c = 0; c < numCols || 0; c++) {
+                for (var c = 0; c < numCols + headerCols || 0; c++) {
                     if (r === 0) {
                         var col = grid.colModel.create();
                         col.dataCol = c;
-                        if (c < fixedCols) {
+                        if (c < headerCols) {
+                            col.header = true;
+                        } else if (c < fixedCols + headerCols) {
                             col.fixed = true;
                         }
                         if (varyWidths) {

@@ -8,8 +8,8 @@ describe('view-layer', function () {
     var $ = require('jQuery');
     var container;
 
-    function viewBeforeEach(varyHeight, varyWidth, frows, fcols) {
-        grid = helper.buildSimpleGrid(100, 20, varyHeight, varyWidth, frows, fcols);
+    function viewBeforeEach(varyHeight, varyWidth, frows, fcols, hrows, hcols) {
+        grid = helper.buildSimpleGrid(100, 20, varyHeight, varyWidth, frows, fcols, hrows, hcols);
         view = grid.viewLayer;
         //mock the view port
         grid.viewPort.sizeToContainer = function () {
@@ -204,8 +204,8 @@ describe('view-layer', function () {
         return $(container).find('[dts="grid-cell"]:nth-child(' + (index + 1) + ')');
     }
 
-    function findRowCellByIndex(index) {
-        return $(findGridCells(container)[index * viewCols]);
+    function findRowCellsByIndex(index) {
+        return $(findGridRows()[index]).find('[dts="grid-cell"]');
     }
 
     function findCellByRowCol(r, c) {
@@ -236,9 +236,9 @@ describe('view-layer', function () {
             expect(findColCellsByIndex(0).width()).toEqual(100);
             expect(findColCellsByIndex(1).width()).toEqual(101);
             expect(findColCellsByIndex(2).width()).toEqual(102);
-            expect(findRowCellByIndex(0).height()).toEqual(21);
-            expect(findRowCellByIndex(1).height()).toEqual(31);
-            expect(findRowCellByIndex(2).height()).toEqual(41);
+            expect(findRowCellsByIndex(0).height()).toEqual(21);
+            expect(findRowCellsByIndex(1).height()).toEqual(31);
+            expect(findRowCellsByIndex(2).height()).toEqual(41);
         });
     });
 
@@ -508,7 +508,7 @@ describe('view-layer', function () {
         });
     });
 
-    describe('fixed rows and cols', function () {
+    ddescribe('fixed rows and cols', function () {
         it('should not move on scroll', function () {
             viewBeforeEach(false, false, 1, 0);
             grid.cellScrollModel.scrollTo(1, 0);
@@ -528,6 +528,25 @@ describe('view-layer', function () {
             grid.cellScrollModel.scrollTo(1, 0);
             helper.onDraw(function () {
                 findGridCells(container);
+            });
+        });
+
+        it('should have a class to indicate the last', function () {
+            viewBeforeEach(false, false, 1, 1);
+            helper.onDraw(function () {
+                expect(findColCellsByIndex(0)[1]).toHaveClass('grid-last-fixed-col');
+                expect(findRowCellsByIndex(0)[1]).toHaveClass('grid-last-fixed-row');
+            });
+        });
+    });
+
+    ddescribe('headers', function () {
+        it('should get a special class', function () {
+            viewBeforeEach(false, false, 1, 1, 1, 1);
+
+            helper.onDraw(function () {
+                expect(findColCellsByIndex(1)[0]).toHaveClass('grid-header grid-col-header');
+                expect(findRowCellsByIndex(1)[0]).toHaveClass('grid-header grid-row-header');
             });
         });
     });

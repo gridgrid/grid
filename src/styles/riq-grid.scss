@@ -75,8 +75,16 @@ a {
 
   }
 
-  .grid-cell:nth-of-type(3) {
+  .grid-cell.grid-row-header {
+    background: #f7f3f3 !important;
+  }
+
+  .grid-cell.grid-last-fixed-col {
     border-right-width: 3px;
+  }
+
+  .grid-cell.grid-last-fixed-row {
+    border-bottom-width: 3px;
   }
 }
 

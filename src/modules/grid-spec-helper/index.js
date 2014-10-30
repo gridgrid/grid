@@ -5,11 +5,11 @@ module.exports = function () {
         CONTAINER_WIDTH: 800,
         CONTAINER_HEIGHT: 500,
         container: undefined,
-        buildSimpleGrid: function (numRows, numCols, varyHeight, varyWidths, fixedRows, fixedCols) {
+        buildSimpleGrid: function (numRows, numCols, varyHeight, varyWidths, fixedRows, fixedCols, headerRows, headerCols) {
             maybeDestroyGrid();
             helper.grid = require('@grid/simple-grid')(numRows || 100, numCols || 10, varyHeight, varyWidths, fixedRows, fixedCols, function (grid) {
                 helper.resizeSpy = spyOn(grid.viewPort, '_resize');
-            });
+            }, headerRows, headerCols);
             helper.grid.viewPort.sizeToContainer(helper.container);
             helper.grid.eventLoop.setContainer(helper.container);
             return helper.grid;
