@@ -21,8 +21,8 @@ module.exports = function (_grid) {
     });
 
     model.scrollTo = function (r, c) {
-        var maxRow = grid.rowModel.length() - 1;
-        var maxCol = grid.colModel.length() - 1;
+        var maxRow = grid.rowModel.length() - grid.rowModel.numFixed() - 1;
+        var maxCol = grid.colModel.length() - grid.colModel.numFixed() - 1;
         var lastRow = model.row;
         var lastCol = model.col;
         model.row = util.clamp(r, 0, maxRow);
