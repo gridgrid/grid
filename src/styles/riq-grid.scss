@@ -28,13 +28,13 @@ a {
 
 .odds {
   .grid-row:nth-of-type(odd) {
-    .grid-cell {
+    .grid-cell:not(.grid-last-fixed-row) {
       background: #f7f7f7;
     }
   }
 
   .grid-row:nth-of-type(even) {
-    .grid-cell {
+    .grid-cell:not(.grid-last-fixed-row) {
       background: transparent;
     }
   }
@@ -142,4 +142,8 @@ a {
     border-right: 1px solid black;
     border-left: none;
   }
+}
+
+.grid-header-selected {
+  background-color: rgba(0, 0, 0, 0.1);
 }

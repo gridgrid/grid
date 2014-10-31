@@ -136,7 +136,7 @@
             };
             return fieldName in this.actual;
         },
-        toBeRange: function (t, l, h, w) {
+        rangeToBe: function (t, l, h, w) {
             this.message = function () {
                 return expectedObjectWithNot.call(this, makeFakeRange(this.actual.top, this.actual.left, this.actual.height, this.actual.width)) + ' to be ' + JSON.stringify(makeFakeRange(t, l, h, w));
             };

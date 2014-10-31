@@ -162,19 +162,35 @@ module.exports = function (_grid) {
 
     });
 
-    var rowSelectionClasses = [];
+    model._rowSelectionDecorators = [];
+    model._colSelectionDecorators = [];
     //row col selection
+    function handleRowColSelectionChange(rowOrCol) {
+        var decoratorsField = ('_' + rowOrCol + 'SelectionDecorators');
+        model[decoratorsField].forEach(function (selectionDecorator) {
+            grid.decorators.remove(selectionDecorator);
+        });
+        model[decoratorsField] = [];
+
+        grid[rowOrCol + 'Model'].getSelected().forEach(function (index) {
+            var virtualIndex = index + grid[rowOrCol + 'Model'].numHeaders();
+            var top = rowOrCol === 'row' ? virtualIndex : 0;
+            var left = rowOrCol === 'col' ? virtualIndex : 0;
+            var decorator = grid.decorators.create(top, left, 1, 1, 'cell', 'virtual');
+            decorator.postRender = function (elem) {
+                elem.setAttribute('class', 'grid-header-selected');
+            };
+            grid.decorators.add(decorator);
+            model[decoratorsField].push(decorator);
+        });
+    }
+
     grid.eventLoop.bind('grid-row-selection-change', function () {
-        rowSelectionClasses.forEach(function (selectionClass) {
-            grid.cellClass.remove(selectionClass);
-        });
-        grid.rowModel.getSelected().forEach(function (row) {
-            //var selectionClass = grid.cellClasses.create(row, );
-        });
+        handleRowColSelectionChange('row');
     });
 
     grid.eventLoop.bind('grid-col-selection-change', function () {
-
+        handleRowColSelectionChange('col');
     });
 
     var selection = grid.decorators.create();

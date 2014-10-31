@@ -226,7 +226,7 @@ describe('view port', function () {
 
         it('should return the same range for ranges totally in the view', function () {
             var range = helper.makeFakeRange(0, 0, 2, 3);
-            expect(viewPort.intersect(range)).toBeRange(0, 0, 2, 3);
+            expect(viewPort.intersect(range)).rangeToBe(0, 0, 2, 3);
         });
 
         it('should return null for ranges whos top is too high', function () {
@@ -253,37 +253,37 @@ describe('view port', function () {
 
         it('should be able to intersect single cell ranges', function () {
             var range = helper.makeFakeRange(0, 0, 1, 1);
-            expect(viewPort.intersect(range)).toBeRange(0, 0, 1, 1);
+            expect(viewPort.intersect(range)).rangeToBe(0, 0, 1, 1);
         });
 
         it('should return just the intersected piece for ranges that do intersect', function () {
             var range = helper.makeFakeRange(5, 5, 10000, 10000);
-            expect(viewPort.intersect(range)).toBeRange(5, 5, viewPort.rows - 5, viewPort.cols - 5);
+            expect(viewPort.intersect(range)).rangeToBe(5, 5, viewPort.rows - 5, viewPort.cols - 5);
             range = helper.makeFakeRange(5, 5, Infinity, Infinity);
-            expect(viewPort.intersect(range)).toBeRange(5, 5, viewPort.rows - 5, viewPort.cols - 5);
+            expect(viewPort.intersect(range)).rangeToBe(5, 5, viewPort.rows - 5, viewPort.cols - 5);
             range = helper.makeFakeRange(0, 0, 5, 6);
             grid.cellScrollModel.scrollTo(3, 3);
-            expect(viewPort.intersect(range)).toBeRange(0, 0, 2, 3);
+            expect(viewPort.intersect(range)).rangeToBe(0, 0, 2, 3);
         });
 
         it('should be able to return ranges that cross the fixed boundary when scrolled', function () {
             beforeEachFn(false, false, 1, 2);
             var range = helper.makeFakeRange(0, 0, 5, 5);
             grid.cellScrollModel.scrollTo(2, 3);
-            expect(viewPort.intersect(range)).toBeRange(0, 0, 3, 2);
+            expect(viewPort.intersect(range)).rangeToBe(0, 0, 3, 2);
         });
 
         it('should be able to return ranges that only intersect the fixed area', function () {
             beforeEachFn(false, false, 3, 3);
             var range = helper.makeFakeRange(0, 0, 1, 1);
             grid.cellScrollModel.scrollTo(2, 3);
-            expect(viewPort.intersect(range)).toBeRange(0, 0, 1, 1);
+            expect(viewPort.intersect(range)).rangeToBe(0, 0, 1, 1);
         });
 
         it('should be able to intersect single cell ranges just past the fixed area', function () {
             beforeEachFn(false, false, 1, 1);
             var range = helper.makeFakeRange(1, 1, 1, 1);
-            expect(viewPort.intersect(range)).toBeRange(1, 1, 1, 1);
+            expect(viewPort.intersect(range)).rangeToBe(1, 1, 1, 1);
         });
 
         it('should return null for ranges that should be scrolled out of view that would otherwise lie in the fixed area', function () {
@@ -297,20 +297,20 @@ describe('view port', function () {
             beforeEachFn(false, false, 3, 3);
             var range = helper.makeFakeRange(0, 0, 3, 3);
             grid.cellScrollModel.scrollTo(2, 3);
-            expect(viewPort.intersect(range)).toBeRange(0, 0, 3, 3);
+            expect(viewPort.intersect(range)).rangeToBe(0, 0, 3, 3);
         });
 
         it('should be able to return ranges that only intersect the scrollable area', function () {
             beforeEachFn(false, false, 1, 2);
             var range = helper.makeFakeRange(5, 5, 10000, 10000);
             grid.cellScrollModel.scrollTo(1, 1);
-            expect(viewPort.intersect(range)).toBeRange(4, 4, viewPort.rows - 4, viewPort.cols - 4);
+            expect(viewPort.intersect(range)).rangeToBe(4, 4, viewPort.rows - 4, viewPort.cols - 4);
         });
 
         it('should be able to return a range for the entire virtual space', function () {
             beforeEachFn(false, false, 1, 1);
             var range = helper.makeFakeRange(0, 0, Infinity, Infinity);
-            expect(viewPort.intersect(range)).toBeRange(0, 0, viewPort.rows, viewPort.cols);
+            expect(viewPort.intersect(range)).rangeToBe(0, 0, viewPort.rows, viewPort.cols);
         });
     });
 

@@ -216,7 +216,7 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
 
         it('should fire an event on change', function () {
             var spy = jasmine.createSpy('selection change');
-            grid.eventLoop.bind('grid-' + name + 'selection-change', spy);
+            grid.eventLoop.bind('grid-' + name + '-selection-change', spy);
             model.select(0);
             expect(spy).toHaveBeenCalled();
             spy.reset();

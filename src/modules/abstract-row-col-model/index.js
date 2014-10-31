@@ -17,7 +17,7 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
     }
 
     function fireSelectionChange() {
-        grid.eventLoop.fire('grid-' + name + 'selection-change');
+        grid.eventLoop.fire('grid-' + name + '-selection-change');
     }
 
     var api = {
@@ -78,6 +78,7 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
             return numFixed;
         },
         select: function (index) {
+
             var descriptor = api.get(index);
             if (!descriptor.selected) {
                 descriptor.selected = true;

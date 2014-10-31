@@ -40,11 +40,11 @@ describe('range-util', function () {
 
     describe('createFromPoints', function () {
         it('should create a range from ordered points', function () {
-            expect(util.createFromPoints(2, 3, 5, 6)).toBeRange(2, 3, 4, 4);
+            expect(util.createFromPoints(2, 3, 5, 6)).rangeToBe(2, 3, 4, 4);
         });
 
         it('should create a range from out of order points', function () {
-            expect(util.createFromPoints(5, 6, 2, 3)).toBeRange(2, 3, 4, 4);
+            expect(util.createFromPoints(5, 6, 2, 3)).rangeToBe(2, 3, 4, 4);
         });
     });
 });
