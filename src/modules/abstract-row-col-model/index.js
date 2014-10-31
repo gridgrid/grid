@@ -85,7 +85,7 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
             }
         },
         deselect: function (index, dontNotify) {
-            var descriptor = api.get(index);
+            var descriptor = api[name](index);
             if (descriptor.selected) {
                 descriptor.selected = false;
                 selected.splice(selected.indexOf(index), 1);
@@ -95,7 +95,7 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
             }
         },
         toggleSelect: function (index) {
-            var descriptor = api.get(index);
+            var descriptor = api[name](index);
             if (descriptor.selected) {
                 api.deselect(index);
             } else {

@@ -307,7 +307,7 @@ describe('navigation-model', function () {
 
     });
 
-    describe('headers', function () {
+    describe('headers / col row selection', function () {
         beforeEach(function () {
             beforeEachFn(1, 1);
         });
@@ -320,6 +320,17 @@ describe('navigation-model', function () {
         it('should select a whole row on header mousedown', function () {
             makeAndFireMouseDownForCell(3, 0, true);
             expect(grid.rowModel.getSelected()).toEqual([2]);
+        });
+
+        it('should set a class for a selected col', function () {
+            grid.colModel.select(0);
+            var spy = spyOn(grid.cellClasses, 'add');
+            expect(spy).toHaveBeenCalled();
+            var descriptor = spy.argsForCall[0][0];
+            expect(descriptor).unitsToBe('cell');
+            expect(descriptor).spaceToBe('virtual');
+            expect(descriptor).classToBe('selected');
+            expect(descriptor).rangeToBe(0, 1, 1, 1);
         });
     });
 

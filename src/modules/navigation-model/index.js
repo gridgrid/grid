@@ -172,7 +172,7 @@ module.exports = function (_grid) {
         if (e.col < 0) {
             grid.rowModel.select(e.row);
         }
-        
+
         if (outsideMinMax(row, col)) {
             return;
         }
@@ -181,6 +181,21 @@ module.exports = function (_grid) {
         } else {
             setSelectionFromPoints(model.focus.row, model.focus.col, row, col);
         }
+    });
+
+    var rowSelectionClasses = [];
+    //row col selection
+    grid.eventLoop.bind('grid-row-selection-change', function () {
+        rowSelectionClasses.forEach(function (selectionClass) {
+            grid.cellClass.remove(selectionClass);
+        });
+        grid.rowModel.getSelected().forEach(function (row) {
+            //var selectionClass = grid.cellClasses.create(row, );
+        });
+    });
+
+    grid.eventLoop.bind('grid-col-selection-change', function () {
+
     });
 
     var selection = grid.decorators.create();
