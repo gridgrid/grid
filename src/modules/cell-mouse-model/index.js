@@ -10,7 +10,7 @@ module.exports = function (_grid) {
 
     var wasDragged = false;
 
-    grid.eventLoop.addInterceptor(function (e) {
+    model._annotateEvent = function annotateEvent(e) {
         switch (e.type) {
             case 'click':
                 e.wasDragged = wasDragged;
@@ -23,13 +23,19 @@ module.exports = function (_grid) {
                 var x = grid.viewPort.toGridX(e.clientX);
                 e.realRow = grid.viewPort.getRowByTop(y);
                 e.realCol = grid.viewPort.getColByLeft(x);
-                e.row = grid.viewPort.toVirtualRow(e.realRow);
-                e.col = grid.viewPort.toVirtualCol(e.realCol);
+                e.headerRow = grid.viewPort.toVirtualRow(e.realRow);
+                e.headerCol = grid.viewPort.toVirtualCol(e.realCol);
+                e.row = e.headerRow - grid.rowModel.numHeaders();
+                e.col = e.headerCol - grid.colModel.numHeaders();
                 e.gridX = x;
                 e.gridY = y;
                 break;
 
         }
+    };
+
+    grid.eventLoop.addInterceptor(function (e) {
+        model._annotateEvent(e);
 
         if (e.type === 'mousedown') {
             setupDragEventForMouseDown(e);

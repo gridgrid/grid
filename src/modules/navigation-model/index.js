@@ -166,6 +166,13 @@ module.exports = function (_grid) {
         //assume the event has been annotated by the cell mouse model interceptor
         var row = e.row;
         var col = e.col;
+        if (e.row < 0) {
+            grid.colModel.select(e.col);
+        }
+        if (e.col < 0) {
+            grid.rowModel.select(e.row);
+        }
+        
         if (outsideMinMax(row, col)) {
             return;
         }

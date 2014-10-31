@@ -5,10 +5,10 @@ describe('navigation-model', function () {
     var helper = require('@grid/grid-spec-helper')();
     var model;
     var grid;
-    beforeEach(function () {
-        grid = helper.buildSimpleGrid();
+    var beforeEachFn = function (hRows, hCols) {
+        grid = helper.buildSimpleGrid(undefined, undefined, undefined, undefined, undefined, undefined, hRows, hCols);
         model = grid.navigationModel;
-    });
+    };
 
 
     function makeAndFireKeyDown(code, shiftKey) {
@@ -39,6 +39,7 @@ describe('navigation-model', function () {
     describe('focus', function () {
         var focus;
         beforeEach(function () {
+            beforeEachFn();
             focus = model.focus;
         });
 
@@ -175,6 +176,7 @@ describe('navigation-model', function () {
     describe('selection', function () {
         var selection;
         beforeEach(function () {
+            beforeEachFn();
             selection = model.selection;
         });
 
@@ -303,6 +305,22 @@ describe('navigation-model', function () {
             expect(selection).toBeRange(-1, -1, -1, -1);
         });
 
+    });
+
+    describe('headers', function () {
+        beforeEach(function () {
+            beforeEachFn(1, 1);
+        });
+        //row col selection
+        it('should select a whole col on header mousedown', function () {
+            makeAndFireMouseDownForCell(0, 3, true);
+            expect(grid.colModel.getSelected()).toEqual([2]);
+        });
+
+        it('should select a whole row on header mousedown', function () {
+            makeAndFireMouseDownForCell(3, 0, true);
+            expect(grid.rowModel.getSelected()).toEqual([2]);
+        });
     });
 
 });
