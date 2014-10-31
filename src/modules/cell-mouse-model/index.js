@@ -19,19 +19,23 @@ module.exports = function (_grid) {
             /* jshint +W086 */
             case 'mousemove':
             case 'mouseup':
-                var y = grid.viewPort.toGridY(e.clientY);
-                var x = grid.viewPort.toGridX(e.clientX);
-                e.realRow = grid.viewPort.getRowByTop(y);
-                e.realCol = grid.viewPort.getColByLeft(x);
-                e.headerRow = grid.viewPort.toVirtualRow(e.realRow);
-                e.headerCol = grid.viewPort.toVirtualCol(e.realCol);
-                e.row = e.headerRow - grid.rowModel.numHeaders();
-                e.col = e.headerCol - grid.colModel.numHeaders();
-                e.gridX = x;
-                e.gridY = y;
+                model._annotateEventInternal(e);
                 break;
 
         }
+    };
+
+    model._annotateEventInternal = function (e) {
+        var y = grid.viewPort.toGridY(e.clientY);
+        var x = grid.viewPort.toGridX(e.clientX);
+        e.realRow = grid.viewPort.getRowByTop(y);
+        e.realCol = grid.viewPort.getColByLeft(x);
+        e.virtualRow = grid.viewPort.toVirtualRow(e.realRow);
+        e.virtualCol = grid.viewPort.toVirtualCol(e.realCol);
+        e.row = e.virtualRow - grid.rowModel.numHeaders();
+        e.col = e.virtualCol - grid.colModel.numHeaders();
+        e.gridX = x;
+        e.gridY = y;
     };
 
     grid.eventLoop.addInterceptor(function (e) {

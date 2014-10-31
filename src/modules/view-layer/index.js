@@ -288,14 +288,25 @@ module.exports = function (_grid) {
                         positionCellDecoratorFromRealCellRange(decorator, boundingBox);
                         break;
                 }
-            } else if ((decorator.isDirty() || cellsPositionOrSizeChanged) && decorator.space === 'virtual') {
+            } else if ((decorator.isDirty() || cellsPositionOrSizeChanged) && (decorator.space === 'virtual' || decorator.space === 'data')) {
                 switch (decorator.units) {
                     case 'px':
                         break;
                     case 'cell':
                     /* jshint -W086 */
                     default:
-                        var realCellRange = grid.viewPort.intersect(decorator);
+                        var range = {
+                            top: decorator.top,
+                            left: decorator.left,
+                            height: decorator.height,
+                            width: decorator.width
+                        };
+                        if (decorator.space === 'data') {
+                            range.top += grid.rowModel.numHeaders();
+                            range.left += grid.colModel.numHeaders();
+                        }
+                        
+                        var realCellRange = grid.viewPort.intersect(range);
                         if (realCellRange) {
                             positionCellDecoratorFromRealCellRange(realCellRange, boundingBox);
                         } else {

@@ -29,13 +29,6 @@ describe('navigation-model', function () {
         grid.eventLoop.fire(mouseDown);
     }
 
-    function setMinMax(minR, minC, maxR, maxC) {
-        model.minRow = minR;
-        model.minCol = minC;
-        model.maxRow = maxR;
-        model.maxCol = maxC;
-    }
-
     describe('focus', function () {
         var focus;
         beforeEach(function () {
@@ -74,7 +67,7 @@ describe('navigation-model', function () {
             expect(spy).toHaveBeenCalled();
             var descriptor = spy.argsForCall[0][0];
             expect(descriptor).unitsToBe('cell');
-            expect(descriptor).spaceToBe('virtual');
+            expect(descriptor).spaceToBe('data');
             expect(descriptor).classToBe('focus');
         });
 
@@ -116,34 +109,6 @@ describe('navigation-model', function () {
             expect(descriptor).leftToBe(3);
         });
 
-
-        it('should have a min and max row and col that it respects', function () {
-            setMinMax(1, 1, 4, 3);
-            model.setFocus(0, 0);
-            expect(focus).rowToBe(1);
-            expect(focus).colToBe(1);
-
-            model.setFocus(10, 10);
-            expect(focus).rowToBe(4);
-            expect(focus).colToBe(3);
-        });
-
-        it('should reflect min on set', function () {
-            model.setFocus(0, 0);
-            model.minRow = 1;
-            expect(focus).rowToBe(1);
-            model.minCol = 1;
-            expect(focus).colToBe(1);
-        });
-
-        it('should reflect max on set', function () {
-            model.setFocus(Infinity, Infinity);
-            model.maxRow = 1;
-            expect(focus).rowToBe(1);
-            model.maxCol = 1;
-            expect(focus).colToBe(1);
-        });
-
         it('should try to scroll the cell into view on nav', function () {
             var spy = spyOn(grid.cellScrollModel, 'scrollIntoView');
             model.setFocus(1, 1);
@@ -160,18 +125,25 @@ describe('navigation-model', function () {
             expect(focus).rowToBe(row);
             expect(focus).colToBe(col);
         });
-
-        it('should reflect min and max on mousedown', function () {
-            model.setFocus(2, 3);
-            setMinMax(1, 1, 4, 4);
-            makeAndFireMouseDownForCell(0, 0);
-            expect(focus).rowToBe(2);
-            expect(focus).colToBe(3);
-            makeAndFireMouseDownForCell(5, 5);
-            expect(focus).rowToBe(2);
-            expect(focus).colToBe(3);
-        });
     });
+
+
+    function selectCells(sr, sc, er, ec, dontSetFocus) {
+
+        var dragStart = {type: 'grid-drag-start'};
+        dragStart.clientX = sc * 100 + 1;
+        dragStart.clientY = sr * 30 + 1;
+        grid.cellMouseModel._annotateEventInternal(dragStart);
+        if (!dontSetFocus) {
+            model.setFocus(dragStart.row, dragStart.col); //simulate the mousedown effect
+        }
+        grid.eventLoop.fire(dragStart);
+        var drag = {type: 'grid-cell-drag'};
+        drag.clientX = ec * 100 + 1;
+        drag.clientY = er * 30 + 1;
+        grid.cellMouseModel._annotateEventInternal(drag);
+        grid.eventLoop.fire(drag);
+    }
 
     describe('selection', function () {
         var selection;
@@ -196,15 +168,10 @@ describe('navigation-model', function () {
             expect(grid.decorators.getAlive()).toContain(selection);
         });
 
-        function selectCells(sr, sc, er, ec, dontSetFocus) {
-            if (!dontSetFocus) {
-                model.setFocus(sr, sc); //simulate the mousedown effect
-            }
-            var dragStart = {type: 'grid-drag-start', row: sr, col: sc};
-            grid.eventLoop.fire(dragStart);
-            var drag = {type: 'grid-cell-drag', row: er, col: ec};
-            grid.eventLoop.fire(drag);
-        }
+        it('should have the right defaults', function () {
+            expect(selection).spaceToBe('data');
+            expect(selection).unitsToBe('cell');
+        });
 
         it('should default to all -1', function () {
             expect(selection).toBeRange(-1, -1, -1, -1);
@@ -219,22 +186,6 @@ describe('navigation-model', function () {
         it('should expand the selection from focus even if that isnt the initial mousedown', function () {
             selectCells(1, 2, 3, 4, true);
             expect(selection).toBeRange(0, 0, 4, 5);
-        });
-
-        it('should not select if drag begins out of max min', function () {
-            setMinMax(1, 1, 4, 4);
-            selectCells(0, 0, 3, 3);
-            expect(selection).toBeRange(-1, -1, -1, -1);
-            selectCells(5, 5, 3, 3);
-            expect(selection).toBeRange(-1, -1, -1, -1);
-        });
-
-        it('selection should clamp to min max', function () {
-            setMinMax(1, 1, 4, 4);
-            selectCells(1, 1, 0, 0);
-            expect(selection).toBeRange(1, 1, 1, 1);
-            selectCells(1, 1, 5, 5);
-            expect(selection).toBeRange(1, 1, 4, 4);
         });
 
         it('should unbind on drag end', function () {
@@ -264,15 +215,6 @@ describe('navigation-model', function () {
         it('should set on mousedown if shift is held', function () {
             makeAndFireMouseDownForCell(2, 2, true);
             expect(selection).toBeRange(0, 0, 3, 3);
-        });
-
-        it('should not set on mousedown out of min max range if shift is held', function () {
-            model.setFocus(1, 1);
-            setMinMax(1, 1, 4, 4);
-            makeAndFireMouseDownForCell(0, 0, true);
-            expect(selection).toBeRange(-1, -1, -1, -1);
-            makeAndFireMouseDownForCell(5, 5, true);
-            expect(selection).toBeRange(-1, -1, -1, -1);
         });
 
         it('should expand and shrink selection on key nav', function () {
@@ -322,7 +264,7 @@ describe('navigation-model', function () {
             expect(grid.rowModel.getSelected()).toEqual([2]);
         });
 
-        it('should set a class for a selected col', function () {
+        xit('should set a class for a selected col', function () {
             grid.colModel.select(0);
             var spy = spyOn(grid.cellClasses, 'add');
             expect(spy).toHaveBeenCalled();
@@ -331,6 +273,33 @@ describe('navigation-model', function () {
             expect(descriptor).spaceToBe('virtual');
             expect(descriptor).classToBe('selected');
             expect(descriptor).rangeToBe(0, 1, 1, 1);
+        });
+
+
+        it('focus should ignore headers on mousedown', function () {
+            model.setFocus(2, 3);
+            makeAndFireMouseDownForCell(0, 0);
+            expect(model.focus).rowToBe(2);
+            expect(model.focus).colToBe(3);
+        });
+
+
+        it('should not select if drag begins in headers', function () {
+            selectCells(0, 0, 3, 3);
+            expect(model.selection).toBeRange(-1, -1, -1, -1);
+        });
+
+
+        it('should not set on mousedown on headers even if shift is held', function () {
+            model.setFocus(1, 1);
+            makeAndFireMouseDownForCell(0, 0, true);
+            expect(model.selection).toBeRange(-1, -1, -1, -1);
+        });
+
+
+        it('selection should clamp to data range', function () {
+            selectCells(1, 1, 0, 0);
+            expect(model.selection).toBeRange(0, 0, 1, 1);
         });
     });
 

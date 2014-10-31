@@ -63,8 +63,9 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
         get: function (index) {
             return descriptors[index];
         },
-        length: function () {
-            return descriptors.length;
+        length: function (includeHeaders) {
+            var subtract = includeHeaders ? 0 : numHeaders;
+            return descriptors.length - subtract;
         },
         move: function (start, target) {
             descriptors.splice(target, 0, descriptors.splice(start, 1)[0]);

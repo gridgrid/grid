@@ -17,7 +17,7 @@
         describe('position-range', function () {
             it('should default to virtual cell', function () {
                 expect(ctx.range).unitsToBe('cell');
-                expect(ctx.range).spaceToBe('virtual');
+                expect(ctx.range).spaceToBe('data');
             });
         });
     });

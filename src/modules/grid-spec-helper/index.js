@@ -27,7 +27,7 @@ module.exports = function () {
             });
             waitsFor(function () {
                 return hasBeenDrawn;
-            }, 'the view draw', 50);
+            }, 'the view draw', 150);
             runs(fn);
         },
         resetAllDirties: function () {

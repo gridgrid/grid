@@ -12,7 +12,7 @@ module.exports = function (range, dirtyClean, parentDirtyClean) {
     addDirtyProps(range, watchedProperties, dirtyCleans);
     //defaults
     range.units = 'cell';
-    range.space = 'virtual';
+    range.space = 'data';
 
     return range;
 };

@@ -79,7 +79,7 @@ describe('view-layer', function () {
         expect($(cells[1]).position()).toEqual({top: 0, left: firstCellWidth - 1});
     }
 
-    describe('generally', function () {
+    describe('', function () {
 
         beforeEach(viewBeforeEach);
 
@@ -400,6 +400,15 @@ describe('view-layer', function () {
                 grid.decorators.add(decorator);
                 // the plus one is so it overlaps the borders
                 expectBoundingBoxSize(5 * 30, 6 * 100, 3 * 30 + 1, 3 * 100 + 1);
+            });
+
+            it('should position a data cell range decorator', function () {
+                viewBeforeEach(false, false, 0, 0, 1, 1);
+                setDecoratorPosition(5, 6, 3, 3);
+                grid.decorators.add(decorator);
+                decorator.space = 'data';
+                // the plus one is so it overlaps the borders
+                expectBoundingBoxSize(6 * 30, 7 * 100, 3 * 30 + 1, 3 * 100 + 1);
             });
 
             it('should handle virtual cell ranges that are not in view', function () {

@@ -37,8 +37,8 @@ describe('cell-mouse-model', function () {
                 expect(event).colToBe(2);
                 expect(event.realRow).toBe(1);
                 expect(event.realCol).toBe(1);
-                expect(event.headerRow).toBe(2);
-                expect(event.headerCol).toBe(2);
+                expect(event.virtualRow).toBe(2);
+                expect(event.virtualCol).toBe(2);
             });
         });
 
@@ -53,8 +53,8 @@ describe('cell-mouse-model', function () {
                 expect(event).colToBe(1);
                 expect(event.realRow).toBe(0);
                 expect(event.realCol).toBe(0);
-                expect(event.headerRow).toBe(1);
-                expect(event.headerCol).toBe(1);
+                expect(event.virtualRow).toBe(1);
+                expect(event.virtualCol).toBe(1);
 
             });
         });
@@ -208,8 +208,8 @@ describe('cell-mouse-model', function () {
                 expect(event).colToBe(2);
                 expect(event.realRow).toBe(1);
                 expect(event.realCol).toBe(1);
-                expect(event.headerRow).toBe(3);
-                expect(event.headerCol).toBe(3);
+                expect(event.virtualRow).toBe(3);
+                expect(event.virtualCol).toBe(3);
             });
         });
 
@@ -221,8 +221,8 @@ describe('cell-mouse-model', function () {
                 expect(event).colToBe(-1);
                 expect(event.realRow).toBe(0);
                 expect(event.realCol).toBe(0);
-                expect(event.headerRow).toBe(0);
-                expect(event.headerCol).toBe(0);
+                expect(event.virtualRow).toBe(0);
+                expect(event.virtualCol).toBe(0);
             });
         });
     });

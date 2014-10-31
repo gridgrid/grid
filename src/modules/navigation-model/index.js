@@ -25,36 +25,13 @@ module.exports = function (_grid) {
     };
     grid.decorators.add(model.focusDecorator);
 
-    function defineLimitProp(prop, defaultValue) {
-        var val = defaultValue;
-        Object.defineProperty(model, prop, {
-            enumerable: true,
-            get: function () {
-                return val;
-            }, set: function (_val) {
-                var isChanged = _val !== val;
-                val = _val;
-
-                if (isChanged) {
-                    model.setFocus(model.focus.row, model.focus.col);
-                }
-            }
-        });
-    }
-
-    defineLimitProp('minRow', 0);
-    defineLimitProp('minCol', 0);
-    defineLimitProp('maxRow', Infinity);
-    defineLimitProp('maxCol', Infinity);
-
 
     function clampRowToMinMax(row) {
-        row = util.clamp(row, Math.max(model.minRow, 0), Math.min(model.maxRow, grid.rowModel.length() - 1));
-        return row;
+        return util.clamp(row, 0, grid.rowModel.length() - 1);
     }
 
     function clampColToMinMax(col) {
-        return util.clamp(col, Math.max(model.minCol, 0), Math.min(model.maxCol, grid.colModel.length() - 1));
+        return util.clamp(col, 0, grid.colModel.length() - 1);
     }
 
     model.setFocus = function setFocus(row, col, optionalEvent) {
@@ -159,28 +136,30 @@ module.exports = function (_grid) {
     });
 
     function outsideMinMax(row, col) {
-        return row < model.minRow || row > model.maxRow || col < model.minCol || col > model.maxCol;
+        return row < 0 || row > grid.rowModel.length() || col < 0 || col > grid.colModel.length();
     }
 
     grid.eventLoop.bind('mousedown', function (e) {
         //assume the event has been annotated by the cell mouse model interceptor
         var row = e.row;
         var col = e.col;
-        if (e.row < 0) {
-            grid.colModel.select(e.col);
+        if (row < 0 && col >= 0) {
+            grid.colModel.select(col);
         }
-        if (e.col < 0) {
-            grid.rowModel.select(e.row);
+        if (col < 0 && row >= 0) {
+            grid.rowModel.select(row);
         }
 
-        if (outsideMinMax(row, col)) {
+        if (row < 0 && col < 0) {
             return;
         }
+
         if (!e.shiftKey) {
             model.setFocus(row, col, e);
         } else {
             setSelectionFromPoints(model.focus.row, model.focus.col, row, col);
         }
+
     });
 
     var rowSelectionClasses = [];

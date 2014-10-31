@@ -117,6 +117,12 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
             expect(model.numHeaders()).toBe(1);
         });
 
+        it('should tell me length of all descriptors including headers', function () {
+            model.addHeaders(model.create());
+            model.add(model.create());
+            expect(model.length(true)).toBe(2);
+        });
+
         it('should add headers at the beginning', function () {
             var descriptor = model.create();
             model.addHeaders(descriptor);
