@@ -43,6 +43,11 @@ describe('view-layer', function () {
         return $(findGridCells(container)[r * viewCols + c]);
     }
 
+    function getCellText(r, c, header) {
+        var h = header ? 'h' : '';
+        return h + 'r' + r + ' ' + h + 'c' + c;
+    }
+
     function expectOnlyRangeToHaveClass(t, l, h, w, cellClass) {
         for (var r = 0; r < viewRows; r++) {
             for (var c = 0; c < viewCols; c++) {
@@ -207,7 +212,7 @@ describe('view-layer', function () {
         it('should be able to write values to cells', function () {
             view.draw();
             helper.onDraw(function () {
-                expect(findGridCells(container).first().text()).toEqual('0-0');
+                expect(findGridCells(container).first().text()).toEqual(getCellText(0, 0));
             });
         });
 
@@ -247,7 +252,7 @@ describe('view-layer', function () {
         it('should write offset values to the cells if scrolled', function () {
             grid.cellScrollModel.scrollTo(5, 6);
             helper.onDraw(function () {
-                expectFirstCellText('5-6');
+                expectFirstCellText(getCellText(5, 6));
             });
         });
 
@@ -583,7 +588,7 @@ describe('view-layer', function () {
                         expect(updateSpy.argsForCall[r][1]).toEqual({
                             virtualRow: r + 1,
                             virtualCol: 1,
-                            data: (r + 1) + '-1'
+                            data: grid.dataModel.get(r + 1, 1)
                         });
                     }
 
@@ -674,7 +679,7 @@ describe('view-layer', function () {
                 });
             });
         });
-        
+
     });
 
     describe('varied sizes', function () {
@@ -712,7 +717,7 @@ describe('view-layer', function () {
             viewBeforeEach(false, false, 1, 0);
             grid.cellScrollModel.scrollTo(1, 0);
             helper.onDraw(function () {
-                expectFirstCellText('0-0');
+                expectFirstCellText(getCellText(0, 0));
             });
         });
 
@@ -720,7 +725,7 @@ describe('view-layer', function () {
             viewBeforeEach(false, false, 0, 1);
             grid.cellScrollModel.scrollTo(0, 1);
             helper.onDraw(function () {
-                expectFirstCellText('0-0');
+                expectFirstCellText(getCellText(0, 0));
             });
         });
 
@@ -751,8 +756,18 @@ describe('view-layer', function () {
             });
         });
 
-        it('should offset the request for data by the headers', function () {
+        it('should offset the data by the headers', function () {
             viewBeforeEach(false, false, 1, 1, 1, 1);
+            helper.onDraw(function () {
+                expect(findCellByRowCol(1, 1).text()).toBe(getCellText(0, 0));
+            });
+        });
+
+        it('should set the contents of the headers', function () {
+            viewBeforeEach(false, false, 1, 1, 1, 1);
+            helper.onDraw(function () {
+                expect(findCellByRowCol(0, 0).text()).toBe(getCellText(0, 0, true));
+            });
         });
     });
 

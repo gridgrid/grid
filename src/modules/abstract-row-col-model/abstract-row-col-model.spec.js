@@ -108,7 +108,7 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
         it('should be able to add a header', function () {
             var descriptor = model.create();
             model.addHeaders(descriptor);
-            expect(model.getHeader(0)).toBe(descriptor);
+            expect(model.header(0)).toBe(descriptor);
         });
 
         it('should tell me the number of headers', function () {
@@ -134,6 +134,13 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
         it('should be included in num fixed', function () {
             model.addHeaders(model.create());
             expect(model.numFixed()).toBe(1);
+        });
+
+        it('should get me back ' + name + 's', function () {
+            model.addHeaders(model.create());
+            var descriptor = model.create();
+            model.add(descriptor);
+            expect(model[name](0)).toBe(descriptor);
         });
 
     });

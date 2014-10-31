@@ -16,8 +16,10 @@ module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows,
         var cols = [];
         for (var r = 0; r < numRows + headerRows; r++) {
             var row = grid.rowModel.create();
-            row.dataRow = r;
+            var dataRow = r - headerRows;
+            row.dataRow = dataRow;
             if (r < headerRows) {
+                row.dataRow = r;
                 row.header = true;
             }
             else if (r < fixedRows + headerRows) { //returns false for undefined luckily
@@ -29,10 +31,12 @@ module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows,
             rows.push(row);
             if (numCols) {
                 for (var c = 0; c < numCols + headerCols || 0; c++) {
+                    var dataCol = c - headerCols;
                     if (r === 0) {
                         var col = grid.colModel.create();
-                        col.dataCol = c;
+                        col.dataCol = dataCol;
                         if (c < headerCols) {
+                            col.dataCol = c;
                             col.header = true;
                         } else if (c < fixedCols + headerCols) {
                             col.fixed = true;
@@ -47,7 +51,12 @@ module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows,
                         }
                         cols.push(col);
                     }
-                    grid.dataModel.set(r, c, {value: [r, c]});
+                    if (c < headerCols || r < headerRows) {
+                        grid.dataModel.setHeader(r, c, {value: [r, c]});
+                    } else {
+                        grid.dataModel.set(dataRow, dataCol, {value: [dataRow, dataCol]});
+                    }
+                    
                 }
             }
         }

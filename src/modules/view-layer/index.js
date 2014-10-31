@@ -138,6 +138,8 @@ module.exports = function (_grid) {
     viewLayer._drawCells = function () {
         measureBorderWidth();
         var bWidth = getBorderWidth();
+        var headerRows = grid.rowModel.numHeaders();
+        var headerCols = grid.colModel.numHeaders();
         grid.viewPort.iterateCells(function drawCell(r, c) {
             var cell = cells[r][c];
             var width = grid.viewPort.getColWidth(c);
@@ -151,7 +153,12 @@ module.exports = function (_grid) {
             }
             var virtualRow = grid.viewPort.toVirtualRow(r);
             var virtualCol = grid.viewPort.toVirtualCol(c);
-            var formattedData = grid.dataModel.getFormatted(virtualRow, virtualCol);
+            var data;
+            if (r < headerRows || c < headerCols) {
+                data = grid.dataModel.getHeader(virtualRow, virtualCol);
+            } else {
+                data = grid.dataModel.get(virtualRow - headerRows, virtualCol - headerCols);
+            }
             var builder = grid.colBuilders.get(virtualCol);
             var cellChild;
             if (builder) {
@@ -159,12 +166,12 @@ module.exports = function (_grid) {
                 cellChild = builder.update(builtElem, {
                     virtualCol: virtualCol,
                     virtualRow: virtualRow,
-                    data: formattedData
+                    data: data
                 });
             }
             //if we didn't get a child from the builder use a regular text node
             if (!cellChild) {
-                cellChild = document.createTextNode(formattedData);
+                cellChild = document.createTextNode(data.formatted);
             }
             cell.appendChild(cellChild);
         }, function drawRow(r) {

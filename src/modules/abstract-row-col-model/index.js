@@ -52,7 +52,7 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
             });
             api.add(toAdd);
         },
-        getHeader: function (index) {
+        header: function (index) {
             return descriptors[index];
         },
         get: function (index) {
@@ -101,6 +101,11 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
         }
 
         return descriptors[index] && descriptors[index][lengthName] || DEFAULT_LENGTH;
+    };
+
+    //row or col get
+    api[name] = function (index) {
+        return descriptors[index + numHeaders];
     };
 
     return api;

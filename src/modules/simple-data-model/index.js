@@ -2,26 +2,46 @@ module.exports = function (_grid) {
     var grid = _grid;
 
     var cellData = [];
+    var headerData = [];
     var sortedCol;
     var ascending;
     var dirtyClean = require('@grid/dirty-clean')(grid);
+    var internalSet = function (data, r, c, datum) {
+        if (!data[r]) {
+            data[r] = [];
+        }
+        data[r][c] = datum;
+        dirtyClean.setDirty();
+    };
+
     var api = {
         isDirty: dirtyClean.isDirty,
         set: function (r, c, datum) {
-            if (!cellData[r]) {
-                cellData[r] = [];
-            }
-            cellData[r][c] = datum;
-            dirtyClean.setDirty();
+            internalSet(cellData, r, c, datum);
+        },
+        setHeader: function (r, c, datum) {
+            internalSet(headerData, r, c, datum);
         },
         get: function (r, c) {
-            var dataRow = cellData[grid.rowModel.get(r).dataRow];
-            return dataRow && dataRow[grid.colModel.get(c).dataCol];
+            var dataRow = cellData[grid.rowModel.row(r).dataRow];
+            var datum = dataRow && dataRow[grid.colModel.col(c).dataCol];
+            var value = datum && datum.value;
+            return {
+                value: value,
+                formatted: value && 'r' + value[0] + ' c' + value[1] || ''
+            };
         },
-        getFormatted: function (r, c) {
-            var datum = api.get(r, c);
-            return datum && datum.value && datum.value.join('-') || '';
+        getHeader: function (r, c) {
+            var dataRow = headerData[grid.rowModel.get(r).dataRow];
+
+            var datum = dataRow && dataRow[grid.colModel.get(c).dataCol];
+            var value = datum && datum.value;
+            return {
+                value: value,
+                formatted: value && 'hr' + value[0] + ' hc' + value[1] || ''
+            };
         },
+
         toggleSort: function (c) {
             var retVal = -1;
             var compareMethod = function (val1, val2) {

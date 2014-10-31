@@ -15,18 +15,14 @@ angular.module('riqGridApp', [])
 
                 var numRows = 1000;
                 var numCols = 100;
-                
+
                 var grid = makeSimpleGrid(numRows, numCols, [30], [40, 100, 400, 90], 1, 3, undefined, 1, 1);
                 grid.colModel.get(2).width = 40;
                 grid.build(elem);
                 grid.navigationModel.minRow = 1;
 
-                var debouncedApply = debounce(function () {
-                    $scope.$digest();
-                }, 1);
-
                 var builder = grid.colBuilders.create(function () {
-                    return $compile('<a>{{data}}</a>')($scope.$new())[0];
+                    return $compile('<a>{{data.formatted}}</a>')($scope.$new())[0];
                 }, function (elem, ctx) {
                     var scope = angular.element(elem).scope();
                     scope.data = ctx.data;
@@ -37,7 +33,6 @@ angular.module('riqGridApp', [])
                 grid.colBuilders.set(0, builder);
                 grid.colBuilders.set(1, builder);
                 grid.colBuilders.set(2, builder);
-                debouncedApply();
 
                 //this really shouldn't be necessary but just to make sure
                 grid.requestDraw();

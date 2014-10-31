@@ -3,23 +3,25 @@ describe('simple-data-model', function () {
     var grid;
     var dataModel;
     beforeEach(function () {
-        grid = helper.buildSimpleGrid();
+        grid = helper.buildSimpleGrid(undefined, undefined, false, false, 1, 1, 1, 1);
         dataModel = grid.dataModel;
     });
 
     it('should be able to get back data', function () {
         expect(dataModel.get(0, 0).value).toBeDefined();
+        expect(dataModel.get(0, 0).formatted).toBeAString();
     });
 
-    it('should be able to get back a formatted string', function () {
-        expect(dataModel.getFormatted(0, 0)).toBeAString();
+    it('should be able to get back header data', function () {
+        expect(dataModel.getHeader(0, 0).value).toBeDefined();
+        expect(dataModel.getHeader(0, 0).formatted).toBeAString();
     });
 
     it('should be able to sort by a col', function () {
-        var last = dataModel.getFormatted(99, 0);
+        var last = dataModel.get(99, 0).formatted;
         dataModel.toggleSort(0);
         dataModel.toggleSort(0);
-        expect(dataModel.getFormatted(0, 0)).toBe(last);
+        expect(dataModel.get(0, 0).formatted).toBe(last);
     });
 
 });
