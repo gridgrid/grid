@@ -9,10 +9,15 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
     var numFixed = 0;
     var numHeaders = 0;
     var dirtyClean = require('@grid/dirty-clean')(grid);
+    var selected = [];
 
     function setDescriptorsDirty() {
         grid.eventLoop.fire('grid-' + name + '-change');
         dirtyClean.setDirty();
+    }
+
+    function fireSelectionChange() {
+        grid.eventLoop.fire('grid-' + name + 'selection-change');
     }
 
     var api = {
@@ -70,6 +75,44 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
         },
         numFixed: function () {
             return numFixed;
+        },
+        select: function (index) {
+            var descriptor = api.get(index);
+            if (!descriptor.selected) {
+                descriptor.selected = true;
+                selected.push(index);
+                fireSelectionChange();
+            }
+        },
+        deselect: function (index, dontNotify) {
+            var descriptor = api.get(index);
+            if (descriptor.selected) {
+                descriptor.selected = false;
+                selected.splice(selected.indexOf(index), 1);
+                if (!dontNotify) {
+                    fireSelectionChange();
+                }
+            }
+        },
+        toggleSelect: function (index) {
+            var descriptor = api.get(index);
+            if (descriptor.selected) {
+                api.deselect(index);
+            } else {
+                api.select(index);
+            }
+        },
+        clearSelected: function () {
+            var length = selected.length;
+            selected.slice(0).forEach(function (index) {
+                api.deselect(index, true);
+            });
+            if (length) {
+                fireSelectionChange();
+            }
+        },
+        getSelected: function () {
+            return selected;
         },
         create: function () {
             var descriptor = {};

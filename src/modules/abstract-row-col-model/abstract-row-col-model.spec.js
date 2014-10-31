@@ -168,6 +168,68 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
         });
     });
 
+    describe('selection', function () {
+        beforeEach(function () {
+            model.add(model.create());
+        });
+
+        it('should be able to select ' + name + 's', function () {
+            model.select(0);
+            expect(model.getSelected()).toEqual([0]);
+        });
+
+        it('should be idempotent', function () {
+            model.select(0);
+            model.select(0);
+            expect(model.getSelected()).toEqual([0]);
+        });
+
+        it('should be able to clear', function () {
+            model.select(0);
+            model.clearSelected();
+            expect(model.getSelected()).toEqual([]);
+        });
+
+        it('should be able to deselect', function () {
+            model.select(0);
+            model.deselect(0);
+            expect(model.getSelected()).toEqual([]);
+        });
+
+        it('should be able to toggle select', function () {
+            model.toggleSelect(0);
+            expect(model.getSelected()).toEqual([0]);
+            model.toggleSelect(0);
+            expect(model.getSelected()).toEqual([]);
+        });
+
+        it('should set a selected flag on the descriptor', function () {
+            model.select(0);
+            expect(model.get(0).selected).toBe(true);
+        });
+
+        it('should fire an event on change', function () {
+            var spy = jasmine.createSpy('selection change');
+            grid.eventLoop.bind('grid-' + name + 'selection-change', spy);
+            model.select(0);
+            expect(spy).toHaveBeenCalled();
+            spy.reset();
+            model.deselect(0);
+            expect(spy).toHaveBeenCalled();
+            spy.reset();
+            model.toggleSelect(0);
+            expect(spy).toHaveBeenCalled();
+            spy.reset();
+            //select two so we can ensure it only gets called once
+            model.add(model.create());
+            model.select(1);
+            spy.reset();
+            model.clearSelected();
+            expect(spy).toHaveBeenCalled();
+            expect(spy.callCount).toBe(1);
+        });
+    });
+
 }
 
 
