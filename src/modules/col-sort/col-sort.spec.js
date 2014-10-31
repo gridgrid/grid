@@ -1,6 +1,6 @@
 (function () {
     var mockEvent = require('@grid/custom-event');
-    describe('col-sort', function () {
+    xdescribe('col-sort', function () {
 
 
         var helper = require('@grid/grid-spec-helper')();
