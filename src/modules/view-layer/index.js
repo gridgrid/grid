@@ -175,7 +175,7 @@ module.exports = function (_grid) {
             }
             cell.appendChild(cellChild);
         }, function drawRow(r) {
-            var height = grid.viewPort.getRowHeight(r); //maybe faster to do this only on row iterations but meh
+            var height = grid.viewPort.getRowHeight(r);
             var row = rows[r];
             row.style.height = height + bWidth + 'px';
             var top = grid.viewPort.getRowTop(r);
@@ -305,7 +305,7 @@ module.exports = function (_grid) {
                             range.top += grid.rowModel.numHeaders();
                             range.left += grid.colModel.numHeaders();
                         }
-                        
+
                         var realCellRange = grid.viewPort.intersect(range);
                         if (realCellRange) {
                             positionCellDecoratorFromRealCellRange(realCellRange, boundingBox);
