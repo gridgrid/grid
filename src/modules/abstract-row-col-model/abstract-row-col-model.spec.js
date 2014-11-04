@@ -1,10 +1,10 @@
 function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
-    var helper = require('@grid/grid-spec-helper')();
+    require('@grid/grid-spec-helper')();
     var model;
     var grid;
 
     beforeEach(function () {
-        grid = helper.buildSimpleGrid();
+        grid = this.buildSimpleGrid();
         model = modelCreatorFn(grid, name, lengthName, defaultLength);
     });
 
@@ -23,7 +23,7 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
     });
 
     it('should be dirty on add', function () {
-        helper.resetAllDirties();
+        this.resetAllDirties();
         model.add({});
         expect(model).toBeDirty();
     });
@@ -156,7 +156,6 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
         describe('should satisfy', function () {
             var ctx = {};
             beforeEach(function () {
-                ctx.helper = helper;
                 ctx.obj = model.create();
                 ctx.dirtyObjs = [model];
                 ctx.props = [lengthName];
@@ -242,9 +241,7 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
 //maybe we should separate the module and the test but it's fine for now cause any requires will still only cause it to execute once
 describe('abstract-row-col-model', function () {
     var abstractRowCol = require('@grid/abstract-row-col-model');
-    //make sure it can satisify two sets of requirements
     testAbstractModel(abstractRowCol, 'colish', 'widthy', 100);
-    testAbstractModel(abstractRowCol, 'rowesque', 'heightlike', 30);
 });
 
 module.exports = testAbstractModel;

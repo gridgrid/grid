@@ -2,11 +2,11 @@
     describe('col-builders', function () {
 
 
-        var helper = require('@grid/grid-spec-helper')();
+        require('@grid/grid-spec-helper')();
         var grid;
         var builders;
         beforeEach(function () {
-            grid = helper.buildSimpleGrid();
+            grid =this.buildSimpleGrid();
             builders = grid.colBuilders;
         });
 
@@ -43,7 +43,7 @@
         });
 
         it('should be dirty on set', function () {
-            helper.resetAllDirties();
+           this.resetAllDirties();
             builders.set(2, builders.create());
             expect(builders).toBeDirty();
         });

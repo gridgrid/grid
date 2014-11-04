@@ -3,21 +3,20 @@ var mockEvent = require('@grid/custom-event');
 
 describe('col-reorder', function () {
 
-    var helper = require('@grid/grid-spec-helper')();
+    require('@grid/grid-spec-helper')();
     var grid;
     var colReorder;
     var beforeEachFn = function (fixedR, fixedC) {
-        grid = helper.buildSimpleGrid(undefined, undefined, undefined, undefined, fixedR, fixedC);
+        grid = this.buildSimpleGrid(undefined, undefined, undefined, undefined, fixedR, fixedC);
         colReorder = grid.colReorder;
     };
     beforeEach(function () {
-        beforeEachFn();
+        beforeEachFn.call(this);
     });
 
     describe('should satisfy', function () {
         var ctx = {};
         beforeEach(function () {
-            ctx.helper = helper;
             ctx.headerDecorators = colReorder;
         });
 
@@ -29,7 +28,6 @@ describe('col-reorder', function () {
         var ctx = {};
         var col = 1;
         beforeEach(function () {
-            ctx.helper = helper;
             ctx.decorator = colReorder._decorators[col];
         });
 
@@ -67,7 +65,6 @@ describe('col-reorder', function () {
 
 
             beforeEach(function () {
-                dragCtx.helper = helper;
                 startDrag();
                 dragCtx.decorator = ctx.decorator._dragRect;
             });
@@ -103,7 +100,6 @@ describe('col-reorder', function () {
             describe('target col', function () {
                 var targetCtx = {};
                 beforeEach(function () {
-                    targetCtx.helper = helper;
                     targetCtx.decorator = dragCtx.decorator._targetCol;
                     targetCtx.decorator.render(); //mock the render so we don't have to wait for the entire view in test
                     fireDrag(205);
@@ -173,7 +169,7 @@ describe('col-reorder', function () {
 
         describe('fixed cols', function () {
             beforeEach(function () {
-                beforeEachFn(1, 3);
+                beforeEachFn.call(this, 1, 3);
                 ctx.decorator = colReorder._decorators[col];
             });
 

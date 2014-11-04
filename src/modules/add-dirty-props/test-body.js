@@ -1,10 +1,8 @@
 module.exports = function (context) {
-    var helper;
     var obj;
     var props;
     var dirtyObjs;
     beforeEach(function () {
-        helper = context.helper;
         obj = context.obj;
         dirtyObjs = context.dirtyObjs;
         props = context.props;
@@ -12,7 +10,7 @@ module.exports = function (context) {
 
     describe('add-dirty-props', function () {
         function setPropAndCheckDirty(prop, val) {
-            helper.resetAllDirties();
+            this.resetAllDirties();
             dirtyObjs.forEach(function (dirtyObj) {
                 expect(dirtyObj).not.toBeDirty();
             });
@@ -23,8 +21,9 @@ module.exports = function (context) {
         }
 
         it('should get marked dirty on relevant property changes', function () {
+            var self = this;
             props.forEach(function (prop) {
-                setPropAndCheckDirty(prop, 'some really weird value that hopefully no one would use as a default'); //any value should do    
+                setPropAndCheckDirty.call(self, prop, 'some really weird value that hopefully no one would use as a default'); //any value should do    
             });
         });
     });

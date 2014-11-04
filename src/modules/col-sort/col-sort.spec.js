@@ -3,10 +3,10 @@
     xdescribe('col-sort', function () {
 
 
-        var helper = require('@grid/grid-spec-helper')();
+        require('@grid/grid-spec-helper')();
         var grid;
         beforeEach(function () {
-            grid = helper.buildSimpleGrid();
+            grid =this.buildSimpleGrid();
         });
 
         it('should call data model toggle sort on click without drag', function () {

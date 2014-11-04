@@ -1,10 +1,10 @@
 describe('dirty-clean', function () {
-    var helper = require('@grid/grid-spec-helper')();
+    require('@grid/grid-spec-helper')();
     var dirtyClean;
     var grid;
     beforeEach(function () {
-        grid = helper.buildSimpleGrid();
-        helper.viewBuild();
+        grid = this.buildSimpleGrid();
+        this.viewBuild();
         dirtyClean = require('@grid/dirty-clean')(grid);
     });
 
@@ -15,7 +15,7 @@ describe('dirty-clean', function () {
 
     it('should be clean on draw', function (done) {
         grid.viewLayer.draw();
-        helper.onDraw(function () {
+        this.onDraw(function () {
             expect(dirtyClean).not.toBeDirty();
             done();
         });
@@ -23,11 +23,11 @@ describe('dirty-clean', function () {
 
     it('should let me set it to dirty and request draw', function (done) {
         var spy = spyOn(grid, 'requestDraw');
-        helper.resetAllDirties();
+        this.resetAllDirties();
         dirtyClean.setDirty();
         expect(dirtyClean).toBeDirty();
         expect(dirtyClean).not.toBeClean();
-        helper.onDraw(function () {
+        this.onDraw(function () {
             expect(spy).toHaveBeenCalled();
             done();
         });

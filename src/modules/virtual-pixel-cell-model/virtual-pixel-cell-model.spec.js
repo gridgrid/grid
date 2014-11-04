@@ -1,19 +1,19 @@
 describe('virtual-pixel-cell-model', function () {
 
-    var helper = require('@grid/grid-spec-helper')();
+    require('@grid/grid-spec-helper')();
     var model;
     var numRows = 100;
     var numCols = 10;
     var grid;
 
     function beforeEachFn(varyH, varyW, fixedR, fixedC) {
-        grid = helper.buildSimpleGrid(numRows, numCols, varyH, varyW, fixedR, fixedC);
+        grid = this.buildSimpleGrid(numRows, numCols, varyH, varyW, fixedR, fixedC);
         model = grid.virtualPixelCellModel;
 
     }
 
     beforeEach(function () {
-        beforeEachFn();
+        beforeEachFn.call(this);
     });
 
     it('should tell me the data row of a virtual top location', function () {
@@ -92,7 +92,7 @@ describe('virtual-pixel-cell-model', function () {
     });
 
     it('should tell me fixed height', function () {
-        beforeEachFn(false, false, 2, 3);
+        beforeEachFn.call(this, false, false, 2, 3);
         expect(model.fixedHeight()).toBe(60);
         expect(model.fixedWidth()).toBe(300);
     });

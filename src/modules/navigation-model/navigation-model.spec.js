@@ -2,11 +2,11 @@ var mockEvent = require('@grid/custom-event');
 var key = require('key');
 
 describe('navigation-model', function () {
-    var helper = require('@grid/grid-spec-helper')();
+    require('@grid/grid-spec-helper')();
     var model;
     var grid;
     var beforeEachFn = function (hRows, hCols) {
-        grid = helper.buildSimpleGrid(undefined, undefined, undefined, undefined, undefined, undefined, hRows, hCols);
+        grid = this.buildSimpleGrid(undefined, undefined, undefined, undefined, undefined, undefined, hRows, hCols);
         model = grid.navigationModel;
     };
 
@@ -32,7 +32,7 @@ describe('navigation-model', function () {
     describe('focus', function () {
         var focus;
         beforeEach(function () {
-            beforeEachFn();
+            beforeEachFn.call(this);
             focus = model.focus;
         });
 
@@ -85,7 +85,7 @@ describe('navigation-model', function () {
             });
 
             describe('should satisfy:', function () {
-                var ctx = {helper: helper};
+                var ctx = {};
                 beforeEach(function () {
                     ctx.decorator = decorator;
                 });
@@ -148,12 +148,12 @@ describe('navigation-model', function () {
     describe('selection', function () {
         var selection;
         beforeEach(function () {
-            beforeEachFn();
+            beforeEachFn.call(this);
             selection = model.selection;
         });
 
         describe('should satisfy:', function () {
-            var ctx = {helper: helper};
+            var ctx = {};
             beforeEach(function () {
                 ctx.decorator = selection;
             });
@@ -190,7 +190,7 @@ describe('navigation-model', function () {
 
         it('should unbind on drag end', function () {
             var dragStart = {type: 'grid-drag-start', row: 1, col: 2};
-            var unbind = helper.spyOnUnbind();
+            var unbind = this.spyOnUnbind();
             selection._onDragStart(dragStart);
             var drag = {type: 'grid-cell-drag', row: 3, col: 4};
             grid.eventLoop.fire(drag);
@@ -251,7 +251,7 @@ describe('navigation-model', function () {
 
     describe('headers / col row selection', function () {
         beforeEach(function () {
-            beforeEachFn(1, 1);
+            beforeEachFn.call(this, 1, 1);
         });
         //row col selection
         it('should select a whole col on header mousedown', function () {

@@ -3,11 +3,11 @@
 
 
         var makeDirtyClean = require('@grid/dirty-clean');
-        var helper = require('@grid/grid-spec-helper')();
+        require('@grid/grid-spec-helper')();
         var spy;
         var ctx = {props: ['random', 'props', 'are', 'fun']};
         beforeEach(function () {
-            var grid = helper.buildSimpleGrid();
+            var grid = this.buildSimpleGrid();
             var parentDirtyClean = makeDirtyClean(grid);
             var parent = {isDirty: parentDirtyClean.isDirty};
             var dirtyClean = makeDirtyClean(grid);
@@ -16,7 +16,6 @@
             ctx.obj = require('@grid/add-dirty-props')({}, ctx.props, [dirtyClean, parentDirtyClean]);
             ctx.obj.isDirty = dirtyClean.isDirty;
             ctx.dirtyObjs = [ctx.obj, parent];
-            ctx.helper = helper;
         });
 
         require('@grid/add-dirty-props/test-body')(ctx);

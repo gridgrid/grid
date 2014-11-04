@@ -1,6 +1,6 @@
 describe('cell-scroll-model', function () {
 
-    var helper = require('@grid/grid-spec-helper')();
+    require('@grid/grid-spec-helper')();
     var model;
     var numRows = 100;
     var numCols = 10;
@@ -8,11 +8,11 @@ describe('cell-scroll-model', function () {
 
     var beforeEachFunction = function (fixedR, fixedC, vary) {
 
-        grid = helper.buildSimpleGrid(numRows, numCols, false, vary, fixedR, fixedC);
+        grid = this.buildSimpleGrid(numRows, numCols, false, vary, fixedR, fixedC);
         model = grid.cellScrollModel;
     };
     beforeEach(function () {
-        beforeEachFunction();
+        beforeEachFunction.call(this);
     });
 
     it('should have a row and col value that start at 0', function () {
@@ -83,7 +83,7 @@ describe('cell-scroll-model', function () {
         });
 
         it('should scroll a cell into view from above with fixed rows and cols', function () {
-            beforeEachFunction(3, 3);
+            beforeEachFunction.call(this, 3, 3);
             model.scrollTo(2, 2);
             model.scrollIntoView(3, 3);
             expect(model).rowToBe(0);
@@ -100,7 +100,7 @@ describe('cell-scroll-model', function () {
         });
 
         it('should scroll a cell into view with varied sizes', function () {
-            beforeEachFunction(3, 3, [40, 100, 400, 90]);
+            beforeEachFunction.call(this, 3, 3, [40, 100, 400, 90]);
             model.scrollIntoView(0, 6);
             expect(model).rowToBe(0);
             expect(model).colToBe(3);

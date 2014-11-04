@@ -2,19 +2,19 @@ var mockEvent = require('@grid/custom-event');
 
 describe('pixel-scroll-model', function () {
     var $ = require('jquery');
-    var helper = require('@grid/grid-spec-helper')();
+    require('@grid/grid-spec-helper')();
     var model;
     var numRows = 100;
     var numCols = 10;
     var grid;
 
     function beforeEachFn(varyH, varyW, fixedR, fixedC) {
-        grid = helper.buildSimpleGrid(numRows, numCols, varyH, varyW, fixedR, fixedC);
+        grid = this.buildSimpleGrid(numRows, numCols, varyH, varyW, fixedR, fixedC);
         model = grid.pixelScrollModel;
     }
 
     beforeEach(function () {
-        beforeEachFn();
+        beforeEachFn.call(this);
     });
 
     it('should have a top and left value that start at 0', function () {
@@ -35,7 +35,7 @@ describe('pixel-scroll-model', function () {
     });
 
     it('should not include fixed width or height in its scroll size', function () {
-        beforeEachFn(false, false, 2, 3);
+        beforeEachFn.call(this, false, false, 2, 3);
         grid.eventLoop.fire('grid-virtual-pixel-cell-change');
         expect(model).heightToBe(numRows * 30 - 2 * 30);
         expect(model).widthToBe(numCols * 100 - 3 * 100);
@@ -126,7 +126,7 @@ describe('pixel-scroll-model', function () {
         }
 
         beforeEach(function () {
-            scrollBeforeEachFn();
+            scrollBeforeEachFn.call(this);
         });
 
         it('should stopbubbling mousedowns', function () {
@@ -186,8 +186,8 @@ describe('pixel-scroll-model', function () {
         });
 
         it('should size to the right percentage of the view accounting for fixed width and height', function () {
-            beforeEachFn(false, false, 2, 3);
-            scrollBeforeEachFn();
+            beforeEachFn.call(this, false, false, 2, 3);
+            scrollBeforeEachFn.call(this);
             expect(model.vertScrollBar).heightToBe(getScrollBarHeight());
             expect(model.vertScrollBar).widthToBe(10);
             expect(model.horzScrollBar).widthToBe(getScrollBarWidth());
@@ -195,7 +195,7 @@ describe('pixel-scroll-model', function () {
         });
 
         it('should have a min width or height', function () {
-            scrollBeforeEachFn(30, 90);
+            scrollBeforeEachFn.call(this, 30, 90);
             expect(model.vertScrollBar).heightToBe(20);
             expect(model.vertScrollBar).widthToBe(10);
             expect(model.horzScrollBar).widthToBe(20);
@@ -203,7 +203,7 @@ describe('pixel-scroll-model', function () {
         });
 
         it('should consider the min height when positioning', function () {
-            scrollBeforeEachFn(30, 90);
+            scrollBeforeEachFn.call(this, 30, 90);
             model.scrollTo(Infinity, Infinity);
             expect(model.vertScrollBar).topToBe(30 - 20);
 
@@ -221,7 +221,7 @@ describe('pixel-scroll-model', function () {
         });
 
         it('should start out at the top and left of the unfixed area', function () {
-            beforeEachFn(false, false, 2, 3);
+            beforeEachFn.call(this, false, false, 2, 3);
             expect(model.vertScrollBar).topToBe(2 * 30);
             expect(model.horzScrollBar).leftToBe(3 * 100);
         });
@@ -241,7 +241,7 @@ describe('pixel-scroll-model', function () {
 
         function renderBar(barDecorator) {
             var bar = barDecorator.render();
-            helper.container.appendChild(bar);
+            this.container.appendChild(bar);
             return bar;
         }
 
@@ -252,7 +252,7 @@ describe('pixel-scroll-model', function () {
         }
 
         function renderBarAndFireDragStart(preFireFn) {
-            var bar = renderBar(model.vertScrollBar);
+            var bar = renderBar.call(this, model.vertScrollBar);
             var dragStart = mockEvent('grid-drag-start', true);
             if (preFireFn) {
                 preFireFn();
@@ -263,7 +263,7 @@ describe('pixel-scroll-model', function () {
 
         it('should bind drag and drag-end on drag-start', function () {
             var bind;
-            renderBarAndFireDragStart(function () {
+            renderBarAndFireDragStart.call(this, function () {
                 bind = spyOn(grid.eventLoop, 'bind').and.callThrough();
             });
             //these start at 2 because the mousemodel binds first
@@ -330,28 +330,28 @@ describe('pixel-scroll-model', function () {
 
         //i'm so so sorry if you have to try to debug these test failures. it's bad. 
         it('should scroll with mousemove', function () {
-            var vertBar = renderBar(model.vertScrollBar);
+            var vertBar = renderBar.call(this, model.vertScrollBar);
             //send two scrolls to ensure it doesn't reset in between (cause that was a bug)
             var top = sendScrollToBar(vertBar, [4, 6, 3, 2, -1], 0, false, model.vertScrollBar);
             sendScrollToBar(vertBar, [2, 5, 6], top, false, model.vertScrollBar);
 
 
-            var horzBar = renderBar(model.horzScrollBar);
+            var horzBar = renderBar.call(this, model.horzScrollBar);
             //send two scrolls to ensure it doesn't reset in between (cause that was a bug)
             var left = sendScrollToBar(horzBar, [2, 8, -1, 3, 2], 0, true, model.horzScrollBar);
             sendScrollToBar(horzBar, [5, 2, 9], left, true, model.horzScrollBar);
         });
 
         it('should scroll with mousemove when fixed', function () {
-            beforeEachFn(false, false, 1, 1);
-            scrollBeforeEachFn(1500, 500);
-            var vertBar = renderBar(model.vertScrollBar);
+            beforeEachFn.call(this, false, false, 1, 1);
+            scrollBeforeEachFn.call(this, 1500, 500);
+            var vertBar = renderBar.call(this, model.vertScrollBar);
             //send two scrolls to ensure it doesn't reset in between (cause that was a bug)
             var top = sendScrollToBar(vertBar, [4, 6, 3, 2, -1], 0, false, model.vertScrollBar);
             sendScrollToBar(vertBar, [2, 5, 6], top, false, model.vertScrollBar);
 
 
-            var horzBar = renderBar(model.horzScrollBar);
+            var horzBar = renderBar.call(this, model.horzScrollBar);
             //send two scrolls to ensure it doesn't reset in between (cause that was a bug)
             var left = sendScrollToBar(horzBar, [2, 8, -1, 3, 2], 0, true, model.horzScrollBar);
             sendScrollToBar(horzBar, [5, 2, 9], left, true, model.horzScrollBar);
@@ -364,7 +364,7 @@ describe('pixel-scroll-model', function () {
         }
 
         it('should unbind on mouseup', function () {
-            renderBarAndFireDragStart();
+            renderBarAndFireDragStart.call(this);
             var dragSpy = spyOn(model.vertScrollBar, '_unbindDrag');
             var endSpy = spyOn(model.vertScrollBar, '_unbindDragEnd');
             fireMouseUp();
