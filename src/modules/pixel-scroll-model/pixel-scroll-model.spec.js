@@ -28,6 +28,12 @@ describe('pixel-scroll-model', function () {
         expect(model.left).toEqual(6);
     });
 
+    it('should match the cell scroll', function () {
+        grid.cellScrollModel.scrollTo(6, 2);
+        expect(model.top).toEqual(6 * 30);
+        expect(model.left).toEqual(2 * 100);
+    });
+
     it('should let you set a scroll height and width', function () {
         model.setScrollSize(100, 200);
         expect(model.height).toEqual(100);

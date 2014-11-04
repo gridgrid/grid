@@ -10,17 +10,7 @@ module.exports = function (_grid) {
 
     model.isDirty = dirtyClean.isDirty;
 
-    grid.eventLoop.bind('grid-pixel-scroll', function () {
-        var scrollTop = grid.pixelScrollModel.top;
-        var row = grid.virtualPixelCellModel.getRow(scrollTop);
-
-        var scrollLeft = grid.pixelScrollModel.left;
-        var col = grid.virtualPixelCellModel.getCol(scrollLeft);
-
-        model.scrollTo(row, col);
-    });
-
-    model.scrollTo = function (r, c) {
+    model.scrollTo = function (r, c, dontFire) {
         var maxRow = grid.rowModel.length() - grid.rowModel.numFixed() - 1;
         var maxCol = grid.colModel.length() - grid.colModel.numFixed() - 1;
         var lastRow = model.row;
@@ -29,6 +19,11 @@ module.exports = function (_grid) {
         model.col = util.clamp(c, 0, maxCol);
         if (lastRow !== model.row || lastCol !== model.col) {
             dirtyClean.setDirty();
+            if (!dontFire) {
+                var top = grid.virtualPixelCellModel.height(0, model.row - 1);
+                var left = grid.virtualPixelCellModel.width(0, model.col - 1);
+                grid.pixelScrollModel.scrollTo(top, left, true);
+            }
         }
     };
 

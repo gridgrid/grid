@@ -33,6 +33,15 @@ module.exports = function (_grid) {
     function notifyListeners() {
         //TODO: possibly keep track of delta since last update and send it along. for now, no
         grid.eventLoop.fire('grid-pixel-scroll');
+
+        //update the cell scroll
+        var scrollTop = model.top;
+        var row = grid.virtualPixelCellModel.getRow(scrollTop);
+
+        var scrollLeft = model.left;
+        var col = grid.virtualPixelCellModel.getCol(scrollLeft);
+
+        grid.cellScrollModel.scrollTo(row, col, true);
     }
 
     var debouncedNotify = debounce(notifyListeners, 1);
@@ -46,6 +55,8 @@ module.exports = function (_grid) {
         if (!dontNotify) {
             notifyListeners();
         }
+
+
     };
 
 

@@ -27,6 +27,13 @@ describe('cell-scroll-model', function () {
         expect(model.col).toEqual(6);
     });
 
+    it('should be able to scroll without firing', function () {
+        var spy = jasmine.createSpy('cell scroll');
+        grid.eventLoop.bind('grid-cell-scroll', spy);
+        model.scrollTo(5, 6, true);
+        expect(spy).not.toHaveBeenCalled();
+    });
+
     it('should not let you scroll to a row that doesnt exist', function () {
         model.scrollTo(1000, 5);
         expect(model.row).toEqual(numRows - 1);
