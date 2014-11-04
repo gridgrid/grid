@@ -15,9 +15,7 @@ module.exports = function (_grid) {
     var focusClass = grid.cellClasses.create(0, 0, 'focus');
     grid.cellClasses.add(focusClass);
 
-    model.focusDecorator = grid.decorators.create();
-    model.focusDecorator.height = 1;
-    model.focusDecorator.width = 1;
+    model.focusDecorator = grid.decorators.create(0, 0, 1, 1);
     model.focusDecorator.render = function () {
         var div = defaultRender();
         div.setAttribute('class', 'grid-focus-decorator');
