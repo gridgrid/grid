@@ -79,7 +79,7 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
         },
         select: function (index) {
 
-            var descriptor = api.get(index);
+            var descriptor = api[name](index);
             if (!descriptor.selected) {
                 descriptor.selected = true;
                 selected.push(index);

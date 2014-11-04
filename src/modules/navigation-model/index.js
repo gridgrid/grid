@@ -144,10 +144,10 @@ module.exports = function (_grid) {
         var row = e.row;
         var col = e.col;
         if (row < 0 && col >= 0) {
-            grid.colModel.select(col);
+            grid.colModel.toggleSelect(col);
         }
         if (col < 0 && row >= 0) {
-            grid.rowModel.select(row);
+            grid.rowModel.toggleSelect(row);
         }
 
         if (row < 0 && col < 0) {

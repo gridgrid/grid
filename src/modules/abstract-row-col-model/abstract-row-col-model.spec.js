@@ -149,6 +149,16 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
             expect(model[name](0)).toBe(descriptor);
         });
 
+        it('should select disregarding headers', function () {
+            model.addHeaders(model.create());
+            var descriptor = model.create();
+            model.add(descriptor);
+            model.select(0);
+            expect(descriptor.selected).toBe(true);
+            model.deselect(0);
+            expect(descriptor.selected).toBe(false);
+        });
+
     });
 
 

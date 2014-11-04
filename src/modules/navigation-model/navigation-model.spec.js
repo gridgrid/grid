@@ -254,14 +254,20 @@ describe('navigation-model', function () {
             beforeEachFn.call(this, 1, 1);
         });
         //row col selection
-        it('should select a whole col on header mousedown', function () {
+        it('should toggle select a whole col on header mousedown', function () {
             makeAndFireMouseDownForCell(0, 3, true);
             expect(grid.colModel.getSelected()).toEqual([2]);
+            makeAndFireMouseDownForCell(0, 3, true);
+            expect(grid.colModel.getSelected()).toEqual([]);
         });
 
-        it('should select a whole row on header mousedown', function () {
+        it('should toggle select a whole row on header mousedown', function () {
             makeAndFireMouseDownForCell(3, 0, true);
             expect(grid.rowModel.getSelected()).toEqual([2]);
+            grid.cellScrollModel.scrollTo(0, 0);
+
+            makeAndFireMouseDownForCell(3, 0, true);
+            expect(grid.rowModel.getSelected()).toEqual([]);
         });
 
         it('should set a decorator for a selected row', function () {
