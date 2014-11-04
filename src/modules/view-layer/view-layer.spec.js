@@ -831,12 +831,13 @@ describe('view-layer', function () {
             });
         });
 
-        xit('should add a class to a range of cells in the data space', function (done) {
+        it('should add a class to a range of cells in the data space', function (done) {
+            viewBeforeEach.call(this, false, false, 1, 1, 1, 1);
             var cellClass = 'myRangedClass';
             var descriptor = grid.cellClasses.create(0, 0, cellClass, 2, 3, 'data');
             grid.cellClasses.add(descriptor);
             this.onDraw(function () {
-                expectOnlyRangeToHaveClass(1, 1, 2, 3, cellClass);
+                expectOnlyRangeToHaveClass.call(this, 1, 1, 2, 3, cellClass);
                 done();
             });
         });

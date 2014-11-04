@@ -115,7 +115,7 @@
         toHaveClass: defineBasicMatcher(function (actual, className) {
             return $(actual).hasClass(className);
         }, function (actual, expected, pass) {
-            return 'Expected "' + $(actual).attr('class') + '"' + (!pass ? ' not' : '') + ' to have class "' + expected + '"';
+            return 'Expected "' + $(actual).attr('class') + '"' + (pass ? ' not' : '') + ' to have class "' + expected + '"';
         }),
         toBeDirty: defineBasicMatcher(function (actual) {
             return actual.isDirty();

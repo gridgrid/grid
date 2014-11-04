@@ -25,8 +25,8 @@ module.exports = function (_grid) {
     //add the cell classes through the standard method
     grid.cellClasses.add(grid.cellClasses.create(0, 0, CELL_CLASS, Infinity, Infinity));
 
-    var rowHeaderClasses = grid.cellClasses.create(0, 0, 'grid-header grid-row-header', Infinity, 0);
-    var colHeaderClasses = grid.cellClasses.create(0, 0, 'grid-header grid-col-header', 0, Infinity);
+    var rowHeaderClasses = grid.cellClasses.create(0, 0, 'grid-header grid-row-header', Infinity, 0, 'virtual');
+    var colHeaderClasses = grid.cellClasses.create(0, 0, 'grid-header grid-col-header', 0, Infinity, 'virtual');
     var fixedColClasses = grid.cellClasses.create(0, -1, 'grid-last-fixed-col', Infinity, 1);
     var fixedRowClasses = grid.cellClasses.create(-1, 0, 'grid-last-fixed-row', 1, Infinity);
     grid.cellClasses.add(rowHeaderClasses);
@@ -262,6 +262,20 @@ module.exports = function (_grid) {
         positionDecorator(boundingBox, realPxRange.top, realPxRange.left, realPxRange.height + getBorderWidth(), realPxRange.width + getBorderWidth());
     }
 
+    function createRangeForDescriptor(descriptor) {
+        var range = {
+            top: descriptor.top,
+            left: descriptor.left,
+            height: descriptor.height,
+            width: descriptor.width
+        };
+        if (descriptor.space === 'data' && descriptor.units === 'cell') {
+            range.top += grid.rowModel.numHeaders();
+            range.left += grid.colModel.numHeaders();
+        }
+        return range;
+    }
+
     viewLayer._drawDecorators = function (cellsPositionOrSizeChanged) {
         var aliveDecorators = grid.decorators.getAlive();
         aliveDecorators.forEach(function (decorator) {
@@ -296,17 +310,7 @@ module.exports = function (_grid) {
                         case 'cell':
                         /* jshint -W086 */
                         default:
-                            var range = {
-                                top: decorator.top,
-                                left: decorator.left,
-                                height: decorator.height,
-                                width: decorator.width
-                            };
-                            if (decorator.space === 'data') {
-                                range.top += grid.rowModel.numHeaders();
-                                range.left += grid.colModel.numHeaders();
-                            }
-
+                            var range = createRangeForDescriptor(decorator);
                             var realCellRange = grid.viewPort.intersect(range);
                             if (realCellRange) {
                                 positionCellDecoratorFromViewCellRange(realCellRange, boundingBox);
@@ -349,7 +353,8 @@ module.exports = function (_grid) {
             cells[r][c].className = '';
         });
         grid.cellClasses.getAll().forEach(function (descriptor) {
-            var intersection = grid.viewPort.intersect(descriptor);
+            var range = createRangeForDescriptor(descriptor);
+            var intersection = grid.viewPort.intersect(range);
             if (intersection) {
                 rowLoop:
                     for (var r = 0; r < intersection.height; r++) {
