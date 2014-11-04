@@ -1,57 +1,14 @@
 module.exports = function () {
     var $ = require('jQuery');
 
-    var helper = {
-        CONTAINER_WIDTH: 800,
-        CONTAINER_HEIGHT: 500,
-        container: undefined,
-        buildSimpleGrid: function (numRows, numCols, varyHeight, varyWidths, fixedRows, fixedCols, headerRows, headerCols) {
-            maybeDestroyGrid();
-            helper.grid = require('@grid/simple-grid')(numRows || 100, numCols || 10, varyHeight, varyWidths, fixedRows, fixedCols, function (grid) {
-                helper.resizeSpy = spyOn(grid.viewPort, '_resize');
-            }, headerRows, headerCols);
-            helper.grid.viewPort.sizeToContainer(helper.container);
-            helper.grid.eventLoop.setContainer(helper.container);
-            return helper.grid;
-        },
-        viewBuild: function () {
-            helper.grid.viewLayer.build(helper.container);
-            return helper.container;
-        },
-        onDraw: function (fn) {
-            var hasBeenDrawn = false;
-            runs(function () {
-                helper.grid.eventLoop.bind('grid-draw', function () {
-                    hasBeenDrawn = true;
-                });
-            });
-            waitsFor(function () {
-                return hasBeenDrawn;
-            }, 'the view draw', 150);
-            runs(fn);
-        },
-        resetAllDirties: function () {
-            helper.grid.eventLoop.fire('grid-draw');
-        },
-        makeFakeRange: function (t, l, h, w) {
-            return {top: t, left: l, height: h, width: w};
-        },
-        spyOnUnbind: function () {
-            var unbind = jasmine.createSpy();
-            var bind = helper.grid.eventLoop.bind;
-            helper.grid.eventLoop.bind = function () {
-                bind.apply(bind, arguments);
-                return unbind;
-            };
-            return unbind;
-        }
-    };
-
     beforeEach(function () {
-        helper.container = document.createElement('div');
-        $(helper.container).css({
-            width: helper.CONTAINER_WIDTH + 'px',
-            height: helper.CONTAINER_HEIGHT + 'px',
+        this.CONTAINER_WIDTH = 800;
+        this.CONTAINER_HEIGHT = 500;
+
+        this.container = document.createElement('div');
+        $(this.container).css({
+            width: this.CONTAINER_WIDTH + 'px',
+            height: this.CONTAINER_HEIGHT + 'px',
             position: 'absolute',
             top: '0px',
             left: '0px',
@@ -59,23 +16,60 @@ module.exports = function () {
             right: '0px'
         }).addClass('js-grid-container');
         $('.js-grid-container').remove();
-        $('body').append(helper.container);
+        $('body').append(this.container);
 
+        var self = this;
+        this.buildSimpleGrid = function (numRows, numCols, varyHeight, varyWidths, fixedRows, fixedCols, headerRows, headerCols) {
+            maybeDestroyGrid();
+            this.grid = require('@grid/simple-grid')(numRows || 100, numCols || 10, varyHeight, varyWidths, fixedRows, fixedCols, function (grid) {
+                self.resizeSpy = spyOn(grid.viewPort, '_resize');
+            }, headerRows, headerCols);
+            this.grid.viewPort.sizeToContainer(this.container);
+            this.grid.eventLoop.setContainer(this.container);
+            return this.grid;
+        };
+        this.viewBuild = function () {
+            this.grid.viewLayer.build(this.container);
+            return this.container;
+        };
+        this.onDraw = function (fn) {
+            var self = this;
+            var unbind = this.grid.eventLoop.bind('grid-draw', function () {
+                setTimeout(function () {
+                    fn.call(self);
+                }, 1);
+                unbind();
+            });
+        };
+        this.resetAllDirties = function () {
+            this.grid.eventLoop.fire('grid-draw');
+        };
+        this.makeFakeRange = function (t, l, h, w) {
+            return {top: t, left: l, height: h, width: w};
+        };
+        this.spyOnUnbind = function () {
+            var unbind = jasmine.createSpy();
+            var bind = this.grid.eventLoop.bind;
+            this.grid.eventLoop.bind = function () {
+                bind.apply(bind, arguments);
+                return unbind;
+            };
+            return unbind;
+        };
     });
 
     function maybeDestroyGrid() {
-        if (helper.grid) {
-            helper.grid.eventLoop.fire('grid-destroy');
-            helper.grid = undefined;
+        var grid = this.grid;
+        if (grid) {
+            grid.eventLoop.fire('grid-destroy');
+            grid = undefined;
         }
     }
 
     afterEach(function () {
         $('.js-grid-container').remove();
-        maybeDestroyGrid();
+        maybeDestroyGrid.call(this);
     });
-
-    return helper;
 
 };
         

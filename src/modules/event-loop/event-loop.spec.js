@@ -2,11 +2,11 @@ var mockEvent = require('@grid/custom-event');
 var eventLoopFn = require('@grid/event-loop');
 
 describe('event-loop', function () {
-    var helper = require('@grid/grid-spec-helper')();
+    require('@grid/grid-spec-helper')();
     var loop;
     var grid;
     beforeEach(function () {
-        grid = helper.buildSimpleGrid();
+        grid = this.buildSimpleGrid();
         loop = grid.eventLoop;
     });
 
@@ -14,11 +14,12 @@ describe('event-loop', function () {
         var events = eventLoopFn.EVENTS;
         //include mousewheel for tests because it's not bound the normal way
         events.push('mousewheel');
+        var self = this;
         events.forEach(function (type) {
             var spy = jasmine.createSpy(type);
             //use interceptor in case something else tries to stop propagation
             grid.eventLoop.addInterceptor(spy);
-            helper.container.dispatchEvent(mockEvent(type, true, true));
+            self.container.dispatchEvent(mockEvent(type, true, true));
             var spyExpect = expect(spy);
             if (not) {
                 spyExpect = spyExpect.not;
@@ -28,7 +29,7 @@ describe('event-loop', function () {
     }
 
     it('should bind a handler for all the events we care about', function () {
-        spyAndFireAllNormalEvents();
+        spyAndFireAllNormalEvents.call(this);
     });
 
     function spyAndFireAllGridEvents(not) {
@@ -37,26 +38,27 @@ describe('event-loop', function () {
             //use interceptor in case something else tries to stop propagation
             grid.eventLoop.addInterceptor(spy);
             window.dispatchEvent(mockEvent(type, true, true));
-            var expectSpy = expect(spy);
             if (not) {
-                expectSpy = expectSpy.not;
+                expect(spy).not.toHaveBeenCalled();
+            } else {
+                expect(spy).toHaveBeenCalled();
+
             }
-            expectSpy.toHaveBeenCalled();
         });
     }
 
     it('should bind a handler for all the grid events we care about', function () {
-        spyAndFireAllGridEvents();
+        spyAndFireAllGridEvents.call(this);
     });
 
     it('should unbind all normal events on grid-destroy', function () {
         loop.fire('grid-destroy');
-        spyAndFireAllNormalEvents(true);
+        spyAndFireAllNormalEvents.call(this, true);
     });
 
     it('should unbind all grid events on grid-destroy', function () {
         loop.fire('grid-destroy');
-        spyAndFireAllGridEvents(true);
+        spyAndFireAllGridEvents.call(this, true);
     });
 
     it('should unbind any events bound to dom elements through bind', function () {
@@ -107,17 +109,20 @@ describe('event-loop', function () {
         expect(loop.isRunning).toEqual(false);
     });
 
+
     it('should say its in the loop if it is', function () {
-        loop.addInterceptor(inLoopFn);
+        var wasRunning = false;
+        loop.addInterceptor(function inLoopFn(e) {
+            wasRunning = grid.eventLoop.isRunning;
+        });
         loop.fire({});
-        function inLoopFn() {
-            expect(loop.isRunning).toEqual(true);
-        }
+        expect(wasRunning).toEqual(true);
     });
 
     it('should allow loop exit listener to be added and removed', function () {
         var unbind = loop.addExitListener(jasmine.createSpy());
         unbind();
+        expect(true).toBe(true);
     });
 
     it('should notify exit listeners after looping with loop event', function () {
@@ -147,7 +152,7 @@ describe('event-loop', function () {
             expect(spy).toHaveBeenCalled();
             expect(wasInLoop).toEqual(true);
 
-            spy.reset();
+            spy.calls.reset();
             unbind();
             grid.eventLoop.fire('test-event');
             expect(spy).not.toHaveBeenCalled();
@@ -163,7 +168,7 @@ describe('event-loop', function () {
             expect(spy).toHaveBeenCalled();
             expect(wasInLoop).toEqual(true);
 
-            spy.reset();
+            spy.calls.reset();
             unbind();
             div.dispatchEvent(click);
             expect(spy).not.toHaveBeenCalled();
@@ -179,7 +184,7 @@ describe('event-loop', function () {
 
         it('should let me bind, fire and unbind a dom event to the grid container and be in loop during', function () {
             var spy = jasmine.createSpy();
-            var container = helper.container;
+            var container = this.container;
             grid.eventLoop.setContainer(container);
             var div = document.createElement('div');
             container.appendChild(div);
@@ -191,7 +196,7 @@ describe('event-loop', function () {
             expect(spy).toHaveBeenCalled();
             expect(wasInLoop).toEqual(true);
 
-            spy.reset();
+            spy.calls.reset();
             unbind();
             div.dispatchEvent(click);
             expect(spy).not.toHaveBeenCalled();

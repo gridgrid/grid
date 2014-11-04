@@ -9,7 +9,8 @@ module.exports = function (_grid, model) {
 
 
         decorator.getDecoratorLeft = function () {
-            return grid.viewPort.toGridX(decorator.boundingBox && decorator.boundingBox.getClientRects()[0].left) || 0;
+            var firstRect = decorator.boundingBox && decorator.boundingBox.getClientRects() && decorator.boundingBox.getClientRects()[0] || {};
+            return grid.viewPort.toGridX(firstRect.left) || 0;
         };
 
         if (api.annotateDecorator) {

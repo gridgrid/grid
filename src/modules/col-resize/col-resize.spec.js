@@ -3,18 +3,17 @@ var mockEvent = require('@grid/custom-event');
 describe('col-resize', function () {
     var $ = require('jquery');
 
-    var helper = require('@grid/grid-spec-helper')();
+    require('@grid/grid-spec-helper')();
     var grid;
     var colResize;
     beforeEach(function () {
-        grid = helper.buildSimpleGrid();
+        grid = this.buildSimpleGrid();
         colResize = grid.colResize;
     });
 
     describe('should satisfy', function () {
         var ctx = {};
         beforeEach(function () {
-            ctx.helper = helper;
             ctx.headerDecorators = colResize;
         });
 
@@ -26,7 +25,6 @@ describe('col-resize', function () {
         var ctx = {};
         var viewCol = 1;
         beforeEach(function () {
-            ctx.helper = helper;
             ctx.decorator = colResize._decorators[viewCol];
         });
 
@@ -34,12 +32,12 @@ describe('col-resize', function () {
             expect(ctx.decorator.render()).toHaveClass('col-resize');
         });
 
-        it('should center on the right side of its bounding box', function () {
-            helper.viewBuild();
+        it('should center on the right side of its bounding box', function (done) {
+            this.viewBuild();
             var style = document.createElement('style');
             style.innerHTML = '.col-resize{width : 6px}';
             document.body.appendChild(style);
-            helper.onDraw(function () {
+            this.onDraw(function () {
                 var $rendered = $(ctx.decorator.boundingBox.firstChild);
                 var $box = $(ctx.decorator.boundingBox);
                 var width = $rendered.width();
@@ -47,6 +45,7 @@ describe('col-resize', function () {
                 expect($rendered.position().top).toBe(0);
                 expect($rendered.height()).toBe($box.height());
                 document.body.removeChild(style);
+                done();
             });
         });
 
@@ -60,7 +59,6 @@ describe('col-resize', function () {
             var dragCtx = {};
             var dragStart = 100;
             beforeEach(function () {
-                dragCtx.helper = helper;
                 var e = mockEvent('grid-drag-start', true);
                 e.gridX = dragStart;
                 ctx.decorator._onDragStart(e);
@@ -96,20 +94,17 @@ describe('col-resize', function () {
                 expect(dragCtx.decorator).leftToBe(gridX);
             });
 
-            function getDecoratorLeft() {
-                return grid.viewPort.toGridX(ctx.decorator.boundingBox.getClientRects()[0].left);
-            }
-
-            it('should min out at decorator left + 10', function () {
-                $(helper.container).css({'margin-left': '10px'});
-                helper.viewBuild();
-                helper.onDraw(function () {
+            it('should min out at decorator left + 10', function (done) {
+                $(this.container).css({'margin-left': '10px'});
+                this.viewBuild();
+                this.onDraw(function () {
                     var drag = mockEvent('grid-drag');
-                    var decoratorLeft = getDecoratorLeft();
+                    var decoratorLeft = grid.viewPort.toGridX(ctx.decorator.boundingBox.getClientRects()[0].left);
                     var gridX = decoratorLeft;
                     drag.gridX = gridX;
                     grid.eventLoop.fire(drag);
                     expect(dragCtx.decorator).leftToBe(decoratorLeft + 10);
+                    done();
                 });
 
             });

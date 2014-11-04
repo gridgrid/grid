@@ -4,9 +4,8 @@ module.exports = function (ctx) {
         var $ = require('jquery');
         var posRangeCtx = {};
         beforeEach(function () {
-            posRangeCtx.helper = ctx.helper;
             posRangeCtx.range = ctx.decorator;
-            posRangeCtx.parent = ctx.helper.grid.decorators;
+            posRangeCtx.parent = this.grid.decorators;
         });
 
         it('should have the right defaults', function () {

@@ -20,7 +20,7 @@ module.exports = function (_grid) {
         getAll: function () {
             return descriptors.slice(0);
         },
-        create: function (top, left, className, height, width) {
+        create: function (top, left, className, height, width, space) {
             var thisDirtyClean = makeDirtyClean(grid);
             var descriptor = {};
             //mixins
@@ -34,6 +34,7 @@ module.exports = function (_grid) {
             descriptor.height = height || 1;
             descriptor.width = width || 1;
             descriptor.class = className;
+            descriptor.space = space || descriptor.space;
             return descriptor;
         },
         isDirty: dirtyClean.isDirty

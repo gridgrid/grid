@@ -1,9 +1,9 @@
 describe('grid-core', function () {
-    var helper = require('@grid/grid-spec-helper')();
+    require('@grid/grid-spec-helper')();
     var $ = require('jquery');
     var grid;
     beforeEach(function () {
-        grid = helper.buildSimpleGrid();
+        grid = this.buildSimpleGrid();
     });
 
     it('should have the right models', function () {
@@ -29,7 +29,7 @@ describe('grid-core', function () {
         var viewPortSize = spyOn(grid.viewPort, 'sizeToContainer');
         var viewBuild = spyOn(grid.viewLayer, 'build');
         var loopBuild = spyOn(grid.eventLoop, 'setContainer');
-        grid.build(helper.container);
+        grid.build(this.container);
         expect(viewPortSize).toHaveBeenCalled();
         expect(viewBuild).toHaveBeenCalled();
         expect(loopBuild).toHaveBeenCalled();
@@ -59,35 +59,35 @@ describe('grid-core', function () {
     });
 
     function findTextArea() {
-        return $(helper.container).find('textarea');
+        return $(this.container).find('textarea');
     }
 
     it('should have a focusable text area on build', function () {
-        grid.build(helper.container);
+        grid.build(this.container);
         expect(findTextArea()).toBeAnElement();
     });
 
     it('should add a class to the container on focus', function () {
-        grid.build(helper.container);
-        $(helper.container).find('textarea').focus();
-        expect(helper.container).toHaveClass('focus');
+        grid.build(this.container);
+        $(this.container).find('textarea').focus();
+        expect(this.container).toHaveClass('focus');
     });
 
     it('should not change the containers tabindex if it already has a value', function () {
-        helper.container.tabIndex = 1;
-        grid.build(helper.container);
-        expect(helper.container.tabIndex).toBe(1);
+        this.container.tabIndex = 1;
+        grid.build(this.container);
+        expect(this.container.tabIndex).toBe(1);
     });
 
     it('should give the container a tabindex if it doesnt already have one', function () {
-        grid.build(helper.container);
-        expect(helper.container.tabIndex).toBe(0);
+        grid.build(this.container);
+        expect(this.container.tabIndex).toBe(0);
     });
 
     it('should focus the text area if the grid is focused', function () {
-        grid.build(helper.container);
-        $(helper.container).focus();
-        expect(document.activeElement).toEqual(findTextArea()[0]);
+        grid.build(this.container);
+        $(this.container).focus();
+        expect(document.activeElement).toEqual(findTextArea.call(this)[0]);
     });
 
 });

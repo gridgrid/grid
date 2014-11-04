@@ -2,11 +2,11 @@ var mockEvent = require('@grid/custom-event');
 var key = require('key');
 
 describe('navigation-model', function () {
-    var helper = require('@grid/grid-spec-helper')();
+    require('@grid/grid-spec-helper')();
     var model;
     var grid;
     var beforeEachFn = function (hRows, hCols) {
-        grid = helper.buildSimpleGrid(undefined, undefined, undefined, undefined, undefined, undefined, hRows, hCols);
+        grid = this.buildSimpleGrid(undefined, undefined, undefined, undefined, undefined, undefined, hRows, hCols);
         model = grid.navigationModel;
     };
 
@@ -32,7 +32,7 @@ describe('navigation-model', function () {
     describe('focus', function () {
         var focus;
         beforeEach(function () {
-            beforeEachFn();
+            beforeEachFn.call(this);
             focus = model.focus;
         });
 
@@ -65,7 +65,7 @@ describe('navigation-model', function () {
             var spy = spyOn(grid.cellClasses, 'add');
             require('@grid/navigation-model')(grid);
             expect(spy).toHaveBeenCalled();
-            var descriptor = spy.argsForCall[0][0];
+            var descriptor = spy.calls.argsFor(0)[0];
             expect(descriptor).unitsToBe('cell');
             expect(descriptor).spaceToBe('data');
             expect(descriptor).classToBe('focus');
@@ -85,7 +85,7 @@ describe('navigation-model', function () {
             });
 
             describe('should satisfy:', function () {
-                var ctx = {helper: helper};
+                var ctx = {};
                 beforeEach(function () {
                     ctx.decorator = decorator;
                 });
@@ -103,7 +103,7 @@ describe('navigation-model', function () {
             var spy = spyOn(grid.cellClasses, 'add');
             var model = require('@grid/navigation-model')(grid);
             expect(spy).toHaveBeenCalled();
-            var descriptor = spy.argsForCall[0][0];
+            var descriptor = spy.calls.argsFor(0)[0];
             model.setFocus(2, 3);
             expect(descriptor).topToBe(2);
             expect(descriptor).leftToBe(3);
@@ -148,12 +148,12 @@ describe('navigation-model', function () {
     describe('selection', function () {
         var selection;
         beforeEach(function () {
-            beforeEachFn();
+            beforeEachFn.call(this);
             selection = model.selection;
         });
 
         describe('should satisfy:', function () {
-            var ctx = {helper: helper};
+            var ctx = {};
             beforeEach(function () {
                 ctx.decorator = selection;
             });
@@ -190,14 +190,14 @@ describe('navigation-model', function () {
 
         it('should unbind on drag end', function () {
             var dragStart = {type: 'grid-drag-start', row: 1, col: 2};
-            var unbind = helper.spyOnUnbind();
+            var unbind = this.spyOnUnbind();
             selection._onDragStart(dragStart);
             var drag = {type: 'grid-cell-drag', row: 3, col: 4};
             grid.eventLoop.fire(drag);
             var dragEnd = {type: 'grid-drag-end', row: 2, col: 3};
             grid.eventLoop.fire(dragEnd);
             expect(unbind).toHaveBeenCalled();
-            expect(unbind.callCount).toBe(2);
+            expect(unbind.calls.count()).toBe(2);
         });
 
         it('should clear on mousedown', function () {
@@ -251,7 +251,7 @@ describe('navigation-model', function () {
 
     describe('headers / col row selection', function () {
         beforeEach(function () {
-            beforeEachFn(1, 1);
+            beforeEachFn.call(this, 1, 1);
         });
         //row col selection
         it('should select a whole col on header mousedown', function () {
@@ -268,7 +268,7 @@ describe('navigation-model', function () {
             var spy = spyOn(grid.decorators, 'add');
             grid.rowModel.select(0);
             expect(spy).toHaveBeenCalled();
-            var decorator = spy.argsForCall[0][0];
+            var decorator = spy.calls.argsFor(0)[0];
             expect(decorator).unitsToBe('cell');
             expect(decorator).spaceToBe('virtual');
             expect(decorator).rangeToBe(1, 0, 1, 1);
@@ -279,7 +279,7 @@ describe('navigation-model', function () {
             grid.rowModel.select(0);
             var spy = spyOn(grid.decorators, 'add');
             grid.rowModel.select(1);
-            expect(spy.callCount).toBe(2);
+            expect(spy.calls.count()).toBe(2);
             expect(model._rowSelectionDecorators.length).toBe(2);
         });
 
@@ -287,7 +287,7 @@ describe('navigation-model', function () {
             var spy = spyOn(grid.decorators, 'add');
             grid.colModel.select(0);
             expect(spy).toHaveBeenCalled();
-            var decorator = spy.argsForCall[0][0];
+            var decorator = spy.calls.argsFor(0)[0];
             expect(decorator).unitsToBe('cell');
             expect(decorator).spaceToBe('virtual');
             expect(decorator).rangeToBe(0, 1, 1, 1);
@@ -298,7 +298,7 @@ describe('navigation-model', function () {
             grid.colModel.select(0);
             var spy = spyOn(grid.decorators, 'add');
             grid.colModel.select(1);
-            expect(spy.callCount).toBe(2);
+            expect(spy.calls.count()).toBe(2);
             expect(model._colSelectionDecorators.length).toBe(2);
         });
 

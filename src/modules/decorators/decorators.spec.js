@@ -1,17 +1,17 @@
 describe('decorators', function () {
     var $ = require('jquery');
-    var helper = require('@grid/grid-spec-helper')();
+    require('@grid/grid-spec-helper')();
     var decorators;
     var grid;
-    var ctx = {helper: helper};
+    var ctx = {};
     beforeEach(function () {
-        grid = helper.buildSimpleGrid();
+        grid = this.buildSimpleGrid();
         decorators = grid.decorators;
         //clear any other decorators
         decorators.remove(grid.decorators.getAlive());
         decorators.popAllDead();
         spyOn(grid, 'requestDraw'); //mock the method to prevent draw
-        helper.resetAllDirties(); //set everything clean to start
+        this.resetAllDirties(); //set everything clean to start
     });
 
     describe('should satisfy', function () {
@@ -64,7 +64,7 @@ describe('decorators', function () {
 
     it('should let me add a decorator and request draw', function () {
         var dec = decorators.create();
-        helper.resetAllDirties();
+        this.resetAllDirties();
         expect(decorators).not.toBeDirty();
         decorators.add(dec);
         expect(decorators).toBeDirty();
@@ -73,10 +73,10 @@ describe('decorators', function () {
 
     it('should let me remove a decorator', function () {
         var dec = decorators.create();
-        helper.resetAllDirties();
+        this.resetAllDirties();
         expect(decorators).not.toBeDirty();
         decorators.add(dec);
-        helper.resetAllDirties();
+        this.resetAllDirties();
         expect(decorators).not.toBeDirty();
         decorators.remove(dec);
         expect(decorators).toBeDirty();

@@ -2,11 +2,11 @@
     describe('position range core', function () {
 
         var dirtyClean = require('@grid/dirty-clean');
-        var helper = require('@grid/grid-spec-helper')();
+        require('@grid/grid-spec-helper')();
 
-        var ctx = {helper: helper};
+        var ctx = {};
         beforeEach(function () {
-            var grid = helper.buildSimpleGrid();
+            var grid = this.buildSimpleGrid();
             var parentDirtyClean = dirtyClean(grid);
             var parent = {isDirty: parentDirtyClean.isDirty};
             ctx.range = require('@grid/position-range')(undefined, dirtyClean(grid), parentDirtyClean);

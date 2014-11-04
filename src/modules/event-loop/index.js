@@ -120,7 +120,6 @@ var eventLoop = function (_grid) {
     });
 
     function loop(e, bodyFn) {
-
         var isOuterLoopRunning = eloop.isRunning;
         eloop.isRunning = true;
         interceptors.notify(e);
@@ -136,6 +135,7 @@ var eventLoop = function (_grid) {
 
     eloop.bind('grid-destroy', function () {
         unbindAll();
+        eloop.destroyed = true;
     });
 
     eloop.stopBubbling = function (e) {

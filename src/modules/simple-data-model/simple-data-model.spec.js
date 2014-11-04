@@ -1,9 +1,9 @@
 describe('simple-data-model', function () {
-    var helper = require('@grid/grid-spec-helper')();
+    require('@grid/grid-spec-helper')();
     var grid;
     var dataModel;
     beforeEach(function () {
-        grid = helper.buildSimpleGrid(undefined, undefined, false, false, 1, 1, 1, 1);
+        grid = this.buildSimpleGrid(undefined, undefined, false, false, 1, 1, 1, 1);
         dataModel = grid.dataModel;
     });
 

@@ -1,17 +1,16 @@
-
 describe('cell-classes', function () {
-    var helper = require('@grid/grid-spec-helper')();
+    require('@grid/grid-spec-helper')();
     var classes;
     beforeEach(function () {
-        var grid = helper.buildSimpleGrid();
+        var grid =this.buildSimpleGrid();
         classes = grid.cellClasses;
         spyOn(grid, 'requestDraw'); //mock the draw;
     });
 
     describe('should create descriptors that', function () {
         var descriptor;
-        var ctx = {helper: helper};
-        var addDirtyCtx = {helper: helper};
+        var ctx = {};
+        var addDirtyCtx = {};
         beforeEach(function () {
             ctx.range = descriptor = classes.create();
             ctx.parent = classes;
@@ -35,12 +34,13 @@ describe('cell-classes', function () {
     });
 
     it('should allow created descriptors to be initialized', function () {
-        var descriptor = classes.create(0, 1, 'name', 2, 3);
+        var descriptor = classes.create(0, 1, 'name', 2, 3, 'virtual');
         expect(descriptor.top).toBe(0);
         expect(descriptor.left).toBe(1);
         expect(descriptor.height).toBe(2);
         expect(descriptor.width).toBe(3);
         expect(descriptor.class).toBe('name');
+        expect(descriptor.space).toBe('virtual');
     });
 
     it('should allow created descriptors to be initialized without width and height', function () {
@@ -54,7 +54,7 @@ describe('cell-classes', function () {
 
     it('should be able to add descriptors and be dirty', function () {
         var descriptor = classes.create();
-        helper.resetAllDirties();
+       this.resetAllDirties();
         classes.add(descriptor);
         expect(classes.getAll()).toContain(descriptor);
         expect(classes).toBeDirty();
@@ -63,7 +63,7 @@ describe('cell-classes', function () {
     it('should be able to remove descriptors and be dirty', function () {
         var descriptor = classes.create();
         classes.add(descriptor);
-        helper.resetAllDirties();
+       this.resetAllDirties();
         classes.remove(descriptor);
         expect(classes.getAll()).not.toContain(descriptor);
         expect(classes).toBeDirty();

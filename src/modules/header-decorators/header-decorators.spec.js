@@ -1,13 +1,11 @@
 function testHeaderDecorators() {
     describe('header-decorators', function (ctx) {
 
-        var internalHelper = require('@grid/grid-spec-helper')();
-        var helper;
+        require('@grid/grid-spec-helper')();
         var grid;
         var headerDecorators;
         beforeEach(function () {
-            helper = ctx && ctx.helper || internalHelper;
-            grid = ctx && ctx.helper.grid || helper.buildSimpleGrid();
+            grid = ctx && this.grid || this.buildSimpleGrid();
             headerDecorators = ctx && ctx.headerDecorators || require('@grid/header-decorators')(grid);
         });
 
@@ -15,7 +13,6 @@ function testHeaderDecorators() {
             var ctx = {};
             var viewCol = 1;
             beforeEach(function () {
-                ctx.helper = helper;
                 ctx.decorator = headerDecorators._decorators[viewCol];
             });
 
