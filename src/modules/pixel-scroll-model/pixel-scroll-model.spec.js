@@ -13,7 +13,9 @@ describe('pixel-scroll-model', function () {
         model = grid.pixelScrollModel;
     }
 
-    beforeEach(beforeEachFn);
+    beforeEach(function () {
+        beforeEachFn();
+    });
 
     it('should have a top and left value that start at 0', function () {
         expect(model.top).toEqual(0);
@@ -93,14 +95,14 @@ describe('pixel-scroll-model', function () {
         expect(spy).not.toHaveBeenCalled();
     });
 
-    it('should call a scroll listener asynchronously on mousewheel', function () {
+    it('should call a scroll listener asynchronously on mousewheel', function (done) {
         var spy = jasmine.createSpy();
         grid.eventLoop.bind('grid-pixel-scroll', spy);
         sendMouseWheelToModel(40, 30);
-        waits(10);
-        runs(function () {
+        setTimeout(function () {
             expect(spy).toHaveBeenCalled();
-        });
+            done();
+        }, 10);
     });
 
     it('should prevent default on events', function () {
@@ -123,7 +125,9 @@ describe('pixel-scroll-model', function () {
             grid.viewPort.sizeToContainer({offsetWidth: viewWidth, offsetHeight: viewHeight});
         }
 
-        beforeEach(scrollBeforeEachFn);
+        beforeEach(function () {
+            scrollBeforeEachFn();
+        });
 
         it('should stopbubbling mousedowns', function () {
             var event = mockEvent('mousedown', true, true);
@@ -260,14 +264,14 @@ describe('pixel-scroll-model', function () {
         it('should bind drag and drag-end on drag-start', function () {
             var bind;
             renderBarAndFireDragStart(function () {
-                bind = spyOn(grid.eventLoop, 'bind').andCallThrough();
+                bind = spyOn(grid.eventLoop, 'bind').and.callThrough();
             });
             //these start at 2 because the mousemodel binds first
             expect(bind).toHaveBeenCalled();
-            expect(bind.argsForCall[0][0]).toEqual('grid-drag');
-            expect(bind.argsForCall[0][1]).toBeAFunction();
-            expect(bind.argsForCall[1][0]).toEqual('grid-drag-end');
-            expect(bind.argsForCall[1][1]).toBeAFunction();
+            expect(bind.calls.argsFor([0])[0]).toEqual('grid-drag');
+            expect(bind.calls.argsFor([0])[1]).toBeAFunction();
+            expect(bind.calls.argsFor([1])[0]).toEqual('grid-drag-end');
+            expect(bind.calls.argsFor([1])[1]).toBeAFunction();
 
 
         });

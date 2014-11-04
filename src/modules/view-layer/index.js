@@ -20,10 +20,9 @@ module.exports = function (_grid) {
 
     var cells; //matrix of rendered cell elements;
     var rows; //array of all rendered rows
-    var builtCols;
+    var builtCols; //map from col index to an array of built elements for the column to update on scroll
 
-    //add the cell classes through the standard way
-
+    //add the cell classes through the standard method
     grid.cellClasses.add(grid.cellClasses.create(0, 0, CELL_CLASS, Infinity, Infinity));
 
     var rowHeaderClasses = grid.cellClasses.create(0, 0, 'grid-header grid-row-header', Infinity, 0);
@@ -48,10 +47,10 @@ module.exports = function (_grid) {
 
 
     viewLayer.build = function (elem) {
+        cleanup();
+
         container = elem;
 
-
-        cleanup();
         cellContainer = document.createElement('div');
         cellContainer.setAttribute('dts', 'grid-cells');
         cellContainer.setAttribute('class', GRID_CELL_CONTAINER_BASE_CLASS);
@@ -258,7 +257,7 @@ module.exports = function (_grid) {
         setPosition(bounding, t, l, util.clamp(h, 0, grid.viewPort.height), util.clamp(w, 0, grid.viewPort.width));
     }
 
-    function positionCellDecoratorFromRealCellRange(realCellRange, boundingBox) {
+    function positionCellDecoratorFromViewCellRange(realCellRange, boundingBox) {
         var realPxRange = grid.viewPort.toPx(realCellRange);
         positionDecorator(boundingBox, realPxRange.top, realPxRange.left, realPxRange.height + getBorderWidth(), realPxRange.width + getBorderWidth());
     }
@@ -279,43 +278,46 @@ module.exports = function (_grid) {
                 }
             }
 
-            if ((decorator.isDirty() || cellsPositionOrSizeChanged) && decorator.space === 'real') {
-                switch (decorator.units) {
-                    case 'px':
-                        positionDecorator(boundingBox, decorator.top, decorator.left, decorator.height, decorator.width);
-                        break;
-                    case 'cell':
-                        positionCellDecoratorFromRealCellRange(decorator, boundingBox);
-                        break;
+            if (decorator.isDirty() || cellsPositionOrSizeChanged) {
+                if (decorator.space === 'real') {
+                    switch (decorator.units) {
+                        case 'px':
+                            positionDecorator(boundingBox, decorator.top, decorator.left, decorator.height, decorator.width);
+                            break;
+                        case 'cell':
+                            positionCellDecoratorFromViewCellRange(decorator, boundingBox);
+                            break;
+                    }
                 }
-            } else if ((decorator.isDirty() || cellsPositionOrSizeChanged) && (decorator.space === 'virtual' || decorator.space === 'data')) {
-                switch (decorator.units) {
-                    case 'px':
-                        break;
-                    case 'cell':
-                    /* jshint -W086 */
-                    default:
-                        var range = {
-                            top: decorator.top,
-                            left: decorator.left,
-                            height: decorator.height,
-                            width: decorator.width
-                        };
-                        if (decorator.space === 'data') {
-                            range.top += grid.rowModel.numHeaders();
-                            range.left += grid.colModel.numHeaders();
-                        }
+                else if (decorator.space === 'virtual' || decorator.space === 'data') {
+                    switch (decorator.units) {
+                        case 'px':
+                            break;
+                        case 'cell':
+                        /* jshint -W086 */
+                        default:
+                            var range = {
+                                top: decorator.top,
+                                left: decorator.left,
+                                height: decorator.height,
+                                width: decorator.width
+                            };
+                            if (decorator.space === 'data') {
+                                range.top += grid.rowModel.numHeaders();
+                                range.left += grid.colModel.numHeaders();
+                            }
 
-                        var realCellRange = grid.viewPort.intersect(range);
-                        if (realCellRange) {
-                            positionCellDecoratorFromRealCellRange(realCellRange, boundingBox);
-                        } else {
-                            positionDecorator(boundingBox, -1, -1, -1, -1);
-                        }
-                        break;
-                    /* jshint +W086 */
+                            var realCellRange = grid.viewPort.intersect(range);
+                            if (realCellRange) {
+                                positionCellDecoratorFromViewCellRange(realCellRange, boundingBox);
+                            } else {
+                                positionDecorator(boundingBox, -1, -1, -1, -1);
+                            }
+                            break;
+                        /* jshint +W086 */
+                    }
+
                 }
-
             }
         });
 
@@ -349,7 +351,7 @@ module.exports = function (_grid) {
         grid.cellClasses.getAll().forEach(function (descriptor) {
             var intersection = grid.viewPort.intersect(descriptor);
             if (intersection) {
-                rowloop:
+                rowLoop:
                     for (var r = 0; r < intersection.height; r++) {
                         for (var c = 0; c < intersection.width; c++) {
                             var row = intersection.top + r;
@@ -357,7 +359,7 @@ module.exports = function (_grid) {
 
                             var cellRow = cells[row];
                             if (!cellRow) {
-                                continue rowloop;
+                                continue rowLoop;
                             }
                             var cell = cellRow[col];
                             if (!cell) {

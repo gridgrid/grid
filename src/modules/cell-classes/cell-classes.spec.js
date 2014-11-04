@@ -1,4 +1,3 @@
-
 describe('cell-classes', function () {
     var helper = require('@grid/grid-spec-helper')();
     var classes;
@@ -35,12 +34,13 @@ describe('cell-classes', function () {
     });
 
     it('should allow created descriptors to be initialized', function () {
-        var descriptor = classes.create(0, 1, 'name', 2, 3);
+        var descriptor = classes.create(0, 1, 'name', 2, 3, 'virtual');
         expect(descriptor.top).toBe(0);
         expect(descriptor.left).toBe(1);
         expect(descriptor.height).toBe(2);
         expect(descriptor.width).toBe(3);
         expect(descriptor.class).toBe('name');
+        expect(descriptor.space).toBe('virtual');
     });
 
     it('should allow created descriptors to be initialized without width and height', function () {

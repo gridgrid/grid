@@ -10,7 +10,9 @@ describe('col-reorder', function () {
         grid = helper.buildSimpleGrid(undefined, undefined, undefined, undefined, fixedR, fixedC);
         colReorder = grid.colReorder;
     };
-    beforeEach(beforeEachFn);
+    beforeEach(function () {
+        beforeEachFn();
+    });
 
     describe('should satisfy', function () {
         var ctx = {};

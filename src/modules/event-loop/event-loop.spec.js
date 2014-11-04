@@ -147,7 +147,7 @@ describe('event-loop', function () {
             expect(spy).toHaveBeenCalled();
             expect(wasInLoop).toEqual(true);
 
-            spy.reset();
+            spy.calls.reset();
             unbind();
             grid.eventLoop.fire('test-event');
             expect(spy).not.toHaveBeenCalled();
@@ -163,7 +163,7 @@ describe('event-loop', function () {
             expect(spy).toHaveBeenCalled();
             expect(wasInLoop).toEqual(true);
 
-            spy.reset();
+            spy.calls.reset();
             unbind();
             div.dispatchEvent(click);
             expect(spy).not.toHaveBeenCalled();
@@ -191,7 +191,7 @@ describe('event-loop', function () {
             expect(spy).toHaveBeenCalled();
             expect(wasInLoop).toEqual(true);
 
-            spy.reset();
+            spy.calls.reset();
             unbind();
             div.dispatchEvent(click);
             expect(spy).not.toHaveBeenCalled();

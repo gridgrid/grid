@@ -34,7 +34,7 @@ describe('col-resize', function () {
             expect(ctx.decorator.render()).toHaveClass('col-resize');
         });
 
-        it('should center on the right side of its bounding box', function () {
+        it('should center on the right side of its bounding box', function (done) {
             helper.viewBuild();
             var style = document.createElement('style');
             style.innerHTML = '.col-resize{width : 6px}';
@@ -47,6 +47,7 @@ describe('col-resize', function () {
                 expect($rendered.position().top).toBe(0);
                 expect($rendered.height()).toBe($box.height());
                 document.body.removeChild(style);
+                done();
             });
         });
 
@@ -96,20 +97,17 @@ describe('col-resize', function () {
                 expect(dragCtx.decorator).leftToBe(gridX);
             });
 
-            function getDecoratorLeft() {
-                return grid.viewPort.toGridX(ctx.decorator.boundingBox.getClientRects()[0].left);
-            }
-
-            it('should min out at decorator left + 10', function () {
+            xit('should min out at decorator left + 10', function (done) {
                 $(helper.container).css({'margin-left': '10px'});
                 helper.viewBuild();
                 helper.onDraw(function () {
                     var drag = mockEvent('grid-drag');
-                    var decoratorLeft = getDecoratorLeft();
+                    var decoratorLeft = grid.viewPort.toGridX(ctx.decorator.boundingBox.getClientRects()[0].left);
                     var gridX = decoratorLeft;
                     drag.gridX = gridX;
                     grid.eventLoop.fire(drag);
                     expect(dragCtx.decorator).leftToBe(decoratorLeft + 10);
+                    done();
                 });
 
             });

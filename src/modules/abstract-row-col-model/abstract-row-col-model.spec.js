@@ -219,20 +219,20 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
             grid.eventLoop.bind('grid-' + name + '-selection-change', spy);
             model.select(0);
             expect(spy).toHaveBeenCalled();
-            spy.reset();
+            spy.calls.reset();
             model.deselect(0);
             expect(spy).toHaveBeenCalled();
-            spy.reset();
+            spy.calls.reset();
             model.toggleSelect(0);
             expect(spy).toHaveBeenCalled();
-            spy.reset();
+            spy.calls.reset();
             //select two so we can ensure it only gets called once
             model.add(model.create());
             model.select(1);
-            spy.reset();
+            spy.calls.reset();
             model.clearSelected();
             expect(spy).toHaveBeenCalled();
-            expect(spy.callCount).toBe(1);
+            expect(spy.calls.count()).toBe(1);
         });
     });
 

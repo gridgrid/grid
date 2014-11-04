@@ -65,7 +65,7 @@ describe('navigation-model', function () {
             var spy = spyOn(grid.cellClasses, 'add');
             require('@grid/navigation-model')(grid);
             expect(spy).toHaveBeenCalled();
-            var descriptor = spy.argsForCall[0][0];
+            var descriptor = spy.calls.argsFor(0)[0];
             expect(descriptor).unitsToBe('cell');
             expect(descriptor).spaceToBe('data');
             expect(descriptor).classToBe('focus');
@@ -103,7 +103,7 @@ describe('navigation-model', function () {
             var spy = spyOn(grid.cellClasses, 'add');
             var model = require('@grid/navigation-model')(grid);
             expect(spy).toHaveBeenCalled();
-            var descriptor = spy.argsForCall[0][0];
+            var descriptor = spy.calls.argsFor(0)[0];
             model.setFocus(2, 3);
             expect(descriptor).topToBe(2);
             expect(descriptor).leftToBe(3);
@@ -197,7 +197,7 @@ describe('navigation-model', function () {
             var dragEnd = {type: 'grid-drag-end', row: 2, col: 3};
             grid.eventLoop.fire(dragEnd);
             expect(unbind).toHaveBeenCalled();
-            expect(unbind.callCount).toBe(2);
+            expect(unbind.calls.count()).toBe(2);
         });
 
         it('should clear on mousedown', function () {
@@ -268,7 +268,7 @@ describe('navigation-model', function () {
             var spy = spyOn(grid.decorators, 'add');
             grid.rowModel.select(0);
             expect(spy).toHaveBeenCalled();
-            var decorator = spy.argsForCall[0][0];
+            var decorator = spy.calls.argsFor(0)[0];
             expect(decorator).unitsToBe('cell');
             expect(decorator).spaceToBe('virtual');
             expect(decorator).rangeToBe(1, 0, 1, 1);
@@ -279,7 +279,7 @@ describe('navigation-model', function () {
             grid.rowModel.select(0);
             var spy = spyOn(grid.decorators, 'add');
             grid.rowModel.select(1);
-            expect(spy.callCount).toBe(2);
+            expect(spy.calls.count()).toBe(2);
             expect(model._rowSelectionDecorators.length).toBe(2);
         });
 
@@ -287,7 +287,7 @@ describe('navigation-model', function () {
             var spy = spyOn(grid.decorators, 'add');
             grid.colModel.select(0);
             expect(spy).toHaveBeenCalled();
-            var decorator = spy.argsForCall[0][0];
+            var decorator = spy.calls.argsFor(0)[0];
             expect(decorator).unitsToBe('cell');
             expect(decorator).spaceToBe('virtual');
             expect(decorator).rangeToBe(0, 1, 1, 1);
@@ -298,7 +298,7 @@ describe('navigation-model', function () {
             grid.colModel.select(0);
             var spy = spyOn(grid.decorators, 'add');
             grid.colModel.select(1);
-            expect(spy.callCount).toBe(2);
+            expect(spy.calls.count()).toBe(2);
             expect(model._colSelectionDecorators.length).toBe(2);
         });
 

@@ -11,7 +11,9 @@ describe('view port', function () {
         viewPort = grid.viewPort;
         viewPort.sizeToContainer(helper.container);
     };
-    beforeEach(beforeEachFn);
+    beforeEach(function () {
+        beforeEachFn();
+    });
 
     it('should accurately calculate the width and height of the container', function () {
         expect(viewPort.width).toEqual(helper.CONTAINER_WIDTH);
@@ -41,7 +43,7 @@ describe('view port', function () {
         expect(spyFn).toHaveBeenCalledWith(0, 0);
         expect(spyFn).toHaveBeenCalledWith(5, 6);
         expect(spyFn).toHaveBeenCalledWith(viewPort.rows - 1, viewPort.cols - 1);
-        expect(spyFn.callCount).toEqual(viewPort.cols * viewPort.rows);
+        expect(spyFn.calls.count()).toEqual(viewPort.cols * viewPort.rows);
     });
 
     it('should let you iterate the rows', function () {
@@ -50,7 +52,7 @@ describe('view port', function () {
         expect(spyFn).toHaveBeenCalledWith(0);
         expect(spyFn).toHaveBeenCalledWith(5);
         expect(spyFn).toHaveBeenCalledWith(viewPort.rows - 1);
-        expect(spyFn.callCount).toEqual(viewPort.rows);
+        expect(spyFn.calls.count()).toEqual(viewPort.rows);
     });
 
     it('should let you iterate the rows to a max', function () {
@@ -59,7 +61,7 @@ describe('view port', function () {
         expect(spyFn).toHaveBeenCalledWith(0);
         expect(spyFn).toHaveBeenCalledWith(2);
         expect(spyFn).not.toHaveBeenCalledWith(viewPort.rows - 1);
-        expect(spyFn.callCount).toEqual(3);
+        expect(spyFn.calls.count()).toEqual(3);
     });
 
     it('should let you iterate the cols to a max', function () {
@@ -68,7 +70,7 @@ describe('view port', function () {
         expect(spyFn).toHaveBeenCalledWith(0, 0);
         expect(spyFn).toHaveBeenCalledWith(5, 2);
         expect(spyFn).not.toHaveBeenCalledWith(viewPort.rows - 1, viewPort.cols - 1);
-        expect(spyFn.callCount).toEqual(3 * viewPort.rows);
+        expect(spyFn.calls.count()).toEqual(3 * viewPort.rows);
     });
 
     describe('should satisfy', function () {
@@ -337,34 +339,34 @@ describe('view port', function () {
         });
     });
 
-    it('should sizeToContainer on window resize', function () {
-        helper.resizeSpy.andCallThrough();
+    it('should sizeToContainer on window resize', function (done) {
+        helper.resizeSpy.and.callThrough();
         var sizeSpy = spyOn(viewPort, 'sizeToContainer');
         window.dispatchEvent(mockEvent('resize'));
-        waits(201);
-        runs(function () {
+        setTimeout(function () {
             expect(sizeSpy).toHaveBeenCalled();
-        });
+            done();
+        }, 201);
     });
 
-    it('should size to container on col change', function () {
-        helper.resizeSpy.andCallThrough();
+    it('should size to container on col change', function (done) {
+        helper.resizeSpy.and.callThrough();
         var sizeSpy = spyOn(viewPort, 'sizeToContainer');
         grid.eventLoop.fire('grid-col-change');
-        waits(2);
-        runs(function () {
+        setTimeout(function () {
             expect(sizeSpy).toHaveBeenCalled();
-        });
+            done();
+        }, 2);
     });
 
-    it('should size to container on col change', function () {
-        helper.resizeSpy.andCallThrough();
+    it('should size to container on col change', function (done) {
+        helper.resizeSpy.and.callThrough();
         var sizeSpy = spyOn(viewPort, 'sizeToContainer');
         grid.eventLoop.fire('grid-row-change');
-        waits(2);
-        runs(function () {
+        setTimeout(function () {
             expect(sizeSpy).toHaveBeenCalled();
-        });
+            done();
+        }, 2);
     });
 
     it('should have top and left values for the client offset of the grid container', function () {

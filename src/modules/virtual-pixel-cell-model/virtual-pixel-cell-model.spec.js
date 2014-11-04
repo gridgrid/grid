@@ -12,13 +12,15 @@ describe('virtual-pixel-cell-model', function () {
 
     }
 
-    beforeEach(beforeEachFn);
+    beforeEach(function () {
+        beforeEachFn();
+    });
 
     it('should tell me the data row of a virtual top location', function () {
         expect(model.getRow(91)).toBe(3);
     });
 
-    it('should tell the the data col of a virtual left location', function () {
+    it('should tell the data col of a virtual left location', function () {
         expect(model.getCol(201)).toBe(2);
     });
 

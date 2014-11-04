@@ -11,7 +11,9 @@ describe('cell-scroll-model', function () {
         grid = helper.buildSimpleGrid(numRows, numCols, false, vary, fixedR, fixedC);
         model = grid.cellScrollModel;
     };
-    beforeEach(beforeEachFunction);
+    beforeEach(function () {
+        beforeEachFunction();
+    });
 
     it('should have a row and col value that start at 0', function () {
         expect(model.row).toEqual(0);

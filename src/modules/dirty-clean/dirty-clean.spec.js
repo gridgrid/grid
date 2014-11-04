@@ -13,14 +13,15 @@ describe('dirty-clean', function () {
     });
 
 
-    it('should be clean on draw', function () {
+    it('should be clean on draw', function (done) {
         grid.viewLayer.draw();
         helper.onDraw(function () {
             expect(dirtyClean).not.toBeDirty();
+            done();
         });
     });
 
-    it('should let me set it to dirty and request draw', function () {
+    it('should let me set it to dirty and request draw', function (done) {
         var spy = spyOn(grid, 'requestDraw');
         helper.resetAllDirties();
         dirtyClean.setDirty();
@@ -28,6 +29,7 @@ describe('dirty-clean', function () {
         expect(dirtyClean).not.toBeClean();
         helper.onDraw(function () {
             expect(spy).toHaveBeenCalled();
+            done();
         });
     });
 

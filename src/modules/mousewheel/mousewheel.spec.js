@@ -23,7 +23,7 @@ describe('mousewheel', function () {
         expect(add).toHaveBeenCalledWithAll(events);
         //make sure the second argument was at least a function for all the calls (since it's not really the function we passed in)
         events.forEach(function (e, i) {
-            expect(add.argsForCall[i][1]).toBeAFunction();
+            expect(add.calls.argsFor(i)[1]).toBeAFunction();
         });
     });
 
@@ -39,13 +39,13 @@ describe('mousewheel', function () {
         expect(remove).toHaveBeenCalledWithAll(events);
         //make sure the second argument was at least a function for all the calls (since it's not really the function we passed in)
         events.forEach(function (e, i) {
-            expect(remove.argsForCall[i][1]).toBeAFunction();
+            expect(remove.calls.argsFor(i)[1]).toBeAFunction();
         });
     });
 
     function expectListenerToHaveBeenCalledWithDelta(listener, y, x) {
         expect(listener).toHaveBeenCalled();
-        var calledEvent = listener.argsForCall[0][0];
+        var calledEvent = listener.calls.argsFor(0)[0];
         expect(calledEvent.type).toBe('mousewheel');
         expect(calledEvent.deltaY).toBe(y);
         expect(calledEvent.deltaX).toBe(x);

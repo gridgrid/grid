@@ -19,16 +19,10 @@ module.exports = function () {
             return helper.container;
         },
         onDraw: function (fn) {
-            var hasBeenDrawn = false;
-            runs(function () {
-                helper.grid.eventLoop.bind('grid-draw', function () {
-                    hasBeenDrawn = true;
-                });
+            var unbind = helper.grid.eventLoop.bind('grid-draw', function () {
+                setTimeout(fn, 1);
+                unbind();
             });
-            waitsFor(function () {
-                return hasBeenDrawn;
-            }, 'the view draw', 150);
-            runs(fn);
         },
         resetAllDirties: function () {
             helper.grid.eventLoop.fire('grid-draw');

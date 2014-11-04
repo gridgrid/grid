@@ -26,7 +26,9 @@ describe('cell-mouse-model', function () {
     var annotatedEvents = ['mousedown', 'mousemove', 'mouseup', 'click'];
 
     describe('general', function () {
-        beforeEach(beforeEachFunction);
+        beforeEach(function () {
+            beforeEachFunction();
+        });
 
         it('should annotate mouse events with the cell they are on', function () {
             grid.cellScrollModel.scrollTo(1, 1);
@@ -92,7 +94,7 @@ describe('cell-mouse-model', function () {
                 expect(spy).not.toHaveBeenCalled();
             });
             expect(spy).toHaveBeenCalled();
-            var dragEvent = spy.argsForCall[0][0];
+            var dragEvent = spy.calls.argsFor(0)[0];
             expect(dragEvent.type).toBe('grid-drag-start');
             expect(dragEvent).rowToBe(1);
             expect(dragEvent).colToBe(1);
@@ -108,8 +110,8 @@ describe('cell-mouse-model', function () {
             startDrag();
             expect(startSpy).toHaveBeenCalled();
             expect(dragSpy).toHaveBeenCalled();
-            startSpy.reset();
-            dragSpy.reset();
+            startSpy.calls.reset();
+            dragSpy.calls.reset();
             var mousemove = createEventWithXY('mousemove', 111, 41);
             window.dispatchEvent(mousemove);
             expect(startSpy).not.toHaveBeenCalled();
@@ -132,7 +134,7 @@ describe('cell-mouse-model', function () {
             grid.eventLoop.bind('grid-drag', spy);
             startDrag();
             expect(spy).toHaveBeenCalled();
-            var dragEvent = spy.argsForCall[0][0];
+            var dragEvent = spy.calls.argsFor(0)[0];
             expect(dragEvent.type).toBe('grid-drag');
             expect(dragEvent).rowToBe(1);
             expect(dragEvent).colToBe(1);
@@ -151,7 +153,7 @@ describe('cell-mouse-model', function () {
             var mousemove = createEventWithXY('mousemove', 201, 41);
             window.dispatchEvent(mousemove);
             expect(spy).toHaveBeenCalled();
-            var dragEvent = spy.argsForCall[0][0];
+            var dragEvent = spy.calls.argsFor(0)[0];
             expect(dragEvent.type).toBe('grid-cell-drag');
             expect(dragEvent).rowToBe(1);
             expect(dragEvent).colToBe(2);
@@ -159,7 +161,7 @@ describe('cell-mouse-model', function () {
             expect(dragEvent.clientX).toBe(201);
             expect(dragEvent.gridY).toBe(41);
             expect(dragEvent.gridX).toBe(201);
-            spy.reset();
+            spy.calls.reset();
             mousemove = createEventWithXY('mousemove', 202, 41);
             window.dispatchEvent(mousemove);
             expect(spy).not.toHaveBeenCalled();
@@ -173,7 +175,7 @@ describe('cell-mouse-model', function () {
             var mouseup = createEventWithXY('mouseup', 111, 41);
             window.dispatchEvent(mouseup);
             expect(spy).toHaveBeenCalled();
-            var dragEvent = spy.argsForCall[0][0];
+            var dragEvent = spy.calls.argsFor(0)[0];
             expect(dragEvent.type).toBe('grid-drag-end');
             expect(dragEvent).rowToBe(1);
             expect(dragEvent).colToBe(1);

@@ -23,7 +23,7 @@
 
         afterEach(function () {
             expect(spy).toHaveBeenCalled();
-            expect(spy.callCount).toBe(1);
+            expect(spy.calls.count()).toBe(1);
         });
     });
 })();
