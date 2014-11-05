@@ -22,7 +22,6 @@ describe('grid-core', function () {
         expect(grid).toHaveField('pixelScrollModel');
         expect(grid).toHaveField('colResize');
         expect(grid).toHaveField('colReorder');
-        expect(grid).toHaveField('colBuilders');
     });
 
     it('should have a main build function', function () {

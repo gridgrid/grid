@@ -166,7 +166,13 @@ describe('view-layer', function () {
 
             it('should rebuild colbuilders and draw cells if col builders are dirty', function (done) {
                 expectRedraw.call(this, ['_buildCols', '_drawCells'], function () {
-                    grid.colBuilders.set(0, grid.colBuilders.create());
+                    grid.colModel.get(0).builder = grid.colModel.createBuilder();
+                }, done);
+            });
+
+            it('should rebuild row headers and draw cells if row builders are dirty', function (done) {
+                expectRedraw.call(this, ['_buildRows', '_drawCells'], function () {
+                    grid.rowModel.get(0).builder = grid.rowModel.createBuilder();
                 }, done);
             });
 
@@ -521,79 +527,26 @@ describe('view-layer', function () {
         });
 
         describe('col builders', function () {
-            it('should call render for each view row on build', function (done) {
-                var builder = grid.colBuilders.create();
-                var renderSpy = spyOn(builder, 'render');
-                grid.colBuilders.set(0, builder);
-                this.onDraw(function () {
-                    expect(renderSpy).toHaveBeenCalled();
-                    expect(renderSpy.calls.count()).toBe(grid.viewPort.rows);
-                    done();
-                });
+            beforeEach(function () {
+                this.rowColModel = grid.colModel;
+                this.numBuilt = grid.viewPort.rows;
+                this.findCells = findColCellsByIndex;
+                this.getCtxForBuilt = function (r) {
+                    return {
+                        virtualRow: r + 1,
+                        virtualCol: 1,
+                        data: grid.dataModel.get(r + 1, 1)
+                    };
+                };
+                this.scrolledBuilderRowCol = 1;
             });
 
-            it('should put the returned element into the cells for that col', function (done) {
-                var builder = grid.colBuilders.create(function () {
-                    return document.createElement('a');
-                }, function (elem) {
-                    return elem;
-                });
-                grid.colBuilders.set(0, builder);
-                this.onDraw(function () {
-                    findColCellsByIndex(0).each(function () {
-                        var firstChild = this.firstChild;
-                        expect(firstChild.tagName).toBe('A');
-                    });
-                    done();
-                });
-            });
-
-            it('should use a text node if the update doesnt return an element', function (done) {
-                var builder = grid.colBuilders.create(function () {
-                    return document.createElement('a');
-                }, function (elem, ctx) {
-                    if (ctx.virtualRow === 1) {
-                        return undefined;
-                    }
-                    return elem;
-                });
-                grid.colBuilders.set(0, builder);
-                this.onDraw(function () {
-                    findColCellsByIndex(0).each(function (index) {
-                        var firstChild = this.firstChild;
-                        if (index === 1) {
-                            expect(firstChild.nodeType).toBe(3);
-                        } else {
-                            expect(firstChild.tagName).toBe('A');
-                        }
-                    });
-                    done();
-                });
-            });
-
-
-            it('should call update for each view row on draw', function (done) {
-                var builder = grid.colBuilders.create();
-                var updateSpy = spyOn(builder, 'update');
-                grid.colBuilders.set(1, builder);
-                this.onDraw(function () {
-                    expect(updateSpy).toHaveBeenCalled();
-                    expect(updateSpy.calls.count()).toBe(grid.viewPort.rows);
-                    updateSpy.calls.reset();
-                    grid.cellScrollModel.scrollTo(1, 1);
-                    this.onDraw(function () {
-                        expect(updateSpy).toHaveBeenCalled();
-                        expect(updateSpy.calls.count()).toBe(grid.viewPort.rows);
-                        done();
-                    });
-                });
-
-            });
+            testBuilders('col');
 
             it('should not call update for cols out of the view', function (done) {
-                var builder = grid.colBuilders.create();
+                var builder = grid.colModel.createBuilder();
                 var updateSpy = spyOn(builder, 'update');
-                grid.colBuilders.set(0, builder);
+                grid.colModel.get(0).builder = builder;
                 grid.cellScrollModel.scrollTo(1, 1);
                 this.onDraw(function () {
                     expect(updateSpy).not.toHaveBeenCalled();
@@ -601,41 +554,8 @@ describe('view-layer', function () {
                 });
             });
 
-            it('should pass back the rendered element to the update function', function (done) {
-                var aTags = [];
-                var updateSpy = jasmine.createSpy('update');
-                var builder = grid.colBuilders.create(function () {
-                    var aTag = document.createElement('a');
-                    aTags.push(aTag);
-                    return aTag;
-                }, updateSpy);
-                grid.colBuilders.set(0, builder);
-                this.onDraw(function () {
-                    expect(aTags.length).toBe(grid.viewPort.rows);
-                    aTags.forEach(function (aTag, i) {
-                        expect(updateSpy.calls.argsFor(i)[0]).toBe(aTag);
-                    });
-                    done();
-                });
-            });
-
-            it('should call update with a context obj', function (done) {
-                var updateSpy = jasmine.createSpy('update');
-                var builder = grid.colBuilders.create(undefined, updateSpy);
-                grid.colBuilders.set(1, builder);
-                grid.cellScrollModel.scrollTo(1, 1);
-                this.onDraw(function () {
-                    for (var r = 0; r < grid.viewPort.rows; r++) {
-                        expect(updateSpy.calls.argsFor(r)[1]).toEqual({
-                            virtualRow: r + 1,
-                            virtualCol: 1,
-                            data: grid.dataModel.get(r + 1, 1)
-                        });
-                    }
-                    done();
-                });
-            });
         });
+
 
         describe('cell classes', function () {
             it('should draw the classes only  when dirty', function (done) {
@@ -733,6 +653,109 @@ describe('view-layer', function () {
 
     });
 
+    function testBuilders(rowOrCol) {
+        it('should call render for each view ' + rowOrCol + 'on build', function (done) {
+            var builder = this.rowColModel.createBuilder();
+            var renderSpy = spyOn(builder, 'render');
+            this.rowColModel.get(0).builder = builder;
+            this.onDraw(function () {
+                expect(renderSpy).toHaveBeenCalled();
+                expect(renderSpy.calls.count()).toBe(this.numBuilt);
+                done();
+            });
+        });
+
+        it('should put the returned element into the cells for that ' + rowOrCol, function (done) {
+            var builder = this.rowColModel.createBuilder(function () {
+                return document.createElement('a');
+            }, function (elem) {
+                return elem;
+            });
+            this.rowColModel.get(0).builder = builder;
+            this.onDraw(function () {
+                this.findCells(0).each(function () {
+                    var firstChild = this.firstChild;
+                    expect(firstChild.tagName).toBe('A');
+                });
+                done();
+            });
+        });
+
+        it('should use a text node if the update doesnt return an element', function (done) {
+            var builder = this.rowColModel.createBuilder(function () {
+                return document.createElement('a');
+            }, function (elem, ctx) {
+                if (ctx.virtualRow === 1 || ctx.virtualCol === 1) {
+                    return undefined;
+                }
+                return elem;
+            });
+            this.rowColModel.get(0).builder = builder;
+            this.onDraw(function () {
+                this.findCells(0).each(function (index) {
+                    var firstChild = this.firstChild;
+                    if (index === 1) {
+                        expect(firstChild.nodeType).toBe(3);
+                    } else {
+                        expect(firstChild.tagName).toBe('A');
+                    }
+                });
+                done();
+            });
+        });
+
+
+        it('should call update for each view cell on draw', function (done) {
+            var builder = this.rowColModel.createBuilder();
+            var updateSpy = spyOn(builder, 'update');
+            this.rowColModel.get(this.scrolledBuilderRowCol).builder = builder;
+            this.onDraw(function () {
+                expect(updateSpy).toHaveBeenCalled();
+                expect(updateSpy.calls.count()).toBe(this.numBuilt);
+                updateSpy.calls.reset();
+                grid.cellScrollModel.scrollTo(1, 1);
+                this.onDraw(function () {
+                    expect(updateSpy).toHaveBeenCalled();
+                    expect(updateSpy.calls.count()).toBe(this.numBuilt);
+                    done();
+                });
+            });
+
+        });
+
+
+        it('should pass back the rendered element to the update function', function (done) {
+            var aTags = [];
+            var updateSpy = jasmine.createSpy('update');
+            var builder = this.rowColModel.createBuilder(function () {
+                var aTag = document.createElement('a');
+                aTags.push(aTag);
+                return aTag;
+            }, updateSpy);
+            grid.colModel.get(0).builder = builder;
+            this.onDraw(function () {
+                expect(aTags.length).toBe(this.numBuilt);
+                aTags.forEach(function (aTag, i) {
+                    expect(updateSpy.calls.argsFor(i)[0]).toBe(aTag);
+                });
+                done();
+            });
+        });
+
+        it('should call update with a context obj', function (done) {
+            var updateSpy = jasmine.createSpy('update');
+            var builder = this.rowColModel.createBuilder(undefined, updateSpy);
+            this.rowColModel.get(this.scrolledBuilderRowCol).builder = builder;
+            grid.cellScrollModel.scrollTo(1, 1);
+            this.onDraw(function () {
+                for (var r = 0; r < this.numBuilt; r++) {
+                    expect(updateSpy.calls.argsFor(r)[1]).toEqual(this.getCtxForBuilt(r));
+                }
+                done();
+            });
+        });
+    }
+
     describe('varied sizes', function () {
 
         it('should position on scroll', function (done) {
@@ -805,8 +828,12 @@ describe('view-layer', function () {
     });
 
     describe('headers', function () {
-        it('should get a special class', function (done) {
+
+        beforeEach(function () {
             viewBeforeEach.call(this, false, false, 1, 1, 1, 1);
+        });
+
+        it('should get a special class', function (done) {
 
             this.onDraw(function () {
                 expect(findColCellsByIndex(1)[0]).toHaveClass('grid-header grid-col-header');
@@ -816,7 +843,6 @@ describe('view-layer', function () {
         });
 
         it('should offset the data by the headers', function (done) {
-            viewBeforeEach.call(this, false, false, 1, 1, 1, 1);
             this.onDraw(function () {
                 expect(findCellByRowCol(1, 1).text()).toBe(getCellText(0, 0));
                 done();
@@ -824,7 +850,6 @@ describe('view-layer', function () {
         });
 
         it('should set the contents of the headers', function (done) {
-            viewBeforeEach.call(this, false, false, 1, 1, 1, 1);
             this.onDraw(function () {
                 expect(findCellByRowCol(0, 0).text()).toBe(getCellText(0, 0, true));
                 done();
@@ -832,7 +857,6 @@ describe('view-layer', function () {
         });
 
         it('should add a class to a range of cells in the data space', function (done) {
-            viewBeforeEach.call(this, false, false, 1, 1, 1, 1);
             var cellClass = 'myRangedClass';
             var descriptor = grid.cellClasses.create(0, 0, cellClass, 2, 3, 'data');
             grid.cellClasses.add(descriptor);
@@ -841,6 +865,27 @@ describe('view-layer', function () {
                 done();
             });
         });
+
+        describe('row builders', function () {
+            beforeEach(function () {
+                this.rowColModel = grid.rowModel;
+                this.numBuilt = grid.viewPort.cols;
+                this.findCells = findRowCellsByIndex;
+                this.getCtxForBuilt = function (c) {
+                    var virtualCol = grid.viewPort.toVirtualCol(c);
+                    return {
+                        virtualRow: 0,
+                        virtualCol: virtualCol,
+                        data: grid.dataModel.getHeader(0, virtualCol)
+                    };
+                };
+                this.scrolledBuilderRowCol = 0;
+            });
+
+            testBuilders('row');
+
+        });
+
     });
 
 })

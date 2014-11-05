@@ -23,7 +23,6 @@ module.exports = function () {
     grid.pixelScrollModel = require('@grid/pixel-scroll-model')(grid);
     grid.colResize = require('@grid/col-resize')(grid);
     grid.colReorder = require('@grid/col-reorder')(grid);
-    grid.colBuilders = require('@grid/col-builders')(grid);
 
     //sort functionality has no api, it just sets up an event listener
     //for now disable header click sort cause we're gonna use the click for selection instead

@@ -245,6 +245,47 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
         });
     });
 
+    describe('dom builder', function () {
+
+        it('should let me create a dom builder', function () {
+            var render = function () {
+            };
+            var update = function () {
+            };
+            var builder = model.createBuilder(render, update);
+            expect(builder).toBeDefined();
+            expect(builder.render).toBe(render);
+            expect(builder.update).toBe(update);
+        });
+
+        it('should be able to be passed to col create', function () {
+            var builder = model.createBuilder();
+            var descriptor = model.create(builder);
+            expect(descriptor.builder).toBe(builder);
+        });
+
+        it('should default to empty functions', function () {
+            var builder = model.createBuilder();
+            expect(builder.render).toBeAFunction();
+            expect(builder.update).toBeAFunction();
+        });
+    });
+
+    it('should be dirty on col add', function () {
+        var descriptor = model.create(model.createBuilder());
+        this.resetAllDirties();
+        model.add(descriptor);
+        expect(model.areBuildersDirty()).toBe(true);
+    });
+
+    it('should be dirty on set later', function () {
+        var descriptor = model.create();
+        model.add(descriptor);
+        this.resetAllDirties();
+        model.get(0).builder = model.createBuilder();
+        expect(model.areBuildersDirty()).toBe(true);
+    });
+
 }
 
 

@@ -22,7 +22,7 @@ angular.module('riqGridApp', [])
                 grid.build(elem);
                 grid.navigationModel.minRow = 1;
 
-                var builder = grid.colBuilders.create(function () {
+                var builder = grid.colModel.createBuilder(function () {
                     return $compile('<a>{{data.formatted}}</a>')($scope.$new())[0];
                 }, function (elem, ctx) {
                     var scope = angular.element(elem).scope();
@@ -31,9 +31,23 @@ angular.module('riqGridApp', [])
                     return elem;
                 });
 
-                grid.colBuilders.set(0, builder);
-                grid.colBuilders.set(1, builder);
-                grid.colBuilders.set(2, builder);
+                grid.colModel.get(0).builder = builder;
+                grid.colModel.get(1).builder = builder;
+                grid.colModel.get(2).builder = builder;
+
+                var headerRow = grid.rowModel.get(0);
+                headerRow.builder = grid.rowModel.createBuilder(function () {
+                    return $compile('<div><div>{{line1}}</div><div style="color:hotpink;">{{line2}}</div></div>')($scope.$new())[0];
+                }, function (elem, ctx) {
+                    var scope = angular.element(elem).scope();
+                    scope.line1 = ctx.data.formatted;
+                    scope.line2 = 'header' + ctx.virtualCol;
+                    scope.$digest();
+                    return elem;
+                });
+
+                headerRow.height = 40;
+
 
                 //this really shouldn't be necessary but just to make sure
                 grid.requestDraw();

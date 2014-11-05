@@ -21,6 +21,7 @@ module.exports = function (_grid) {
     var cells; //matrix of rendered cell elements;
     var rows; //array of all rendered rows
     var builtCols; //map from col index to an array of built elements for the column to update on scroll
+    var builtRows; //map from row index to an array of built elements for the row to update on scroll
 
     //add the cell classes through the standard method
     grid.cellClasses.add(grid.cellClasses.create(0, 0, CELL_CLASS, Infinity, Infinity, 'virtual'));
@@ -103,14 +104,20 @@ module.exports = function (_grid) {
         if (!container) {
             return;
         }
+
         var rebuilt = grid.viewPort.isDirty();
         if (rebuilt) {
             viewLayer._buildCells(cellContainer);
         }
 
-        var builtColsDirty = grid.colBuilders.isDirty();
+        var builtColsDirty = grid.colModel.areBuildersDirty();
         if (rebuilt || builtColsDirty) {
             viewLayer._buildCols();
+        }
+
+        var builtRowsDirty = grid.rowModel.areBuildersDirty();
+        if (rebuilt || builtRowsDirty) {
+            viewLayer._buildRows();
         }
 
         var cellsPositionOrSizeChanged = grid.colModel.isDirty() || grid.rowModel.isDirty() || grid.cellScrollModel.isDirty();
@@ -119,7 +126,7 @@ module.exports = function (_grid) {
             viewLayer._drawCellClasses();
         }
 
-        if (rebuilt || cellsPositionOrSizeChanged || builtColsDirty || grid.dataModel.isDirty()) {
+        if (rebuilt || cellsPositionOrSizeChanged || builtColsDirty || builtRowsDirty || grid.dataModel.isDirty()) {
             viewLayer._drawCells();
         }
 
@@ -159,10 +166,22 @@ module.exports = function (_grid) {
             } else {
                 data = grid.dataModel.get(virtualRow - headerRows, virtualCol - headerCols);
             }
-            var builder = grid.colBuilders.get(virtualCol);
+            //artificially only get builders for row headers for now
+            var builder = virtualRow < headerRows && grid.rowModel.get(virtualRow).builder || undefined;
+            var hasRowBuilder = true;
+            if (!builder) {
+                hasRowBuilder = false;
+                builder = grid.colModel.get(virtualCol).builder;
+            }
+
             var cellChild;
             if (builder) {
-                var builtElem = builtCols[virtualCol][r];
+                var builtElem;
+                if (hasRowBuilder) {
+                    builtElem = builtRows[virtualRow][c];
+                } else {
+                    builtElem = builtCols[virtualCol][r];
+                }
                 cellChild = builder.update(builtElem, {
                     virtualCol: virtualCol,
                     virtualRow: virtualRow,
@@ -233,7 +252,7 @@ module.exports = function (_grid) {
     viewLayer._buildCols = function () {
         builtCols = {};
         for (var c = 0; c < grid.colModel.length(); c++) {
-            var builder = grid.colBuilders.get(c);
+            var builder = grid.colModel.get(c).builder;
             if (builder) {
                 builtCols[c] = [];
                 for (var realRow = 0; realRow < grid.viewPort.rows; realRow++) {
@@ -243,6 +262,24 @@ module.exports = function (_grid) {
         }
     };
     /* END COL BUILDER LOGIC */
+
+    /* ROW BUILDER LOGIC 
+     *  for now we only build headers
+     * */
+
+    viewLayer._buildRows = function () {
+        builtRows = {};
+        for (var r = 0; r < grid.rowModel.numHeaders(); r++) {
+            var builder = grid.rowModel.get(r).builder;
+            if (builder) {
+                builtRows[r] = [];
+                for (var realCol = 0; realCol < grid.viewPort.cols; realCol++) {
+                    builtRows[r][realCol] = builder.render();
+                }
+            }
+        }
+    };
+    /* END ROW BUILDER LOGIC*/
 
     /* DECORATOR LOGIC */
     function setPosition(boundingBox, top, left, height, width) {

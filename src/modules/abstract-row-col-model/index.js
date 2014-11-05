@@ -1,5 +1,6 @@
 var addDirtyProps = require('@grid/add-dirty-props');
 var util = require('@grid/util');
+var noop = require('@grid/no-op');
 
 module.exports = function (_grid, name, lengthName, defaultLength) {
     var grid = _grid;
@@ -8,12 +9,15 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
     var descriptors = [];
     var numFixed = 0;
     var numHeaders = 0;
-    var dirtyClean = require('@grid/dirty-clean')(grid);
+    var makeDirtyClean = require('@grid/dirty-clean');
+    var dirtyClean = makeDirtyClean(grid);
+    var builderDirtyClean = makeDirtyClean(grid);
     var selected = [];
 
     function setDescriptorsDirty() {
         grid.eventLoop.fire('grid-' + name + '-change');
         dirtyClean.setDirty();
+        builderDirtyClean.setDirty();
     }
 
     function fireSelectionChange() {
@@ -21,6 +25,7 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
     }
 
     var api = {
+        areBuildersDirty: builderDirtyClean.isDirty,
         isDirty: dirtyClean.isDirty,
         add: function (toAdd) {
             if (!util.isArray(toAdd)) {
@@ -116,7 +121,7 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
         getSelected: function () {
             return selected;
         },
-        create: function () {
+        create: function (builder) {
             var descriptor = {};
             var fixed = false;
             Object.defineProperty(descriptor, 'fixed', {
@@ -128,6 +133,10 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
                     fixed = _fixed;
                 }
             });
+
+            addDirtyProps(descriptor, ['builder'], [builderDirtyClean]);
+            descriptor.builder = builder;
+
             return addDirtyProps(descriptor, [
                 {
                     name: lengthName,
@@ -136,6 +145,9 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
                     }
                 }
             ], [dirtyClean]);
+        },
+        createBuilder: function (render, update) {
+            return {render: render || noop, update: update || noop};
         }
     };
 
