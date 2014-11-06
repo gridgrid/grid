@@ -164,7 +164,7 @@ module.exports = function (_grid) {
             if (r < headerRows || c < headerCols) {
                 data = grid.dataModel.getHeader(virtualRow, virtualCol);
             } else {
-                data = grid.dataModel.get(virtualRow - headerRows, virtualCol - headerCols);
+                data = grid.dataModel.get(grid.rowModel.toData(virtualRow), grid.colModel.toData(virtualCol));
             }
             //artificially only get builders for row headers for now
             var builder = virtualRow < headerRows && grid.rowModel.get(virtualRow).builder || undefined;

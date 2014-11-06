@@ -159,6 +159,17 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
             expect(descriptor.selected).toBe(false);
         });
 
+        it('should let me convert from virtual to data', function () {
+            model.addHeaders(model.create());
+            expect(model.toData(0)).toBe(-1);
+            expect(model.toData(1)).toBe(0);
+        });
+
+        it('should let me convert from data to virtual', function () {
+            model.addHeaders(model.create());
+            expect(model.toVirtual(0)).toBe(1);
+        });
+
     });
 
 

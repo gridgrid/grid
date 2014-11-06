@@ -82,6 +82,13 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
         numFixed: function () {
             return numFixed;
         },
+        toVirtual: function (dataIndex) {
+            return dataIndex + api.numHeaders();
+        },
+        toData: function (virtualIndex) {
+            return virtualIndex - api.numHeaders();
+        },
+        
         select: function (index) {
 
             var descriptor = api[name](index);

@@ -171,7 +171,7 @@ module.exports = function (_grid) {
         model[decoratorsField] = [];
 
         grid[rowOrCol + 'Model'].getSelected().forEach(function (index) {
-            var virtualIndex = index + grid[rowOrCol + 'Model'].numHeaders();
+            var virtualIndex = grid[rowOrCol + 'Model'].toVirtual(index);
             var top = rowOrCol === 'row' ? virtualIndex : 0;
             var left = rowOrCol === 'col' ? virtualIndex : 0;
             var decorator = grid.decorators.create(top, left, 1, 1, 'cell', 'virtual');
