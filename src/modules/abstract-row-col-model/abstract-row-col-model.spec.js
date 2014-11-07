@@ -39,6 +39,47 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
         expect(model[lengthName](0)).toBeANumber();
     });
 
+    it('should be able to clear', function () {
+        model.add({});
+        model.clear();
+        expect(model.length()).toBe(0);
+    });
+
+    it('should not clear headers by default', function () {
+        model.add({});
+        model.addHeaders({});
+        model.clear();
+        expect(model.length(true)).toBe(1);
+    });
+
+    it('should clear headers with flag', function () {
+        model.add({});
+        model.addHeaders({});
+        model.clear();
+        expect(model.length()).toBe(0);
+    });
+
+    it('should let you remove a descriptor', function () {
+        var descriptor = {};
+        model.add(descriptor);
+        model.remove(descriptor);
+        expect(model.length()).toBe(0);
+    });
+
+    it('should update numFixed on remove', function () {
+        var descriptor = {fixed: true};
+        model.add(descriptor);
+        model.remove(descriptor);
+        expect(model.numFixed()).toBe(0);
+    });
+
+    it('should update numHeaders on remove', function () {
+        var descriptor = {};
+        model.addHeaders(descriptor);
+        model.remove(descriptor);
+        expect(model.numHeaders()).toBe(0);
+    });
+
     it('should be able to tell you a few specified ' + name + ' ' + lengthName + 's', function () {
         var weirdLength = 311;
         var descriptor = {};

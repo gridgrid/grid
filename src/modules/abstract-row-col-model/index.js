@@ -72,6 +72,25 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
             var subtract = includeHeaders ? 0 : numHeaders;
             return descriptors.length - subtract;
         },
+        remove: function (descriptor) {
+            var index = descriptors.indexOf(descriptor);
+            if (index !== -1) {
+                descriptors.splice(index, 1);
+                if (descriptor.header) {
+                    numFixed--;
+                    numHeaders--;
+                } else if (descriptor.fixed) {
+                    numFixed--;
+                }
+            }
+        },
+        clear: function (includeHeaders) {
+            descriptors.slice(0).forEach(function (descriptor) {
+                if (includeHeaders || !descriptor.header) {
+                    api.remove(descriptor);
+                }
+            });
+        },
         move: function (start, target) {
             descriptors.splice(target, 0, descriptors.splice(start, 1)[0]);
             setDescriptorsDirty();
@@ -88,7 +107,7 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
         toData: function (virtualIndex) {
             return virtualIndex - api.numHeaders();
         },
-        
+
         select: function (index) {
 
             var descriptor = api[name](index);
