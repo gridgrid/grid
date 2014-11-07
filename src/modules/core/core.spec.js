@@ -88,5 +88,12 @@ describe('grid-core', function () {
         $(this.container).focus();
         expect(document.activeElement).toEqual(findTextArea.call(this)[0]);
     });
+    
+    it('should let me create a dirty clean', function () {
+        var dirtyClean = grid.makeDirtyClean();
+        expect(dirtyClean).toBeDirty();
+        this.resetAllDirties();
+        expect(dirtyClean).not.toBeDirty();
+    });
 
 });

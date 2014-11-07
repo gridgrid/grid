@@ -1,4 +1,5 @@
 var elementClass = require('element-class');
+var dirtyClean = require('@grid/dirty-clean');
 
 module.exports = function () {
 
@@ -82,6 +83,10 @@ module.exports = function () {
         grid.viewPort.sizeToContainer(container);
         grid.viewLayer.build(container);
         grid.eventLoop.setContainer(container);
+    };
+
+    grid.makeDirtyClean = function () {
+        return dirtyClean(grid);
     };
 
     return grid;
