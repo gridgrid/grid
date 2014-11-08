@@ -28,6 +28,10 @@ describe('util', function () {
             expect(util.clamp(11, 0, 10, true)).toBeNaN();
             expect(util.clamp(-1, 0, 10, true)).toBeNaN();
         });
+
+        it('should clamp if both numbers are the same', function () {
+            expect(util.clamp(99, 0, 0)).toBe(0);
+        });
     });
 
     describe('position', function () {

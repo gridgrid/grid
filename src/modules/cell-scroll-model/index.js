@@ -6,13 +6,30 @@ module.exports = function (_grid) {
     var dirtyClean = require('@grid/dirty-clean')(grid);
 
 
-    var model = {row: 0, col: 0};
+    var row;
+    var model = {col: 0};
+    Object.defineProperty(model, 'row', {
+        enumerable: true,
+        get: function () {
+            return row;
+        },
+        set: function (r) {
+            if (r < 0 || isNaN(r)) {
+                debugger;
+            }
+            row = r;
+        }
+    });
+    model.row = 0;
 
     model.isDirty = dirtyClean.isDirty;
 
     model.scrollTo = function (r, c, dontFire) {
-        var maxRow = grid.rowModel.length() - grid.rowModel.numFixed() - 1;
-        var maxCol = grid.colModel.length() - grid.colModel.numFixed() - 1;
+        if (isNaN(r) || isNaN(c)) {
+            return;
+        }
+        var maxRow = (grid.rowModel.length() || 1) - 1;
+        var maxCol = (grid.colModel.length() || 1) - 1;
         var lastRow = model.row;
         var lastCol = model.col;
         model.row = util.clamp(r, 0, maxRow);

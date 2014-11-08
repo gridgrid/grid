@@ -204,6 +204,15 @@ describe('view port', function () {
             //skip the scrolled width
             expect(viewPort.getRowTop(2)).toBe(5 + 15);
         });
+
+        it('should play into max cells', function () {
+            beforeEachFn.call(this, undefined, undefined, 1, 1);
+            grid.rowModel.clear();
+            grid.colModel.clear();
+            viewPort.sizeToContainer(this.container);
+            expect(viewPort.rows).toBe(1);
+            expect(viewPort.cols).toBe(1);
+        });
     });
 
     it('should let me get a real row or col from a virtual one', function () {

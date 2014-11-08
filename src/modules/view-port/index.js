@@ -291,7 +291,7 @@ module.exports = function (_grid) {
         }
 
         //it might be safer to actually sum the lengths in the virtualPixelCellModel but for now here is ok
-        for (var index = numFixed; index < lengthModel.length(); index++) {
+        for (var index = numFixed; index < lengthModel.length(true); index++) {
             windowLength += lengthMethod(index);
             while (windowLength + fixedLength > totalLength && windowStartIndex < index) {
                 windowLength -= lengthMethod(index);
@@ -303,7 +303,7 @@ module.exports = function (_grid) {
             }
 
         }
-        return maxSize === 0 ? 0 : maxSize + numFixed + 1;
+        return maxSize + numFixed + 1;
     }
 
 

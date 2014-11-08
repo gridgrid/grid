@@ -10,7 +10,7 @@ module.exports = function (_grid) {
             return NaN;
         }
         var sumLength = 0;
-        for (var r = 0; r < grid.rowModel.length(); r++) {
+        for (var r = 0; r < grid.rowModel.length(true); r++) {
             sumLength += grid.rowModel.height(r);
             if (topPx < sumLength) {
                 return r;
@@ -25,7 +25,7 @@ module.exports = function (_grid) {
             return NaN;
         }
         var sumLength = 0;
-        for (var c = 0; c < grid.colModel.length(); c++) {
+        for (var c = 0; c < grid.colModel.length(true); c++) {
             sumLength += grid.colModel.width(c);
             if (leftPx < sumLength) {
                 return c;
@@ -36,7 +36,7 @@ module.exports = function (_grid) {
 
 
     function clampRowOrCol(virtualRowCol, rowOrCol) {
-        var maxRowCol = grid[rowOrCol + 'Model'].length() - 1;
+        var maxRowCol = grid[rowOrCol + 'Model'].length(true) - 1;
         return util.clamp(virtualRowCol, 0, maxRowCol);
     }
 
@@ -74,11 +74,11 @@ module.exports = function (_grid) {
     }
 
     model.totalHeight = function () {
-        return model.height(0, grid.rowModel.length() - 1);
+        return model.height(0, grid.rowModel.length(true) - 1);
     };
 
     model.totalWidth = function () {
-        return model.width(0, grid.colModel.length() - 1);
+        return model.width(0, grid.colModel.length(true) - 1);
     };
 
     model.fixedHeight = function () {

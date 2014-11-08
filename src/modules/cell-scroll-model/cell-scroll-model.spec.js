@@ -23,8 +23,14 @@ describe('cell-scroll-model', function () {
 
     it('should let you "scroll" to a cell', function () {
         model.scrollTo(5, 6);
-        expect(model.row).toEqual(5);
-        expect(model.col).toEqual(6);
+        expect(model).rowToBe(5);
+        expect(model).colToBe(6);
+    });
+
+    it('should ignore NaN', function () {
+        model.scrollTo(NaN, NaN);
+        expect(model).rowToBe(0);
+        expect(model).colToBe(0);
     });
 
     it('should be able to scroll without firing', function () {

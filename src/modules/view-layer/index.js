@@ -251,7 +251,7 @@ module.exports = function (_grid) {
     /* COL BUILDER LOGIC */
     viewLayer._buildCols = function () {
         builtCols = {};
-        for (var c = 0; c < grid.colModel.length(); c++) {
+        for (var c = 0; c < grid.colModel.length(true); c++) {
             var builder = grid.colModel.get(c).builder;
             if (builder) {
                 builtCols[c] = [];
