@@ -29,7 +29,7 @@
             output: config.filenames.build.scripts
         },
         {
-            input: glob.sync('./node_modules/@grid/!(proto)/*.js'), //we load the tests through this symlink so istanbul can map correctly
+            input: glob.sync('./src/modules/!(proto)/*.js'), //we load the tests through this symlink so istanbul can map correctly
             output: 'bundle-tests.js',
             dest: 'test-assets',
             istanbul: argv.coverage
@@ -39,28 +39,30 @@
 
     createBundle = function (options, cb) {
         var isWatching = !global.release;
-        var bundleMethod, bundler, rebundle;
-        bundleMethod = isWatching ? watchify : browserify;
-        bundler = bundleMethod({
-            entries: options.input,
-            paths: config.paths.browserify
-        });
+        var bundler, rebundle;
+        var opts = isWatching ? {cache: {}, packageCache: {}, fullPaths: true} : {};
+        opts.entries = options.input;
+        opts.paths = config.paths.browserify;
+        opts.debug = true;
+        bundler = browserify(opts);
 
         if (options.istanbul) {
             //only do this when testing
             bundler.transform(istanbul({
-                ignore: ['**/bower_components/**', '**/templates.js', '**/proto/**', '**/grid-spec-helper/**', '**/*.spec.js', '**/node_modules/!(@grid)/**'],
+                ignore: ['**/bower_components/**', '**/templates.js', '**/proto/**', '**/grid-spec-helper/**', '**/*.spec.js', '**/node_modules/!(@grid)/**', '**/src/modules/**'],
                 defaultIgnore: false
-            }));
+            }), {global: true});
+        }
+
+        if (isWatching) {
+            bundler = watchify(bundler);
         }
 
         var destination = options.dest || (global.release ? config.paths.dest.release.scripts : config.paths.dest.build.scripts);
         rebundle = function () {
             var startTime;
             startTime = new Date().getTime();
-            return bundler.bundle({
-                debug: true
-            }).on('error', function () {
+            return bundler.bundle().on('error', function () {
                 return console.log(arguments);
             }).pipe(source(options.output)).pipe(gulp.dest(destination).on('end', function () {
                 var time;
