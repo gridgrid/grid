@@ -1,5 +1,5 @@
 global.SRC_FOLDER = 'src';
-global.BUILD_FOLDER = 'build';
+global.BUILD_FOLDER = 'release';
 global.RELEASE_FOLDER = 'release';
 global.TMP_FOLDER = 'tmp';
 var packageJsonPath = 'package.json';
