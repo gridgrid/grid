@@ -70,6 +70,7 @@
     "phantomjs": "^1.9.7-15",
     "run-sequence": "^0.3.6",
     "sugar": "^1.4.1",
+    "through2": "^0.6.3",
     "vinyl-source-stream": "^0.1.1",
     "vinyl-transform": "0.0.1",
     "watchify": "^1.0.0",
