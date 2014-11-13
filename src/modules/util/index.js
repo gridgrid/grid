@@ -26,5 +26,6 @@ module.exports = {
         elem.style.bottom = b + 'px';
         elem.style.right = r + 'px';
         elem.style.position = 'absolute';
+        
     }
 };
