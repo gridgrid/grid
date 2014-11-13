@@ -28,7 +28,10 @@ gulp.task('tagCommit', function () {
     var mainReleasePipe = gulp.src([config.paths.package]);
 
     return mainReleasePipe
-        .pipe(shell(['git add --all', 'git commit -am "bumps package version"']))
+        .pipe(shell(['git ls-files -z release/ | xargs -0 git update-index --no-assume-unchanged',
+            'git add --all',
+            'git commit -am "bumps package version"',
+            'git ls-files -z release/ | xargs -0 git update-index --assume-unchanged']))
         .pipe(filter(config.paths.package))
         .pipe(tag_version()) // tag it in the repository 
         .pipe(git.push('origin', 'master', {args: '--tags'})) // push the tags to master
