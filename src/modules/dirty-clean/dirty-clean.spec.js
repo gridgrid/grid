@@ -1,11 +1,11 @@
 describe('dirty-clean', function () {
-    require('@grid/grid-spec-helper')();
+    require('../grid-spec-helper')();
     var dirtyClean;
     var grid;
     beforeEach(function () {
         grid = this.buildSimpleGrid();
         this.viewBuild();
-        dirtyClean = require('@grid/dirty-clean')(grid);
+        dirtyClean = require('../dirty-clean')(grid);
     });
 
     it('should start dirty', function () {

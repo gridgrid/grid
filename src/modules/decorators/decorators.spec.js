@@ -1,6 +1,6 @@
 describe('decorators', function () {
     var $ = require('jquery');
-    require('@grid/grid-spec-helper')();
+    require('../grid-spec-helper')();
     var decorators;
     var grid;
     var ctx = {};
@@ -48,7 +48,7 @@ describe('decorators', function () {
 
         });
 
-        require('@grid/decorators/decorator-test-body')(ctx);
+        require('../decorators/decorator-test-body')(ctx);
     });
 
     it('should let me create a decorator with values', function () {

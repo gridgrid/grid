@@ -1,4 +1,4 @@
-var addDirtyProps = require('@grid/add-dirty-props');
+var addDirtyProps = require('../add-dirty-props');
 module.exports = function (range, dirtyClean, parentDirtyClean) {
     range = range || {}; //allow mixin functionality
     range.isDirty = dirtyClean.isDirty;

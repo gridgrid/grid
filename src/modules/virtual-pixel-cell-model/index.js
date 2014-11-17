@@ -1,4 +1,4 @@
-var util = require('@grid/util');
+var util = require('../util');
 
 module.exports = function (_grid) {
     var grid = _grid;

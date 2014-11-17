@@ -1,8 +1,8 @@
-var mockEvent = require('@grid/custom-event');
+var mockEvent = require('../custom-event');
 
 describe('cell-mouse-model', function () {
 
-    require('@grid/grid-spec-helper')();
+    require('../grid-spec-helper')();
     var model;
     var numRows = 100;
     var numCols = 10;

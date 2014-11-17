@@ -1,12 +1,12 @@
-var util = require('@grid/util');
-var rangeUtil = require('@grid/range-util');
+var util = require('../util');
+var rangeUtil = require('../range-util');
 var capitalize = require('capitalize');
-var addDirtyProps = require('@grid/add-dirty-props');
-var debounce = require('@grid/debounce');
+var addDirtyProps = require('../add-dirty-props');
+var debounce = require('../debounce');
 
 module.exports = function (_grid) {
     var grid = _grid;
-    var dirtyClean = require('@grid/dirty-clean')(grid);
+    var dirtyClean = require('../dirty-clean')(grid);
     var container;
 
     var viewPort = addDirtyProps({}, ['rows', 'cols', 'width', 'height'], [dirtyClean]);

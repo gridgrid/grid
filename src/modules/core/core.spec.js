@@ -1,5 +1,5 @@
 describe('grid-core', function () {
-    require('@grid/grid-spec-helper')();
+    require('../grid-spec-helper')();
     var $ = require('jquery');
     var grid;
     beforeEach(function () {

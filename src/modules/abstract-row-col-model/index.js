@@ -1,6 +1,6 @@
-var addDirtyProps = require('@grid/add-dirty-props');
-var util = require('@grid/util');
-var noop = require('@grid/no-op');
+var addDirtyProps = require('../add-dirty-props');
+var util = require('../util');
+var noop = require('../no-op');
 
 module.exports = function (_grid, name, lengthName, defaultLength) {
     var grid = _grid;
@@ -9,7 +9,7 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
     var descriptors = [];
     var numFixed = 0;
     var numHeaders = 0;
-    var makeDirtyClean = require('@grid/dirty-clean');
+    var makeDirtyClean = require('../dirty-clean');
     var dirtyClean = makeDirtyClean(grid);
     var builderDirtyClean = makeDirtyClean(grid);
     var selected = [];

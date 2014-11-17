@@ -1,9 +1,11 @@
-var mockEvent = require('@grid/custom-event');
+var mockEvent = require('../custom-event');
+var specHelper = require('../grid-spec-helper');
 
 describe('col-resize', function () {
     var $ = require('jquery');
 
-    require('@grid/grid-spec-helper')();
+
+    specHelper();
     var grid;
     var colResize;
     beforeEach(function () {
@@ -18,7 +20,7 @@ describe('col-resize', function () {
         });
 
         //covers the decorator interface
-        require('@grid/header-decorators/header-decorators.spec')(ctx);
+        require('../header-decorators/test-body')(ctx);
     });
 
     describe('decorator', function () {
@@ -103,7 +105,8 @@ describe('col-resize', function () {
                     var gridX = decoratorLeft;
                     drag.gridX = gridX;
                     grid.eventLoop.fire(drag);
-                    expect(dragCtx.decorator).leftToBe(decoratorLeft + 10);
+                    expect(dragCtx.decorator)
+                        .leftToBe(decoratorLeft + 10);
                     done();
                 });
 
@@ -131,7 +134,7 @@ describe('col-resize', function () {
             });
 
             describe('should satisfy', function () {
-                require('@grid/decorators/decorator-test-body')(dragCtx);
+                require('../decorators/decorator-test-body')(dragCtx);
             });
         });
 

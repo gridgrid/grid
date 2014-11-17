@@ -1,5 +1,5 @@
 describe('debounce', function () {
-    var debounce = require('@grid/debounce');
+    var debounce = require('../debounce');
 
     it('should not call immediately', function () {
         var spy = jasmine.createSpy();

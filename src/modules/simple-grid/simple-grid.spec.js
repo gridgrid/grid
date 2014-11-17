@@ -1,6 +1,6 @@
 describe('simple-grid', function () {
 
-    require('@grid/grid-spec-helper')();
+    require('../grid-spec-helper')();
     var grid;
 
     it('should let me vary the widths ', function () {

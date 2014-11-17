@@ -1,8 +1,8 @@
-var mockEvent = require('@grid/custom-event');
+var mockEvent = require('../custom-event');
 var key = require('key');
 
 describe('navigation-model', function () {
-    require('@grid/grid-spec-helper')();
+    require('../grid-spec-helper')();
     var model;
     var grid;
     var beforeEachFn = function (hRows, hCols) {
@@ -63,7 +63,7 @@ describe('navigation-model', function () {
 
         it('should register a cell class for focus', function () {
             var spy = spyOn(grid.cellClasses, 'add');
-            require('@grid/navigation-model')(grid);
+            require('../navigation-model')(grid);
             expect(spy).toHaveBeenCalled();
             var descriptor = spy.calls.argsFor(0)[0];
             expect(descriptor).unitsToBe('cell');
@@ -89,7 +89,7 @@ describe('navigation-model', function () {
                 beforeEach(function () {
                     ctx.decorator = decorator;
                 });
-                require('@grid/decorators/decorator-test-body')(ctx);
+                require('../decorators/decorator-test-body')(ctx);
             });
 
             it('should move when focus changes', function () {
@@ -101,7 +101,7 @@ describe('navigation-model', function () {
 
         it('should move the cell class on navigation', function () {
             var spy = spyOn(grid.cellClasses, 'add');
-            var model = require('@grid/navigation-model')(grid);
+            var model = require('../navigation-model')(grid);
             expect(spy).toHaveBeenCalled();
             var descriptor = spy.calls.argsFor(0)[0];
             model.setFocus(2, 3);
@@ -157,7 +157,7 @@ describe('navigation-model', function () {
             beforeEach(function () {
                 ctx.decorator = selection;
             });
-            require('@grid/decorators/decorator-test-body')(ctx);
+            require('../decorators/decorator-test-body')(ctx);
         });
 
         it('adds style class to rendered elem', function () {

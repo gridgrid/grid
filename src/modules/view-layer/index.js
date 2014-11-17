@@ -1,6 +1,6 @@
-var customEvent = require('@grid/custom-event');
-var debounce = require('@grid/debounce');
-var util = require('@grid/util');
+var customEvent = require('../custom-event');
+var debounce = require('../debounce');
+var util = require('../util');
 
 
 module.exports = function (_grid) {

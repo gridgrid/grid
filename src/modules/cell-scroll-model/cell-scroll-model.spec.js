@@ -1,6 +1,6 @@
 describe('cell-scroll-model', function () {
 
-    require('@grid/grid-spec-helper')();
+    require('../grid-spec-helper')();
     var model;
     var numRows = 100;
     var numCols = 10;

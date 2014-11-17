@@ -1,9 +1,9 @@
-var util = require('@grid/util');
+var util = require('../util');
 var capitalize = require('capitalize');
 
 module.exports = function (_grid) {
     var grid = _grid;
-    var dirtyClean = require('@grid/dirty-clean')(grid);
+    var dirtyClean = require('../dirty-clean')(grid);
 
 
     var row;

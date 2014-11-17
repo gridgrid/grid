@@ -13,7 +13,7 @@ module.exports = function (ctx) {
         });
 
         describe('should satisfy', function () {
-            require('@grid/position-range/test-body')(posRangeCtx);
+            require('../position-range/test-body')(posRangeCtx);
         });
     });
 }

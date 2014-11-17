@@ -7,7 +7,6 @@ module.exports = {
             return returnNaN ? NaN : min;
         }
         return num;
-
     },
     isNumber: function (number) {
         return typeof number === 'number' && !isNaN(number);
@@ -26,6 +25,6 @@ module.exports = {
         elem.style.bottom = b + 'px';
         elem.style.right = r + 'px';
         elem.style.position = 'absolute';
-        
+
     }
 };

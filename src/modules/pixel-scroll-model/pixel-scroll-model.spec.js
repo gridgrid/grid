@@ -1,8 +1,8 @@
-var mockEvent = require('@grid/custom-event');
+var mockEvent = require('../custom-event');
 
 describe('pixel-scroll-model', function () {
     var $ = require('jquery');
-    require('@grid/grid-spec-helper')();
+    require('../grid-spec-helper')();
     var model;
     var numRows = 100;
     var numCols = 10;
@@ -71,10 +71,10 @@ describe('pixel-scroll-model', function () {
     });
 
     function sendMouseWheelToModel(y, x) {
-        var event = require('@grid/custom-event')('mousewheel');
+        var event = require('../custom-event')('mousewheel');
         event.deltaY = y;
         event.deltaX = x;
-        event = require('@grid/mousewheel').normalize(event);
+        event = require('../mousewheel').normalize(event);
         grid.eventLoop.fire(event);
         return event;
     }

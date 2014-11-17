@@ -1,8 +1,8 @@
 describe('range-util', function () {
-    require('@grid/grid-spec-helper')();
+    require('../grid-spec-helper')();
     var util;
     beforeEach(function () {
-        util = require('@grid/range-util');
+        util = require('../range-util');
     });
 
     describe('intersect', function () {

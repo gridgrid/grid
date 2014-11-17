@@ -1,9 +1,9 @@
 (function () {
-    var mockEvent = require('@grid/custom-event');
+    var mockEvent = require('../custom-event');
     xdescribe('col-sort', function () {
 
 
-        require('@grid/grid-spec-helper')();
+        require('../grid-spec-helper')();
         var grid;
         beforeEach(function () {
             grid =this.buildSimpleGrid();

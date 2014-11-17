@@ -1,5 +1,5 @@
-var abstractRowColTest = require('@grid/abstract-row-col-model/abstract-row-col-model.spec.js');
-var rowModelFn = require('@grid/row-model');
+var abstractRowColTest = require('../abstract-row-col-model/test-body.js');
+var rowModelFn = require('../row-model');
 
 describe('row-model', function () {
     describe('abstract interface', function () {

@@ -1,9 +1,9 @@
-var mockEvent = require('@grid/custom-event');
+var mockEvent = require('../custom-event');
 
 
 describe('col-reorder', function () {
 
-    require('@grid/grid-spec-helper')();
+    require('../grid-spec-helper')();
     var grid;
     var colReorder;
     var beforeEachFn = function (fixedR, fixedC) {
@@ -21,7 +21,7 @@ describe('col-reorder', function () {
         });
 
         //covers the decorator interface
-        require('@grid/header-decorators/header-decorators.spec')(ctx);
+        require('../header-decorators/test-body')(ctx);
     });
 
     describe('decorator', function () {
@@ -106,7 +106,7 @@ describe('col-reorder', function () {
                 });
 
                 describe('should satisfy', function () {
-                    require('@grid/decorators/decorator-test-body')(targetCtx);
+                    require('../decorators/decorator-test-body')(targetCtx);
                 });
 
                 it('should add a decorator', function () {
@@ -163,7 +163,7 @@ describe('col-reorder', function () {
 
 
             describe('should satisfy', function () {
-                require('@grid/decorators/decorator-test-body')(dragCtx);
+                require('../decorators/decorator-test-body')(dragCtx);
             });
         });
 

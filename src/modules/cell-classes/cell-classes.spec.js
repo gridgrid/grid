@@ -1,5 +1,5 @@
 describe('cell-classes', function () {
-    require('@grid/grid-spec-helper')();
+    require('../grid-spec-helper')();
     var classes;
     beforeEach(function () {
         var grid =this.buildSimpleGrid();
@@ -24,11 +24,11 @@ describe('cell-classes', function () {
 
         describe('satisfy', function () {
             addDirtyCtx.props = ['class'];
-            require('@grid/add-dirty-props/test-body')(addDirtyCtx);
+            require('../add-dirty-props/test-body')(addDirtyCtx);
         });
 
         describe('satisfy', function () {
-            require('@grid/position-range/test-body')(ctx);
+            require('../position-range/test-body')(ctx);
         });
 
     });

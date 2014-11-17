@@ -1,8 +1,8 @@
-var mockEvent = require('@grid/custom-event');
-var eventLoopFn = require('@grid/event-loop');
+var mockEvent = require('../custom-event');
+var eventLoopFn = require('../event-loop');
 
 describe('event-loop', function () {
-    require('@grid/grid-spec-helper')();
+    require('../grid-spec-helper')();
     var loop;
     var grid;
     beforeEach(function () {

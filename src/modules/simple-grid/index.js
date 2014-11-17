@@ -1,8 +1,8 @@
-var util = require('@grid/util');
+var util = require('../util');
 
 module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows, fixedCols, preSetupFn, headerRows, headerCols) {
 
-    var grid = require('@grid/core')();
+    var grid = require('../core')();
 
     if (preSetupFn) {
         preSetupFn(grid);

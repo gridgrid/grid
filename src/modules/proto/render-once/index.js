@@ -1,6 +1,6 @@
-var mousewheel = require('@grid/mousewheel');
-var core = require('@grid/proto/grid-core');
-var gridAbsoluteDivs = require('@grid/proto/grid-absolute-divs');
+var mousewheel = require('../mousewheel');
+var core = require('../proto/grid-core');
+var gridAbsoluteDivs = require('../proto/grid-absolute-divs');
 
 module.exports = function (container) {
     var $container = $(container);

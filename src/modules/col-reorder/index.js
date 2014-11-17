@@ -1,5 +1,5 @@
 var elementClass = require('element-class');
-var util = require('@grid/util');
+var util = require('../util');
 
 
 module.exports = function (_grid) {
@@ -63,7 +63,7 @@ module.exports = function (_grid) {
         return headerDecorator;
     }
 
-    require('@grid/header-decorators')(grid, api);
+    require('../header-decorators')(grid, api);
 
     return api;
 };

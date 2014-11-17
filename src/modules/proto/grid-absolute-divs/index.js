@@ -1,4 +1,4 @@
-var util = require('@grid/proto/grid-util');
+var util = require('../proto/grid-util');
 
 module.exports = {
     makeCell: function (r, c, grid) {

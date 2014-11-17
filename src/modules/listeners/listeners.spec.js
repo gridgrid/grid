@@ -1,7 +1,7 @@
 describe('listeners', function () {
     var listeners;
     beforeEach(function () {
-        listeners = require('@grid/listeners')();
+        listeners = require('../listeners')();
     });
 
     it('should allow me to add and remove a listener', function () {

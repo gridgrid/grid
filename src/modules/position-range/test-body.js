@@ -21,7 +21,7 @@ function testPositionRange(context) {
         });
 
         describe('should satisfy', function () {
-            require('@grid/add-dirty-props/test-body')(dirtyPropsCtx);
+            require('../add-dirty-props/test-body')(dirtyPropsCtx);
         });
     });
 }

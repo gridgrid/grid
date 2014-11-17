@@ -5,7 +5,7 @@ module.exports = function (_grid) {
     var headerData = [];
     var sortedCol;
     var ascending;
-    var dirtyClean = require('@grid/dirty-clean')(grid);
+    var dirtyClean = require('../dirty-clean')(grid);
     var internalSet = function (data, r, c, datum) {
         if (!data[r]) {
             data[r] = [];

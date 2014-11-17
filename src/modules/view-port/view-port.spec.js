@@ -1,8 +1,8 @@
-var mockEvent = require('@grid/custom-event');
+var mockEvent = require('../custom-event');
 
 describe('view port', function () {
 
-    require('@grid/grid-spec-helper')();
+    require('../grid-spec-helper')();
     var viewPort;
     var grid;
 
@@ -80,7 +80,7 @@ describe('view port', function () {
             ctx.props = ['rows', 'cols', 'width', 'height'];
             ctx.dirtyObjs = [viewPort];
         });
-        require('@grid/add-dirty-props/test-body')(ctx);
+        require('../add-dirty-props/test-body')(ctx);
     });
 
     describe('cell coordinate conversion', function () {

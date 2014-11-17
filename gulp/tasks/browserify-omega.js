@@ -30,12 +30,6 @@
         {
             input: [config.paths.src.riqGridApp],
             output: config.filenames.build.scripts
-        },
-        {
-            input: glob.sync('./src/modules/!(proto)/*.js'), //we load the tests through this symlink so istanbul can map correctly
-            output: 'bundle-tests.js',
-            dest: 'test-assets',
-            istanbul: argv.coverage
         }
     ];
 
@@ -48,14 +42,6 @@
         opts.paths = config.paths.browserify;
         opts.debug = true;
         bundler = browserify(opts);
-
-        if (options.istanbul) {
-            //only do this when testing
-            bundler.transform(istanbul({
-                ignore: ['**/bower_components/**', '**/templates.js', '**/proto/**', '**/grid-spec-helper/**', '**/*.spec.js', '**/node_modules/!(@grid)/**', '**/src/modules/**'],
-                defaultIgnore: false
-            }), {global: true});
-        }
 
         if (isWatching) {
             bundler = watchify(bundler);

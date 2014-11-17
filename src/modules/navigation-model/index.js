@@ -1,6 +1,6 @@
 var key = require('key');
-var util = require('@grid/util');
-var rangeUtil = require('@grid/range-util');
+var util = require('../util');
+var rangeUtil = require('../range-util');
 
 module.exports = function (_grid) {
     var grid = _grid;

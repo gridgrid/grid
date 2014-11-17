@@ -1,4 +1,4 @@
-var customEvent = require('@grid/custom-event');
+var customEvent = require('../custom-event');
 
 var PROPS_TO_COPY_FROM_MOUSE_EVENTS = ['clientX', 'clientY', 'gridX', 'gridY', 'layerX', 'layerY', 'row', 'col', 'realRow', 'realCol'];
 

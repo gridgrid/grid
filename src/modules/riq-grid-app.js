@@ -1,8 +1,8 @@
 'use strict';
 
-var makeSimpleGrid = require('@grid/simple-grid');
+var makeSimpleGrid = require('./simple-grid');
 require('angular');
-var debounce = require('@grid/debounce');
+var debounce = require('./debounce');
 
 angular.module('riqGridApp', [])
     .directive('riqGridApp', function ($compile) {

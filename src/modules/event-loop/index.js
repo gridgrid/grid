@@ -1,6 +1,6 @@
-var mousewheel = require('@grid/mousewheel');
-var util = require('@grid/util');
-var listeners = require('@grid/listeners');
+var mousewheel = require('../mousewheel');
+var util = require('../util');
+var listeners = require('../listeners');
 
 var EVENTS = ['click', 'mousedown', 'mouseup', 'mousemove', 'dblclick', 'keydown', 'keypress', 'keyup'];
 

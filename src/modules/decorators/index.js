@@ -1,6 +1,6 @@
-var util = require('@grid/util');
-var makeDirtyClean = require('@grid/dirty-clean');
-var positionRange = require('@grid/position-range');
+var util = require('../util');
+var makeDirtyClean = require('../dirty-clean');
+var positionRange = require('../position-range');
 
 module.exports = function (_grid) {
     var grid = _grid;

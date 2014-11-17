@@ -2,8 +2,8 @@
     describe('add dirty props root', function () {
 
 
-        var makeDirtyClean = require('@grid/dirty-clean');
-        require('@grid/grid-spec-helper')();
+        var makeDirtyClean = require('../dirty-clean');
+        require('../grid-spec-helper')();
         var spy;
         var ctx = {props: ['random', 'props', 'are', 'fun']};
         beforeEach(function () {
@@ -13,12 +13,12 @@
             var dirtyClean = makeDirtyClean(grid);
             spy = jasmine.createSpy('prop function');
             ctx.props.push({name: 'objProp', onDirty: spy});
-            ctx.obj = require('@grid/add-dirty-props')({}, ctx.props, [dirtyClean, parentDirtyClean]);
+            ctx.obj = require('../add-dirty-props')({}, ctx.props, [dirtyClean, parentDirtyClean]);
             ctx.obj.isDirty = dirtyClean.isDirty;
             ctx.dirtyObjs = [ctx.obj, parent];
         });
 
-        require('@grid/add-dirty-props/test-body')(ctx);
+        require('../add-dirty-props/test-body')(ctx);
 
         afterEach(function () {
             expect(spy).toHaveBeenCalled();

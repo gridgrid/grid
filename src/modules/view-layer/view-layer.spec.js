@@ -1,6 +1,6 @@
 describe('view-layer', function () {
 
-    require('@grid/grid-spec-helper')();
+    require('../grid-spec-helper')();
     var viewRows = 10;
     var viewCols = 10;
     var view;

@@ -1,14 +1,14 @@
 describe('mousewheel', function () {
     var mousewheel;
     var $ = require('jQuery');
-    var mockEvent = require('@grid/custom-event');
+    var mockEvent = require('../custom-event');
     var div;
 
     var events = ['mousewheel', 'wheel', 'DOMMouseScroll'];
 
 
     beforeEach(function () {
-        mousewheel = require('@grid/mousewheel');
+        mousewheel = require('../mousewheel');
         div = document.createElement('div');
     });
 

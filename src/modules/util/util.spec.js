@@ -2,11 +2,10 @@ describe('util', function () {
 
     var util;
     beforeEach(function () {
-        util = require('@grid/util');
+        util = require('../util');
     });
 
     describe('clamp', function () {
-
         it('should do nothing to a number in the range', function () {
             expect(util.clamp(5, 0, 10)).toEqual(5);
         });

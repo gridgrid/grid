@@ -1,7 +1,6 @@
 module.exports = function (_grid) {
     var grid = _grid;
 
-
     var api = {annotateDecorator: annotateDecorator};
 
     function annotateDecorator(headerDecorator) {
@@ -40,7 +39,7 @@ module.exports = function (_grid) {
         };
     }
 
-    require('@grid/header-decorators')(grid, api);
+    require('../header-decorators')(grid, api);
 
     return api;
 };

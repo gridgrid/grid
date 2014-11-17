@@ -1,5 +1,5 @@
 describe('simple-data-model', function () {
-    require('@grid/grid-spec-helper')();
+    require('../grid-spec-helper')();
     var grid;
     var dataModel;
     beforeEach(function () {
