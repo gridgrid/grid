@@ -2,10 +2,9 @@ var addDirtyProps = require('../add-dirty-props');
 var util = require('../util');
 var noop = require('../no-op');
 
-module.exports = function (_grid, name, lengthName, defaultLength) {
+module.exports = function (_grid, name, lengthName, defaultSize) {
     var grid = _grid;
 
-    var DEFAULT_LENGTH = defaultLength;
     var descriptors = [];
     var numFixed = 0;
     var numHeaders = 0;
@@ -27,6 +26,7 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
     var api = {
         areBuildersDirty: builderDirtyClean.isDirty,
         isDirty: dirtyClean.isDirty,
+        defaultSize: defaultSize,
         add: function (toAdd) {
             if (!util.isArray(toAdd)) {
                 toAdd = [toAdd];
@@ -175,6 +175,7 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
         createBuilder: function (render, update) {
             return {render: render || noop, update: update || noop};
         }
+
     };
 
     //basically height or width
@@ -183,7 +184,7 @@ module.exports = function (_grid, name, lengthName, defaultLength) {
             return NaN;
         }
 
-        return descriptors[index] && descriptors[index][lengthName] || DEFAULT_LENGTH;
+        return descriptors[index] && descriptors[index][lengthName] || api.defaultSize;
     };
 
     //row or col get

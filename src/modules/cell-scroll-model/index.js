@@ -1,5 +1,4 @@
 var util = require('../util');
-var capitalize = require('capitalize');
 
 module.exports = function (_grid) {
     var grid = _grid;
@@ -14,9 +13,6 @@ module.exports = function (_grid) {
             return row;
         },
         set: function (r) {
-            if (r < 0 || isNaN(r)) {
-                debugger;
-            }
             row = r;
         }
     });
@@ -24,7 +20,7 @@ module.exports = function (_grid) {
 
     model.isDirty = dirtyClean.isDirty;
 
-    model.scrollTo = function (r, c, dontFire) {
+    model.scrollTo = function (r, c, dontFire, fromPixelModel) {
         if (isNaN(r) || isNaN(c)) {
             return;
         }
@@ -36,7 +32,12 @@ module.exports = function (_grid) {
         model.col = util.clamp(c, 0, maxCol);
         if (lastRow !== model.row || lastCol !== model.col) {
             dirtyClean.setDirty();
+
             if (!dontFire) {
+                grid.eventLoop.fire('grid-cell-scroll');
+            }
+
+            if (!fromPixelModel) {
                 var top = grid.virtualPixelCellModel.height(0, model.row - 1);
                 var left = grid.virtualPixelCellModel.width(0, model.col - 1);
                 grid.pixelScrollModel.scrollTo(top, left, true);

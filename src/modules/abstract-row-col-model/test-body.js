@@ -8,11 +8,8 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
         model = modelCreatorFn(grid, name, lengthName, defaultLength);
     });
 
-    it('should be able to add and get back a ' + name + ' object', function () {
-        var obj = {};
-        model.add(obj);
-        expect(model.get(0)).toBe(obj);
-    });
+
+
 
     it('should let me add multiple', function () {
         var ob1 = {};
@@ -37,6 +34,12 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
     it('should be able to tell you a default ' + name + ' ' + lengthName, function () {
         model.add({});
         expect(model[lengthName](0)).toBeANumber();
+    });
+
+    it('should have a settable default', function () {
+        model.add({});
+        model.defaultSize = 20;
+        expect(model[lengthName](0)).toBe(20);
     });
 
     it('should be able to clear', function () {
@@ -223,7 +226,7 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
                 ctx.props = [lengthName];
             });
 
-            require('..//add-dirty-props/test-body')(ctx);
+            require('@grid/add-dirty-props/test-body')(ctx);
         });
 
         it('should fire change on ' + lengthName + ' set', function () {
@@ -339,4 +342,5 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
     });
 
 }
+
 module.exports = testAbstractModel;

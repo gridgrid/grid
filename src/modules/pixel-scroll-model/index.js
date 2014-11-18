@@ -41,7 +41,7 @@ module.exports = function (_grid) {
         var scrollLeft = model.left;
         var col = grid.virtualPixelCellModel.getCol(scrollLeft);
 
-        grid.cellScrollModel.scrollTo(row, col, true);
+        grid.cellScrollModel.scrollTo(row, col, undefined, true);
     }
 
     var debouncedNotify = debounce(notifyListeners, 1);
@@ -77,8 +77,7 @@ module.exports = function (_grid) {
         var layerCoordField = 'layer' + xOrY;
         var viewPortClampFn = grid.viewPort['clamp' + xOrY];
 
-        decorator.render = function () {
-            var scrollBarElem = document.createElement('div');
+        decorator.postRender = function (scrollBarElem) {
             scrollBarElem.setAttribute('class', 'grid-scroll-bar');
             decorator._onDragStart = function (e) {
                 if (e.target !== scrollBarElem) {

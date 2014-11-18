@@ -152,6 +152,7 @@ describe('pixel-scroll-model', function () {
 
         function expectRenderToBeAScrollBar(div) {
             expect(div).toBeAnElement();
+            expect(div).toBePositioned(0, 0, 0, 0);
             expect($(div).hasClass('grid-scroll-bar')).toBe(true);
         }
 

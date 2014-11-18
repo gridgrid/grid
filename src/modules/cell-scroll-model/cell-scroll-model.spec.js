@@ -33,6 +33,13 @@ describe('cell-scroll-model', function () {
         expect(model).colToBe(0);
     });
 
+    it('should fire event on scroll', function () {
+        var spy = jasmine.createSpy('cell scroll');
+        grid.eventLoop.bind('grid-cell-scroll', spy);
+        model.scrollTo(5, 6, false);
+        expect(spy).toHaveBeenCalled();
+    });
+
     it('should be able to scroll without firing', function () {
         var spy = jasmine.createSpy('cell scroll');
         grid.eventLoop.bind('grid-cell-scroll', spy);
