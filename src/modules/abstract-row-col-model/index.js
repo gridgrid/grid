@@ -53,7 +53,7 @@ module.exports = function (_grid, name, lengthName, defaultSize) {
                 }
             });
 
-            setDescriptorsDirty({action: 'add'});
+            setDescriptorsDirty({action: 'add', descriptors: toAdd});
         },
         addHeaders: function (toAdd) {
             if (!util.isArray(toAdd)) {
@@ -95,7 +95,7 @@ module.exports = function (_grid, name, lengthName, defaultSize) {
         },
         move: function (start, target) {
             descriptors.splice(target, 0, descriptors.splice(start, 1)[0]);
-            setDescriptorsDirty({action: 'move'});
+            setDescriptorsDirty({action: 'move', descriptors: [api.get(start), api.get(target)]});
         },
         numHeaders: function () {
             return numHeaders;
@@ -162,6 +162,13 @@ module.exports = function (_grid, name, lengthName, defaultSize) {
                 }
             });
 
+            Object.defineProperty(descriptor, 'index', {
+                enumerable: true,
+                get: function () {
+                    return descriptors.indexOf(descriptor);
+                }
+            });
+
             addDirtyProps(descriptor, ['builder'], [builderDirtyClean]);
             descriptor.builder = builder;
 
@@ -169,7 +176,7 @@ module.exports = function (_grid, name, lengthName, defaultSize) {
                 {
                     name: lengthName,
                     onDirty: function () {
-                        setDescriptorsDirty({action: 'size'});
+                        setDescriptorsDirty({action: 'size', descriptors: [descriptor]});
                     }
                 }
             ], [dirtyClean]);

@@ -98,9 +98,11 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
     it('should notify listeners if ' + name + 's are added', function () {
         var spy = jasmine.createSpy();
         grid.eventLoop.bind('grid-' + name + '-change', spy);
-        model.add({});
+        var descriptor = {};
+        model.add(descriptor);
         expect(spy).toHaveBeenCalled();
         expect(spy.calls.argsFor(0)[0].action).toBe('add');
+        expect(spy.calls.argsFor(0)[0].descriptors).toEqual([descriptor]);
     });
 
     it('should tell you there are 0 fixed ' + name + 's by default', function () {
@@ -126,19 +128,27 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
         expect(model[lengthName](undefined)).toBeNaN();
     });
 
-    it('should allow me to move a descriptor to a new index', function () {
-        var orig = model.get(0);
-        model.move(0, 3);
-        expect(model.get(3)).toBe(orig);
-    });
+    describe('move', function () {
+        beforeEach(function () {
+            model.add({});
+            model.add({});
+        });
 
-    it('should fire change on move', function () {
-        var spy = jasmine.createSpy();
-        grid.eventLoop.bind('grid-' + name + '-change', spy);
-        model.move(0, 3);
-        expect(spy).toHaveBeenCalled();
-        expect(spy.calls.argsFor(0)[0].action).toBe('move');
-        expect(model.isDirty()).toBe(true);
+        it('should allow me to move a descriptor to a new index', function () {
+            var orig = model.get(0);
+            model.move(0, 1);
+            expect(model.get(1)).toBe(orig);
+        });
+
+        it('should fire change on move', function () {
+            var spy = jasmine.createSpy();
+            grid.eventLoop.bind('grid-' + name + '-change', spy);
+            model.move(0, 1);
+            expect(spy).toHaveBeenCalled();
+            expect(spy.calls.argsFor(0)[0].action).toBe('move');
+            expect(spy.calls.argsFor(0)[0].descriptors).toEqual([model.get(0), model.get(1)]);
+            expect(model.isDirty()).toBe(true);
+        });
     });
 
     describe('headers', function () {
@@ -230,13 +240,22 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
         });
 
         it('should fire change on ' + lengthName + ' set', function () {
-            model.add(model.create());
+            var descriptor = model.create();
+            model.add(descriptor);
             var spy = jasmine.createSpy();
             grid.eventLoop.bind('grid-' + name + '-change', spy);
             model.get(0)[lengthName] = 5;
             expect(spy).toHaveBeenCalled();
             expect(spy.calls.argsFor(0)[0].action).toBe('size');
+            expect(spy.calls.argsFor(0)[0].descriptors).toEqual([descriptor]);
         });
+
+        it('should be able to get its index', function () {
+            var descriptor = model.create();
+            model.add(descriptor);
+            expect(descriptor.index).toBe(0);
+        });
+
     });
 
     describe('selection', function () {

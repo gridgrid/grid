@@ -7,7 +7,11 @@ module.exports = function (obj, props, dirtyCleans) {
             get: function () {
                 return val;
             }, set: function (_val) {
-                if (_val !== val) {
+                var isChanged = _val !== val;
+                
+                val = _val;
+
+                if (isChanged) {
                     dirtyCleans.forEach(function (dirtyClean) {
                         dirtyClean.setDirty();
                     });
@@ -15,7 +19,6 @@ module.exports = function (obj, props, dirtyCleans) {
                         prop.onDirty();
                     }
                 }
-                val = _val;
             }
         });
     });
