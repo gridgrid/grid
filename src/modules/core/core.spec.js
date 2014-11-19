@@ -80,7 +80,7 @@ describe('grid-core', function () {
 
     it('should give the container a tabindex if it doesnt already have one', function () {
         grid.build(this.container);
-        expect(this.container.tabIndex).toBe(0);
+        expect(this.container.tabIndex).toBe(-1);
     });
 
     it('should focus the text area if the grid is focused', function () {
@@ -88,7 +88,7 @@ describe('grid-core', function () {
         $(this.container).focus();
         expect(document.activeElement).toEqual(findTextArea.call(this)[0]);
     });
-    
+
     it('should let me create a dirty clean', function () {
         var dirtyClean = grid.makeDirtyClean();
         expect(dirtyClean).toBeDirty();

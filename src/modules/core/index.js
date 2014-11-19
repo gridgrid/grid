@@ -62,7 +62,7 @@ module.exports = function () {
 
         container.appendChild(textarea);
         if (!container.getAttribute('tabIndex')) {
-            container.tabIndex = 0;
+            container.tabIndex = -1;
         }
         container.addEventListener('focus', function () {
             if (textarea) {
