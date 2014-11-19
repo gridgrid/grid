@@ -13,8 +13,10 @@ module.exports = function (_grid, name, lengthName, defaultSize) {
     var builderDirtyClean = makeDirtyClean(grid);
     var selected = [];
 
-    function setDescriptorsDirty() {
-        grid.eventLoop.fire('grid-' + name + '-change');
+    function setDescriptorsDirty(eventOptional) {
+        var event = eventOptional || {};
+        event.type = 'grid-' + name + '-change';
+        grid.eventLoop.fire(event);
         dirtyClean.setDirty();
         builderDirtyClean.setDirty();
     }
@@ -51,7 +53,7 @@ module.exports = function (_grid, name, lengthName, defaultSize) {
                 }
             });
 
-            setDescriptorsDirty();
+            setDescriptorsDirty({action: 'add'});
         },
         addHeaders: function (toAdd) {
             if (!util.isArray(toAdd)) {
@@ -93,7 +95,7 @@ module.exports = function (_grid, name, lengthName, defaultSize) {
         },
         move: function (start, target) {
             descriptors.splice(target, 0, descriptors.splice(start, 1)[0]);
-            setDescriptorsDirty();
+            setDescriptorsDirty({action: 'move'});
         },
         numHeaders: function () {
             return numHeaders;
@@ -167,7 +169,7 @@ module.exports = function (_grid, name, lengthName, defaultSize) {
                 {
                     name: lengthName,
                     onDirty: function () {
-                        grid.eventLoop.fire('grid-' + name + '-change');
+                        setDescriptorsDirty({action: 'size'});
                     }
                 }
             ], [dirtyClean]);

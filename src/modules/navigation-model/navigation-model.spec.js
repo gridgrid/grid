@@ -270,42 +270,42 @@ describe('navigation-model', function () {
             expect(grid.rowModel.getSelected()).toEqual([]);
         });
 
-        it('should set a decorator for a selected row', function () {
-            var spy = spyOn(grid.decorators, 'add');
+        it('should set a cell class for a selected row', function () {
+            var spy = spyOn(grid.cellClasses, 'add');
             grid.rowModel.select(0);
             expect(spy).toHaveBeenCalled();
             var decorator = spy.calls.argsFor(0)[0];
             expect(decorator).unitsToBe('cell');
             expect(decorator).spaceToBe('virtual');
             expect(decorator).rangeToBe(1, 0, 1, 1);
-            expect(decorator.render()).toHaveClass('grid-header-selected');
+            expect(decorator).classToBe('selected');
         });
 
         it('should not duplicate decorators for row select', function () {
             grid.rowModel.select(0);
-            var spy = spyOn(grid.decorators, 'add');
+            var spy = spyOn(grid.cellClasses, 'add');
             grid.rowModel.select(1);
             expect(spy.calls.count()).toBe(2);
-            expect(model._rowSelectionDecorators.length).toBe(2);
+            expect(model._rowSelectionClasses.length).toBe(2);
         });
 
-        it('should set a decorator for a selected col', function () {
-            var spy = spyOn(grid.decorators, 'add');
+        it('should set a cell class for a selected col', function () {
+            var spy = spyOn(grid.cellClasses, 'add');
             grid.colModel.select(0);
             expect(spy).toHaveBeenCalled();
             var decorator = spy.calls.argsFor(0)[0];
             expect(decorator).unitsToBe('cell');
             expect(decorator).spaceToBe('virtual');
             expect(decorator).rangeToBe(0, 1, 1, 1);
-            expect(decorator.render()).toHaveClass('grid-header-selected');
+            expect(decorator).classToBe('selected');
         });
 
         it('should not duplicate decorators for col select', function () {
             grid.colModel.select(0);
-            var spy = spyOn(grid.decorators, 'add');
+            var spy = spyOn(grid.cellClasses, 'add');
             grid.colModel.select(1);
             expect(spy.calls.count()).toBe(2);
-            expect(model._colSelectionDecorators.length).toBe(2);
+            expect(model._colSelectionClasses.length).toBe(2);
         });
 
         it('focus should ignore headers on mousedown', function () {

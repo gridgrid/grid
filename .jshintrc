@@ -141,11 +141,8 @@
     "JSHINT": false,
     "mostRecentAjaxRequest": false,
     "qq": false,
-    "runs": false,
     "spyOn": false,
     "spyOnEvent": false,
-    "waitsFor": false,
-    "waits": false,
     "xdescribe": false
   }
 }

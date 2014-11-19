@@ -9,8 +9,6 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
     });
 
 
-
-
     it('should let me add multiple', function () {
         var ob1 = {};
         var ob2 = {};
@@ -102,6 +100,7 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
         grid.eventLoop.bind('grid-' + name + '-change', spy);
         model.add({});
         expect(spy).toHaveBeenCalled();
+        expect(spy.calls.argsFor(0)[0].action).toBe('add');
     });
 
     it('should tell you there are 0 fixed ' + name + 's by default', function () {
@@ -138,6 +137,7 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
         grid.eventLoop.bind('grid-' + name + '-change', spy);
         model.move(0, 3);
         expect(spy).toHaveBeenCalled();
+        expect(spy.calls.argsFor(0)[0].action).toBe('move');
         expect(model.isDirty()).toBe(true);
     });
 
@@ -226,7 +226,7 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
                 ctx.props = [lengthName];
             });
 
-            require('@grid/add-dirty-props/test-body')(ctx);
+            require('../add-dirty-props/test-body')(ctx);
         });
 
         it('should fire change on ' + lengthName + ' set', function () {
@@ -235,6 +235,7 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
             grid.eventLoop.bind('grid-' + name + '-change', spy);
             model.get(0)[lengthName] = 5;
             expect(spy).toHaveBeenCalled();
+            expect(spy.calls.argsFor(0)[0].action).toBe('size');
         });
     });
 

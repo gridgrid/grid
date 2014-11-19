@@ -160,13 +160,13 @@ module.exports = function (_grid) {
 
     });
 
-    model._rowSelectionDecorators = [];
-    model._colSelectionDecorators = [];
+    model._rowSelectionClasses = [];
+    model._colSelectionClasses = [];
     //row col selection
     function handleRowColSelectionChange(rowOrCol) {
-        var decoratorsField = ('_' + rowOrCol + 'SelectionDecorators');
+        var decoratorsField = ('_' + rowOrCol + 'SelectionClasses');
         model[decoratorsField].forEach(function (selectionDecorator) {
-            grid.decorators.remove(selectionDecorator);
+            grid.cellClasses.remove(selectionDecorator);
         });
         model[decoratorsField] = [];
 
@@ -174,11 +174,8 @@ module.exports = function (_grid) {
             var virtualIndex = grid[rowOrCol + 'Model'].toVirtual(index);
             var top = rowOrCol === 'row' ? virtualIndex : 0;
             var left = rowOrCol === 'col' ? virtualIndex : 0;
-            var decorator = grid.decorators.create(top, left, 1, 1, 'cell', 'virtual');
-            decorator.postRender = function (elem) {
-                elem.setAttribute('class', 'grid-header-selected');
-            };
-            grid.decorators.add(decorator);
+            var decorator = grid.cellClasses.create(top, left, 'selected', 1, 1, 'virtual');
+            grid.cellClasses.add(decorator);
             model[decoratorsField].push(decorator);
         });
     }
