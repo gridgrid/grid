@@ -1,4 +1,7 @@
 (function () {
+    var tools = require('jasmine-tools-riq');
+    require('jasmine-tools-riq/basic-matchers');
+
     function addFieldMatcher(matchers, fieldName) {
         matchers[fieldName + 'ToBe'] = function () {
             return {
@@ -7,7 +10,7 @@
                     var pass = actualVal === val;
                     return {
                         pass: pass,
-                        message: expectedObjectWithNot(actual, pass) + ' \nto have ' + fieldName + ' value of ' + val + ' but it was ' + actualVal + '\n'
+                        message: tools.expectedObjectWithNot(actual, pass) + ' \nto have ' + fieldName + ' value of ' + val + ' but it was ' + actualVal + '\n'
 
                     };
                 }
@@ -18,14 +21,6 @@
 
     var $ = require('jquery');
 
-    function expectedObjectWithNot(actual, pass, obj) {
-        try {
-            actual = JSON.stringify(obj || actual);
-        } catch (e) {
-            actual = 'actual';
-        }
-        return 'Expected ' + actual + (pass ? '' : ' not' );
-    }
 
     function makeFakeRange(t, l, h, w) {
         return {top: t, left: l, height: h, width: w};
@@ -39,47 +34,8 @@
         return typeof v === 'string' ? v : v + 'px';
     }
 
-    function defineBasicMatcher(passFn, messageFn) {
-        return function () {
-            return {
-                compare: function (actual, expected) {
-                    var pass = passFn(actual, expected);
-                    return {
-                        pass: pass,
-                        message: messageFn && messageFn(actual, expected, pass)
-                    };
-                }
-            };
-        };
-    }
-
     var matchers = {
 
-        toBeANumber: defineBasicMatcher(function (actual) {
-            return angular.isNumber(actual);
-        }),
-        toBeAFunction: defineBasicMatcher(function (actual) {
-            return angular.isFunction(actual);
-        }),
-
-        toBeAnObject: defineBasicMatcher(function (actual) {
-            return angular.isObject(actual);
-        }),
-
-        toBeAnArray: defineBasicMatcher(function (actual) {
-            return angular.isArray(actual);
-        }),
-        toBeAString: defineBasicMatcher(function (actual) {
-            return angular.isString(actual);
-        }),
-        toBeNully: defineBasicMatcher(function (actual) {
-            return actual === undefined || actual === null;
-        }),
-        toBeAnElement: defineBasicMatcher(function (actual) {
-            return !!(actual &&
-            (actual.nodeName || // we are a direct element
-            (actual.prop && actual.attr && actual.find)));
-        }),
         toHaveBeenCalledWithAll: function () {
             return {
                 compare: function (actual, argsArrays) {
@@ -112,26 +68,15 @@
                 }
             };
         },
-        toHaveClass: defineBasicMatcher(function (actual, className) {
-            return $(actual).hasClass(className);
-        }, function (actual, expected, pass) {
-            return 'Expected "' + $(actual).attr('class') + '"' + (pass ? ' not' : '') + ' to have class "' + expected + '"';
-        }),
-        toBeDirty: defineBasicMatcher(function (actual) {
+        toBeDirty: tools.defineBasicMatcher(function (actual) {
             return actual.isDirty();
         }, function (actual, expected, pass) {
-            return expectedObjectWithNot(actual, pass) + ' to be dirty';
+            return tools.expectedObjectWithNot(actual, pass) + ' to be dirty';
         }),
-        toBeClean: defineBasicMatcher(function (actual) {
+        toBeClean: tools.defineBasicMatcher(function (actual) {
             return actual.isClean();
         }, function (actual, exp, pass) {
-            return expectedObjectWithNot(actual, pass) + ' to be clean';
-        }),
-
-        toHaveField: defineBasicMatcher(function (actual, exp) {
-            return exp in actual;
-        }, function (actual, exp, pass) {
-            return expectedObjectWithNot(actual, pass) + ' to have field: ' + exp;
+            return tools.expectedObjectWithNot(actual, pass) + ' to be clean';
         }),
         rangeToBe: function () {
             return {
@@ -139,19 +84,11 @@
                     var pass = actual.top === t && actual.left === l && actual.height === h && actual.width === w;
                     return {
                         pass: pass,
-                        message: expectedObjectWithNot(actual, pass, makeFakeRange(actual.top, actual.left, actual.height, actual.width)) + ' to be ' + JSON.stringify(makeFakeRange(t, l, h, w))
+                        message: tools.expectedObjectWithNot(actual, pass, makeFakeRange(actual.top, actual.left, actual.height, actual.width)) + ' to be ' + JSON.stringify(makeFakeRange(t, l, h, w))
                     };
                 }
             };
         },
-        toContainAll: defineBasicMatcher(function (actual, array) {
-            array.forEach(function (item) {
-                if (actual.indexOf(item) === -1) {
-                    return false;
-                }
-            });
-            return true;
-        }),
         toBePositioned: function () {
             return {
                 compare: function (actual, t, l, b, r) {
@@ -167,12 +104,12 @@
                         pos === 'absolute';
                     return {
                         pass: pass,
-                        message: expectedObjectWithNot(actual, pass, makeFakePosRange(top, left, right, bottom)) + ' to be positioned ' + JSON.stringify(makeFakePosRange(t, l, r, b))
+                        message: tools.expectedObjectWithNot(actual, pass, makeFakePosRange(top, left, right, bottom)) + ' to be positioned ' + JSON.stringify(makeFakePosRange(t, l, r, b))
                     };
                 }
             };
         },
-        toHaveBeenBoundWith: defineBasicMatcher(function (actual, name, elem) {
+        toHaveBeenBoundWith: tools.defineBasicMatcher(function (actual, name, elem) {
             var spy = actual;
             var hasName = spy.calls.argsFor(0)[0] === name;
             var hasElem = !elem || spy.calls.argsFor(0)[1] === elem;
