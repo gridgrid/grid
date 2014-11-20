@@ -1,5 +1,5 @@
 module.exports = function (config) {
-    var testsGlob = 'src/modules/!(proto)/*.spec.js';
+    var testsGlob = 'src/modules/**/*.spec.js';
     var preprocessors = {};
     preprocessors[testsGlob] = ['browserify'];
     preprocessors['src/modules/grid-spec-helper/matchers.js'] = ['browserify'];
