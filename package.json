@@ -51,6 +51,7 @@
         "gulp-shell": "^0.2.9",
         "gulp-streamify": "0.0.5",
         "gulp-tag-version": "^1.0.2",
+        "gulp-tasks-riq": "git+ssh://git@github.com:relateiq/gulp-tasks-riq.git#v0.0.4",
         "gulp-uglify": "^0.3.0",
         "gulp-watch": "^0.6.9",
         "inherits": "^2.0.1",

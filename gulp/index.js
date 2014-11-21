@@ -1,8 +1,8 @@
 'use strict';
 
 var fs = require('fs'),
-  argv = require('yargs').argv,
-  tasks = fs.readdirSync('./gulp/tasks/');
+    argv = require('yargs').argv,
+    tasks = fs.readdirSync('./gulp/tasks/');
 
 require('./config');
 
@@ -10,5 +10,11 @@ require('./config');
 global.release = argv.release;
 
 tasks.forEach(function (task) {
-  require('./tasks/' + task);
+    require('./tasks/' + task);
+});
+
+require('gulp-tasks-riq/karma')({
+    coverage: argv.coverage,
+    testGlobs: ['src/modules/**/*.spec.js', 'src/modules/grid-spec-helper/matchers.js'],
+    karmaConfPath: '../../karma.conf.js'
 });
