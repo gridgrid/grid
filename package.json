@@ -2,6 +2,7 @@
     "name": "riq-grid",
     "version": "0.0.6",
     "private": "true",
+    "main": "src/main/riq-grid-entry.js",
     "engines": {
         "node": ">=0.10.0"
     },
