@@ -1,13 +1,12 @@
 {
     "name": "riq-grid",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "private": "true",
     "main": "src/modules/riq-grid-entry.js",
     "engines": {
         "node": ">=0.10.0"
     },
-    "scripts": {
-    },
+    "scripts": {},
     "devDependencies": {
         "aliasify": "^1.5.0",
         "array.prototype.find": "^1.0.0",
@@ -15,7 +14,6 @@
         "browserify": "~6.0.2",
         "browserify-istanbul": "^0.1.2",
         "browserify-shim": "^3.6.0",
-
         "colors": "^0.6.2",
         "connect": "^2.24.2",
         "dependo": "^0.1.3",
@@ -75,7 +73,9 @@
         "yargs": "^1.2.2"
     },
     "browserify": {
-        "transform": ["aliasify"]
+        "transform": [
+            "aliasify"
+        ]
     },
     "browser": {
         "angular": "./bower_components/angular/angular.js",
