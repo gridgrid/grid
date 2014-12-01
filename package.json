@@ -2,12 +2,11 @@
     "name": "riq-grid",
     "version": "0.0.6",
     "private": "true",
-    "main": "src/main/riq-grid-entry.js",
+    "main": "src/modules/riq-grid-entry.js",
     "engines": {
         "node": ">=0.10.0"
     },
     "scripts": {
-        "postinstall": ""
     },
     "devDependencies": {
         "aliasify": "^1.5.0",
@@ -53,7 +52,6 @@
         "gulp-shell": "^0.2.9",
         "gulp-streamify": "0.0.5",
         "gulp-tag-version": "^1.0.2",
-        "gulp-tasks-riq": "git+ssh://git@github.com:relateiq/gulp-tasks-riq.git#v0.0.5",
         "gulp-uglify": "^0.3.0",
         "gulp-watch": "^0.6.9",
         "inherits": "^2.0.1",
@@ -78,6 +76,9 @@
         "watchify": "^1.0.0",
         "yargs": "^1.2.2"
     },
+    "browserify": {
+        "transform": ["aliasify"]
+    },
     "browser": {
         "angular": "./bower_components/angular/angular.js",
         "angular-route": "./bower_components/angular-route/angular-route.js"
@@ -88,6 +89,7 @@
         }
     },
     "dependencies": {
-        "debounce": "^1.0.0"
+        "debounce": "^1.0.0",
+        "gulp-tasks-riq": "git+ssh://git@github.com:relateiq/gulp-tasks-riq.git#v0.0.14"
     }
 }

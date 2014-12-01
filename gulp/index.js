@@ -17,10 +17,18 @@ require('gulp-tasks-riq/default')();
 require('gulp-tasks-riq/images')({src: config.paths.src.images, dest: config.paths.dest.release.images});
 
 require('gulp-tasks-riq/index')({src: config.paths.src.index, dest: config.paths.dest.release.index, styles: 'riq-grid.css', scripts: config.filenames.build.scripts});
+
+var karmaConf;
+require('../karma.conf.js')({
+    set: function (opts) {
+        karmaConf = opts;
+    }
+});
+
 require('gulp-tasks-riq/karma')({
     coverage: argv.coverage,
     testGlobs: ['src/modules/**/*.spec.js', 'src/modules/grid-spec-helper/matchers.js'],
-    karmaConfPath: '../../karma.conf.js'
+    karmaConf: karmaConf
 });
 
 require('gulp-tasks-riq/lint')({src: config.paths.src.scripts});
@@ -54,7 +62,6 @@ require('gulp-tasks-riq/browserify-omega')({
             output: 'riq-grid-app.js'
         }
     ],
-    dest: RELEASE_FOLDER,
-    transforms: [require('aliasify')]
+    dest: RELEASE_FOLDER
 });
 
