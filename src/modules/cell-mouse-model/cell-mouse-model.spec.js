@@ -23,7 +23,7 @@ describe('cell-mouse-model', function () {
         return mouseEvent;
     }
 
-    var annotatedEvents = ['mousedown', 'mousemove', 'mouseup', 'click'];
+    var annotatedEvents = ['mousedown', 'mousemove', 'mouseup', 'click', 'dblclick'];
 
     describe('general', function () {
         beforeEach(function () {

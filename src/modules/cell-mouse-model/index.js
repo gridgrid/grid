@@ -19,21 +19,28 @@ module.exports = function (_grid) {
             /* jshint +W086 */
             case 'mousemove':
             case 'mouseup':
+            case 'dblclick':
                 model._annotateEventInternal(e);
                 break;
 
         }
     };
 
-    model._annotateEventInternal = function (e) {
-        var y = grid.viewPort.toGridY(e.clientY);
-        var x = grid.viewPort.toGridX(e.clientX);
-        e.realRow = grid.viewPort.getRowByTop(y);
-        e.realCol = grid.viewPort.getColByLeft(x);
+    model._annotateEventFromViewCoords = function (e, viewRow, viewCol) {
+        e.realRow = viewRow;
+        e.realCol = viewCol;
         e.virtualRow = grid.viewPort.toVirtualRow(e.realRow);
         e.virtualCol = grid.viewPort.toVirtualCol(e.realCol);
         e.row = e.virtualRow - grid.rowModel.numHeaders();
         e.col = e.virtualCol - grid.colModel.numHeaders();
+    }
+
+    model._annotateEventInternal = function (e) {
+        var y = grid.viewPort.toGridY(e.clientY);
+        var x = grid.viewPort.toGridX(e.clientX);
+        var viewRow = grid.viewPort.getRowByTop(y);
+        var viewCol = grid.viewPort.getColByLeft(x);
+        model._annotateEventFromViewCoords(e, viewRow, viewCol);
         e.gridX = x;
         e.gridY = y;
     };
