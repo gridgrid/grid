@@ -33,7 +33,7 @@ require('gulp-tasks-riq/karma')({
 
 require('gulp-tasks-riq/lint')({src: config.paths.src.scripts});
 require('gulp-tasks-riq/minify')({src: config.paths.dest.release.scripts + '/' + config.filenames.release.scripts, dest: config.paths.dest.release.scripts});
-require('gulp-tasks-riq/serve')({serverPath: RELEASE_FOLDER, port: 8081});
+require('gulp-tasks-riq/serve')({serverPath: RELEASE_FOLDER, port: 8082});
 
 require('gulp-tasks-riq/styles')({src: config.paths.src.releaseStyles, dest: config.paths.dest.release.styles});
 

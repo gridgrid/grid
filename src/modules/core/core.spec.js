@@ -89,6 +89,14 @@ describe('grid-core', function () {
         expect(document.activeElement).toEqual(findTextArea.call(this)[0]);
     });
 
+    it('should select all text in the paste area when focused', function () {
+        grid.build(this.container);
+        var textarea = findTextArea.call(this)[0];
+        var select = spyOn(textarea, 'select');
+        textarea.focus();
+        expect(select).toHaveBeenCalled();
+    });
+
     it('should let me create a dirty clean', function () {
         var dirtyClean = grid.makeDirtyClean();
         expect(dirtyClean).toBeDirty();

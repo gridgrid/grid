@@ -53,6 +53,7 @@ module.exports = function () {
             if (container) {
                 elementClass(container).add('focus');
             }
+            textarea.select();
         });
 
         textarea.addEventListener('blur', function () {
@@ -75,7 +76,7 @@ module.exports = function () {
     }
 
     grid.build = function (container) {
-        createFocusTextArea(container);
+        grid.textarea = createFocusTextArea(container);
         grid.viewPort.sizeToContainer(container);
         grid.viewLayer.build(container);
         grid.eventLoop.setContainer(container);
