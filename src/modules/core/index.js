@@ -46,6 +46,7 @@ module.exports = function () {
 
     function createFocusTextArea(container) {
         var textarea = document.createElement('textarea');
+        textarea.setAttribute('dts', 'grid-textarea');
         textarea.style.position = 'fixed';
         textarea.style.left = '-100000px';
         textarea.addEventListener('focus', function () {
