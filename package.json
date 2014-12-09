@@ -1,6 +1,6 @@
 {
     "name": "riq-grid",
-    "version": "0.0.10",
+    "version": "0.0.11",
     "private": "true",
     "main": "src/modules/riq-grid-entry.js",
     "engines": {
@@ -19,7 +19,7 @@
         "jquery": "^2.0.0",
         "yargs": "^1.2.2"
     },
-    "peerDependencies" : {
+    "peerDependencies": {
         "aliasify": "^1.5.0"
     },
     "browserify": {
