@@ -15,7 +15,7 @@
     "devDependencies": {
         "aliasify": "^1.5.0",
         "gulp": "^3.8.0",
-        "gulp-tasks-riq": "git+ssh://git@github.com:relateiq/gulp-tasks-riq.git#v0.0.17",
+        "gulp-tasks-riq": "git+ssh://git@github.com:relateiq/gulp-tasks-riq.git#v0.0.19",
         "jasmine-tools-riq": "git+ssh://git@github.com:relateiq/jasmine-tools-riq.git",
         "jquery": "^2.0.0",
         "yargs": "^1.2.2"
