@@ -76,6 +76,8 @@ module.exports = function (_grid) {
         viewPort._resize();
     }, 1);
 
+    viewPort.shortDebouncedResize = shortDebouncedResize;
+
 
     grid.eventLoop.bind('resize', window, function () {
         //we don't bind the handler directly so that tests can mock it out
