@@ -1,4 +1,4 @@
-describe('grid-core', function () {
+ddescribe('grid-core', function () {
     require('../grid-spec-helper')();
     var $ = require('jquery');
     var grid;
@@ -22,6 +22,7 @@ describe('grid-core', function () {
         expect(grid).toHaveField('pixelScrollModel');
         expect(grid).toHaveField('colResize');
         expect(grid).toHaveField('colReorder');
+        expect(grid).toHaveField('showHiddenCols');
     });
 
     it('should have a main build function', function () {

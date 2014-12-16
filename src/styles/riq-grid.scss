@@ -147,3 +147,15 @@ a {
 .grid-header-selected {
   background-color: rgba(0, 0, 0, 0.1);
 }
+
+.show-hidden-cols {
+  width: 15px;
+  text-align: center;
+  z-index: 21;
+  &:after {
+    content: "< >";
+    font-size: 10px;
+    background: gray;
+    border-radius: 3px;
+  }
+}

@@ -24,6 +24,7 @@ module.exports = function () {
     grid.pixelScrollModel = require('../pixel-scroll-model')(grid);
     grid.colResize = require('../col-resize')(grid);
     grid.colReorder = require('../col-reorder')(grid);
+    grid.showHiddenCols = require('../show-hidden-cols')(grid);
 
     var drawRequested = false;
     grid.requestDraw = function () {

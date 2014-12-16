@@ -9,7 +9,7 @@ describe('view-layer', function () {
     var container;
 
     function viewBeforeEach(varyHeight, varyWidth, frows, fcols, hrows, hcols) {
-        this.grid = grid = this.buildSimpleGrid(100, 20, varyHeight, varyWidth, frows, fcols, hrows, hcols);
+        grid = this.buildSimpleGrid(100, 20, varyHeight, varyWidth, frows, fcols, hrows, hcols);
         view = grid.viewLayer;
         //mock the view port
         grid.viewPort.sizeToContainer = function () {

@@ -182,7 +182,7 @@ module.exports = function (_grid, name, lengthName, defaultSize) {
                 {
                     name: 'hidden',
                     onDirty: function () {
-                        setDescriptorsDirty({action: 'hidden', descriptors: [descriptor]});
+                        setDescriptorsDirty({action: 'hide', descriptors: [descriptor]});
                     }
                 }
             ], [dirtyClean]);
@@ -200,7 +200,7 @@ module.exports = function (_grid, name, lengthName, defaultSize) {
             return NaN;
         }
 
-        
+
         if (descriptor.hidden) {
             return 0;
         }
