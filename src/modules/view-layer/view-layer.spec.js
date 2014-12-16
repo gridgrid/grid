@@ -258,6 +258,16 @@ describe('view-layer', function () {
             });
         });
 
+        it('should reduce the rows width if scrolled to the end', function (cb) {
+            this.grid.cellScrollModel.scrollTo(0, 10000000);
+            this.onDraw(function () {
+                var rows = findGridRows();
+                var lastCell = findCellByRowCol(0, 0);
+                expect(rows.width()).toBe(lastCell.position().left + lastCell.width() - 1);
+                cb();
+            });
+        });
+
         it('should write widths and heights to the cells on draw', function (done) {
             view.draw();
             this.onDraw(function () {

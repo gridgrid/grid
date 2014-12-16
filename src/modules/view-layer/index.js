@@ -147,24 +147,36 @@ module.exports = function (_grid) {
         var bWidth = getBorderWidth();
         var headerRows = grid.rowModel.numHeaders();
         var headerCols = grid.colModel.numHeaders();
+        var totalVisibleCellWidth = 0;
+        var lastVirtualCol;
         grid.viewPort.iterateCells(function drawCell(r, c) {
             var cell = cells[r][c];
             var width = grid.viewPort.getColWidth(c);
-            if (width == 0) {
+            var virtualCol = grid.viewPort.toVirtualCol(c);
+            //if we got the same vCol we've been clamped and its time to hide this cell
+            //also hide the cell if its width is zero cause ya...
+            if (width == 0 || virtualCol === lastVirtualCol) {
                 cell.style.display = 'none';
                 return;
             }
+            if (r === 0) {
+                //calculate width for rows later but only do it one time (so on the first row)
+                totalVisibleCellWidth += width;
+            }
+
+            lastVirtualCol = virtualCol;
             cell.style.display = '';
             cell.style.width = width + bWidth + 'px';
 
             var left = grid.viewPort.getColLeft(c);
+
             cell.style.left = left + 'px';
 
             while (cell.firstChild) {
                 cell.removeChild(cell.firstChild);
             }
             var virtualRow = grid.viewPort.toVirtualRow(r);
-            var virtualCol = grid.viewPort.toVirtualCol(c);
+
             var data;
             if (r < headerRows || c < headerCols) {
                 data = grid.dataModel.getHeader(virtualRow, virtualCol);
@@ -211,6 +223,10 @@ module.exports = function (_grid) {
             row.style.top = top + 'px';
         });
 
+        rows.forEach(function (row) {
+            row.style.width = totalVisibleCellWidth + 'px';
+        });
+
         if (grid.cellScrollModel.row % 2) {
             cellContainer.className = GRID_CELL_CONTAINER_BASE_CLASS + ' odds';
         } else {
@@ -239,7 +255,6 @@ module.exports = function (_grid) {
             row.setAttribute('dts', 'grid-row');
             row.style.position = 'absolute';
             row.style.left = 0;
-            row.style.right = 0;
             rows[r] = row;
             cellContainer.appendChild(row);
         });
