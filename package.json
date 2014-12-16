@@ -1,6 +1,6 @@
 {
     "name": "riq-grid",
-    "version": "0.0.15",
+    "version": "0.0.16",
     "private": "true",
     "main": "src/modules/riq-grid-entry.js",
     "engines": {
