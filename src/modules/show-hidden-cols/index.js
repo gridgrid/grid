@@ -7,10 +7,12 @@ module.exports = function (_grid) {
         var headerDecorator = grid.decorators.create(0, col, 1, 1, 'cell', 'virtual');
 
         headerDecorator.postRender = function (div) {
-            div.style.transform = 'translateX(50%)';
-            div.style.webkitTransform = 'translateX(50%)';
+            div.style.transform = 'translate(-50%, -50%)';
+            div.style.webkitTransform = 'translate(-50%, -50%)';
 
-            div.style.removeProperty('left');
+            div.style.removeProperty('right');
+            div.style.removeProperty('bottom');
+            div.style.top = '50%';
             div.setAttribute('class', 'show-hidden-cols');
 
             grid.eventLoop.bind('click', div, function () {
@@ -24,9 +26,12 @@ module.exports = function (_grid) {
     }
 
     grid.eventLoop.bind('grid-col-change', function (e) {
-        if (e.action === 'hide') {
+        if (e.action === 'hide' || e.action === 'add') {
             e.descriptors.forEach(function (descriptor) {
                 var col = descriptor.index;
+                if (!col && col !== 0) {
+                    return;
+                }
                 if (descriptor.hidden) {
                     var decorator = createDecorator(col + 1);
                     grid.decorators.add(decorator);

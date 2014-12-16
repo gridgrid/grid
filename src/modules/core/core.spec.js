@@ -1,4 +1,4 @@
-ddescribe('grid-core', function () {
+describe('grid-core', function () {
     require('../grid-spec-helper')();
     var $ = require('jquery');
     var grid;

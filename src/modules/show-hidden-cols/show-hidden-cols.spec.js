@@ -1,7 +1,7 @@
 var mockEvent = require('../custom-event');
 var specHelper = require('../grid-spec-helper');
 
-ddescribe('show-hidden-cols', function () {
+describe('show-hidden-cols', function () {
     var $ = require('jquery');
     specHelper();
     beforeEach(function () {
@@ -38,6 +38,21 @@ ddescribe('show-hidden-cols', function () {
             expect(decorator).toBeDefined();
         });
 
+        it('should not register if it has no index', function () {
+            var descriptor = this.grid.colModel.create();
+            var add = spyOn(this.grid.decorators, 'add');
+            descriptor.hidden = true;
+            expect(add).not.toHaveBeenCalled();
+        });
+
+        it('should register on add if hidden', function () {
+            var descriptor = this.grid.colModel.create();
+            var add = spyOn(this.grid.decorators, 'add');
+            descriptor.hidden = true;
+            this.grid.colModel.add(descriptor);
+            expect(add).toHaveBeenCalled();
+        });
+
         it('should unregister on unhide', function () {
             this.grid.colModel.get(viewCol).hidden = false;
             var decorator = this.showHiddenCols._decorators[viewCol];
@@ -45,24 +60,26 @@ ddescribe('show-hidden-cols', function () {
             expect(decorator).not.toBeDefined();
         });
 
-        it('should center on the right side of its bounding box', function (done) {
+        it('should center on the left side of its bounding box', function (done) {
             this.viewBuild();
             var style = document.createElement('style');
-            style.innerHTML = '.show-hidden-cols{width : 6px}';
+            style.innerHTML = '.show-hidden-cols{width : 6px; height: 6px;}';
             document.body.appendChild(style);
             this.onDraw(function () {
                 var $rendered = $(ctx.decorator.boundingBox.firstChild);
                 var $box = $(ctx.decorator.boundingBox);
                 var width = $rendered.width();
-                expect($rendered.position().left).toBe($box.width() - width / 2);
-                expect($rendered.position().top).toBe(0);
-                expect($rendered.height()).toBe($box.height());
+                var height = $rendered.height();
+                expect($rendered.position().left).toBe(0 - width / 2);
+                var boxHeight = $box.height();
+                expect($rendered.position().top).toBe(Math.floor(boxHeight / 2) - height / 2);
+
                 document.body.removeChild(style);
                 done();
             });
         });
 
-        iit('should unhide all previous hidden on click', function (cb) {
+        it('should unhide all previous hidden on click', function (cb) {
             this.grid.colModel.get(2).hidden = true;
             this.viewBuild();
             this.onDraw(function () {
