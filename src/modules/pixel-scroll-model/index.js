@@ -4,18 +4,28 @@ var capitalize = require('capitalize');
 
 module.exports = function (_grid) {
     var grid = _grid;
-    var model = {top: 0, left: 0};
+    var model = {top: 0, left: 0, maxScroll: {}};
     var scrollBarWidth = 10;
 
     grid.eventLoop.bind('grid-virtual-pixel-cell-change', function () {
         var scrollHeight = grid.virtualPixelCellModel.totalHeight() - grid.virtualPixelCellModel.fixedHeight();
         var scrollWidth = grid.virtualPixelCellModel.totalWidth() - grid.virtualPixelCellModel.fixedWidth();
         model.setScrollSize(scrollHeight, scrollWidth);
+        cacheMaxScroll();
         sizeScrollBars();
     });
 
 
-    grid.eventLoop.bind('grid-viewport-change', sizeScrollBars);
+    grid.eventLoop.bind('grid-viewport-change', function () {
+        cacheMaxScroll();
+        sizeScrollBars();
+    });
+
+    function cacheMaxScroll() {
+        model.maxScroll.height = getMaxScroll('height');
+        model.maxScroll.width = getMaxScroll('width');
+    }
+
     //assumes a standardized wheel event that we create through the mousewheel package
     grid.eventLoop.bind('mousewheel', function handleMouseWheel(e) {
         var deltaY = e.deltaY;
@@ -36,10 +46,10 @@ module.exports = function (_grid) {
 
         //update the cell scroll
         var scrollTop = model.top;
-        var row = grid.virtualPixelCellModel.getRow(scrollTop + grid.virtualPixelCellModel.fixedHeight());
+        var row = grid.virtualPixelCellModel.getRow(scrollTop + grid.virtualPixelCellModel.fixedHeight()) - grid.rowModel.numFixed();
 
         var scrollLeft = model.left;
-        var col = grid.virtualPixelCellModel.getCol(scrollLeft + grid.virtualPixelCellModel.fixedWidth());
+        var col = grid.virtualPixelCellModel.getCol(scrollLeft + grid.virtualPixelCellModel.fixedWidth()) - grid.colModel.numFixed();
 
         grid.cellScrollModel.scrollTo(row, col, undefined, true);
     }
@@ -47,8 +57,8 @@ module.exports = function (_grid) {
     var debouncedNotify = debounce(notifyListeners, 1);
 
     model.scrollTo = function (top, left, dontNotify) {
-        model.top = util.clamp(top, 0, model.height - getScrollableViewHeight());
-        model.left = util.clamp(left, 0, model.width - getScrollableViewWidth());
+        model.top = util.clamp(top, 0, model.maxScroll.height);
+        model.left = util.clamp(left, 0, model.maxScroll.width);
         positionScrollBars();
 
         if (!dontNotify) {
@@ -63,7 +73,7 @@ module.exports = function (_grid) {
     function getScrollPositionFromReal(scrollBarRealClickCoord, heightWidth, vertHorz) {
         var scrollBarTopClick = scrollBarRealClickCoord - grid.virtualPixelCellModel['fixed' + capitalize(heightWidth)]();
         var scrollRatio = scrollBarTopClick / getMaxScrollBarCoord(heightWidth, vertHorz);
-        var scrollCoord = scrollRatio * getMaxScroll(heightWidth);
+        var scrollCoord = scrollRatio * model.maxScroll[heightWidth];
         return scrollCoord;
     }
 
@@ -123,11 +133,21 @@ module.exports = function (_grid) {
     model.horzScrollBar.height = scrollBarWidth;
 
     function getMaxScroll(heightWidth) {
-        return model[heightWidth] - getViewScrollHeightOrWidth(heightWidth);
+        var rowOrCol = heightWidth === 'height' ? 'row' : 'col';
+        var scrollLength = model[heightWidth];
+        var viewScrollHeightOrWidth = getViewScrollHeightOrWidth(heightWidth);
+        var firstScrollableCell = grid[rowOrCol + 'Model'].numFixed();
+        while (scrollLength > viewScrollHeightOrWidth - 10) {
+            scrollLength -= grid.virtualPixelCellModel[heightWidth](firstScrollableCell);
+            firstScrollableCell++;
+        }
+        return model[heightWidth] - scrollLength;
     }
 
+    model._getMaxScroll = getMaxScroll;
+
     function getScrollRatioFromVirtualScrollCoords(scroll, heightWidth) {
-        var maxScroll = getMaxScroll(heightWidth);
+        var maxScroll = model.maxScroll[heightWidth];
         var scrollRatio = scroll / maxScroll;
         return scrollRatio;
     }

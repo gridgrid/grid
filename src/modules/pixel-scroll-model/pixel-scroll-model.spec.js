@@ -56,25 +56,21 @@ describe('pixel-scroll-model', function () {
         expect(model.left).toEqual(0);
     });
 
-    it('should not let you scroll above the current view', function () {
-        model.setScrollSize(100, 200);
-        grid.viewPort.width = 10;
-        grid.viewPort.height = 5;
-
-        model.scrollTo(1000, 10);
-        expect(model.top).toEqual(95);
-        expect(model.left).toEqual(10);
-
-        model.scrollTo(10, 1000);
-        expect(model.top).toEqual(10);
-        expect(model.left).toEqual(190);
-    });
-
-    it('should set cell scroll properly', function () {
+    it('should set cell scroll to proper max', function () {
+        grid.viewPort.width = 800;
+        grid.viewPort.height = 400;
         beforeEachFn.call(this, [10, 400, 10, 400, 10, 10, 10, 10, 10, 10, 10], [10, 400, 10, 400, 10, 10, 10, 10, 10, 10, 10], 3, 3, 100, 30);
         model.scrollTo(1000000, 1000000);
-        expect(grid.cellScrollModel).rowToBe(92);
-        expect(grid.cellScrollModel).colToBe(25);
+        expect(grid.viewPort.colIsInView(grid.colModel.length(true) - 1)).toBe(true);
+//        expect(grid.viewPort.rowIsInView(grid.rowModel.length(true) - 1)).toBe(true);
+    });
+
+    it('should set cell scroll back to proper min', function () {
+        beforeEachFn.call(this, [10, 400, 10, 400, 10, 10, 10, 10, 10, 10, 10], [10, 400, 10, 400, 10, 10, 10, 10, 10, 10, 10, 10], 3, 3, 100, 12);
+        model.scrollTo(1000000, 1000000);
+        model.scrollTo(0, 0);
+        expect(grid.cellScrollModel).rowToBe(0);
+        expect(grid.cellScrollModel).colToBe(0);
     });
 
     function sendMouseWheelToModel(y, x) {
@@ -240,13 +236,6 @@ describe('pixel-scroll-model', function () {
             expect(model.horzScrollBar).leftToBe(3 * 100);
         });
 
-
-        it('should change top and left positions on scroll', function () {
-            model.scrollTo(13, 23);
-            expect(model.vertScrollBar).topToBe(13 / grid.virtualPixelCellModel.totalHeight() * viewHeight);
-            expect(model.horzScrollBar).leftToBe(23 / grid.virtualPixelCellModel.totalWidth() * viewWidth);
-        });
-
         it('should bind a drag event on render', function () {
             var spy = spyOn(grid.eventLoop, 'bind');
             var scrollBar = model.vertScrollBar.render();
@@ -300,7 +289,6 @@ describe('pixel-scroll-model', function () {
             grid.eventLoop.fire(move);
 
             var view = isHorz ? viewWidth : viewHeight;
-            var total = isHorz ? grid.virtualPixelCellModel.totalWidth() : grid.virtualPixelCellModel.totalHeight();
             var scrollBarRealPosition = (scrollClient - scrollBarOffset);
             var scrollableView = view - fixed;
             var barSize = isHorz ? getScrollBarWidth() : getScrollBarHeight();
@@ -308,7 +296,7 @@ describe('pixel-scroll-model', function () {
 
             var scrollBarPosition = scrollBarRealPosition - fixed;
             var scrollRatio = scrollBarPosition / scrollBarMax;
-            var expectedScroll = scrollRatio * (total - fixed - scrollableView);
+            var expectedScroll = scrollRatio * (model._getMaxScroll(isHorz ? 'width' : 'height'));
             if (isHorz) {
                 expect(model).leftToBe(expectedScroll);
             } else {
@@ -343,28 +331,32 @@ describe('pixel-scroll-model', function () {
         }
 
         //i'm so so sorry if you have to try to debug these test failures. it's bad. 
-        it('should scroll with mousemove', function () {
+        it('should scroll vertically with mousemove', function () {
             var vertBar = renderBar.call(this, model.vertScrollBar);
             //send two scrolls to ensure it doesn't reset in between (cause that was a bug)
             var top = sendScrollToBar(vertBar, [4, 6, 3, 2, -1], 0, false, model.vertScrollBar);
             sendScrollToBar(vertBar, [2, 5, 6], top, false, model.vertScrollBar);
+        });
 
-
+        it('should scroll horizontally with move', function () {
             var horzBar = renderBar.call(this, model.horzScrollBar);
             //send two scrolls to ensure it doesn't reset in between (cause that was a bug)
             var left = sendScrollToBar(horzBar, [2, 8, -1, 3, 2], 0, true, model.horzScrollBar);
             sendScrollToBar(horzBar, [5, 2, 9], left, true, model.horzScrollBar);
         });
 
-        it('should scroll with mousemove when fixed', function () {
+        it('should scroll vertically with mousemove when fixed', function () {
             beforeEachFn.call(this, false, false, 1, 1);
             scrollBeforeEachFn.call(this, 1500, 500);
             var vertBar = renderBar.call(this, model.vertScrollBar);
             //send two scrolls to ensure it doesn't reset in between (cause that was a bug)
             var top = sendScrollToBar(vertBar, [4, 6, 3, 2, -1], 0, false, model.vertScrollBar);
             sendScrollToBar(vertBar, [2, 5, 6], top, false, model.vertScrollBar);
+        });
 
-
+        it('should scroll horizontally when fixed with mousemove', function () {
+            beforeEachFn.call(this, false, false, 1, 1);
+            scrollBeforeEachFn.call(this, 1500, 500);
             var horzBar = renderBar.call(this, model.horzScrollBar);
             //send two scrolls to ensure it doesn't reset in between (cause that was a bug)
             var left = sendScrollToBar(horzBar, [2, 8, -1, 3, 2], 0, true, model.horzScrollBar);
