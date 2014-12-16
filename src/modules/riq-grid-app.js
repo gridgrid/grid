@@ -22,6 +22,13 @@ angular.module('riqGridApp', [])
                 grid.build(elem);
                 grid.navigationModel.minRow = 1;
 
+                //hide columsn for testing
+                for (var c = 0; c < grid.colModel.length(); c++) {
+                    if (c % 3 === 0) {
+                        grid.colModel.get(c).hidden = true;
+                    }
+                }
+
                 var builder = grid.colModel.createBuilder(function () {
                     return $compile('<a>{{data.formatted}}</a>')($scope.$new())[0];
                 }, function (elem, ctx) {

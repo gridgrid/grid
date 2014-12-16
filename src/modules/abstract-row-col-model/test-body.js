@@ -1,5 +1,5 @@
 function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
-    require('..//grid-spec-helper')();
+    require('../grid-spec-helper')();
     var model;
     var grid;
 
@@ -359,6 +359,23 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
         this.resetAllDirties();
         model.get(0).builder = model.createBuilder();
         expect(model.areBuildersDirty()).toBe(true);
+    });
+
+    describe('hidden', function () {
+        it('should return ' + lengthName + ' 0', function () {
+            var descriptor = model.create();
+            model.add(descriptor);
+            descriptor.hidden = true;
+            expect(model[lengthName](0)).toBe(0);
+        });
+
+        it('should be dirty on change', function () {
+            var descriptor = model.create();
+            model.add(descriptor);
+            this.resetAllDirties();
+            descriptor.hidden = true;
+            expect(model.isDirty()).toBe(true);
+        });
     });
 
 }

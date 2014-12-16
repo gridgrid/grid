@@ -9,7 +9,7 @@ describe('view-layer', function () {
     var container;
 
     function viewBeforeEach(varyHeight, varyWidth, frows, fcols, hrows, hcols) {
-        grid = this.buildSimpleGrid(100, 20, varyHeight, varyWidth, frows, fcols, hrows, hcols);
+        this.grid = grid = this.buildSimpleGrid(100, 20, varyHeight, varyWidth, frows, fcols, hrows, hcols);
         view = grid.viewLayer;
         //mock the view port
         grid.viewPort.sizeToContainer = function () {
@@ -243,6 +243,21 @@ describe('view-layer', function () {
             });
         });
 
+        it('should set display none if a row is height 0 and clear it if not', function (done) {
+            var row = this.grid.rowModel.get(3);
+            row.hidden = true;
+            this.onDraw(function () {
+                var rows = findGridRows();
+                expect($(rows[3]).css('display')).toBe('none');
+                row.hidden = false;
+                this.onDraw(function () {
+                    var rows = findGridRows();
+                    expect($(rows[3]).css('display')).toBe('block');
+                    done();
+                });
+            });
+        });
+
         it('should write widths and heights to the cells on draw', function (done) {
             view.draw();
             this.onDraw(function () {
@@ -250,6 +265,21 @@ describe('view-layer', function () {
                 expect(findGridCells(container).first().width()).toEqual(101);
                 expect(findGridCells(container).first().height()).toEqual(31);
                 done();
+            });
+        });
+
+        it('should set display none if a col is width 0 and clear it if not', function (done) {
+            var col = this.grid.colModel.get(3);
+            col.hidden = true;
+            this.onDraw(function () {
+                var cells = findGridCells(container);
+                expect($(cells[3]).css('display')).toBe('none');
+                col.hidden = false;
+                this.onDraw(function () {
+                    var cells = findGridCells(container);
+                    expect($(cells[3]).css('display')).toBe('block');
+                    done();
+                });
             });
         });
 
@@ -443,8 +473,7 @@ describe('view-layer', function () {
                 grid.decorators.add(decorator);
 
                 this.onDraw(function () {
-                    expect(decorator.boundingBox.style.width).toBe('0px');
-                    expect(decorator.boundingBox.style.height).toBe('0px');
+                    expect(decorator.boundingBox.style.display).toBe('none');
                     done();
                 });
             });
@@ -454,8 +483,7 @@ describe('view-layer', function () {
                 grid.decorators.add(decorator);
 
                 this.onDraw(function () {
-                    expect(decorator.boundingBox.style.width).toBe('0px');
-                    expect(decorator.boundingBox.style.height).toBe('0px');
+                    expect(decorator.boundingBox.style.display).toBe('none');
                     done();
                 });
             });
@@ -523,6 +551,36 @@ describe('view-layer', function () {
 
             it('should reposition if scrolled or col dirty', function () {
 
+            });
+
+            it('should not display a decorator with no width', function (cb) {
+                var row = this.grid.rowModel.get(3);
+                row.hidden = true;
+                setDecoratorPosition(3, 3, 1, 1);
+                grid.decorators.add(decorator);
+                this.onDraw(function () {
+                    expect(decorator.boundingBox.style.display).toBe('none');
+                    row.hidden = false;
+                    this.onDraw(function () {
+                        expect(decorator.boundingBox.style.display).toBe('');
+                        cb();
+                    });
+                });
+            });
+
+            it('should not display a decorator with no height', function (cb) {
+                var col = this.grid.colModel.get(3);
+                col.hidden = true;
+                setDecoratorPosition(3, 3, 1, 1);
+                grid.decorators.add(decorator);
+                this.onDraw(function () {
+                    expect(decorator.boundingBox.style.display).toBe('none');
+                    col.hidden = false;
+                    this.onDraw(function () {
+                        expect(decorator.boundingBox.style.display).toBe('');
+                        cb();
+                    });
+                });
             });
         });
 

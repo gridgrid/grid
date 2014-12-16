@@ -178,6 +178,12 @@ module.exports = function (_grid, name, lengthName, defaultSize) {
                     onDirty: function () {
                         setDescriptorsDirty({action: 'size', descriptors: [descriptor]});
                     }
+                },
+                {
+                    name: 'hidden',
+                    onDirty: function () {
+                        setDescriptorsDirty({action: 'hidden', descriptors: [descriptor]});
+                    }
                 }
             ], [dirtyClean]);
         },
@@ -189,11 +195,17 @@ module.exports = function (_grid, name, lengthName, defaultSize) {
 
     //basically height or width
     api[lengthName] = function (index) {
-        if (!descriptors[index]) {
+        var descriptor = descriptors[index];
+        if (!descriptor) {
             return NaN;
         }
 
-        return descriptors[index] && descriptors[index][lengthName] || api.defaultSize;
+        
+        if (descriptor.hidden) {
+            return 0;
+        }
+
+        return descriptor[lengthName] || api.defaultSize;
     };
 
     //row or col get

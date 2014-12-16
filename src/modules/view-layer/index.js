@@ -150,6 +150,11 @@ module.exports = function (_grid) {
         grid.viewPort.iterateCells(function drawCell(r, c) {
             var cell = cells[r][c];
             var width = grid.viewPort.getColWidth(c);
+            if (width == 0) {
+                cell.style.display = 'none';
+                return;
+            }
+            cell.style.display = '';
             cell.style.width = width + bWidth + 'px';
 
             var left = grid.viewPort.getColLeft(c);
@@ -196,6 +201,11 @@ module.exports = function (_grid) {
         }, function drawRow(r) {
             var height = grid.viewPort.getRowHeight(r);
             var row = rows[r];
+            if (height == 0) {
+                row.style.display = 'none';
+                return;
+            }
+            row.style.display = '';
             row.style.height = height + bWidth + 'px';
             var top = grid.viewPort.getRowTop(r);
             row.style.top = top + 'px';
@@ -284,6 +294,11 @@ module.exports = function (_grid) {
     /* DECORATOR LOGIC */
     function setPosition(boundingBox, top, left, height, width) {
         var style = boundingBox.style;
+        if (height <= 0 || width <= 0) {
+            style.display = 'none';
+            return;
+        }
+        style.display = ''
         style.top = top + 'px';
         style.left = left + 'px';
         style.height = height + 'px';
@@ -297,7 +312,7 @@ module.exports = function (_grid) {
 
     function positionCellDecoratorFromViewCellRange(realCellRange, boundingBox) {
         var realPxRange = grid.viewPort.toPx(realCellRange);
-        positionDecorator(boundingBox, realPxRange.top, realPxRange.left, realPxRange.height + getBorderWidth(), realPxRange.width + getBorderWidth());
+        positionDecorator(boundingBox, realPxRange.top, realPxRange.left, realPxRange.height && realPxRange.height + getBorderWidth(), realPxRange.width && realPxRange.width + getBorderWidth());
     }
 
     function createRangeForDescriptor(descriptor) {
