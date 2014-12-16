@@ -3,23 +3,38 @@ module.exports = function (_grid) {
 
     var api = {_decorators: {}};
 
-    function createDecorator(col) {
+    function setColShowing(col) {
+        grid.colModel.get(col).hidden = false;
+    }
+
+    function doWhileHidden(col, fn) {
+        while (grid.colModel.get(col - 1).hidden) {
+            col--;
+            fn && fn(col);
+        }
+        return col;
+    }
+
+    function createDecorator(col, right) {
         var headerDecorator = grid.decorators.create(0, col, 1, 1, 'cell', 'virtual');
 
         headerDecorator.postRender = function (div) {
-            div.style.transform = 'translate(-50%, -50%)';
-            div.style.webkitTransform = 'translate(-50%, -50%)';
 
-            div.style.removeProperty('right');
+            if (right) {
+                div.style.transform = 'translate(50%, -50%)';
+                div.style.webkitTransform = 'translate(50%, -50%)';
+                div.style.removeProperty('left');
+            } else {
+                div.style.transform = 'translate(-50%, -50%)';
+                div.style.webkitTransform = 'translate(-50%, -50%)';
+                div.style.removeProperty('right');
+            }
             div.style.removeProperty('bottom');
             div.style.top = '50%';
             div.setAttribute('class', 'show-hidden-cols');
 
             grid.eventLoop.bind('click', div, function () {
-                while (grid.colModel.get(col - 1).hidden) {
-                    col--;
-                    grid.colModel.get(col).hidden = false;
-                }
+                doWhileHidden(col, setColShowing);
             });
         };
         return headerDecorator;
@@ -33,7 +48,15 @@ module.exports = function (_grid) {
                     return;
                 }
                 if (descriptor.hidden) {
-                    var decorator = createDecorator(col + 1);
+                    var decCol = col + 1;
+                    var rightSide = col === grid.colModel.length() - 1;
+                    if (rightSide) {
+                        //if we're last we actually have to backtrack to the last showing column
+                        var lastHiddenCol = doWhileHidden(col);
+                        decCol = lastHiddenCol - 1;
+
+                    }
+                    var decorator = createDecorator(decCol, rightSide);
                     grid.decorators.add(decorator);
                     api._decorators[col] = decorator;
                 } else {

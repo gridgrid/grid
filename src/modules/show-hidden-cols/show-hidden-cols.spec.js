@@ -60,6 +60,33 @@ describe('show-hidden-cols', function () {
             expect(decorator).not.toBeDefined();
         });
 
+        it('should add to the last visible column if at the end', function () {
+            var length = this.grid.colModel.length();
+            this.grid.colModel.get(length - 2).hidden = true;
+            var lastCol = length - 1;
+            this.grid.colModel.get(lastCol).hidden = true;
+            var decorator = this.showHiddenCols._decorators[lastCol];
+            expect(decorator).leftToBe(length - 3);
+        });
+
+        it('should center on the right side of its bounding box if its last', function (done) {
+            var lastCol = this.grid.colModel.length() - 1;
+            this.grid.colModel.get(lastCol).hidden = true;
+            this.viewBuild();
+            var style = document.createElement('style');
+            style.innerHTML = '.show-hidden-cols{width : 6px}';
+            document.body.appendChild(style);
+            this.onDraw(function () {
+                var decorator = this.showHiddenCols._decorators[lastCol];
+                var $rendered = $(decorator.boundingBox.firstChild);
+                var $box = $(decorator.boundingBox);
+                var width = $rendered.width();
+                expect($rendered.position().left).toBe($box.width() - width / 2);
+                document.body.removeChild(style);
+                done();
+            });
+        });
+
         it('should center on the left side of its bounding box', function (done) {
             this.viewBuild();
             var style = document.createElement('style');
