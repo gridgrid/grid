@@ -36,10 +36,10 @@ module.exports = function (_grid) {
 
         //update the cell scroll
         var scrollTop = model.top;
-        var row = grid.virtualPixelCellModel.getRow(scrollTop);
+        var row = grid.virtualPixelCellModel.getRow(scrollTop + grid.virtualPixelCellModel.fixedHeight());
 
         var scrollLeft = model.left;
-        var col = grid.virtualPixelCellModel.getCol(scrollLeft);
+        var col = grid.virtualPixelCellModel.getCol(scrollLeft + grid.virtualPixelCellModel.fixedWidth());
 
         grid.cellScrollModel.scrollTo(row, col, undefined, true);
     }
@@ -49,7 +49,6 @@ module.exports = function (_grid) {
     model.scrollTo = function (top, left, dontNotify) {
         model.top = util.clamp(top, 0, model.height - getScrollableViewHeight());
         model.left = util.clamp(left, 0, model.width - getScrollableViewWidth());
-
         positionScrollBars();
 
         if (!dontNotify) {

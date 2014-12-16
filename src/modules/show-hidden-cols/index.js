@@ -49,7 +49,7 @@ module.exports = function (_grid) {
                 }
                 if (descriptor.hidden) {
                     var decCol = col + 1;
-                    var rightSide = col === grid.colModel.length() - 1;
+                    var rightSide = col === grid.colModel.length(true) - 1;
                     if (rightSide) {
                         //if we're last we actually have to backtrack to the last showing column
                         var lastHiddenCol = doWhileHidden(col);

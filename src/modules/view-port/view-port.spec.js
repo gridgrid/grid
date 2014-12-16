@@ -6,8 +6,8 @@ describe('view port', function () {
     var viewPort;
     var grid;
 
-    var beforeEachFn = function (varyHeights, varyWidths, frows, fcols) {
-        grid = this.buildSimpleGrid(100, 10, varyHeights, varyWidths, frows, fcols);
+    var beforeEachFn = function (varyHeights, varyWidths, frows, fcols, nCols) {
+        grid = this.buildSimpleGrid(100, nCols || 10, varyHeights, varyWidths, frows, fcols);
         viewPort = grid.viewPort;
         viewPort.sizeToContainer(this.container);
     };
@@ -35,6 +35,12 @@ describe('view port', function () {
 
         expect(viewPort.cols).toEqual(cols);
         expect(viewPort.rows).toEqual(rows);
+    });
+
+    it('should calculate the max number of cells that could fit in the screen with weird sizes', function () {
+        beforeEachFn.call(this, undefined, [10, 400, 10, 300, 20, 300, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10], undefined, 3, 16);
+        viewPort.sizeToContainer(this.container);
+        expect(viewPort.cols).toEqual(14);
     });
 
     it('should let you iterate the cells', function () {

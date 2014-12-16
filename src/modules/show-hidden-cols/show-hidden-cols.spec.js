@@ -61,7 +61,7 @@ describe('show-hidden-cols', function () {
         });
 
         it('should add to the last visible column if at the end', function () {
-            var length = this.grid.colModel.length();
+            var length = this.grid.colModel.length(true);
             this.grid.colModel.get(length - 2).hidden = true;
             var lastCol = length - 1;
             this.grid.colModel.get(lastCol).hidden = true;
@@ -70,7 +70,7 @@ describe('show-hidden-cols', function () {
         });
 
         it('should center on the right side of its bounding box if its last', function (done) {
-            var lastCol = this.grid.colModel.length() - 1;
+            var lastCol = this.grid.colModel.length(true) - 1;
             this.grid.colModel.get(lastCol).hidden = true;
             this.viewBuild();
             var style = document.createElement('style');

@@ -8,8 +8,8 @@ describe('pixel-scroll-model', function () {
     var numCols = 10;
     var grid;
 
-    function beforeEachFn(varyH, varyW, fixedR, fixedC) {
-        grid = this.buildSimpleGrid(numRows, numCols, varyH, varyW, fixedR, fixedC);
+    function beforeEachFn(varyH, varyW, fixedR, fixedC, nRows, nCols) {
+        grid = this.buildSimpleGrid(nRows || numRows, nCols || numCols, varyH, varyW, fixedR, fixedC);
         model = grid.pixelScrollModel;
     }
 
@@ -68,6 +68,13 @@ describe('pixel-scroll-model', function () {
         model.scrollTo(10, 1000);
         expect(model.top).toEqual(10);
         expect(model.left).toEqual(190);
+    });
+
+    it('should set cell scroll properly', function () {
+        beforeEachFn.call(this, [10, 400, 10, 400, 10, 10, 10, 10, 10, 10, 10], [10, 400, 10, 400, 10, 10, 10, 10, 10, 10, 10], 3, 3, 100, 30);
+        model.scrollTo(1000000, 1000000);
+        expect(grid.cellScrollModel).rowToBe(92);
+        expect(grid.cellScrollModel).colToBe(25);
     });
 
     function sendMouseWheelToModel(y, x) {
