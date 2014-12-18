@@ -7,6 +7,7 @@ module.exports = function (config) {
         frameworks: ['browserify', 'jasmine'],
 
         files: [
+            'node_modules/polyfill-function-prototype-bind/bind.js',
             'bower_components/angular/angular.js',
             'bower_components/angular-mocks/angular-mocks.js'
         ],

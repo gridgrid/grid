@@ -1,8 +1,10 @@
-angular.module('riq-grid', [])
-    .factory('RiqGridSrvc', function () {
-        return {
-            core: require('./core')
-        };
-    })
+angular.module('riq-grid', [
+  require('./angular-decorator').name
+])
+  .factory('RiqGridSrvc', function () {
+    return {
+      core: require('./core')
+    };
+  })
 ;
 
