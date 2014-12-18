@@ -1,6 +1,6 @@
 module.exports = angular.module('grid-decorator', [])
     .factory('GridDecoratorSrvc', function ($compile) {
-        return {
+        var GridDecoratorSrvc = {
             render: function (opts) {
                 var compiled = $compile(opts.template)(opts.$scope);
                 compiled.on('decorator-destroy', function () {
@@ -12,8 +12,22 @@ module.exports = angular.module('grid-decorator', [])
                 });
                 opts.$scope.$apply();
                 return  compiled[0];
+            },
+            headerDecorators: function (grid, model) {
+                var origAnnotate = model.annotateDecorator;
+                model.annotateDecorator = function (dec) {
+                    dec.render = function () {
+                        return GridDecoratorSrvc.render(model.renderOpts);
+                    };
+                    if (origAnnotate) {
+                        origAnnotate(dec);
+                    }
+                };
+                
+                require('../header-decorators')(grid, model);
             }
-        }
+        };
+        return  GridDecoratorSrvc
     })
 
 ;

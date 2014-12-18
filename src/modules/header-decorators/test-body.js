@@ -55,6 +55,13 @@ function testHeaderDecorators() {
             expect(spy).toHaveBeenCalled();
         });
 
+        it('should call makeDecorator on the api so it can be overridden if need be', function () {
+
+            var spy = spyOn(headerDecorators, 'makeDecorator').and.callThrough();
+            grid.viewPort.cols = grid.viewPort.cols + 1;
+            grid.eventLoop.fire('grid-viewport-change');
+            expect(spy).toHaveBeenCalled();
+        });
 
     });
 }

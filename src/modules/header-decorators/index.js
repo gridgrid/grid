@@ -21,10 +21,12 @@ module.exports = function (_grid, model) {
         return decorator;
     }
 
+    api.makeDecorator = api.makeDecorator || makeDecorator;
+
     function ensureDecoratorPerCol() {
         for (var c = 0; c < grid.viewPort.cols; c++) {
             if (!api._decorators[c]) {
-                var decorator = makeDecorator(c);
+                var decorator = api.makeDecorator(c);
                 api._decorators[c] = decorator;
                 grid.decorators.add(decorator);
             }
