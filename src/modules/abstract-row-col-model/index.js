@@ -1,6 +1,7 @@
 var addDirtyProps = require('../add-dirty-props');
 var util = require('../util');
 var noop = require('../no-op');
+var passThrough = require('../pass-through');
 
 module.exports = function (_grid, name, lengthName, defaultSize) {
     var grid = _grid;
@@ -198,7 +199,7 @@ module.exports = function (_grid, name, lengthName, defaultSize) {
             ], [dirtyClean]);
         },
         createBuilder: function (render, update) {
-            return {render: render || noop, update: update || noop};
+            return {render: render || noop, update: update || passThrough};
         }
 
     };

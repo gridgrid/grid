@@ -339,10 +339,11 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
             expect(descriptor.builder).toBe(builder);
         });
 
-        it('should default to empty functions', function () {
+        it('should default to pass through functions', function () {
             var builder = model.createBuilder();
             expect(builder.render).toBeAFunction();
             expect(builder.update).toBeAFunction();
+            expect(builder.update(8)).toBe(8);
         });
     });
 
