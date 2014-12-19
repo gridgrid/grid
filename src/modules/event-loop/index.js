@@ -56,16 +56,19 @@ var eventLoop = function (_grid) {
         return unbindFn;
     }
 
+    function getHandlerFromArgs(args) {
+        var handler = args.filter(function (arg) {
+            return typeof arg === 'function';
+        })[0];
+        return handler;
+    }
+
     eloop.bind = function () {
         var args = Array.prototype.slice.call(arguments, 0);
         var name = args.filter(function (arg) {
             return typeof arg === 'string';
         })[0];
-
-        var handler = args.filter(function (arg) {
-            return typeof arg === 'function';
-        })[0];
-
+        var handler = getHandlerFromArgs(args);
         if (!handler || !name) {
             throw 'cannot bind without at least name and function';
         }
@@ -90,6 +93,17 @@ var eventLoop = function (_grid) {
             return bindToDomElement(elem, name, listener);
         }
     };
+
+    eloop.bindOnce = function () {
+        var args = Array.prototype.slice.call(arguments, 0);
+        var handler = getHandlerFromArgs(args);
+        args.splice(args.indexOf(handler), 1, function bindOnceHandler(e) {
+            unbind();
+            handler(e);
+        });
+        var unbind = eloop.bind.apply(this, args);
+        return unbind;
+    }
 
     eloop.fire = function (event) {
         event = typeof event === 'string' ? {type: event} : event;

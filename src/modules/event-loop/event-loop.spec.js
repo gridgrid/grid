@@ -250,4 +250,16 @@ describe('event-loop', function () {
         });
     });
 
+    describe('bindOnce', function () {
+        it('should fire an event once and then unbind', function () {
+            var spy = jasmine.createSpy();
+            this.grid.eventLoop.bindOnce('test-event', spy);
+            this.grid.eventLoop.fire(mockEvent('test-event'));
+            expect(spy).toHaveBeenCalled();
+            spy.calls.reset();
+            this.grid.eventLoop.fire(mockEvent('test-event'));
+            expect(spy).not.toHaveBeenCalled();
+        });
+    });
+
 });
