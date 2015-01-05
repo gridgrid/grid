@@ -17,13 +17,13 @@ module.exports = angular.module('grid-decorator', [])
                 var origAnnotate = model.annotateDecorator;
                 model.annotateDecorator = function (dec) {
                     dec.render = function () {
-                        return GridDecoratorSrvc.render(model.renderOpts);
+                        return GridDecoratorSrvc.render(dec.renderOpts);
                     };
                     if (origAnnotate) {
                         origAnnotate(dec);
                     }
                 };
-                
+
                 require('../header-decorators')(grid, model);
             }
         };

@@ -89,13 +89,17 @@ describe('angular-decorator', function () {
         });
 
         it('should call angular render on decorator render', function () {
-            var model = {renderOpts: {template: '<div>', scope: {}}}
+            var renderOpts = {template: '<div>', scope: {}};
+            var model = {annotateDecorator: function (dec) {
+                dec.renderOpts = renderOpts
+            }}
             this.GridDecoratorSrvc.headerDecorators(this.buildSimpleGrid(), model);
-            var dec = {};
+            var dec = {
+            };
             model.annotateDecorator(dec);
             var renderSpy = spyOn(this.GridDecoratorSrvc, 'render');
             dec.render();
-            expect(renderSpy).toHaveBeenCalledWith(model.renderOpts);
+            expect(renderSpy).toHaveBeenCalledWith(renderOpts);
         });
 
         it('should call previous annotate', function () {

@@ -5,7 +5,7 @@ describe('view-layer', function () {
     var viewCols = 10;
     var view;
     var grid;
-    var $ = require('jQuery');
+    var $ = require('jquery');
     var container;
 
     function viewBeforeEach(varyHeight, varyWidth, frows, fcols, hrows, hcols) {

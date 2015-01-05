@@ -1,6 +1,6 @@
 describe('mousewheel', function () {
     var mousewheel;
-    var $ = require('jQuery');
+    var $ = require('jquery');
     var mockEvent = require('../custom-event');
     var div;
 

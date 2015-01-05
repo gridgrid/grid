@@ -1,5 +1,5 @@
 module.exports = function () {
-    var $ = require('jQuery');
+    var $ = require('jquery');
     beforeEach(function () {
 
         this.CONTAINER_WIDTH = 800;
