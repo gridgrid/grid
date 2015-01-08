@@ -22,13 +22,29 @@ describe('angular-decorator', function () {
                     }
                     return compileObj.$compile;
                 });
-            });
+
+            })
+                .run(function ($templateCache) {
+                    $templateCache.put('foo.html', '<div></div>');
+                })
+            ;
+            angular.module(moduleName)
+                .directive('foo', function () {
+                    return {
+                        restrict: 'E',
+                        replace: true,
+                        templateUrl: 'foo.html',
+                        link: function () {
+
+                        }
+                    };
+                });
             tools.angularDeps.call(this, 'GridDecoratorSrvc');
             tools.angularDeps.call(this, '$compile', '$rootScope');
             this.$scope = this.$rootScope.$new();
             this.tpl = '<div>{{scopeValue}}</div>';
-            this.render = (function () {
-                return this.GridDecoratorSrvc.render({$scope: this.$scope, template: this.tpl});
+            this.render = (function (opts) {
+                return this.GridDecoratorSrvc.render(angular.extend({$scope: this.$scope, template: this.tpl}, opts));
             }).bind(this);
         });
 
@@ -81,6 +97,17 @@ describe('angular-decorator', function () {
             }, 2);
 
         });
+
+        it('should add pointer events all if events flag is set to true', function () {
+            var rendered = this.render({events: true});
+            expect(rendered.style.pointerEvents).toEqual('all');
+        });
+
+        it('should add pointer events even if root node is an element directive with replace true and templateUrl', function () {
+            var rendered = this.render({events: true, template: '<foo></foo>'});
+            console.log(rendered);
+            expect(rendered.style.pointerEvents).toEqual('all');
+        });
     });
 
     describe('headerDecorators', function () {
@@ -90,12 +117,13 @@ describe('angular-decorator', function () {
 
         it('should call angular render on decorator render', function () {
             var renderOpts = {template: '<div>', scope: {}};
-            var model = {annotateDecorator: function (dec) {
-                dec.renderOpts = renderOpts
-            }}
+            var model = {
+                annotateDecorator: function (dec) {
+                    dec.renderOpts = renderOpts
+                }
+            }
             this.GridDecoratorSrvc.headerDecorators(this.buildSimpleGrid(), model);
-            var dec = {
-            };
+            var dec = {};
             model.annotateDecorator(dec);
             var renderSpy = spyOn(this.GridDecoratorSrvc, 'render');
             dec.render();

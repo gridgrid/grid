@@ -11,7 +11,10 @@ module.exports = angular.module('grid-decorator', [])
                     }, 1);
                 });
                 opts.$scope.$apply();
-                return  compiled[0];
+                if (opts.events) {
+                    compiled[0].style.pointerEvents = 'all';
+                }
+                return compiled[0];
             },
             headerDecorators: function (grid, model) {
                 var origAnnotate = model.annotateDecorator;
@@ -27,7 +30,7 @@ module.exports = angular.module('grid-decorator', [])
                 require('../header-decorators')(grid, model);
             }
         };
-        return  GridDecoratorSrvc
+        return GridDecoratorSrvc
     })
 
 ;
