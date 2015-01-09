@@ -31,6 +31,9 @@ module.exports = function (_grid) {
                 formatted: value && 'r' + value[0] + ' c' + value[1] || ''
             };
         },
+        getCopyData: function (r, c) {
+            return api.get(r, c);
+        },
         getHeader: function (r, c) {
             var dataRow = headerData[grid.rowModel.get(r).dataRow];
 

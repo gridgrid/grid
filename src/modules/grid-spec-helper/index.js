@@ -29,7 +29,7 @@ module.exports = function () {
             return this.grid;
         };
         this.viewBuild = function () {
-            this.grid.viewLayer.build(this.container);
+            this.grid.build(this.container);
             return this.container;
         };
         this.onDraw = function (fn) {

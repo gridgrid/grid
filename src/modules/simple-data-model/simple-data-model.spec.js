@@ -24,4 +24,8 @@ describe('simple-data-model', function () {
         expect(dataModel.get(0, 0).formatted).toBe(last);
     });
 
+    it('should be able to get copy data', function () {
+        expect(dataModel.getCopyData(0, 0).value).toBeDefined();
+        expect(dataModel.getCopyData(0, 0).formatted).toBeAString();
+    });
 });

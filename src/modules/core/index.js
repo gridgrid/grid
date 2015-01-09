@@ -25,6 +25,7 @@ module.exports = function () {
     grid.colResize = require('../col-resize')(grid);
     grid.colReorder = require('../col-reorder')(grid);
     grid.showHiddenCols = require('../show-hidden-cols')(grid);
+    require('../copy-paste')(grid);
 
     var drawRequested = false;
     grid.requestDraw = function () {

@@ -92,7 +92,7 @@ describe('view-layer', function () {
 
         it('should clear the container before building again', function () {
             view.build(container);
-            expect(container.childElementCount).toBe(1);
+            expect(container.childElementCount).toBe(2);
         });
 
 
@@ -350,7 +350,8 @@ describe('view-layer', function () {
 
         it('should remove all grid elements on destroy', function () {
             view.destroy();
-            expect(container.children.length).toBe(0);
+            //one because the text area will still be there
+            expect(container.children.length).toBe(1);
         });
 
         function makeDivDecorator() {
