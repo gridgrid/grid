@@ -27,4 +27,10 @@ describe('simple-data-model', function () {
     it('should be able to get copy data', function () {
         expect(dataModel.getCopyData(0, 0)).toBeAString();
     });
+
+    it('should have a multi data set', function () {
+        var data = ['oW', 'oL'];
+        dataModel.set([{row: 0, col: 0, data: {value: data}}]);
+        expect(dataModel.get(0, 0).formatted).toEqual('roW coL');
+    });
 });

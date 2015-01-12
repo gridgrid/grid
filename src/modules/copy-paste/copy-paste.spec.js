@@ -39,45 +39,49 @@ describe('copy-paste', function () {
 
     }
 
+    function expectProperRanges(expectFn) {
+        it('should get the copy data for the selected range', function () {
+            var selectionRange = {top: 1, left: 2, width: 1, height: 2};
+            this.grid.navigationModel.setSelection(selectionRange);
+            expectFn.call(this, selectionRange);
+        });
+
+        it('should get the copy data for the focus range if no selection', function () {
+            this.grid.navigationModel.setFocus(1, 2);
+            expectFn.call(this, {top: 1, left: 2, width: 1, height: 1});
+        });
+
+        it('should prefer the selection to the focus', function () {
+            this.grid.navigationModel.setFocus(1, 2);
+            var selectionRange = {top: 1, left: 2, width: 1, height: 2};
+            this.grid.navigationModel.setSelection(selectionRange);
+
+            expectFn.call(this, selectionRange);
+        });
+    }
+
     describe('copy', function () {
         function fireCopy() {
-            var e = mockEvent('keydown');
-            e.which = key.code.alnum.c;
-            e.metaKey = true;
+            var e = {type: 'copy'};
+            e.preventDefault = jasmine.createSpy('preventDefault');
+            e.clipboardData = {setData: jasmine.createSpy('setData')};
             this.grid.eventLoop.fire(e);
+            return e;
         }
 
-        function expectCopyDataForRange(selectionRange) {
+        expectProperRanges(function expectCopyDataForRange(selectionRange) {
             var spy = spyOn(this.grid.dataModel, 'getCopyData').and.callThrough();
             fireCopy.call(this);
             expect(spy).toHaveBeenCalled();
             expect(spy).toHaveBeenCalledWithAllPointsInRange(selectionRange);
-        }
-
-        it('should get the copy data for the selected range', function () {
-            var selectionRange = {top: 1, left: 2, width: 1, height: 2};
-            this.grid.navigationModel.setSelection(selectionRange);
-            expectCopyDataForRange.call(this, selectionRange);
         });
 
-        it('should get the copy data for the focus range if no selection', function () {
-            this.grid.navigationModel.setFocus(1, 1);
-            expectCopyDataForRange.call(this, {top: 1, left: 1, width: 1, height: 1});
-        });
-
-        it('should prefer the selection to the focus', function () {
-            this.grid.navigationModel.setFocus(1, 1);
-            var selectionRange = {top: 1, left: 2, width: 1, height: 2};
-            this.grid.navigationModel.setSelection(selectionRange);
-
-            expectCopyDataForRange.call(this, selectionRange);
-        });
-
-        it('should put copy data into text area as tab delimitted csv', function () {
+        it('should put copy data into clipboard', function () {
             var selectionRange = {top: 1, left: 2, width: 2, height: 2};
             this.grid.navigationModel.setSelection(selectionRange);
-            fireCopy.call(this);
-            expect(this.grid.textarea.value).toEqual('r1 c2\tr1 c3\nr2 c2\tr2 c3')
+            var e = fireCopy.call(this);
+            expect(e.clipboardData.setData).toHaveBeenCalledWith('Text', 'r1 c2\tr1 c3\nr2 c2\tr2 c3');
+            expect(e.preventDefault).toHaveBeenCalled();
         });
 
         describe('text area selection', function () {
@@ -122,18 +126,27 @@ describe('copy-paste', function () {
     });
 
     describe('paste', function () {
-        function firePasteKeyDown() {
-            var e = mockEvent('keydown');
-            e.which = key.code.alnum.v;
-            e.metaKey = true;
-            this.grid.eventLoop.fire(e);
-        }
-
         function firePaste() {
-            var e = mockEvent('paste');
+            var e = {type: 'paste'};
+            e.clipboardData = {
+                getData: function () {
+                    return 'R1 C2\tR1 C3\nR2 C2\tR2 C3'
+                }
+            };
             this.grid.eventLoop.fire(e);
         }
 
+        expectProperRanges(function expectPasteForRange(range) {
+            var spy = spyOn(this.grid.dataModel, 'set');
+            firePaste.call(this);
+            var args = spy.calls.argsFor(0)[0];
+            for (var r = range.top; r < range.top + range.height; r++) {
+                for (var c = range.left; c < range.left + range.width; c++) {
+                    expect(args).toContain({row: r, col: c, data: 'R' + r + ' C' + c, paste: true});
+                }
+            }
+
+        });
 
     });
 

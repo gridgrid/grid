@@ -53,6 +53,27 @@ module.exports = {
             range.width = c1 - c2 + 1;
         }
         return range;
+    },
+    iterate: function (range) {
+        var cellFn;
+        var rowFn;
+        if (arguments.length === 2) {
+            cellFn = arguments[1];
+        } else if (arguments.length === 3) {
+            cellFn = arguments[2];
+            rowFn = arguments[1];
+        }
+        for (var r = range.top; r < range.top + range.height; r++) {
+            var rowResult;
+            if (rowFn) {
+                rowResult = rowFn(r);
+            }
+            for (var c = range.left; c < range.left + range.width; c++) {
+                if (cellFn) {
+                    cellFn(r, c, rowResult);
+                }
+            }
+        }
     }
 };
 

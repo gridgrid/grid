@@ -1,3 +1,5 @@
+var util = require('../util');
+
 module.exports = function (_grid) {
     var grid = _grid;
 
@@ -17,7 +19,16 @@ module.exports = function (_grid) {
     var api = {
         isDirty: dirtyClean.isDirty,
         set: function (r, c, datum) {
-            internalSet(cellData, r, c, datum);
+            var data = arguments[0];
+            if (!util.isArray(data)) {
+                if (typeof datum === 'string') {
+                    datum = {value: datum.replace('[rR]', '').replace('[cC]', '').split(' ')};
+                }
+                data = [{row: r, col: c, data: datum}];
+            }
+            data.forEach(function (change) {
+                internalSet(cellData, change.row, change.col, change.data);
+            });
         },
         setHeader: function (r, c, datum) {
             internalSet(headerData, r, c, datum);
