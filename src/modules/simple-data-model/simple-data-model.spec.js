@@ -25,7 +25,6 @@ describe('simple-data-model', function () {
     });
 
     it('should be able to get copy data', function () {
-        expect(dataModel.getCopyData(0, 0).value).toBeDefined();
-        expect(dataModel.getCopyData(0, 0).formatted).toBeAString();
+        expect(dataModel.getCopyData(0, 0)).toBeAString();
     });
 });

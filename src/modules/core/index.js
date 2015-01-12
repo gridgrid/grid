@@ -25,7 +25,7 @@ module.exports = function () {
     grid.colResize = require('../col-resize')(grid);
     grid.colReorder = require('../col-reorder')(grid);
     grid.showHiddenCols = require('../show-hidden-cols')(grid);
-    require('../copy-paste')(grid);
+    grid.copyPaste = require('../copy-paste')(grid);
 
     var drawRequested = false;
     grid.requestDraw = function () {
@@ -46,22 +46,20 @@ module.exports = function () {
         }
     });
 
-    function createFocusTextArea(container) {
-        var textarea = document.createElement('textarea');
-        textarea.setAttribute('dts', 'grid-textarea');
-        textarea.style.position = 'fixed';
-        textarea.style.left = '-100000px';
+    function setupTextareaForContainer(textarea, container) {
         textarea.addEventListener('focus', function () {
             if (container) {
                 elementClass(container).add('focus');
             }
             textarea.select();
+            grid.eventLoop.fire('grid-focus');
         });
 
         textarea.addEventListener('blur', function () {
             if (container) {
                 elementClass(container).remove('focus');
             }
+            grid.eventLoop.fire('grid-blur');
         });
 
         container.appendChild(textarea);
@@ -73,12 +71,18 @@ module.exports = function () {
                 textarea.focus();
             }
         });
+    }
 
+    function createFocusTextArea() {
+        var textarea = document.createElement('textarea');
+        textarea.setAttribute('dts', 'grid-textarea');
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-100000px';
         return textarea;
     }
 
     grid.build = function (container) {
-        grid.textarea = createFocusTextArea(container);
+        setupTextareaForContainer(grid.textarea, container);
         grid.viewPort.sizeToContainer(container);
         grid.viewLayer.build(container);
         grid.eventLoop.setContainer(container);
@@ -87,6 +91,8 @@ module.exports = function () {
     grid.makeDirtyClean = function () {
         return dirtyClean(grid);
     };
+
+    grid.textarea = createFocusTextArea();
 
     return grid;
 };

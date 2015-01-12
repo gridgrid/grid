@@ -23,6 +23,7 @@ describe('grid-core', function () {
         expect(grid).toHaveField('colResize');
         expect(grid).toHaveField('colReorder');
         expect(grid).toHaveField('showHiddenCols');
+        expect(grid).toHaveField('copyPaste');
     });
 
     it('should have a main build function', function () {
@@ -61,6 +62,10 @@ describe('grid-core', function () {
     function findTextArea() {
         return $(this.container).find('textarea');
     }
+
+    it('should create the textarea on creation before build', function () {
+        expect(this.grid.textarea).toBeAnElement();
+    });
 
     it('should have a focusable text area on build', function () {
         grid.build(this.container);
@@ -105,4 +110,21 @@ describe('grid-core', function () {
         expect(dirtyClean).not.toBeDirty();
     });
 
+    it('should fire text area focus events', function () {
+        grid.build(this.container);
+        grid.textarea.blur();
+        var spy = jasmine.createSpy();
+        grid.eventLoop.bind('grid-focus', spy);
+        grid.textarea.focus();
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it('should fire text area blur events', function () {
+        grid.build(this.container);
+        grid.textarea.focus();
+        var spy = jasmine.createSpy();
+        grid.eventLoop.bind('grid-blur', spy);
+        grid.textarea.blur();
+        expect(spy).toHaveBeenCalled();
+    });
 });

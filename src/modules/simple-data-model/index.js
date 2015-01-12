@@ -26,13 +26,16 @@ module.exports = function (_grid) {
             var dataRow = cellData[grid.rowModel.row(r).dataRow];
             var datum = dataRow && dataRow[grid.colModel.col(c).dataCol];
             var value = datum && datum.value;
+            if (value === undefined) {
+                console.log((value && 'r' + value[0] + ' c' + value[1]) || '');
+            }
             return {
                 value: value,
-                formatted: value && 'r' + value[0] + ' c' + value[1] || ''
+                formatted: (value && 'r' + value[0] + ' c' + value[1]) || ''
             };
         },
         getCopyData: function (r, c) {
-            return api.get(r, c);
+            return api.get(r, c).formatted;
         },
         getHeader: function (r, c) {
             var dataRow = headerData[grid.rowModel.get(r).dataRow];
