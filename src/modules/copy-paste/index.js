@@ -40,7 +40,6 @@ module.exports = function (_grid) {
     });
 
     grid.eventLoop.bind('paste', function (e) {
-        console.log('paste', e);
         var selectionRange = getCopyPasteRange();
         if (!e.clipboardData || !e.clipboardData.getData) {
             console.warn('no clipboard data on paste event');
@@ -78,7 +77,6 @@ module.exports = function (_grid) {
     }, 1)
 
     grid.eventLoop.bind('keyup', function (e) {
-        console.log('keyup', e);
         maybeSelectText();
     });
     grid.eventLoop.bind('grid-focus', maybeSelectText);

@@ -32,6 +32,8 @@ describe('copy-paste', function () {
                 };
             }
         });
+
+        this.tableString = '<table><tbody><tr><td>r1 c2</td><td>r1 c3</td></tr><tr><td>r2 c2</td><td>r2 c3</td></tr></tbody></table>';
     });
 
 
@@ -89,8 +91,7 @@ describe('copy-paste', function () {
             var selectionRange = {top: 1, left: 2, width: 2, height: 2};
             this.grid.navigationModel.setSelection(selectionRange);
             var e = fireCopy.call(this);
-            var tableString = '<table><tbody><tr><td>r1 c2</td><td>r1 c3</td></tr><tr><td>r2 c2</td><td>r2 c3</td></tr></tbody></table>';
-            expect(this.grid.textarea.innerHTML).toEqual(tableString);
+            expect(this.grid.textarea.innerHTML).toEqual(this.tableString);
             expect(window.getSelection().toString()).toContain('r1 c2');
             expect(window.getSelection().toString()).toContain('r1 c3');
             expect(window.getSelection().toString()).toContain('r2 c2');
@@ -143,27 +144,41 @@ describe('copy-paste', function () {
             var e = {type: 'paste'};
             e.clipboardData = {
                 getData: function () {
-                    return data || 'R1 C2\tR1 C3\nR2 C2\tR2 C3'
+                    return data || 'r1 c2\tr1 c3\nr2 c2\tr2 c3'
                 }
             };
+            spyOn(e.clipboardData, 'getData').and.callThrough();
             this.grid.eventLoop.fire(e);
+            return e;
         }
 
-        expectProperRanges(function expectPasteForRange(range, cb) {
+        function expectPasteForRange(range, cb, mockGetData) {
             var spy = spyOn(this.grid.dataModel, 'set');
-            firePaste.call(this);
+            var e = firePaste.call(this)
+            if (mockGetData) {
+                e.clipboardData.getData.and.returnValue(undefined);
+            }
             setTimeout(function () {
                 var args = spy.calls.argsFor(0)[0];
                 for (var r = range.top; r < range.top + range.height; r++) {
                     for (var c = range.left; c < range.left + range.width; c++) {
-                        expect(args).toContain({row: r, col: c, data: 'R' + r + ' C' + c, paste: true});
+                        expect(args).toContain({row: r, col: c, data: 'r' + r + ' c' + c, paste: true});
                     }
                 }
                 cb();
             }, 2);
 
-        }, true);
+        }
 
+        expectProperRanges(expectPasteForRange, true);
+
+
+        it('should handle pasted html', function (cb) {
+            var selectionRange = {top: 1, left: 2, width: 2, height: 2};
+            this.grid.navigationModel.setSelection(selectionRange);
+            this.grid.textarea.innerHTML = this.tableString;
+            expectPasteForRange.call(this, selectionRange, cb, true);
+        });
     });
 
 });
