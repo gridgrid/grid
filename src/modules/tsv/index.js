@@ -2,9 +2,9 @@ module.exports.stringify = function (data) {
     var string = '';
     data.forEach(function (row, r) {
         row.forEach(function (value, c) {
-            if (value.indexOf('\n') !== -1 || value.indexOf('\t') !== -1) {
+            if (value.indexOf('\n') !== -1 || value.indexOf('\t') !== -1 || value.indexOf('"') !== -1) {
                 //replace " with "" to escape and wrap the whole value in quotes 
-                value = '"' + value.replace('"', '""') + '"';
+                value = '"' + value.replace(/"/g, '""') + '"';
             }
             string += value;
             if (c !== row.length - 1) {

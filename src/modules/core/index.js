@@ -74,10 +74,27 @@ module.exports = function () {
     }
 
     function createFocusTextArea() {
-        var textarea = document.createElement('textarea');
+        var textarea = document.createElement('div');
         textarea.setAttribute('dts', 'grid-textarea');
+        textarea.setAttribute('contenteditable', 'true');
         textarea.style.position = 'fixed';
         textarea.style.left = '-100000px';
+        textarea.classList.add('grid-textarea');
+        textarea.select = function () {
+            var range = document.createRange();
+            range.selectNodeContents(textarea);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+        };
+
+        Object.defineProperty(textarea, 'value', {
+            get: function () {
+                return textarea.innerText;
+            },
+            set: function (val) {
+                textarea.innerText = val;
+            }
+        });
         return textarea;
     }
 

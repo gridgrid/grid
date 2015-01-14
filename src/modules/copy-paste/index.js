@@ -23,49 +23,64 @@ module.exports = function (_grid) {
 
     grid.eventLoop.bind('copy', function (e) {
         //prepare for copy
-        var copyData = [];
+        var copyTable = document.createElement('table');
         var selectionRange = getCopyPasteRange();
         rangeUtil.iterate(selectionRange, function () {
-            var row = [];
-            copyData.push(row)
+            var row = document.createElement('tr');
+            copyTable.appendChild(row);
             return row;
         }, function (r, c, row) {
             var data = grid.dataModel.getCopyData(r, c);
-            row.push(data);
+            var td = document.createElement('td');
+            td.innerHTML = data;
+            row.appendChild(td);
         });
-        if (e.clipboardData && e.clipboardData.setData) {
-            e.preventDefault();
-            e.clipboardData.setData('Text', tsv.stringify(copyData));
-        } else {
-            console.warn('copy event without clipboard data or setdata property');
-        }
-
+        grid.textarea.innerHTML = copyTable.outerHTML;
+        grid.textarea.select();
     });
 
     grid.eventLoop.bind('paste', function (e) {
+        console.log('paste', e);
         var selectionRange = getCopyPasteRange();
         if (!e.clipboardData || !e.clipboardData.getData) {
             console.warn('no clipboard data on paste event');
             return;
         }
         var pasteData = tsv.parse(e.clipboardData.getData('Text'));
-        var dataChanges = [];
-        rangeUtil.iterate(selectionRange, function (r, c) {
-            var offsetR = r - selectionRange.top;
-            var offsetC = c - selectionRange.left;
-            dataChanges.push({row: r, col: c, data: pasteData[offsetR][offsetC], paste: true});
-        });
-        grid.dataModel.set(dataChanges);
+
+
+        setTimeout(function () {
+            if (grid.textarea.querySelector('table')) {
+                pasteData = [];
+                [].forEach.call(grid.textarea.querySelectorAll('tr'), function (tr) {
+                    var row = [];
+                    pasteData.push(row);
+                    [].forEach.call(tr.querySelectorAll('td'), function (td) {
+                        row.push(td.innerHTML);
+                    });
+                });
+            }
+            var dataChanges = [];
+            rangeUtil.iterate(selectionRange, function (r, c) {
+                var offsetR = r - selectionRange.top;
+                var offsetC = c - selectionRange.left;
+                dataChanges.push({row: r, col: c, data: pasteData[offsetR][offsetC], paste: true});
+            });
+            grid.dataModel.set(dataChanges);
+        }, 1);
     });
 
     var maybeSelectText = debounce(function maybeSelectTextInner() {
         if (!model.isSelectionDisabled || !model.isSelectionDisabled()) {
-            grid.textarea.value = ' ';
+            grid.textarea.innerText = 'gridtext';
             grid.textarea.select();
         }
     }, 1)
 
-    grid.eventLoop.bind('keyup', maybeSelectText);
+    grid.eventLoop.bind('keyup', function (e) {
+        console.log('keyup', e);
+        maybeSelectText();
+    });
     grid.eventLoop.bind('grid-focus', maybeSelectText);
 
     var model = {};

@@ -60,7 +60,7 @@ describe('grid-core', function () {
     });
 
     function findTextArea() {
-        return $(this.container).find('textarea');
+        return $(this.container).find('.grid-textarea');
     }
 
     it('should create the textarea on creation before build', function () {
@@ -69,12 +69,12 @@ describe('grid-core', function () {
 
     it('should have a focusable text area on build', function () {
         grid.build(this.container);
-        expect(findTextArea()).toBeAnElement();
+        expect(findTextArea.call(this)).toBeAnElement();
     });
 
     it('should add a class to the container on focus', function () {
         grid.build(this.container);
-        $(this.container).find('textarea').focus();
+        findTextArea.call(this).focus();
         expect(this.container).toHaveClass('focus');
     });
 

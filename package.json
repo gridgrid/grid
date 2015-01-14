@@ -3,7 +3,7 @@
   "version": "0.0.24",
   "main": "src/modules/riq-grid-entry.js",
   "publishConfig": {
-    "registry": "https://relateiq.artifactoryonline.com/relateiq/api/npm/npm-local"
+    "registry": "https://relateiq.artifactoryonline.com/relateiq/api/npm/npm-local/riq-grid"
   },
   "engines": {
     "node": ">=0.10.0"

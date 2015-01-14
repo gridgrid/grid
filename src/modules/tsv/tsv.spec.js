@@ -28,6 +28,11 @@ describe('tsv', function () {
                 this.data = [['v"1' + char + 'v1', 'v2'], ['v3', 'v4']];
                 this.string = '"v""1' + char + 'v1"\tv2\nv3\tv4'
             });
+
+            it('should handle a string with quotes but no other special chars', function () {
+                this.data = [['v"1v1"', 'v2'], ['v3', 'v4']];
+                this.string = '"v""1v1"""\tv2\nv3\tv4'
+            });
         }
 
         expectsForSpecialChar('tabs', '\t');

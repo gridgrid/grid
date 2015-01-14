@@ -39,24 +39,33 @@ describe('copy-paste', function () {
 
     }
 
-    function expectProperRanges(expectFn) {
-        it('should get the copy data for the selected range', function () {
+    function expectProperRanges(expectFn, async) {
+        it('should get the copy data for the selected range', function (cb) {
             var selectionRange = {top: 1, left: 2, width: 1, height: 2};
             this.grid.navigationModel.setSelection(selectionRange);
-            expectFn.call(this, selectionRange);
+            expectFn.call(this, selectionRange, cb);
+            if (!async) {
+                cb();
+            }
         });
 
-        it('should get the copy data for the focus range if no selection', function () {
+        it('should get the copy data for the focus range if no selection', function (cb) {
             this.grid.navigationModel.setFocus(1, 2);
-            expectFn.call(this, {top: 1, left: 2, width: 1, height: 1});
+            expectFn.call(this, {top: 1, left: 2, width: 1, height: 1}, cb);
+            if (!async) {
+                cb();
+            }
         });
 
-        it('should prefer the selection to the focus', function () {
+        it('should prefer the selection to the focus', function (cb) {
             this.grid.navigationModel.setFocus(1, 2);
             var selectionRange = {top: 1, left: 2, width: 1, height: 2};
             this.grid.navigationModel.setSelection(selectionRange);
 
-            expectFn.call(this, selectionRange);
+            expectFn.call(this, selectionRange, cb);
+            if (!async) {
+                cb();
+            }
         });
     }
 
@@ -80,8 +89,12 @@ describe('copy-paste', function () {
             var selectionRange = {top: 1, left: 2, width: 2, height: 2};
             this.grid.navigationModel.setSelection(selectionRange);
             var e = fireCopy.call(this);
-            expect(e.clipboardData.setData).toHaveBeenCalledWith('Text', 'r1 c2\tr1 c3\nr2 c2\tr2 c3');
-            expect(e.preventDefault).toHaveBeenCalled();
+            var tableString = '<table><tbody><tr><td>r1 c2</td><td>r1 c3</td></tr><tr><td>r2 c2</td><td>r2 c3</td></tr></tbody></table>';
+            expect(this.grid.textarea.innerHTML).toEqual(tableString);
+            expect(window.getSelection().toString()).toContain('r1 c2');
+            expect(window.getSelection().toString()).toContain('r1 c3');
+            expect(window.getSelection().toString()).toContain('r2 c2');
+            expect(window.getSelection().toString()).toContain('r2 c3');
         });
 
         describe('text area selection', function () {
@@ -93,11 +106,11 @@ describe('copy-paste', function () {
 
             function expectSelectionAfterTimeout(cb, noSelection) {
                 setTimeout((function () {
-                    var expected = expect(this.grid.textarea.selectionStart);
-                    if (!noSelection) {
+                    var expected = expect(window.getSelection().toString());
+                    if (noSelection) {
                         expected = expected.not;
                     }
-                    expected.toEqual(this.grid.textarea.selectionEnd);
+                    expected.toEqual('gridtext');
                     cb();
                 }).bind(this), 2);
             }
@@ -126,27 +139,30 @@ describe('copy-paste', function () {
     });
 
     describe('paste', function () {
-        function firePaste() {
+        function firePaste(data) {
             var e = {type: 'paste'};
             e.clipboardData = {
                 getData: function () {
-                    return 'R1 C2\tR1 C3\nR2 C2\tR2 C3'
+                    return data || 'R1 C2\tR1 C3\nR2 C2\tR2 C3'
                 }
             };
             this.grid.eventLoop.fire(e);
         }
 
-        expectProperRanges(function expectPasteForRange(range) {
+        expectProperRanges(function expectPasteForRange(range, cb) {
             var spy = spyOn(this.grid.dataModel, 'set');
             firePaste.call(this);
-            var args = spy.calls.argsFor(0)[0];
-            for (var r = range.top; r < range.top + range.height; r++) {
-                for (var c = range.left; c < range.left + range.width; c++) {
-                    expect(args).toContain({row: r, col: c, data: 'R' + r + ' C' + c, paste: true});
+            setTimeout(function () {
+                var args = spy.calls.argsFor(0)[0];
+                for (var r = range.top; r < range.top + range.height; r++) {
+                    for (var c = range.left; c < range.left + range.width; c++) {
+                        expect(args).toContain({row: r, col: c, data: 'R' + r + ' C' + c, paste: true});
+                    }
                 }
-            }
+                cb();
+            }, 2);
 
-        });
+        }, true);
 
     });
 
