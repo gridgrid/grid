@@ -88,7 +88,7 @@ var eventLoop = function (_grid) {
             var listener = loopWith(handler);
             //make sure the elem can receive events
             if (elem.style) {
-                elem.style.pointerEvents = 'all';
+                elem.style.pointerEvents = 'auto';
             }
             return bindToDomElement(elem, name, listener);
         }
@@ -134,6 +134,9 @@ var eventLoop = function (_grid) {
     });
 
     function loop(e, bodyFn) {
+        if (eloop.logTargets) {
+            console.log('target', e.target, 'currentTarget', e.currentTarget);
+        }
         var isOuterLoopRunning = eloop.isRunning;
         eloop.isRunning = true;
         interceptors.notify(e);

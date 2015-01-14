@@ -100,6 +100,7 @@ describe('view-layer', function () {
             var cellContainer = findCellContainer();
             expect(cellContainer.length).toBe(1);
             expect(cellContainer.hasClass('grid-cells')).toBe(true);
+            expect(cellContainer.css('pointerEvents')).toBe('none');
         });
 
         it('should position the cell container pinned with zindex 0', function () {

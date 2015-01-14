@@ -2,7 +2,7 @@ var ctrlOrCmd = require('../ctrl-or-cmd');
 var tsv = require('../tsv');
 var debounce = require('../debounce');
 var rangeUtil = require('../range-util');
-
+var sanitize = require('sanitize-html');
 
 module.exports = function (_grid) {
     var grid = _grid;
@@ -32,9 +32,17 @@ module.exports = function (_grid) {
         }, function (r, c, row) {
             var data = grid.dataModel.getCopyData(r, c);
             var td = document.createElement('td');
+            //sanitize the html pretty hard core for now just to allow spans with data attributes for our rich content use case
+            data = sanitize(data, {
+                allowedTags: ['span'],
+                allowedAttributes: {
+                    'span': ['data-*']
+                }
+            });
             td.innerHTML = data;
             row.appendChild(td);
         });
+
         grid.textarea.innerHTML = copyTable.outerHTML;
         grid.textarea.select();
     });

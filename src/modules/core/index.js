@@ -1,5 +1,7 @@
 var elementClass = require('element-class');
 var dirtyClean = require('../dirty-clean');
+var util = require('../util');
+
 
 module.exports = function () {
 
@@ -77,8 +79,11 @@ module.exports = function () {
         var textarea = document.createElement('div');
         textarea.setAttribute('dts', 'grid-textarea');
         textarea.setAttribute('contenteditable', 'true');
-        textarea.style.position = 'fixed';
-        textarea.style.left = '-100000px';
+        util.position(textarea, 0, 0, 0, 0);
+        textarea.style.background = 'transparent';
+        textarea.style.color = 'transparent';
+        textarea.style.border = 'none';
+        textarea.style.boxShadow = 'none';
         textarea.classList.add('grid-textarea');
         textarea.select = function () {
             var range = document.createRange();

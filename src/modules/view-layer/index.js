@@ -58,6 +58,7 @@ module.exports = function (_grid) {
         cellContainer.setAttribute('class', GRID_CELL_CONTAINER_BASE_CLASS);
         util.position(cellContainer, 0, 0, 0, 0);
         cellContainer.style.zIndex = 0;
+        cellContainer.style.pointerEvents = 'none';
 
         decoratorContainer = document.createElement('div');
         decoratorContainer.setAttribute('dts', 'grid-decorators');

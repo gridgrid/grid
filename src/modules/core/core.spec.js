@@ -72,6 +72,17 @@ describe('grid-core', function () {
         expect(findTextArea.call(this)).toBeAnElement();
     });
 
+    it('should pin the textarea to the edges and make it transparent', function () {
+        grid.build(this.container);
+
+        var area = findTextArea.call(this);
+        expect(area).toBePositioned(0, 0, 0, 0);
+        expect(area[0].style.background).toBe('transparent');
+        expect(area[0].style.color).toBe('transparent');
+        expect(area[0].style.border).toBe('none');
+        expect(area[0].style.boxShadow).toBe('none');
+    });
+
     it('should add a class to the container on focus', function () {
         grid.build(this.container);
         findTextArea.call(this).focus();

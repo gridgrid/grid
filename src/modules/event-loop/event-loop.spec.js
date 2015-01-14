@@ -179,7 +179,7 @@ describe('event-loop', function () {
             grid.eventLoop.bind('click', div, function () {
 
             });
-            expect(div.style.pointerEvents).toBe('all');
+            expect(div.style.pointerEvents).toBe('auto');
         });
 
         it('should let me bind, fire and unbind a dom event to the grid container and be in loop during', function () {
