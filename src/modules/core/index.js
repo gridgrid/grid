@@ -54,6 +54,7 @@ module.exports = function () {
                 elementClass(container).add('focus');
             }
             textarea.select();
+            grid.focused = true;
             grid.eventLoop.fire('grid-focus');
         });
 
@@ -61,6 +62,7 @@ module.exports = function () {
             if (container) {
                 elementClass(container).remove('focus');
             }
+            grid.focused = false;
             grid.eventLoop.fire('grid-blur');
         });
 
@@ -74,6 +76,7 @@ module.exports = function () {
             }
         });
     }
+
 
     function createFocusTextArea() {
         var textarea = document.createElement('div');

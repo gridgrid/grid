@@ -2,11 +2,11 @@ var mockEvent = require('../custom-event');
 var key = require('key');
 describe('copy-paste', function () {
 
-
     require('../grid-spec-helper')();
     beforeEach(function () {
         this.buildSimpleGrid();
         this.viewBuild(); //to get the textarea
+        this.grid.textarea.focus();
         jasmine.addMatchers({
             toHaveBeenCalledWithAllPointsInRange: function () {
                 return {
@@ -35,11 +35,6 @@ describe('copy-paste', function () {
 
         this.tableString = '<table><tbody><tr><td>r1 c2</td><td>r1 c3</td></tr><tr><td>r2 c2</td><td>r2 c3</td></tr></tbody></table>';
     });
-
-
-    function expectSpyToHaveBeenCalledWithAllPointsInRange(spy, range) {
-
-    }
 
     function expectProperRanges(expectFn, async) {
         it('should get the copy data for the selected range', function (cb) {
@@ -98,6 +93,14 @@ describe('copy-paste', function () {
             expect(window.getSelection().toString()).toContain('r2 c3');
         });
 
+        it('should not paste if textarea isnt focused', function () {
+            var selectionRange = {top: 1, left: 2, width: 2, height: 2};
+            this.grid.navigationModel.setSelection(selectionRange);
+            this.grid.textarea.blur();
+            var e = fireCopy.call(this);
+            expect(this.grid.textarea.innerText).not.toContain('r1 c2');
+        });
+
         describe('text area selection', function () {
             beforeEach(function () {
                 //clear selection
@@ -117,12 +120,27 @@ describe('copy-paste', function () {
             }
 
             it('should have selected text after any keyup', function (cb) {
+                clearTimeout(this.grid.copyPaste._maybeSelectText.timeout);
                 this.grid.eventLoop.fire(mockEvent('keyup'));
+                expectSelectionAfterTimeout.call(this, cb);
+            });
+
+
+            it('should not have selected text after mousedown not in the area', function (cb) {
+                clearTimeout(this.grid.copyPaste._maybeSelectText.timeout);
+                this.grid.eventLoop.fire({type: 'mousedown'});
+                expectSelectionAfterTimeout.call(this, cb, true);
+            });
+
+            it('should have selected text after mousedown in the area', function (cb) {
+                clearTimeout(this.grid.copyPaste._maybeSelectText.timeout);
+                this.grid.eventLoop.fire({type: 'mousedown', target: this.grid.textarea});
                 expectSelectionAfterTimeout.call(this, cb);
             });
 
             it('should have selected text on focus', function (cb) {
                 this.grid.textarea.blur();
+                clearTimeout(this.grid.copyPaste._maybeSelectText.timeout);
                 this.grid.textarea.focus();
                 expectSelectionAfterTimeout.call(this, cb);
             });
@@ -135,6 +153,13 @@ describe('copy-paste', function () {
                 this.grid.textarea.blur();
                 this.grid.textarea.focus();
                 expectSelectionAfterTimeout.call(this, cb, true)
+            });
+
+            it('should not have selected text after any keyup if unfocused', function (cb) {
+                this.grid.textarea.blur();
+                clearTimeout(this.grid.copyPaste._maybeSelectText.timeout);
+                this.grid.eventLoop.fire(mockEvent('keyup'));
+                expectSelectionAfterTimeout.call(this, cb, true);
             });
         });
     });
@@ -172,6 +197,15 @@ describe('copy-paste', function () {
 
         expectProperRanges(expectPasteForRange, true);
 
+        it('should not paste if textarea isnt focused', function (cb) {
+            this.grid.textarea.blur();
+            var spy = spyOn(this.grid.dataModel, 'set');
+            firePaste.call(this);
+            setTimeout(function () {
+                expect(spy).not.toHaveBeenCalled();
+                cb();
+            }, 2);
+        });
 
         it('should handle pasted html', function (cb) {
             var selectionRange = {top: 1, left: 2, width: 2, height: 2};

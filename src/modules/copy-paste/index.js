@@ -6,6 +6,7 @@ var sanitize = require('sanitize-html');
 
 module.exports = function (_grid) {
     var grid = _grid;
+    var model = {};
 
     function getCopyPasteRange() {
         var selectionRange = grid.navigationModel.selection;
@@ -22,6 +23,9 @@ module.exports = function (_grid) {
     }
 
     grid.eventLoop.bind('copy', function (e) {
+        if (!grid.focused) {
+            return;
+        }
         //prepare for copy
         var copyTable = document.createElement('table');
         var selectionRange = getCopyPasteRange();
@@ -48,6 +52,9 @@ module.exports = function (_grid) {
     });
 
     grid.eventLoop.bind('paste', function (e) {
+        if (!grid.focused) {
+            return;
+        }
         var selectionRange = getCopyPasteRange();
         if (!e.clipboardData || !e.clipboardData.getData) {
             console.warn('no clipboard data on paste event');
@@ -78,17 +85,25 @@ module.exports = function (_grid) {
     });
 
     var maybeSelectText = debounce(function maybeSelectTextInner() {
-        if (!model.isSelectionDisabled || !model.isSelectionDisabled()) {
-            grid.textarea.innerText = 'gridtext';
+        if ((!model.isSelectionDisabled || !model.isSelectionDisabled()) && grid.focused) {
+            grid.textarea.value = 'gridtext';
             grid.textarea.select();
         }
     }, 1)
 
+    model._maybeSelectText = maybeSelectText;
+
     grid.eventLoop.bind('keyup', function (e) {
         maybeSelectText();
     });
-    grid.eventLoop.bind('grid-focus', maybeSelectText);
-
-    var model = {};
+    grid.eventLoop.bind('grid-focus', function (e) {
+        maybeSelectText();
+    });
+    grid.eventLoop.bind('mousedown', function (e) {
+        if (e.target !== grid.textarea) {
+            return;
+        }
+        maybeSelectText();
+    });
     return model;
 };

@@ -87,6 +87,15 @@ describe('grid-core', function () {
         grid.build(this.container);
         findTextArea.call(this).focus();
         expect(this.container).toHaveClass('focus');
+        expect(grid.focused).toBe(true);
+    });
+
+    it('should remove the focus class from the container on blur', function () {
+        grid.build(this.container);
+        findTextArea.call(this).focus();
+        findTextArea.call(this).blur();
+        expect(this.container).not.toHaveClass('focus');
+        expect(grid.focused).toBe(false);
     });
 
     it('should not change the containers tabindex if it already has a value', function () {
