@@ -38,7 +38,7 @@ function DSVToArray(strData, strDelimiter) {
         "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
 
             // Standard fields.
-        "([^\"\\" + strDelimiter + "\\r\\n]*))"
+        "([^\"\\" + strDelimiter + "\\r\\n]+))"
         ),
         "gi"
     );
@@ -103,7 +103,7 @@ function DSVToArray(strData, strDelimiter) {
     }
 
     // Return the parsed data.
-    return ( arrData );
+    return (arrData[0].length || !strData) && ( arrData ) || [[strData]];
 }
 
 

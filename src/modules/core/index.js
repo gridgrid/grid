@@ -87,6 +87,7 @@ module.exports = function () {
         textarea.style.color = 'transparent';
         textarea.style.border = 'none';
         textarea.style.boxShadow = 'none';
+        textarea.style.cursor = 'auto';
         textarea.classList.add('grid-textarea');
         textarea.select = function () {
             var range = document.createRange();

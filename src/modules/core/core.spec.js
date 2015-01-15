@@ -81,6 +81,7 @@ describe('grid-core', function () {
         expect(area[0].style.color).toBe('transparent');
         expect(area[0].style.border).toBe('none');
         expect(area[0].style.boxShadow).toBe('none');
+        expect(area[0].style.cursor).toBe('auto');
     });
 
     it('should add a class to the container on focus', function () {
