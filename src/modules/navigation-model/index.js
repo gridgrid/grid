@@ -35,6 +35,7 @@ module.exports = function (_grid) {
     model.setFocus = function setFocus(row, col, optionalEvent) {
         row = clampRowToMinMax(row);
         col = clampColToMinMax(col);
+        var changed = row !== model.focus.row || col !== model.focus.col;
         model.focus.row = row;
         model.focus.col = col;
         focusClass.top = row;
@@ -44,6 +45,9 @@ module.exports = function (_grid) {
         grid.cellScrollModel.scrollIntoView(row, col);
         //focus changes always clear the selection
         clearSelection();
+        if (changed) {
+            grid.eventLoop.fire('grid-focus-change');
+        }
     };
 
     grid.eventLoop.bind('keydown', function (e) {

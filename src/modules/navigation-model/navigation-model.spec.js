@@ -125,6 +125,13 @@ describe('navigation-model', function () {
             expect(focus).rowToBe(row);
             expect(focus).colToBe(col);
         });
+
+        it('should fire an event on focus changes', function () {
+            var spy = jasmine.createSpy('focusListener');
+            grid.eventLoop.bind('grid-focus-change', spy);
+            model.setFocus(1, 1);
+            expect(spy).toHaveBeenCalled();
+        });
     });
 
 
