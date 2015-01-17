@@ -1,4 +1,5 @@
 var key = require('key');
+var arrow = key.code.arrow;
 var util = require('../util');
 var rangeUtil = require('../range-util');
 
@@ -33,8 +34,8 @@ module.exports = function (_grid) {
     }
 
     model.setFocus = function setFocus(row, col, optionalEvent) {
-        row = clampRowToMinMax(row);
-        col = clampColToMinMax(col);
+        row = grid.data.row.clamp(row);
+        col = grid.data.col.clamp(col);
         var changed = row !== model.focus.row || col !== model.focus.col;
         model.focus.row = row;
         model.focus.col = col;
@@ -50,34 +51,43 @@ module.exports = function (_grid) {
         }
     };
 
+    function navFrom(row, col, e) {
+        //if nothing changes great we'll stay where we are
+        var newRow = row;
+        var newCol = col;
+        switch (e.which) {
+            case arrow.down.code:
+                newRow = grid.data.row.next(newRow);
+                break;
+            case arrow.up.code:
+                newRow = grid.data.row.prev(newRow);
+                break;
+            case arrow.right.code:
+                newCol = grid.data.col.next(newCol);
+                break;
+            case arrow.left.code:
+                newCol = grid.data.col.prev(newCol);
+                break;
+        }
+        if (newRow === undefined) {
+            newRow = row;
+        }
+        if (newCol === undefined) {
+            newCol = col;
+        }
+        return {row: newRow, col: newCol};
+    }
+
+
     grid.eventLoop.bind('keydown', function (e) {
-        var arrow = key.code.arrow;
         if (!key.is(arrow, e.which)) {
             return;
         }
         //focus logic
 
         if (!e.shiftKey) {
-            //if nothing changes great we'll stay where we are
-            var navToRow = model.focus.row;
-            var navToCol = model.focus.col;
-
-
-            switch (e.which) {
-                case arrow.down.code:
-                    navToRow++;
-                    break;
-                case arrow.up.code:
-                    navToRow--;
-                    break;
-                case arrow.right.code:
-                    navToCol++;
-                    break;
-                case arrow.left.code:
-                    navToCol--;
-                    break;
-            }
-            model.setFocus(navToRow, navToCol, e);
+            var newFocus = navFrom(model.focus.row, model.focus.col, e);
+            model.setFocus(newFocus.row, newFocus.col, e);
         } else {
             //selection logic
             var newSelection;
@@ -92,47 +102,21 @@ module.exports = function (_grid) {
                     width: model.selection.width
                 };
             }
-
-            switch (e.which) {
-                case arrow.down.code:
-                    if (model.focus.row === newSelection.top) {
-                        newSelection.height++;
-                    } else {
-                        newSelection.top++;
-                        newSelection.height--;
-                    }
-                    break;
-                case arrow.up.code:
-                    if (model.focus.row === newSelection.top + newSelection.height - 1) {
-                        newSelection.top--;
-                        newSelection.height++;
-                    } else {
-                        newSelection.height--;
-
-                    }
-                    break;
-                case arrow.right.code:
-                    if (model.focus.col === newSelection.left) {
-                        newSelection.width++;
-                    } else {
-                        newSelection.left++;
-                        newSelection.width--;
-                    }
-                    break;
-                case arrow.left.code:
-                    if (model.focus.col === newSelection.left + newSelection.width - 1) {
-                        newSelection.left--;
-                        newSelection.width++;
-                    } else {
-                        newSelection.width--;
-                    }
-                    break;
-            }
-            if (newSelection.height === 1 && newSelection.width === 1) {
-                clearSelection();
+            var navFromRow;
+            var navFromCol;
+            if (model.focus.row === newSelection.top) {
+                navFromRow = newSelection.top + newSelection.height - 1;
             } else {
-                model.setSelection(newSelection);
+                navFromRow = newSelection.top;
             }
+
+            if (model.focus.col === newSelection.left) {
+                navFromCol = newSelection.left + newSelection.width - 1;
+            } else {
+                navFromCol = newSelection.left;
+            }
+            var newRowCol = navFrom(navFromRow, navFromCol, e);
+            model.setSelection(rangeUtil.createFromPoints(newRowCol.row, newRowCol.col, model.focus.row, model.focus.col));
 
         }
     });
@@ -204,6 +188,10 @@ module.exports = function (_grid) {
     grid.decorators.add(selection);
 
     model.setSelection = function setSelection(newSelection) {
+        if (newSelection.height === 1 && newSelection.width === 1) {
+            clearSelection();
+            return;
+        }
         selection.top = newSelection.top;
         selection.left = newSelection.left;
         selection.height = newSelection.height;

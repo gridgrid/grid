@@ -54,15 +54,11 @@ module.exports = {
         }
         return range;
     },
-    iterate: function (range) {
-        var cellFn;
-        var rowFn;
-        if (arguments.length === 2) {
-            cellFn = arguments[1];
-        } else if (arguments.length === 3) {
-            cellFn = arguments[2];
-            rowFn = arguments[1];
-        }
+    iterate: function () {
+        var args = this.getArgs(arguments);
+        var range = args.range;
+        var cellFn = args.cellFn;
+        var rowFn = args.rowFn;
         for (var r = range.top; r < range.top + range.height; r++) {
             var rowResult;
             if (rowFn) {
@@ -74,6 +70,18 @@ module.exports = {
                 }
             }
         }
+    },
+    getArgs: function (args) {
+        var range = args[0];
+        var cellFn;
+        var rowFn;
+        if (args.length === 2) {
+            cellFn = args[1];
+        } else if (args.length === 3) {
+            cellFn = args[2];
+            rowFn = args[1];
+        }
+        return {range: range, cellFn: cellFn, rowFn: rowFn};
     }
 };
 

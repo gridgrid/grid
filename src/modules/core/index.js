@@ -1,6 +1,9 @@
 var elementClass = require('element-class');
 var dirtyClean = require('../dirty-clean');
 var util = require('../util');
+var rangeUtil = require('../range-util');
+var passThrough = require('../pass-through');
+var capitalize = require('capitalize');
 
 
 module.exports = function () {
@@ -106,6 +109,154 @@ module.exports = function () {
         });
         return textarea;
     }
+
+    var spaces = ['virtual', 'data', 'view'];
+
+
+    function iterateRange() {
+        //expects to be called with the space as its this
+        var args = rangeUtil.getArgs(arguments);
+        var range = args.range;
+        var rowFn = args.rowFn;
+        var cellFn = args.cellFn;
+        var rowResult;
+        for (var r = range.top; r < range.top + range.height; r = this.row.next(r)) {
+            rowResult = undefined;
+            if (rowFn) {
+                rowResult = rowFn(r);
+            }
+            for (var c = range.left; c < range.left + range.width; c = this.col.next(c)) {
+                if (cellFn) {
+                    cellFn(r, c, rowResult);
+                }
+            }
+        }
+    }
+
+    function iterateWhileHidden(step, start) {
+        step = step || 1;
+        for (var i = start + step; i < this.count() && i >= 0; i += step) {
+            if (!this.get(i).hidden) {
+                return i;
+            }
+        }
+    }
+
+    function addToDimension(dim, spaceName, getter) {
+        //convert whatever space to virtual and use the row or col virtual getter
+        dim.get = function (idx) {
+            return getter(this.toVirtual(idx));
+        }.bind(dim);
+        dim.next = iterateWhileHidden.bind(dim, 1);
+        dim.prev = iterateWhileHidden.bind(dim, -1);
+        dim.clamp = function (idx) {
+            return util.clamp(idx, 0, this.count() - 1);
+        }.bind(dim);
+
+        //have data to data be passthrough for example
+        dim['to' + capitalize(spaceName)] = passThrough;
+
+
+        //bind all fns to this so they can be accidentally changed
+        Object.keys(dim, function (key) {
+            var fn = dim[key];
+            if (typeof fn === 'function') {
+                fn.bind(dim);
+            }
+        })
+        return dim;
+    }
+
+    function addToSpace(spaceName) {
+        var space = grid[spaceName];
+        space.iterate = iterateRange.bind(space);
+        addToDimension(space.col, spaceName, function (idx) {
+            return grid.colModel.get(idx);
+        });
+        addToDimension(space.row, spaceName, function (idx) {
+            return grid.rowModel.get(idx);
+        });
+    }
+
+
+    grid.data = {
+        col: {
+            toVirtual: function (dataCol) {
+                return grid.colModel.toVirtual(dataCol);
+            },
+            toView: function (dataCol) {
+                return grid.viewPort.toRealCol(this.toVirtual(dataCol));
+            },
+            count: function () {
+                return grid.colModel.length();
+            }
+        },
+        row: {
+            toData: passThrough,
+            toVirtual: function (dataRow) {
+                return grid.rowModel.toVirtual(dataRow);
+            },
+            toView: function (dataRow) {
+                return grid.viewPort.toRealRow(this.toVirtual(dataRow));
+            },
+            count: function () {
+                return grid.rowModel.length();
+            }
+        }
+    };
+    addToSpace('data');
+
+    grid.virtual = {
+        col: {
+            toData: function (virtualCol) {
+                return grid.colModel.toData(virtualCol);
+            },
+            toView: function (virtualCol) {
+                return grid.viewPort.toRealCol(virtualCol);
+            },
+            count: function () {
+                return grid.colModel.length(true);
+            }
+        },
+        row: {
+            toData: function (virtualRow) {
+                return grid.rowModel.toData(virtualRow);
+            },
+            toView: function (virtualRow) {
+                return grid.viewPort.toRealRow(virtualRow);
+            },
+            count: function () {
+                return grid.rowModel.length(true);
+            }
+        }
+    };
+    addToSpace('virtual');
+
+    grid.view = {
+        col: {
+            toData: function (viewCol) {
+                return grid.colModel.toData(this.toVirtual(viewCol));
+            },
+            toVirtual: function (viewCol) {
+                return grid.viewPort.toVirtualCol(viewCol);
+            },
+            count: function () {
+                return grid.viewPort.cols();
+            }
+        },
+        row: {
+            toData: function (viewRow) {
+                return grid.rowModel.toData(this.toVirtual(viewRow));
+            },
+            toVirtual: function (viewRow) {
+                return grid.viewPort.toVirtualRow(viewRow);
+            },
+            count: function () {
+                return grid.viewPort.rows();
+            }
+        }
+    };
+    addToSpace('view');
 
     grid.build = function (container) {
         setupTextareaForContainer(grid.textarea, container);

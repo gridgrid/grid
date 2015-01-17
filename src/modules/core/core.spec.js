@@ -148,4 +148,5 @@ describe('grid-core', function () {
         grid.textarea.blur();
         expect(spy).toHaveBeenCalled();
     });
+ 
 });

@@ -337,8 +337,8 @@ describe('navigation-model', function () {
 
 
         it('selection should clamp to data range', function () {
-            selectCells(1, 1, 0, 0);
-            expect(model.selection).rangeToBe(0, 0, 1, 1);
+            selectCells(2, 2, 0, 0);
+            expect(model.selection).rangeToBe(0, 0, 2, 2);
         });
     });
 
