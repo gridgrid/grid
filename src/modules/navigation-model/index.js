@@ -116,8 +116,7 @@ module.exports = function (_grid) {
                 navFromCol = newSelection.left;
             }
             var newRowCol = navFrom(navFromRow, navFromCol, e);
-            model.setSelection(rangeUtil.createFromPoints(newRowCol.row, newRowCol.col, model.focus.row, model.focus.col));
-
+            setSelectionFromPoints(model.focus.row, model.focus.col, newRowCol.row, newRowCol.col);
         }
     });
 
@@ -203,7 +202,10 @@ module.exports = function (_grid) {
     }
 
     function setSelectionFromPoints(fromRow, fromCol, toRow, toCol) {
-        var newSelection = rangeUtil.createFromPoints(fromRow, fromCol, clampRowToMinMax(toRow), clampColToMinMax(toCol));
+        toRow = clampRowToMinMax(toRow);
+        toCol = clampColToMinMax(toCol);
+        var newSelection = rangeUtil.createFromPoints(fromRow, fromCol, toRow, toCol);
+        grid.cellScrollModel.scrollIntoView(toRow, toCol);
         model.setSelection(newSelection);
     }
 
