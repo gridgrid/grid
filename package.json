@@ -1,6 +1,6 @@
 {
   "name": "riq-grid",
-  "version": "0.0.29",
+  "version": "0.0.30",
   "main": "src/modules/riq-grid-entry.js",
   "publishConfig": {
     "registry": "https://relateiq.artifactoryonline.com/relateiq/api/npm/npm-local/riq-grid"
