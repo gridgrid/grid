@@ -2,6 +2,7 @@ var key = require('key');
 var arrow = key.code.arrow;
 var util = require('../util');
 var rangeUtil = require('../range-util');
+var ctrlOrCmd = require('../ctrl-or-cmd');
 
 module.exports = function (_grid) {
     var grid = _grid;
@@ -51,22 +52,83 @@ module.exports = function (_grid) {
         }
     };
 
+    function seekNextEdge(newIndex, size, startedDefined, isForwardEdge, isBackwardEdge, getForward) {
+
+        var isEdgeToSeek
+        if (isForwardEdge(newIndex) || !startedDefined) {
+            isEdgeToSeek = isBackwardEdge;
+        } else {
+            isEdgeToSeek = isForwardEdge;
+        }
+        while (getForward(newIndex) !== undefined && !isEdgeToSeek(newIndex = getForward(newIndex))) {
+        }
+        return newIndex;
+    }
+
     function navFrom(row, col, e) {
         //if nothing changes great we'll stay where we are
         var newRow = row;
         var newCol = col;
+        var isSeek = ctrlOrCmd(e);
+        var getUpward = function (r) {
+            return grid.data.row.prev(r);
+        };
+        var getDownward = function (r) {
+            return grid.data.row.next(r);
+        };
+        var getLeftward = function (c) {
+            return grid.data.col.prev(c);
+        };
+        var getRightward = function (c) {
+            return grid.data.col.next(c);
+        };
+        if (isSeek) {
+            //intentionally using the fact the js doesn't scope these to the block to avoid doing the work when we don't need to
+            var cellHasValue = function (r, c) {
+                return !!grid.dataModel.get(r, c).formatted;
+            };
+            var isLeftwardEdge = function (c) {
+                return cellHasValue(newRow, c) && !cellHasValue(newRow, getLeftward(c));
+            }
+            var isRightwardEdge = function (c) {
+                return cellHasValue(newRow, c) && !cellHasValue(newRow, getRightward(c));
+            };
+            var isUpwardEdge = function (r) {
+                return cellHasValue(r, newCol) && !cellHasValue(getUpward(r), newCol);
+            };
+            var isDownwardEdge = function (r) {
+                return cellHasValue(r, newCol) && !cellHasValue(getDownward(r), newCol);
+            };
+            var startedDefined = !!grid.dataModel.get(newRow, newCol).formatted;
+        }
         switch (e.which) {
             case arrow.down.code:
-                newRow = grid.data.row.next(newRow);
+                if (isSeek) {
+                    newRow = seekNextEdge(newRow, grid.data.row.count(), startedDefined, isDownwardEdge, isUpwardEdge, getDownward);
+                } else {
+                    newRow = getDownward(newRow);
+                }
                 break;
             case arrow.up.code:
-                newRow = grid.data.row.prev(newRow);
+                if (isSeek) {
+                    newRow = seekNextEdge(newRow, grid.data.row.count(), startedDefined, isUpwardEdge, isDownwardEdge, getUpward);
+                } else {
+                    newRow = getUpward(newRow);
+                }
                 break;
             case arrow.right.code:
-                newCol = grid.data.col.next(newCol);
+                if (isSeek) {
+                    newCol = seekNextEdge(newCol, grid.data.col.count(), startedDefined, isRightwardEdge, isLeftwardEdge, getRightward);
+                } else {
+                    newCol = getRightward(newCol);
+                }
                 break;
             case arrow.left.code:
-                newCol = grid.data.col.prev(newCol);
+                if (isSeek) {
+                    newCol = seekNextEdge(newCol, grid.data.col.count(), startedDefined, isLeftwardEdge, isRightwardEdge, getLeftward);
+                } else {
+                    newCol = getLeftward(newCol);
+                }
                 break;
         }
         if (newRow === undefined) {
@@ -77,6 +139,8 @@ module.exports = function (_grid) {
         }
         return {row: newRow, col: newCol};
     }
+
+    model._navFrom = navFrom;
 
 
     grid.eventLoop.bind('keydown', function (e) {

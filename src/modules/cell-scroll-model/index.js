@@ -76,11 +76,12 @@ module.exports = function (_grid) {
         return scrollTo;
     }
 
-    model.scrollIntoView = function (vr, vc) {
-        vr = grid.virtualPixelCellModel.clampRow(vr);
-        vc = grid.virtualPixelCellModel.clampCol(vc);
-        var newRow = getScrollToRowOrCol(vr, 'row', 'height');
-        var newCol = getScrollToRowOrCol(vc, 'col', 'width');
+    //for now assumes data space
+    model.scrollIntoView = function (dataRow, dataCol) {
+        dataRow = grid.data.row.clamp(grid.data.row.toVirtual(dataRow));
+        dataCol = grid.data.col.clamp(grid.data.col.toVirtual(dataCol));
+        var newRow = getScrollToRowOrCol(dataRow, 'row', 'height');
+        var newCol = getScrollToRowOrCol(dataCol, 'col', 'width');
         model.scrollTo(newRow, newCol);
     };
 

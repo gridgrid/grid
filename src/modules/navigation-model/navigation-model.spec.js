@@ -5,8 +5,8 @@ describe('navigation-model', function () {
     require('../grid-spec-helper')();
     var model;
     var grid;
-    var beforeEachFn = function (hRows, hCols) {
-        grid = this.buildSimpleGrid(undefined, undefined, undefined, undefined, undefined, undefined, hRows, hCols);
+    var beforeEachFn = function (hRows, hCols, nRows, nCols) {
+        grid = this.buildSimpleGrid(nRows, nCols, undefined, undefined, undefined, undefined, hRows, hCols);
         model = grid.navigationModel;
     };
 
@@ -134,6 +134,58 @@ describe('navigation-model', function () {
         });
     });
 
+    describe('navFrom', function () {
+
+
+        describe('seek behavior', function () {
+
+            beforeEach(function () {
+                beforeEachFn.call(this, undefined, undefined, 11, 11);
+            });
+
+            function getCoordFromCenter(rowOrCol, amount) {
+                var coord = {row: 5, col: 5};
+                coord[rowOrCol] += amount;
+                return coord;
+            }
+
+            function testSeek(rowOrCol, direction, directionCode, backCode) {
+                var firstEmpty = getCoordFromCenter(rowOrCol, direction * 2);
+                firstEmpty.data = '';
+                var secondEmpty = getCoordFromCenter(rowOrCol, direction * 3);
+                secondEmpty.data = '';
+                var thirdEmpty = getCoordFromCenter(rowOrCol, direction * 5);
+                thirdEmpty.data = '';
+                this.grid.dataModel.set([firstEmpty, secondEmpty, thirdEmpty]);
+                var forwardEvent = {which: directionCode, metaKey: true};
+                var backwardEvent = {which: backCode, metaKey: true};
+                var firstExpect = getCoordFromCenter(rowOrCol, direction);
+                var secondExpect = getCoordFromCenter(rowOrCol, direction * 4);
+                var finalExpect = getCoordFromCenter(rowOrCol, direction * 5);
+                expect(model._navFrom(5, 5, forwardEvent)).toEqual(firstExpect);
+                expect(model._navFrom(firstExpect.row, firstExpect.col, forwardEvent)).toEqual(secondExpect);
+                expect(model._navFrom(secondExpect.row, secondExpect.col, forwardEvent)).toEqual(finalExpect);
+                expect(model._navFrom(finalExpect.row, finalExpect.col, backwardEvent)).toEqual(secondExpect);
+                expect(model._navFrom(secondExpect.row, secondExpect.col, backwardEvent)).toEqual(firstExpect);
+            }
+
+            it('should seek the edge of the data left', function () {
+                testSeek.call(this, 'col', -1, key.code.arrow.left.code, key.code.arrow.right.code);
+            });
+
+            it('should seek the edge of the data right', function () {
+                testSeek.call(this, 'col', 1, key.code.arrow.right.code, key.code.arrow.left.code);
+            });
+
+            it('should seek the edge of the data up', function () {
+                testSeek.call(this, 'row', -1, key.code.arrow.up.code, key.code.arrow.down.code);
+            });
+
+            it('should seek the edge of the data down', function () {
+                testSeek.call(this, 'row', 1, key.code.arrow.down.code, key.code.arrow.up.code);
+            });
+        });
+    });
 
     function selectCells(sr, sc, er, ec, dontSetFocus) {
 

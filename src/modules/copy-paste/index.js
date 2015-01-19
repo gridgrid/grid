@@ -29,7 +29,7 @@ module.exports = function (_grid) {
         //prepare for copy
         var copyTable = document.createElement('table');
         var selectionRange = getCopyPasteRange();
-        rangeUtil.iterate(selectionRange, function () {
+        grid.data.iterate(selectionRange, function () {
             var row = document.createElement('tr');
             copyTable.appendChild(row);
             return row;
@@ -75,7 +75,7 @@ module.exports = function (_grid) {
                 });
             }
             var dataChanges = [];
-            rangeUtil.iterate(selectionRange, function (r, c) {
+            grid.data.iterate(selectionRange, function (r, c) {
                 var offsetR = r - selectionRange.top;
                 var offsetC = c - selectionRange.left;
                 dataChanges.push({row: r, col: c, data: pasteData[offsetR][offsetC], paste: true});
