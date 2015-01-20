@@ -261,11 +261,26 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
     describe('selection', function () {
         beforeEach(function () {
             model.add(model.create());
+            model.add(model.create());
         });
 
         it('should be able to select ' + name + 's', function () {
             model.select(0);
             expect(model.getSelected()).toEqual([0]);
+        });
+
+        it('should let me select and deselect multiple at once and fire only one event', function () {
+            var spy = jasmine.createSpy('selection change');
+            grid.eventLoop.bind('grid-' + name + '-selection-change', spy);
+            model.select([0, 1]);
+            expect(model.getSelected()).toEqual([0, 1]);
+            expect(spy).toHaveBeenCalled();
+            expect(spy.calls.count()).toBe(1);
+            spy.calls.reset();
+            model.deselect([0, 1]);
+            expect(model.getSelected()).toEqual([]);
+            expect(spy).toHaveBeenCalled();
+            expect(spy.calls.count()).toBe(1);
         });
 
         it('should be idempotent', function () {

@@ -152,6 +152,23 @@ module.exports = function () {
         dim.clamp = function (idx) {
             return util.clamp(idx, 0, this.count() - 1);
         }.bind(dim);
+        dim.iterate = function () {
+            var opts;
+            var fn;
+            if (arguments.length === 2) {
+                opts = arguments[0];
+                fn = arguments[1];
+            } else {
+                fn = arguments[0];
+            }
+            opts = opts || {};
+            opts.from = opts.from || 0;
+            var count = this.count();
+            opts.to = opts.to || count;
+            for (var idx = Math.max(opts.from, 0); idx < Math.min(opts.to, count); idx = opts.reverse ? this.prev(idx) : this.next(idx)) {
+                fn(idx);
+            }
+        }
 
         //have data to data be passthrough for example
         dim['to' + capitalize(spaceName)] = passThrough;

@@ -173,7 +173,7 @@ module.exports = function (_grid) {
     });
 
     function outsideMinMax(row, col) {
-        return row < 0 || row > grid.rowModel.length() || col < 0 || col > grid.colModel.length();
+        return row < 0 || row > grid.data.row.count() || col < 0 || col > grid.data.col.count();
     }
 
     grid.eventLoop.bind('mousedown', function (e) {
@@ -186,6 +186,14 @@ module.exports = function (_grid) {
         if (col < 0 && row >= 0) {
             grid.rowModel.toggleSelect(row);
         }
+        //if (row < 0 && col < 0) {
+        //    grid.data.col.iterate(function (c) {
+        //        grid.colModel.toggleSelect(col);
+        //    });
+        //    grid.data.row.iterate(function (r) {
+        //        grid.rowModel.toggleSelect(r);
+        //    });
+        //}
 
         if (row < 0 && col < 0) {
             return;

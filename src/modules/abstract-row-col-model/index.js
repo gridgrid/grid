@@ -121,23 +121,36 @@ module.exports = function (_grid, name, lengthName, defaultSize) {
             return virtualIndex - api.numHeaders();
         },
 
-        select: function (index) {
-
-            var descriptor = api[name](index);
-            if (!descriptor.selected) {
-                descriptor.selected = true;
-                selected.push(index);
+        select: function (indexes) {
+            if (!util.isArray(indexes)) {
+                indexes = [indexes];
+            }
+            var changes = indexes.map(function (idx) {
+                var descriptor = api[name](idx);
+                if (!descriptor.selected) {
+                    descriptor.selected = true;
+                    selected.push(idx);
+                    return idx;
+                }
+            });
+            if (changes.length) {
                 fireSelectionChange();
             }
         },
-        deselect: function (index, dontNotify) {
-            var descriptor = api[name](index);
-            if (descriptor.selected) {
-                descriptor.selected = false;
-                selected.splice(selected.indexOf(index), 1);
-                if (!dontNotify) {
-                    fireSelectionChange();
+        deselect: function (indexes) {
+            if (!util.isArray(indexes)) {
+                indexes = [indexes];
+            }
+            var changes = indexes.map(function (idx) {
+                var descriptor = api[name](idx);
+                if (descriptor.selected) {
+                    descriptor.selected = false;
+                    selected.splice(selected.indexOf(idx), 1);
+                    return idx;
                 }
+            });
+            if (changes.length) {
+                fireSelectionChange();
             }
         },
         toggleSelect: function (index) {
@@ -149,13 +162,7 @@ module.exports = function (_grid, name, lengthName, defaultSize) {
             }
         },
         clearSelected: function () {
-            var length = selected.length;
-            selected.slice(0).forEach(function (index) {
-                api.deselect(index, true);
-            });
-            if (length) {
-                fireSelectionChange();
-            }
+            return api.deselect(api.getSelected());
         },
         getSelected: function () {
             return selected;
