@@ -52,7 +52,7 @@ module.exports = function (_grid) {
         }
     };
 
-    function seekNextEdge(newIndex, size, startedDefined, isForwardEdge, isBackwardEdge, getForward) {
+    function seekNextEdge(newIndex, startedDefined, isForwardEdge, isBackwardEdge, goForward) {
 
         var isEdgeToSeek
         if (isForwardEdge(newIndex) || !startedDefined) {
@@ -60,7 +60,7 @@ module.exports = function (_grid) {
         } else {
             isEdgeToSeek = isForwardEdge;
         }
-        while (getForward(newIndex) !== undefined && !isEdgeToSeek(newIndex = getForward(newIndex))) {
+        while (goForward(newIndex) !== undefined && !isEdgeToSeek(newIndex = goForward(newIndex))) {
         }
         return newIndex;
     }
@@ -70,64 +70,52 @@ module.exports = function (_grid) {
         var newRow = row;
         var newCol = col;
         var isSeek = ctrlOrCmd(e);
-        var getUpward = function (r) {
-            return grid.data.row.prev(r);
-        };
-        var getDownward = function (r) {
-            return grid.data.row.next(r);
-        };
-        var getLeftward = function (c) {
-            return grid.data.col.prev(c);
-        };
-        var getRightward = function (c) {
-            return grid.data.col.next(c);
-        };
         if (isSeek) {
             //intentionally using the fact the js doesn't scope these to the block to avoid doing the work when we don't need to
             var cellHasValue = function (r, c) {
                 return !!grid.dataModel.get(r, c).formatted;
             };
             var isLeftwardEdge = function (c) {
-                return cellHasValue(newRow, c) && !cellHasValue(newRow, getLeftward(c));
+                return cellHasValue(newRow, c) && !cellHasValue(newRow, grid.data.left(c));
             }
             var isRightwardEdge = function (c) {
-                return cellHasValue(newRow, c) && !cellHasValue(newRow, getRightward(c));
+                return cellHasValue(newRow, c) && !cellHasValue(newRow, grid.data.right(c));
             };
             var isUpwardEdge = function (r) {
-                return cellHasValue(r, newCol) && !cellHasValue(getUpward(r), newCol);
+                return cellHasValue(r, newCol) && !cellHasValue(grid.data.up(r), newCol);
             };
             var isDownwardEdge = function (r) {
-                return cellHasValue(r, newCol) && !cellHasValue(getDownward(r), newCol);
+                return cellHasValue(r, newCol) && !cellHasValue(grid.data.down(r), newCol);
             };
-            var startedDefined = !!grid.dataModel.get(newRow, newCol).formatted;
+            var startedDefined = cellHasValue(newRow, newCol);
         }
         switch (e.which) {
             case arrow.down.code:
                 if (isSeek) {
-                    newRow = seekNextEdge(newRow, grid.data.row.count(), startedDefined, isDownwardEdge, isUpwardEdge, getDownward);
+                    newRow = seekNextEdge(newRow, startedDefined, isDownwardEdge, isUpwardEdge, grid.data.down);
                 } else {
-                    newRow = getDownward(newRow);
+                    newRow = grid.data.down(newRow);
                 }
                 break;
             case arrow.up.code:
                 if (isSeek) {
-                    newRow = seekNextEdge(newRow, grid.data.row.count(), startedDefined, isUpwardEdge, isDownwardEdge, getUpward);
+                    newRow = seekNextEdge(newRow, startedDefined, isUpwardEdge, isDownwardEdge, grid.data.up);
                 } else {
-                    newRow = getUpward(newRow);
+                    newRow = grid.data.up(newRow);
                 }
                 break;
             case arrow.right.code:
                 if (isSeek) {
-                    newCol = seekNextEdge(newCol, grid.data.col.count(), startedDefined, isRightwardEdge, isLeftwardEdge, getRightward);
+                    newCol = seekNextEdge(newCol, startedDefined, isRightwardEdge, isLeftwardEdge, grid.data.right);
                 } else {
-                    newCol = getRightward(newCol);
+                    newCol = grid.data.right(newCol);
                 }
                 break;
             case arrow.left.code:
                 if (isSeek) {
-                    newCol = seekNextEdge(newCol, grid.data.col.count(), startedDefined, isLeftwardEdge, isRightwardEdge, getLeftward);
+                    newCol = seekNextEdge(newCol, startedDefined, isLeftwardEdge, isRightwardEdge, grid.data.left);
                 } else {
-                    newCol = getLeftward(newCol);
+                    newCol = grid.data.left(newCol);
                 }
                 break;
         }

@@ -156,14 +156,6 @@ module.exports = function () {
         //have data to data be passthrough for example
         dim['to' + capitalize(spaceName)] = passThrough;
 
-
-        //bind all fns to this so they can be accidentally changed
-        Object.keys(dim, function (key) {
-            var fn = dim[key];
-            if (typeof fn === 'function') {
-                fn.bind(dim);
-            }
-        })
         return dim;
     }
 
@@ -176,6 +168,10 @@ module.exports = function () {
         addToDimension(space.row, spaceName, function (idx) {
             return grid.rowModel.get(idx);
         });
+        space.up = space.row.prev;
+        space.down = space.row.next;
+        space.left = space.col.prev;
+        space.right = space.col.next;
     }
 
 
