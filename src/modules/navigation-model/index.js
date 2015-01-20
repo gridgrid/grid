@@ -288,8 +288,16 @@ module.exports = function (_grid) {
 
     grid.eventLoop.bind('grid-drag-start', selection._onDragStart);
     clearSelection();
+    model._selectionDecorator = selection;
 
-    model.selection = selection;
+    Object.defineProperty(model, 'selection', {
+        get: function () {
+            if (selection.height === -1) { //cleared selection default to focus
+                return {top: model.focus.row, left: model.focus.col, height: 1, width: 1};
+            }
+            return selection;
+        }
+    })
 
     return model;
 };

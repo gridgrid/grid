@@ -205,105 +205,104 @@ describe('navigation-model', function () {
     }
 
     describe('selection', function () {
-        var selection;
         beforeEach(function () {
             beforeEachFn.call(this);
-            selection = model.selection;
         });
 
-        describe('should satisfy:', function () {
+        describe('decorator', function () {
             var ctx = {};
             beforeEach(function () {
-                ctx.decorator = selection;
+                ctx.decorator = model._selectionDecorator;
             });
             require('../decorators/decorator-test-body')(ctx);
+
+            it('adds style class to rendered elem', function () {
+                expect(ctx.decorator.render()).toHaveClass('grid-selection');
+            });
+
+            it('should be added as a decorator', function () {
+                expect(grid.decorators.getAlive()).toContain(ctx.decorator);
+            });
+
+            it('should have the right defaults', function () {
+                expect(ctx.decorator).spaceToBe('data');
+                expect(ctx.decorator).unitsToBe('cell');
+            });
+
+            it('should unbind on drag end', function () {
+                var dragStart = {type: 'grid-drag-start', row: 1, col: 2};
+                var unbind = this.spyOnUnbind();
+                ctx.decorator._onDragStart(dragStart);
+                var drag = {type: 'grid-cell-drag', row: 3, col: 4};
+                grid.eventLoop.fire(drag);
+                var dragEnd = {type: 'grid-drag-end', row: 2, col: 3};
+                grid.eventLoop.fire(dragEnd);
+                expect(unbind).toHaveBeenCalled();
+                expect(unbind.calls.count()).toBe(2);
+            });
         });
 
-        it('adds style class to rendered elem', function () {
-            expect(selection.render()).toHaveClass('grid-selection');
-        });
-
-        it('should be added as a decorator', function () {
-            expect(grid.decorators.getAlive()).toContain(selection);
-        });
-
-        it('should have the right defaults', function () {
-            expect(selection).spaceToBe('data');
-            expect(selection).unitsToBe('cell');
-        });
-
-        it('should default to all -1', function () {
-            expect(selection).rangeToBe(-1, -1, -1, -1);
+        it('should default to the focus', function () {
+            expect(model.selection).rangeToBe(0, 0, 1, 1);
         });
 
         it('should select a range of cells on grid drag', function () {
             model.setFocus(1, 2);
             selectCells(1, 2, 3, 4);
-            expect(selection).rangeToBe(1, 2, 3, 3);
+            expect(model.selection).rangeToBe(1, 2, 3, 3);
         });
 
         it('should expand the selection from focus even if that isnt the initial mousedown', function () {
             selectCells(1, 2, 3, 4, true);
-            expect(selection).rangeToBe(0, 0, 4, 5);
-        });
-
-        it('should unbind on drag end', function () {
-            var dragStart = {type: 'grid-drag-start', row: 1, col: 2};
-            var unbind = this.spyOnUnbind();
-            selection._onDragStart(dragStart);
-            var drag = {type: 'grid-cell-drag', row: 3, col: 4};
-            grid.eventLoop.fire(drag);
-            var dragEnd = {type: 'grid-drag-end', row: 2, col: 3};
-            grid.eventLoop.fire(dragEnd);
-            expect(unbind).toHaveBeenCalled();
-            expect(unbind.calls.count()).toBe(2);
+            expect(model.selection).rangeToBe(0, 0, 4, 5);
         });
 
         it('should clear on mousedown', function () {
             selectCells(1, 2, 3, 4);
-            grid.eventLoop.fire(mockEvent('mousedown'));
-            expect(selection).rangeToBe(-1, -1, -1, -1);
+            makeAndFireMouseDownForCell(2, 2, false);
+            expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
         });
 
         it('should clear key nav if shift is not down', function () {
             selectCells(1, 2, 3, 4);
             makeAndFireKeyDown(key.code.arrow.down.code);
-            expect(selection).rangeToBe(-1, -1, -1, -1);
+            expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
         });
 
         it('should set on mousedown if shift is held', function () {
             makeAndFireMouseDownForCell(2, 2, true);
-            expect(selection).rangeToBe(0, 0, 3, 3);
+            expect(model.selection).rangeToBe(0, 0, 3, 3);
         });
 
         it('should expand and shrink selection on key nav', function () {
             makeAndFireKeyDown(key.code.arrow.down.code, true);
-            expect(selection).rangeToBe(0, 0, 2, 1);
+            expect(model.selection).rangeToBe(0, 0, 2, 1);
             makeAndFireKeyDown(key.code.arrow.right.code, true);
-            expect(selection).rangeToBe(0, 0, 2, 2);
+            expect(model.selection).rangeToBe(0, 0, 2, 2);
             makeAndFireKeyDown(key.code.arrow.up.code, true);
-            expect(selection).rangeToBe(0, 0, 1, 2);
+            expect(model.selection).rangeToBe(0, 0, 1, 2);
             makeAndFireKeyDown(key.code.arrow.left.code, true);
             //when its back to one it should be nothin
-            expect(selection).rangeToBe(-1, -1, -1, -1);
+            expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
         });
 
         it('should expand and shrink selection on key nav up', function () {
             model.setFocus(1, 1);
             makeAndFireKeyDown(key.code.arrow.up.code, true);
-            expect(selection).rangeToBe(0, 1, 2, 1);
+            expect(model.selection).rangeToBe(0, 1, 2, 1);
             makeAndFireKeyDown(key.code.arrow.left.code, true);
-            expect(selection).rangeToBe(0, 0, 2, 2);
+            expect(model.selection).rangeToBe(0, 0, 2, 2);
             makeAndFireKeyDown(key.code.arrow.down.code, true);
-            expect(selection).rangeToBe(1, 0, 1, 2);
+            expect(model.selection).rangeToBe(1, 0, 1, 2);
             makeAndFireKeyDown(key.code.arrow.right.code, true);
             //when its back to one it should be nothin
-            expect(selection).rangeToBe(-1, -1, -1, -1);
+
+            expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
         });
 
         it('should not select merely on shift key down', function () {
             makeAndFireKeyDown(key.code.special.shift, true);
-            expect(selection).rangeToBe(-1, -1, -1, -1);
+            expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
         });
 
     });
@@ -377,14 +376,14 @@ describe('navigation-model', function () {
 
         it('should not select if drag begins in headers', function () {
             selectCells(0, 0, 3, 3);
-            expect(model.selection).rangeToBe(-1, -1, -1, -1);
+            expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
         });
 
 
         it('should not set on mousedown on headers even if shift is held', function () {
             model.setFocus(1, 1);
             makeAndFireMouseDownForCell(0, 0, true);
-            expect(model.selection).rangeToBe(-1, -1, -1, -1);
+            expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
         });
 
 
