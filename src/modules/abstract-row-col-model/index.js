@@ -162,7 +162,8 @@ module.exports = function (_grid, name, lengthName, defaultSize) {
             }
         },
         clearSelected: function () {
-            return api.deselect(api.getSelected());
+            //have to make a copy or we are iterating the same array we're removing from yikes.
+            return api.deselect(api.getSelected().slice(0));
         },
         getSelected: function () {
             return selected;

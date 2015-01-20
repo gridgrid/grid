@@ -186,16 +186,17 @@ module.exports = function (_grid) {
         if (col < 0 && row >= 0) {
             grid.rowModel.toggleSelect(row);
         }
-        //if (row < 0 && col < 0) {
-        //    grid.data.col.iterate(function (c) {
-        //        grid.colModel.toggleSelect(col);
-        //    });
-        //    grid.data.row.iterate(function (r) {
-        //        grid.rowModel.toggleSelect(r);
-        //    });
-        //}
-
         if (row < 0 && col < 0) {
+            var cols = [];
+            grid.data.col.iterate(function (c) {
+                cols.push(c);
+            });
+            grid.colModel.select(cols);
+            var rows = [];
+            grid.data.row.iterate(function (r) {
+                rows.push(r);
+            });
+            grid.rowModel.select(rows);
             return;
         }
 
