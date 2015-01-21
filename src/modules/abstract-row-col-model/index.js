@@ -2,6 +2,7 @@ var addDirtyProps = require('../add-dirty-props');
 var util = require('../util');
 var noop = require('../no-op');
 var passThrough = require('../pass-through');
+var debounce = require('../debounce');
 
 module.exports = function (_grid, name, lengthName, defaultSize) {
     var grid = _grid;
@@ -22,9 +23,9 @@ module.exports = function (_grid, name, lengthName, defaultSize) {
         builderDirtyClean.setDirty();
     }
 
-    function fireSelectionChange() {
+    var fireSelectionChange = debounce(function () {
         grid.eventLoop.fire('grid-' + name + '-selection-change');
-    }
+    }, 1);
 
     function updateDescriptorIndices() {
         descriptors.forEach(function (descriptor, i) {
@@ -121,7 +122,7 @@ module.exports = function (_grid, name, lengthName, defaultSize) {
             return virtualIndex - api.numHeaders();
         },
 
-        select: function (indexes) {
+        select: function (indexes, dontFire) {
             if (!util.isArray(indexes)) {
                 indexes = [indexes];
             }
@@ -133,11 +134,11 @@ module.exports = function (_grid, name, lengthName, defaultSize) {
                     return idx;
                 }
             });
-            if (changes.length) {
+            if (changes.length && !dontFire) {
                 fireSelectionChange();
             }
         },
-        deselect: function (indexes) {
+        deselect: function (indexes, dontFire) {
             if (!util.isArray(indexes)) {
                 indexes = [indexes];
             }
@@ -149,7 +150,7 @@ module.exports = function (_grid, name, lengthName, defaultSize) {
                     return idx;
                 }
             });
-            if (changes.length) {
+            if (changes.length && !dontFire) {
                 fireSelectionChange();
             }
         },

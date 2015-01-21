@@ -269,20 +269,6 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
             expect(model.getSelected()).toEqual([0]);
         });
 
-        it('should let me select and deselect multiple at once and fire only one event', function () {
-            var spy = jasmine.createSpy('selection change');
-            grid.eventLoop.bind('grid-' + name + '-selection-change', spy);
-            model.select([0, 1]);
-            expect(model.getSelected()).toEqual([0, 1]);
-            expect(spy).toHaveBeenCalled();
-            expect(spy.calls.count()).toBe(1);
-            spy.calls.reset();
-            model.deselect([0, 1]);
-            expect(model.getSelected()).toEqual([]);
-            expect(spy).toHaveBeenCalled();
-            expect(spy.calls.count()).toBe(1);
-        });
-
         it('should be idempotent', function () {
             model.select(0);
             model.select(0);
@@ -313,25 +299,49 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
             expect(model.get(0).selected).toBe(true);
         });
 
-        it('should fire an event on change', function () {
-            var spy = jasmine.createSpy('selection change');
-            grid.eventLoop.bind('grid-' + name + '-selection-change', spy);
-            model.select(0);
-            expect(spy).toHaveBeenCalled();
-            spy.calls.reset();
-            model.deselect(0);
-            expect(spy).toHaveBeenCalled();
-            spy.calls.reset();
-            model.toggleSelect(0);
-            expect(spy).toHaveBeenCalled();
-            spy.calls.reset();
-            //select two so we can ensure it only gets called once
-            model.add(model.create());
-            model.select(1);
-            spy.calls.reset();
-            model.clearSelected();
-            expect(spy).toHaveBeenCalled();
-            expect(spy.calls.count()).toBe(1);
+        describe(' event', function () {
+            beforeEach(function () {
+                this.spy = jasmine.createSpy('selection change');
+                grid.eventLoop.bind('grid-' + name + '-selection-change', this.spy);
+            });
+
+            it('select', function () {
+                model.select(0);
+                model.select(1);
+            });
+
+            it('deselect', function () {
+                model.select(0, true);
+                model.deselect(0);
+            });
+
+            it('multiple select', function () {
+                model.select([0, 1]);
+                expect(model.getSelected()).toEqual([0, 1]);
+            });
+
+            it('multiple deselect', function () {
+                model.select([0, 1], true);
+                model.deselect([0, 1]);
+                expect(model.getSelected()).toEqual([]);
+            });
+
+            it('toggle select', function () {
+                model.toggleSelect(0);
+            });
+
+            it('clear selected', function () {
+                model.select([0, 1], true);
+                model.clearSelected();
+            });
+
+            afterEach(function (cb) {
+                setTimeout(function () {
+                    expect(this.spy).toHaveBeenCalled();
+                    expect(this.spy.calls.count()).toBe(1);
+                    cb();
+                }.bind(this), 2)
+            });
         });
     });
 

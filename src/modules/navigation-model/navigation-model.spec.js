@@ -371,7 +371,8 @@ describe('navigation-model', function () {
             makeAndFireMouseDownForCell(3, 0);
             expect(grid.rowModel.getSelected()).toEqual([2]);
             makeAndFireMouseDownForCell(4, 0, false, true);
-            expect(grid.rowModel.getSelected()).toEqual([2, 3]);
+            expect(grid.rowModel.getSelected()).toContain(2);
+            expect(grid.rowModel.getSelected()).toContain(3);
         });
 
         it('should select a range on shift click', function () {
@@ -380,42 +381,58 @@ describe('navigation-model', function () {
             expect(grid.rowModel.getSelected()).toEqual([2, 3, 4]);
         });
 
-        it('should set a cell class for a selected row', function () {
+        it('should set a cell class for a selected row', function (cb) {
             var spy = spyOn(grid.cellClasses, 'add');
             grid.rowModel.select(0);
-            expect(spy).toHaveBeenCalled();
-            var decorator = spy.calls.argsFor(0)[0];
-            expect(decorator).unitsToBe('cell');
-            expect(decorator).spaceToBe('virtual');
-            expect(decorator).rangeToBe(1, 0, 1, 1);
-            expect(decorator).classToBe('selected');
+            setTimeout(function () {
+                expect(spy).toHaveBeenCalled();
+                var cellClass = spy.calls.argsFor(0)[0];
+                expect(cellClass).unitsToBe('cell');
+                expect(cellClass).spaceToBe('virtual');
+                expect(cellClass).rangeToBe(1, 0, 1, 1);
+                expect(cellClass).classToBe('selected');
+                cb();
+            }, 2);
+
         });
 
-        it('should not duplicate cell classes for row select', function () {
+        it('should not duplicate cell classes for row select', function (cb) {
             grid.rowModel.select(0);
             var spy = spyOn(grid.cellClasses, 'add');
             grid.rowModel.select(1);
-            expect(spy.calls.count()).toBe(2);
-            expect(model._rowSelectionClasses.length).toBe(2);
+            setTimeout(function () {
+                expect(spy.calls.count()).toBe(2);
+                expect(model._rowSelectionClasses.length).toBe(2);
+                cb();
+            }, 2)
+
         });
 
-        it('should set a cell class for a selected col', function () {
+        it('should set a cell class for a selected col', function (cb) {
             var spy = spyOn(grid.cellClasses, 'add');
             grid.colModel.select(0);
-            expect(spy).toHaveBeenCalled();
-            var decorator = spy.calls.argsFor(0)[0];
-            expect(decorator).unitsToBe('cell');
-            expect(decorator).spaceToBe('virtual');
-            expect(decorator).rangeToBe(0, 1, 1, 1);
-            expect(decorator).classToBe('selected');
+            setTimeout(function () {
+                expect(spy).toHaveBeenCalled();
+                var decorator = spy.calls.argsFor(0)[0];
+                expect(decorator).unitsToBe('cell');
+                expect(decorator).spaceToBe('virtual');
+                expect(decorator).rangeToBe(0, 1, 1, 1);
+                expect(decorator).classToBe('selected');
+                cb();
+            }, 2);
+
         });
 
-        it('should not duplicate cell classes for col select', function () {
+        it('should not duplicate cell classes for col select', function (cb) {
             grid.colModel.select(0);
             var spy = spyOn(grid.cellClasses, 'add');
             grid.colModel.select(1);
-            expect(spy.calls.count()).toBe(2);
-            expect(model._colSelectionClasses.length).toBe(2);
+            setTimeout(function () {
+                expect(spy.calls.count()).toBe(2);
+                expect(model._colSelectionClasses.length).toBe(2);
+                cb();
+            }, 2);
+
         });
 
         it('selection should clamp to data range', function () {

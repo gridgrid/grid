@@ -50,7 +50,6 @@ module.exports = function (_grid) {
         grid.cellScrollModel.scrollIntoView(row, col);
         if (!dontClearSelection) {
             clearOtherSelections();
-            maybeSelectHeaderFromSelection(selection, true);
         }
         setSelectionToFocus();
         if (changed) {
@@ -179,7 +178,7 @@ module.exports = function (_grid) {
         }
     });
 
-    function outsideMinMax(row, col) {
+    function outsideMinMaxDrag(row, col) {
         return row < 0 || row > grid.data.row.count() || col < 0 || col > grid.data.col.count();
     }
 
@@ -265,6 +264,24 @@ module.exports = function (_grid) {
 
     var selection = createAndAddSelectionDecorator();
 
+    function syncSelectionToHeaders() {
+        grid.colModel.clearSelected(true);
+        grid.rowModel.clearSelected(true);
+        model.getAllSelections().forEach(function (selection) {
+            if (selection) {
+                maybeSelectHeaderFromSelection(selection);
+            }
+        });
+    }
+
+    model.getAllSelections = function () {
+        var selections = [];
+        if (model.selection) {
+            selections.push(model.selection);
+        }
+        return selections.concat(model.otherSelections);
+    };
+
     function maybeSelectHeaderFromSelection(range, deselect) {
         if (range.height === Infinity) {
             var indexes = grid.data.col.indexes({from: range.left, length: range.width});
@@ -296,7 +313,7 @@ module.exports = function (_grid) {
         selection.height = height;
         selection.width = width;
         //select the columns to match
-        maybeSelectHeaderFromSelection(selection);
+        syncSelectionToHeaders();
     };
 
     function setSelectionToFocus() {
@@ -306,9 +323,7 @@ module.exports = function (_grid) {
 
     function clearOtherSelections() {
         grid.decorators.remove(model.otherSelections);
-        model.otherSelections.forEach(function (selection) {
-            maybeSelectHeaderFromSelection(selection, true);
-        });
+        syncSelectionToHeaders();
         model.otherSelections = [];
     }
 
@@ -323,15 +338,19 @@ module.exports = function (_grid) {
     }
 
     selection._onDragStart = function (e) {
-        if (outsideMinMax(e.row, e.col)) {
-            return;
-        }
         var fromRow = model.focus.row;
         var fromCol = model.focus.col;
         var unbindDrag = grid.eventLoop.bind('grid-cell-drag', function (e) {
-            setSelectionFromPoints(fromRow, fromCol, e.row, e.col);
+            var toRow = e.row;
+            var toCol = e.col;
+            if (selection.width === Infinity) {
+                toCol = Infinity;
+            }
+            if (selection.height === Infinity) {
+                fromCol = Infinity;
+            }
+            setSelectionFromPoints(fromRow, fromCol, toRow, toCol);
         });
-
         var unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function () {
             unbindDrag();
             unbindDragEnd();
