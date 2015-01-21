@@ -19,11 +19,12 @@ describe('navigation-model', function () {
     }
 
 
-    function makeAndFireMouseDownForCell(r, c, shiftKey) {
+    function makeAndFireMouseDownForCell(r, c, shiftKey, metaKey) {
         var mouseDown = mockEvent('mousedown');
         var col = c;
         var row = r;
         mouseDown.shiftKey = shiftKey;
+        mouseDown.metaKey = metaKey;
         mouseDown.clientX = col * 100 + 1;
         mouseDown.clientY = row * 30 + 1;
         grid.eventLoop.fire(mouseDown);
@@ -242,6 +243,7 @@ describe('navigation-model', function () {
             });
         });
 
+
         it('should default to the focus', function () {
             expect(model.selection).rangeToBe(0, 0, 1, 1);
         });
@@ -263,6 +265,30 @@ describe('navigation-model', function () {
             expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
         });
 
+        it('should add to a list of selections on mousedown with ctrl/cmd', function () {
+            selectCells(1, 2, 3, 4);
+            makeAndFireMouseDownForCell(2, 2, false, true);
+            expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
+            expect(model.otherSelections[0]).rangeToBe(1, 2, 3, 3);
+        });
+
+        it('should not add to a list of selections on mousedown with ctrl/cmd and shift', function () {
+            selectCells(1, 2, 3, 4);
+            makeAndFireMouseDownForCell(2, 2, true, true);
+            expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 2, 1);
+            expect(model.otherSelections).toEqual([]);
+        });
+
+        it('should clear others on mousedown', function () {
+            selectCells(1, 2, 3, 4);
+            makeAndFireMouseDownForCell(2, 2, false, true);
+            var oldSelections = model.otherSelections
+            makeAndFireMouseDownForCell(2, 2, false, false);
+            expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
+            expect(model.otherSelections).toEqual([]);
+            expect(this.grid.decorators.getAlive()).not.toContain(oldSelections[0]);
+        });
+
         it('should clear key nav if shift is not down', function () {
             selectCells(1, 2, 3, 4);
             makeAndFireKeyDown(key.code.arrow.down.code);
@@ -272,6 +298,17 @@ describe('navigation-model', function () {
         it('should set on mousedown if shift is held', function () {
             makeAndFireMouseDownForCell(2, 2, true);
             expect(model.selection).rangeToBe(0, 0, 3, 3);
+        });
+
+        it('should clear other selections on mousedown even with shift', function () {
+            selectCells(1, 2, 3, 4);
+            makeAndFireMouseDownForCell(2, 2, false, true);
+            var oldSelections = model.otherSelections
+
+            makeAndFireMouseDownForCell(2, 2, true, false);
+            expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
+            expect(model.otherSelections).toEqual([]);
+            expect(this.grid.decorators.getAlive()).not.toContain(oldSelections[0]);
         });
 
         it('should expand and shrink selection on key nav', function () {
@@ -312,20 +349,35 @@ describe('navigation-model', function () {
             beforeEachFn.call(this, 1, 1);
         });
         //row col selection
-        it('should toggle select a whole col on header mousedown', function () {
-            makeAndFireMouseDownForCell(0, 3, true);
+        it('should select a whole col on header mousedown', function () {
+            makeAndFireMouseDownForCell(0, 3);
             expect(grid.colModel.getSelected()).toEqual([2]);
-            makeAndFireMouseDownForCell(0, 3, true);
-            expect(grid.colModel.getSelected()).toEqual([]);
         });
 
-        it('should toggle select a whole row on header mousedown', function () {
-            makeAndFireMouseDownForCell(3, 0, true);
-            expect(grid.rowModel.getSelected()).toEqual([2]);
-            grid.cellScrollModel.scrollTo(0, 0);
 
-            makeAndFireMouseDownForCell(3, 0, true);
-            expect(grid.rowModel.getSelected()).toEqual([]);
+        it('should select a whole row on header mousedown', function () {
+            makeAndFireMouseDownForCell(3, 0);
+            expect(grid.rowModel.getSelected()).toEqual([2]);
+        });
+
+        it('should clear other selections on mousedown', function () {
+            makeAndFireMouseDownForCell(3, 0);
+            expect(grid.rowModel.getSelected()).toEqual([2]);
+            makeAndFireMouseDownForCell(4, 0);
+            expect(grid.rowModel.getSelected()).toEqual([3]);
+        });
+
+        it('should add to the selection on mousedown if ctrl cmd held', function () {
+            makeAndFireMouseDownForCell(3, 0);
+            expect(grid.rowModel.getSelected()).toEqual([2]);
+            makeAndFireMouseDownForCell(4, 0, false, true);
+            expect(grid.rowModel.getSelected()).toEqual([2, 3]);
+        });
+
+        it('should select a range on shift click', function () {
+            makeAndFireMouseDownForCell(3, 0);
+            makeAndFireMouseDownForCell(5, 0, true);
+            expect(grid.rowModel.getSelected()).toEqual([2, 3, 4]);
         });
 
         it('should set a cell class for a selected row', function () {
@@ -339,7 +391,7 @@ describe('navigation-model', function () {
             expect(decorator).classToBe('selected');
         });
 
-        it('should not duplicate decorators for row select', function () {
+        it('should not duplicate cell classes for row select', function () {
             grid.rowModel.select(0);
             var spy = spyOn(grid.cellClasses, 'add');
             grid.rowModel.select(1);
@@ -358,7 +410,7 @@ describe('navigation-model', function () {
             expect(decorator).classToBe('selected');
         });
 
-        it('should not duplicate decorators for col select', function () {
+        it('should not duplicate cell classes for col select', function () {
             grid.colModel.select(0);
             var spy = spyOn(grid.cellClasses, 'add');
             grid.colModel.select(1);
@@ -366,31 +418,11 @@ describe('navigation-model', function () {
             expect(model._colSelectionClasses.length).toBe(2);
         });
 
-        it('focus should ignore headers on mousedown', function () {
-            model.setFocus(2, 3);
-            makeAndFireMouseDownForCell(0, 0);
-            expect(model.focus).rowToBe(2);
-            expect(model.focus).colToBe(3);
-        });
-
-
-        it('should not select if drag begins in headers', function () {
-            selectCells(0, 0, 3, 3);
-            expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
-        });
-
-
-        it('should not set on mousedown on headers even if shift is held', function () {
-            model.setFocus(1, 1);
-            makeAndFireMouseDownForCell(0, 0, true);
-            expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
-        });
-
-
         it('selection should clamp to data range', function () {
             selectCells(2, 2, 0, 0);
             expect(model.selection).rangeToBe(0, 0, 2, 2);
         });
+
     });
 
 });

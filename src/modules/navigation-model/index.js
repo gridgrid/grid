@@ -14,12 +14,15 @@ module.exports = function (_grid) {
         }
     };
 
+    model.otherSelections = [];
+
     var focusClass = grid.cellClasses.create(0, 0, 'focus');
     grid.cellClasses.add(focusClass);
 
     model.focusDecorator = grid.decorators.create(0, 0, 1, 1);
+    var focusDefaultRender = model.focusDecorator.render;
     model.focusDecorator.render = function () {
-        var div = defaultRender();
+        var div = focusDefaultRender();
         div.setAttribute('class', 'grid-focus-decorator');
         return div;
     };
@@ -34,7 +37,7 @@ module.exports = function (_grid) {
         return util.clamp(col, 0, grid.colModel.length() - 1);
     }
 
-    model.setFocus = function setFocus(row, col, optionalEvent) {
+    model.setFocus = function setFocus(row, col, dontClearSelection) {
         row = grid.data.row.clamp(row);
         col = grid.data.col.clamp(col);
         var changed = row !== model.focus.row || col !== model.focus.col;
@@ -45,8 +48,11 @@ module.exports = function (_grid) {
         model.focusDecorator.top = row;
         model.focusDecorator.left = col;
         grid.cellScrollModel.scrollIntoView(row, col);
-        //focus changes always clear the selection
-        clearSelection();
+        if (!dontClearSelection) {
+            clearOtherSelections();
+            maybeSelectHeaderFromSelection(selection, true);
+        }
+        setSelectionToFocus();
         if (changed) {
             grid.eventLoop.fire('grid-focus-change');
         }
@@ -169,6 +175,7 @@ module.exports = function (_grid) {
             }
             var newRowCol = navFrom(navFromRow, navFromCol, e);
             setSelectionFromPoints(model.focus.row, model.focus.col, newRowCol.row, newRowCol.col);
+            grid.cellScrollModel.scrollIntoView(newRowCol.row, newRowCol.col);
         }
     });
 
@@ -180,33 +187,41 @@ module.exports = function (_grid) {
         //assume the event has been annotated by the cell mouse model interceptor
         var row = e.row;
         var col = e.col;
-        if (row < 0 && col >= 0) {
-            grid.colModel.toggleSelect(col);
-        }
-        if (col < 0 && row >= 0) {
-            grid.rowModel.toggleSelect(row);
-        }
-        if (row < 0 && col < 0) {
-            var cols = [];
-            grid.data.col.iterate(function (c) {
-                cols.push(c);
-            });
-            grid.colModel.select(cols);
-            var rows = [];
-            grid.data.row.iterate(function (r) {
-                rows.push(r);
-            });
-            grid.rowModel.select(rows);
-            return;
-        }
 
-        if (!e.shiftKey) {
-            model.setFocus(row, col, e);
+        var ctrlOrCmdPressed = ctrlOrCmd(e);
+
+        if (e.shiftKey) {
+            var fromRow = model.focus.row;
+            var fromCol = model.focus.col;
+            var toRow = row;
+            var toCol = col;
+            if (row < 0) {
+                fromRow = 0;
+                toRow = Infinity;
+            }
+            if (col < 0) {
+                fromCol = 0;
+                toCol = Infinity;
+            }
+            setSelectionFromPoints(fromRow, fromCol, toRow, toCol, ctrlOrCmdPressed);
         } else {
-            setSelectionFromPoints(model.focus.row, model.focus.col, row, col);
+            if (ctrlOrCmdPressed) {
+                addSelection(model.selection);
+            }
+            model.setFocus(row, col, ctrlOrCmdPressed);
+            if (row < 0 && col < 0) {
+                setSelectionFromPoints(0, 0, Infinity, Infinity, ctrlOrCmdPressed);
+            } else if (row < 0) {
+                setSelectionFromPoints(0, col, Infinity, col, ctrlOrCmdPressed);
+            } else if (col < 0) {
+                setSelectionFromPoints(row, 0, row, Infinity, ctrlOrCmdPressed);
+            }
         }
-
     });
+
+    function addSelection(range) {
+        model.otherSelections.push(createAndAddSelectionDecorator(range.top, range.left, range.height, range.width));
+    }
 
     model._rowSelectionClasses = [];
     model._colSelectionClasses = [];
@@ -236,37 +251,74 @@ module.exports = function (_grid) {
         handleRowColSelectionChange('col');
     });
 
-    var selection = grid.decorators.create();
+    function createAndAddSelectionDecorator() {
+        var selection = grid.decorators.create.apply(this, arguments);
+        var defaultRender = selection.render;
+        selection.render = function () {
+            var div = defaultRender();
+            div.setAttribute('class', 'grid-selection');
+            return div;
+        };
+        grid.decorators.add(selection);
+        return selection;
+    }
 
-    var defaultRender = selection.render;
-    selection.render = function () {
-        var div = defaultRender();
-        div.setAttribute('class', 'grid-selection');
-        return div;
-    };
+    var selection = createAndAddSelectionDecorator();
 
-    grid.decorators.add(selection);
+    function maybeSelectHeaderFromSelection(range, deselect) {
+        if (range.height === Infinity) {
+            var indexes = grid.data.col.indexes({from: range.left, length: range.width});
+            if (deselect) {
+                grid.colModel.deselect(indexes);
+            } else {
+                grid.colModel.select(indexes);
+            }
+        }
+        if (range.width === Infinity) {
+            var indexes = grid.data.row.indexes({from: range.top, length: range.height});
+            if (deselect) {
+                grid.rowModel.deselect(indexes);
+            } else {
+                grid.rowModel.select(indexes);
+            }
+        }
+    }
 
     model.setSelection = function setSelection(newSelection) {
-        if (newSelection.height === 1 && newSelection.width === 1) {
-            clearSelection();
-            return;
+        var height = newSelection.height;
+        var width = newSelection.width;
+        if (height === 1 && width === 1 && !model.otherSelections.length) {
+            height = -1;
+            width = -1;
         }
         selection.top = newSelection.top;
         selection.left = newSelection.left;
-        selection.height = newSelection.height;
-        selection.width = newSelection.width;
+        selection.height = height;
+        selection.width = width;
+        //select the columns to match
+        maybeSelectHeaderFromSelection(selection);
     };
 
-    function clearSelection() {
-        model.setSelection({top: -1, left: -1, height: -1, width: -1});
+    function setSelectionToFocus() {
+
+        model.setSelection({top: model.focus.row, left: model.focus.col, height: 1, width: 1});
     }
 
-    function setSelectionFromPoints(fromRow, fromCol, toRow, toCol) {
-        toRow = clampRowToMinMax(toRow);
-        toCol = clampColToMinMax(toCol);
+    function clearOtherSelections() {
+        grid.decorators.remove(model.otherSelections);
+        model.otherSelections.forEach(function (selection) {
+            maybeSelectHeaderFromSelection(selection, true);
+        });
+        model.otherSelections = [];
+    }
+
+    function setSelectionFromPoints(fromRow, fromCol, toRow, toCol, dontClearOthers) {
+        if (!dontClearOthers) {
+            clearOtherSelections();
+        }
+        toRow = util.clamp(toRow, 0, Infinity);
+        toCol = util.clamp(toCol, 0, Infinity);
         var newSelection = rangeUtil.createFromPoints(fromRow, fromCol, toRow, toCol);
-        grid.cellScrollModel.scrollIntoView(toRow, toCol);
         model.setSelection(newSelection);
     }
 
@@ -287,7 +339,7 @@ module.exports = function (_grid) {
     };
 
     grid.eventLoop.bind('grid-drag-start', selection._onDragStart);
-    clearSelection();
+    setSelectionToFocus();
     model._selectionDecorator = selection;
 
     Object.defineProperty(model, 'selection', {

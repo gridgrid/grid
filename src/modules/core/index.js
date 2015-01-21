@@ -152,6 +152,20 @@ module.exports = function () {
         dim.clamp = function (idx) {
             return util.clamp(idx, 0, this.count() - 1);
         }.bind(dim);
+        dim.indexes = function () {
+            var opts;
+            opts = arguments[0];
+            opts = opts || {};
+            opts.from = opts.from || 0;
+            var count = this.count();
+            opts.to = opts.to + 1 || (opts.length && opts.length + opts.from) || count;
+            var indexes = [];
+            for (var idx = Math.max(opts.from, 0); idx < Math.min(opts.to, count); idx = opts.reverse ? this.prev(idx) : this.next(idx)) {
+                indexes.push(idx);
+            }
+            return indexes;
+        };
+
         dim.iterate = function () {
             var opts;
             var fn;
@@ -161,14 +175,10 @@ module.exports = function () {
             } else {
                 fn = arguments[0];
             }
-            opts = opts || {};
-            opts.from = opts.from || 0;
-            var count = this.count();
-            opts.to = opts.to || count;
-            for (var idx = Math.max(opts.from, 0); idx < Math.min(opts.to, count); idx = opts.reverse ? this.prev(idx) : this.next(idx)) {
+            dim.indexes(opts).forEach(function (idx) {
                 fn(idx);
-            }
-        }
+            });
+        };
 
         //have data to data be passthrough for example
         dim['to' + capitalize(spaceName)] = passThrough;
