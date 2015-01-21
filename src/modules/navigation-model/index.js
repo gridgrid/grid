@@ -349,7 +349,8 @@ module.exports = function (_grid) {
             if (selection.height === Infinity) {
                 fromCol = Infinity;
             }
-            setSelectionFromPoints(fromRow, fromCol, toRow, toCol);
+            //pass true to prevent clearing, if it were to be cleared the mousedown handles that
+            setSelectionFromPoints(fromRow, fromCol, toRow, toCol, true);
         });
         var unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function () {
             unbindDrag();
