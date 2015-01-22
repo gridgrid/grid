@@ -99,6 +99,7 @@ module.exports = function () {
             window.getSelection().addRange(range);
         };
 
+        textarea.setAttribute('ondragstart', 'return false;');
         Object.defineProperty(textarea, 'value', {
             get: function () {
                 return textarea.innerText;
@@ -208,19 +209,18 @@ module.exports = function () {
                 return grid.colModel.toVirtual(dataCol);
             },
             toView: function (dataCol) {
-                return grid.viewPort.toRealCol(this.toVirtual(dataCol));
+                return grid.virtual.col.toView(this.toVirtual(dataCol));
             },
             count: function () {
                 return grid.colModel.length();
             }
         },
         row: {
-            toData: passThrough,
             toVirtual: function (dataRow) {
                 return grid.rowModel.toVirtual(dataRow);
             },
             toView: function (dataRow) {
-                return grid.viewPort.toRealRow(this.toVirtual(dataRow));
+                return grid.virtual.row.toView(this.toVirtual(dataRow));
             },
             count: function () {
                 return grid.rowModel.length();
@@ -258,7 +258,7 @@ module.exports = function () {
     grid.view = {
         col: {
             toData: function (viewCol) {
-                return grid.colModel.toData(this.toVirtual(viewCol));
+                return grid.virtual.col.toData(this.toVirtual(viewCol));
             },
             toVirtual: function (viewCol) {
                 return grid.viewPort.toVirtualCol(viewCol);
@@ -269,7 +269,7 @@ module.exports = function () {
         },
         row: {
             toData: function (viewRow) {
-                return grid.rowModel.toData(this.toVirtual(viewRow));
+                return grid.virtual.row.toData(this.toVirtual(viewRow));
             },
             toVirtual: function (viewRow) {
                 return grid.viewPort.toVirtualRow(viewRow);

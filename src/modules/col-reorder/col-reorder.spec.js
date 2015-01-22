@@ -46,7 +46,11 @@ describe('col-reorder', function () {
         function startDrag() {
             var e = mockEvent('grid-drag-start', true);
             e.gridX = dragStart;
-            e.realCol = grid.viewPort.getColByLeft(dragStart);
+            var viewCol = grid.viewPort.getColByLeft(e.gridX);
+            grid.cellMouseModel._annotateEventFromViewCoords(e, 0, viewCol);
+            grid.colModel.select(e.col);
+            var mousedown = grid.cellMouseModel._annotateEventFromViewCoords(mockEvent('mousedown'), 0, viewCol);
+            ctx.decorator._onMousedown(mousedown);
             ctx.decorator._onDragStart(e);
 
         }
@@ -55,7 +59,7 @@ describe('col-reorder', function () {
             var drag = mockEvent('grid-drag');
             var gridX = x;
             drag.gridX = gridX;
-            drag.realCol = grid.viewPort.getColByLeft(gridX);
+            grid.cellMouseModel._annotateEventFromViewCoords(drag, 0, grid.viewPort.getColByLeft(gridX));
             grid.eventLoop.fire(drag);
             return gridX;
         }
@@ -68,6 +72,7 @@ describe('col-reorder', function () {
                 startDrag();
                 dragCtx.decorator = ctx.decorator._dragRect;
             });
+
 
             it('should add a decorator', function () {
                 expect(grid.decorators.getAlive()).toContain(ctx.decorator._dragRect);

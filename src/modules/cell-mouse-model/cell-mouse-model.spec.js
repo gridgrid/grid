@@ -10,6 +10,8 @@ describe('cell-mouse-model', function () {
 
     var beforeEachFunction = function (fixedR, fixedC, hRows, hCols) {
         grid = this.buildSimpleGrid(numRows, numCols, false, false, fixedR, fixedC, hRows, hCols);
+        //set container without building to save perf
+        grid.container = this.container;
         model = grid.cellMouseModel;
     };
 
@@ -20,6 +22,7 @@ describe('cell-mouse-model', function () {
         mouseEvent.clientX = x;
         mouseEvent.clientY = y;
         mouseEvent.which = 1;
+        mouseEvent.currentTarget = grid.container;
         return mouseEvent;
     }
 

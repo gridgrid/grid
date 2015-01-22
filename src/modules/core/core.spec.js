@@ -84,6 +84,11 @@ describe('grid-core', function () {
         expect(area[0].style.cursor).toBe('auto');
     });
 
+    it('should prevent weird browser behavior on dragging the text', function () {
+        grid.build(this.container);
+        expect(findTextArea.call(this).attr('ondragstart')).toEqual('return false;');
+    });
+
     it('should add a class to the container on focus', function () {
         grid.build(this.container);
         findTextArea.call(this).focus();
@@ -148,5 +153,5 @@ describe('grid-core', function () {
         grid.textarea.blur();
         expect(spy).toHaveBeenCalled();
     });
- 
+
 });

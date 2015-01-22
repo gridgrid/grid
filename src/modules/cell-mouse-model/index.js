@@ -29,10 +29,11 @@ module.exports = function (_grid) {
     model._annotateEventFromViewCoords = function (e, viewRow, viewCol) {
         e.realRow = viewRow;
         e.realCol = viewCol;
-        e.virtualRow = grid.viewPort.toVirtualRow(e.realRow);
-        e.virtualCol = grid.viewPort.toVirtualCol(e.realCol);
-        e.row = e.virtualRow - grid.rowModel.numHeaders();
-        e.col = e.virtualCol - grid.colModel.numHeaders();
+        e.virtualRow = grid.view.row.toVirtual(e.realRow);
+        e.virtualCol = grid.view.col.toVirtual(e.realCol);
+        e.row = grid.virtual.row.toData(e.virtualRow);
+        e.col = grid.virtual.col.toData(e.virtualCol);
+        return e;
     }
 
     model._annotateEventInternal = function (e) {
@@ -49,7 +50,9 @@ module.exports = function (_grid) {
         model._annotateEvent(e);
 
         if (e.type === 'mousedown') {
-            setupDragEventForMouseDown(e);
+            if (e.currentTarget === grid.container) {
+                setupDragEventForMouseDown(e);
+            }
         }
     });
 

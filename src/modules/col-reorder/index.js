@@ -15,10 +15,21 @@ module.exports = function (_grid) {
             div.setAttribute('class', 'grid-drag-rect');
         };
 
+        var wasSelectedAtMousedown = false;
+        headerDecorator._onMousedown = function (e) {
+            wasSelectedAtMousedown = grid.data.col.get(e.col).selected;
+            if (wasSelectedAtMousedown) {
+                grid.eventLoop.stopBubbling(e);
+            }
+        }
+
+
         headerDecorator._onDragStart = function (e) {
-            if (e.realCol < grid.colModel.numFixed()) {
+            if (e.realCol < grid.colModel.numFixed() || !wasSelectedAtMousedown) {
                 return;
             }
+            //we want to be the only draggers
+            grid.eventLoop.stopBubbling(e);
 
 
             grid.decorators.add(headerDecorator._dragRect);
@@ -58,6 +69,7 @@ module.exports = function (_grid) {
         headerDecorator.postRender = function (div) {
             div.setAttribute('class', 'grid-col-reorder');
             grid.eventLoop.bind('grid-drag-start', div, headerDecorator._onDragStart);
+            grid.eventLoop.bind('mousedown', div, headerDecorator._onMousedown);
         };
 
         return headerDecorator;
