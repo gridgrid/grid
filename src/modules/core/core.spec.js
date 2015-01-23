@@ -81,7 +81,7 @@ describe('grid-core', function () {
         expect(area[0].style.color).toBe('transparent');
         expect(area[0].style.border).toBe('none');
         expect(area[0].style.boxShadow).toBe('none');
-        expect(area[0].style.cursor).toBe('auto');
+        expect(area[0].style.cursor).toBe('default');
     });
 
     it('should prevent weird browser behavior on dragging the text', function () {
