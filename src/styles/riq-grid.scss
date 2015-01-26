@@ -128,12 +128,14 @@ a {
 
 }
 
-.grid-drag-line {
+.grid-reorder-target {
   background: black;
+  z-index: 10000;
 }
 
 .grid-drag-rect {
   background: rgba(0, 0, 0, 0.4);
+  z-index: 10000;
 }
 
 .grid-reorder-target {

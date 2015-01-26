@@ -1,7 +1,7 @@
 var mockEvent = require('../custom-event');
 
 
-describe('col-reorder', function () {
+ddescribe('col-reorder', function () {
 
     require('../grid-spec-helper')();
     var grid;
@@ -69,16 +69,24 @@ describe('col-reorder', function () {
 
 
             beforeEach(function () {
+                grid.colModel.select(col);
+                grid.colModel.select(3);
                 startDrag();
-                dragCtx.decorator = ctx.decorator._dragRect;
+                dragCtx.decorator = colReorder._dragRects[0];
             });
 
 
             it('should add a decorator', function () {
-                expect(grid.decorators.getAlive()).toContain(ctx.decorator._dragRect);
+                expect(grid.decorators.getAlive()).toContain(dragCtx.decorator);
             });
 
-            it('should be 1px wide and as tall as teh view', function () {
+            it('should add a decorator for each selected col', function () {
+
+                expect(grid.decorators.getAlive()).toContain(colReorder._dragRects[0]);
+                expect(grid.decorators.getAlive()).toContain(colReorder._dragRects[1]);
+            });
+
+            it('should be 1px wide and as tall as the view', function () {
                 expect(dragCtx.decorator).topToBe(0);
                 expect(dragCtx.decorator).heightToBe(Infinity);
                 expect(dragCtx.decorator).unitsToBe('px');
@@ -90,10 +98,9 @@ describe('col-reorder', function () {
             });
 
             it('should set width on drag start', function () {
-                expect(dragCtx.decorator).widthToBe(100);
                 grid.colModel.get(col).width = 10;
                 startDrag();
-                expect(dragCtx.decorator).widthToBe(10);
+                expect(colReorder._dragRects[0]).widthToBe(10);
             });
 
             it('should move the left on grid drag', function () {
@@ -105,7 +112,7 @@ describe('col-reorder', function () {
             describe('target col', function () {
                 var targetCtx = {};
                 beforeEach(function () {
-                    targetCtx.decorator = dragCtx.decorator._targetCol;
+                    targetCtx.decorator = colReorder._targetCol;
                     targetCtx.decorator.render(); //mock the render so we don't have to wait for the entire view in test
                     fireDrag(205);
                 });
@@ -149,8 +156,10 @@ describe('col-reorder', function () {
                     var colScroll = 1;
                     grid.cellScrollModel.scrollTo(0, colScroll);
                     var originalCol = grid.colModel.get(col + colScroll);
+                    var originalCol2 = grid.colModel.get(3 + colScroll);
                     grid.eventLoop.fire(mockEvent('grid-drag-end'));
                     expect(grid.colModel.get(2 + colScroll)).toBe(originalCol);
+                    expect(grid.colModel.get(2 + colScroll + 1)).toBe(originalCol2);
                 });
 
 
@@ -165,7 +174,6 @@ describe('col-reorder', function () {
                 grid.eventLoop.fire(mockEvent('grid-drag-end'));
                 expect(grid.decorators.popAllDead()).toContain(dragCtx.decorator);
             });
-
 
             describe('should satisfy', function () {
                 require('../decorators/decorator-test-body')(dragCtx);
@@ -187,8 +195,8 @@ describe('col-reorder', function () {
                 dragStart = 305;
                 startDrag();
                 fireDrag(105);
-                expect(ctx.decorator._dragRect._targetCol).leftToBe(3);
-                expect(ctx.decorator._dragRect).leftToBe(grid.viewPort.getColLeft(3));
+                expect(colReorder._targetCol).leftToBe(3);
+                expect(colReorder._dragRects[0]).leftToBe(grid.viewPort.getColLeft(3));
             });
         });
 

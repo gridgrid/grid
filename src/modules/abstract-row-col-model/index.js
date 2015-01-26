@@ -104,10 +104,24 @@ module.exports = function (_grid, name, lengthName, defaultSize) {
                 }
             });
         },
-        move: function (start, target) {
-            descriptors.splice(target, 0, descriptors.splice(start, 1)[0]);
+        move: function (fromIndexes, target) {
+
+            if (!util.isArray(fromIndexes)) {
+                fromIndexes = [fromIndexes];
+            }
+            var toValue = descriptors[target];
+            var removed = fromIndexes.sort(function compareNumbers(a, b) {
+                return b - a;
+            }).map(function (fromIndex) {
+                var removedDescriptors = descriptors.splice(fromIndex, 1);
+                return removedDescriptors[0];
+
+            });
+            removed.reverse();
+            var spliceArgs = [descriptors.indexOf(toValue) + 1, 0].concat(removed);
+            descriptors.splice.apply(descriptors, spliceArgs);
             updateDescriptorIndices();
-            setDescriptorsDirty({action: 'move', descriptors: [api.get(start), api.get(target)]});
+            setDescriptorsDirty({action: 'move', descriptors: removed.concat(toValue)});
         },
         numHeaders: function () {
             return numHeaders;

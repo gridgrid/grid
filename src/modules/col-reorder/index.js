@@ -8,12 +8,6 @@ module.exports = function (_grid) {
     var api = {annotateDecorator: makeReorderDecorator};
 
     function makeReorderDecorator(headerDecorator) {
-        var col = headerDecorator.left;
-        headerDecorator._dragRect = grid.decorators.create(0, undefined, Infinity, undefined, 'px', 'real');
-
-        headerDecorator._dragRect.postRender = function (div) {
-            div.setAttribute('class', 'grid-drag-rect');
-        };
 
         var wasSelectedAtMousedown = false;
         headerDecorator._onMousedown = function (e) {
@@ -25,42 +19,62 @@ module.exports = function (_grid) {
 
 
         headerDecorator._onDragStart = function (e) {
+
             if (e.realCol < grid.colModel.numFixed() || !wasSelectedAtMousedown) {
                 return;
             }
             //we want to be the only draggers
             grid.eventLoop.stopBubbling(e);
 
+            var startCol = headerDecorator.left;
 
-            grid.decorators.add(headerDecorator._dragRect);
-
-            headerDecorator._dragRect.width = grid.viewPort.getColWidth(col);
-            var colOffset = e.gridX - headerDecorator.getDecoratorLeft();
-
-            headerDecorator._dragRect._targetCol = grid.decorators.create(0, undefined, Infinity, 1, 'cell', 'real');
-            headerDecorator._dragRect._targetCol.postRender = function (div) {
+            //create the target line
+            api._targetCol = grid.decorators.create(0, undefined, Infinity, 1, 'cell', 'real');
+            api._targetCol.postRender = function (div) {
                 div.setAttribute('class', 'grid-reorder-target');
-                headerDecorator._dragRect._targetCol._renderedElem = div;
+                api._targetCol._renderedElem = div;
             };
-            grid.decorators.add(headerDecorator._dragRect._targetCol);
+            grid.decorators.add(api._targetCol);
+
+            //create a decorator for each selected col
+            var selected = grid.colModel.getSelected();
+            api._dragRects = selected.map(function (dataCol) {
+                var viewCol = grid.data.col.toView(dataCol);
+                var dragRect = grid.decorators.create(0, undefined, Infinity, undefined, 'px', 'real');
+                dragRect.colOffset = e.gridX - api._decorators[viewCol].getDecoratorLeft();
+                dragRect.postRender = function (div) {
+                    div.setAttribute('class', 'grid-drag-rect');
+                };
+                dragRect.width = grid.viewPort.getColWidth(viewCol);
+                return dragRect;
+            });
+
+            grid.decorators.add(api._dragRects);
+
 
             headerDecorator._unbindDrag = grid.eventLoop.bind('grid-drag', function (e) {
-                headerDecorator._dragRect.left = util.clamp(e.gridX - colOffset, grid.viewPort.getColLeft(grid.colModel.numFixed()), Infinity);
-                headerDecorator._dragRect._targetCol.left = util.clamp(e.realCol, grid.colModel.numFixed(), Infinity);
-                if (e.realCol > col) {
-                    elementClass(headerDecorator._dragRect._targetCol._renderedElem).add('right');
+                api._dragRects.forEach(function (dragRect) {
+                    dragRect.left = util.clamp(e.gridX - dragRect.colOffset, grid.viewPort.getColLeft(grid.colModel.numFixed()), Infinity);
+                });
+                api._targetCol.left = util.clamp(e.realCol, grid.colModel.numFixed(), Infinity);
+                if (e.realCol > startCol) {
+                    elementClass(api._targetCol._renderedElem).add('right');
                 } else {
-                    elementClass(headerDecorator._dragRect._targetCol._renderedElem).remove('right');
+                    elementClass(api._targetCol._renderedElem).remove('right');
                 }
 
 
             });
 
             headerDecorator._unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function (e) {
-                var targetCol = headerDecorator._dragRect._targetCol.left;
+                var targetCol = api._targetCol.left;
 
-                grid.colModel.move(grid.viewPort.toVirtualCol(col), grid.viewPort.toVirtualCol(targetCol));
-                grid.decorators.remove([headerDecorator._dragRect._targetCol, headerDecorator._dragRect]);
+                grid.colModel.move(selected.map(function (dataCol) {
+                    return grid.data.col.toVirtual(dataCol);
+                }), grid.viewPort.toVirtualCol(targetCol));
+
+                var removedDecs = api._dragRects.concat(api._targetCol);
+                grid.decorators.remove(removedDecs);
                 headerDecorator._unbindDrag();
                 headerDecorator._unbindDragEnd();
             });

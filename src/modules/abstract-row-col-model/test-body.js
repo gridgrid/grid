@@ -140,6 +140,20 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
             expect(model.get(1)).toBe(orig);
         });
 
+        it('should allow me to move multiple descriptors to a new index', function () {
+            model.add({});
+            model.add({});
+            var orig = model.get(0);
+            var orig1 = model.get(1);
+            var orig2 = model.get(2);
+            var orig3 = model.get(3);
+            model.move([0, 3], 1);
+            expect(model.get(0)).toBe(orig1);
+            expect(model.get(1)).toBe(orig);
+            expect(model.get(2)).toBe(orig3);
+            expect(model.get(3)).toBe(orig2);
+        });
+
         it('should fire change on move', function () {
             var spy = jasmine.createSpy();
             grid.eventLoop.bind('grid-' + name + '-change', spy);

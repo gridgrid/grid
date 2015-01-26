@@ -1,6 +1,6 @@
 {
   "generator-angulpify": {
-    "projectName": "uiQ",
+    "projectName": "uiq",
     "coffee": false,
     "jade": false,
     "sass": true,

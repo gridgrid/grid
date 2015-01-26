@@ -11,8 +11,13 @@ module.exports = function (_grid) {
     var deadDecorators = [];
 
     var decorators = {
-        add: function (decorator) {
-            aliveDecorators.push(decorator);
+        add: function (decorators) {
+            if (!util.isArray(decorators)) {
+                decorators = [decorators];
+            }
+            decorators.forEach(function (decorator) {
+                aliveDecorators.push(decorator);
+            });
             dirtyClean.setDirty();
         },
         remove: function (decorators) {

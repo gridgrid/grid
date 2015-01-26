@@ -71,6 +71,14 @@ describe('decorators', function () {
         expect(decorators.getAlive()[0]).toEqual(dec);
     });
 
+    it('should let me add multiple decorators', function () {
+        var dec = decorators.create();
+        var dec2 = decorators.create();
+        decorators.add([dec, dec2]);
+        expect(decorators.getAlive()[0]).toEqual(dec);
+        expect(decorators.getAlive()[1]).toEqual(dec2);
+    });
+
     it('should let me remove a decorator', function () {
         var dec = decorators.create();
         this.resetAllDirties();
