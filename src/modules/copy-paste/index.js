@@ -75,11 +75,33 @@ module.exports = function (_grid) {
                 });
             }
             var dataChanges = [];
-            grid.data.iterate(selectionRange, function (r, c) {
-                var offsetR = r - selectionRange.top;
-                var offsetC = c - selectionRange.left;
-                dataChanges.push({row: r, col: c, data: pasteData[offsetR][offsetC], paste: true});
+            var singlePasteValue;
+            if (pasteData.length === 1 && pasteData[0].length === 1) {
+                singlePasteValue = pasteData[0][0];
+            }
+            var ranges = [selectionRange];
+            if (singlePasteValue) {
+                //this will do nothing if no other selections as it will be an empty array
+                ranges = ranges.concat(grid.navigationModel.otherSelections);
+            }
+            ranges.forEach(function (range) {
+                grid.data.iterate(range, function (r, c) {
+
+                    var offsetR = r - range.top;
+                    var offsetC = c - range.left;
+
+                    if (!singlePasteValue && (pasteData[offsetR] === undefined || pasteData[offsetR][offsetC] === undefined)) {
+                        return;
+                    }
+                    dataChanges.push({
+                        row: r,
+                        col: c,
+                        data: singlePasteValue || pasteData[offsetR][offsetC],
+                        paste: true
+                    });
+                });
             });
+
             grid.dataModel.set(dataChanges);
         }, 1);
     });

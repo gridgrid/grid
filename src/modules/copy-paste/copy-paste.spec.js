@@ -1,5 +1,7 @@
 var mockEvent = require('../custom-event');
 var key = require('key');
+var util = require('../util');
+
 describe('copy-paste', function () {
 
     require('../grid-spec-helper')();
@@ -177,19 +179,29 @@ describe('copy-paste', function () {
             return e;
         }
 
-        function expectPasteForRange(range, cb, mockGetData) {
+        function expectPasteForRange(ranges, cb, mockGetData, expectedData) {
             var spy = spyOn(this.grid.dataModel, 'set');
-            var e = firePaste.call(this)
+            var e = firePaste.call(this, expectedData)
             if (mockGetData) {
-                e.clipboardData.getData.and.returnValue(undefined);
+                e.clipboardData.getData.and.returnValue();
             }
             setTimeout(function () {
                 var args = spy.calls.argsFor(0)[0];
-                for (var r = range.top; r < range.top + range.height; r++) {
-                    for (var c = range.left; c < range.left + range.width; c++) {
-                        expect(args).toContain({row: r, col: c, data: 'r' + r + ' c' + c, paste: true});
-                    }
+                if (!util.isArray(ranges)) {
+                    ranges = [ranges];
                 }
+                ranges.forEach(function (range) {
+                    for (var r = range.top; r < range.top + range.height; r++) {
+                        for (var c = range.left; c < range.left + range.width; c++) {
+                            expect(args).toContain({
+                                row: r,
+                                col: c,
+                                data: expectedData || 'r' + r + ' c' + c,
+                                paste: true
+                            });
+                        }
+                    }
+                });
                 cb();
             }, 2);
 
@@ -212,6 +224,20 @@ describe('copy-paste', function () {
             this.grid.navigationModel.setSelection(selectionRange);
             this.grid.textarea.innerHTML = this.tableString;
             expectPasteForRange.call(this, selectionRange, cb, true);
+        });
+
+        it('should paste an area smaller than the selection', function (cb) {
+            var selectionRange = {top: 1, left: 2, width: 3, height: 4};
+            this.grid.navigationModel.setSelection(selectionRange);
+            expectPasteForRange.call(this, {top: 1, left: 2, width: 2, height: 2}, cb);
+        });
+
+        it('should repeat a single value across the range', function (cb) {
+            var selectionRange = {top: 1, left: 2, width: 2, height: 2};
+            this.grid.navigationModel.setSelection(selectionRange);
+            var otherSelection = {top: 3, left: 4, width: 2, height: 2};
+            this.grid.navigationModel.otherSelections.push(otherSelection);
+            expectPasteForRange.call(this, [selectionRange, otherSelection], cb, true, 'singleval');
         });
     });
 
