@@ -11,7 +11,14 @@ module.exports = function (_grid) {
             div.setAttribute('class', 'grid-drag-line');
         };
 
+        headerDecorator._onMousedown = function (e) {
+            //prevent mousedowns from getting to selection if they hit the dragline
+            grid.eventLoop.stopBubbling(e);
+        };
+
         headerDecorator._onDragStart = function (e) {
+
+            grid.eventLoop.stopBubbling(e);
 
             grid.decorators.add(headerDecorator._dragLine);
 
@@ -21,7 +28,11 @@ module.exports = function (_grid) {
             });
 
             headerDecorator._unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function (e) {
-                grid.colModel.get(grid.viewPort.toVirtualCol(col)).width = headerDecorator._dragLine.left - headerDecorator.getDecoratorLeft();
+                var newWidth = headerDecorator._dragLine.left - headerDecorator.getDecoratorLeft();
+                grid.view.col.get(col).width = newWidth;
+                grid.colModel.getSelected().forEach(function (dataIdx) {
+                    grid.data.col.get(dataIdx).width = newWidth;
+                });
                 grid.decorators.remove(headerDecorator._dragLine);
                 headerDecorator._unbindDrag();
                 headerDecorator._unbindDragEnd();
@@ -36,6 +47,7 @@ module.exports = function (_grid) {
             div.setAttribute('class', 'col-resize');
 
             grid.eventLoop.bind('grid-drag-start', div, headerDecorator._onDragStart);
+            grid.eventLoop.bind('mousedown', div, headerDecorator._onMousedown);
         };
     }
 

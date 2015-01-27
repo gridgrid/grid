@@ -1,7 +1,7 @@
 var mockEvent = require('../custom-event');
 
 
-ddescribe('col-reorder', function () {
+describe('col-reorder', function () {
 
     require('../grid-spec-helper')();
     var grid;

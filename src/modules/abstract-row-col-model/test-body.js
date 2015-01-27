@@ -160,7 +160,8 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
             model.move(0, 1);
             expect(spy).toHaveBeenCalled();
             expect(spy.calls.argsFor(0)[0].action).toBe('move');
-            expect(spy.calls.argsFor(0)[0].descriptors).toEqual([model.get(0), model.get(1)]);
+            expect(spy.calls.argsFor(0)[0].descriptors).toContain(model.get(0));
+            expect(spy.calls.argsFor(0)[0].descriptors).toContain(model.get(1));
             expect(model.isDirty()).toBe(true);
         });
     });

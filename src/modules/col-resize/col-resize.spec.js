@@ -124,6 +124,17 @@ describe('col-resize', function () {
                 expect(colObj).widthToBe(dragStart + 10);
             });
 
+            it('should set the col width on drag-end for all selected cols', function () {
+                var newWidth = dragStart + 10;
+                fireDrag(newWidth);
+                var selected = viewCol + 2;
+                grid.colModel.select(selected)
+                grid.eventLoop.fire(mockEvent('grid-drag-end'));
+                var colObj = grid.colModel.get(viewCol);
+                expect(colObj).widthToBe(newWidth);
+                expect(grid.colModel.get(selected)).widthToBe(newWidth);
+            });
+
             it('should set the correct width if scrolled', function () {
                 var colScroll = 1;
                 grid.cellScrollModel.scrollTo(0, colScroll);
