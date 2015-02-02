@@ -28,15 +28,6 @@ module.exports = function (_grid) {
     };
     grid.decorators.add(model.focusDecorator);
 
-
-    function clampRowToMinMax(row) {
-        return util.clamp(row, 0, grid.rowModel.length() - 1);
-    }
-
-    function clampColToMinMax(col) {
-        return util.clamp(col, 0, grid.colModel.length() - 1);
-    }
-
     model.setFocus = function setFocus(row, col, dontClearSelection) {
         row = grid.data.row.clamp(row);
         col = grid.data.col.clamp(col);
@@ -59,14 +50,17 @@ module.exports = function (_grid) {
 
     function seekNextEdge(newIndex, startedDefined, isForwardEdge, isBackwardEdge, goForward) {
 
-        var isEdgeToSeek
+        var isEdgeToSeek;
         if (isForwardEdge(newIndex) || !startedDefined) {
             isEdgeToSeek = isBackwardEdge;
         } else {
             isEdgeToSeek = isForwardEdge;
         }
-        while (goForward(newIndex) !== undefined && !isEdgeToSeek(newIndex = goForward(newIndex))) {
-        }
+        
+        while (goForward(newIndex) !== undefined && !isEdgeToSeek(newIndex = goForward(newIndex))) 
+        { // jshint ignore: line
+            //empty
+        }        
         return newIndex;
     }
 
@@ -75,24 +69,25 @@ module.exports = function (_grid) {
         var newRow = row;
         var newCol = col;
         var isSeek = ctrlOrCmd(e);
+        var isLeftwardEdge, isRightwardEdge, isUpwardEdge, isDownwardEdge, cellHasValue, startedDefined;
         if (isSeek) {
             //intentionally using the fact the js doesn't scope these to the block to avoid doing the work when we don't need to
-            var cellHasValue = function (r, c) {
+            cellHasValue = function (r, c) {
                 return !!grid.dataModel.get(r, c).formatted;
             };
-            var isLeftwardEdge = function (c) {
+            isLeftwardEdge = function (c) {
                 return cellHasValue(newRow, c) && !cellHasValue(newRow, grid.data.left(c));
-            }
-            var isRightwardEdge = function (c) {
+            };
+            isRightwardEdge = function (c) {
                 return cellHasValue(newRow, c) && !cellHasValue(newRow, grid.data.right(c));
             };
-            var isUpwardEdge = function (r) {
+            isUpwardEdge = function (r) {
                 return cellHasValue(r, newCol) && !cellHasValue(grid.data.up(r), newCol);
             };
-            var isDownwardEdge = function (r) {
+            isDownwardEdge = function (r) {
                 return cellHasValue(r, newCol) && !cellHasValue(grid.data.down(r), newCol);
             };
-            var startedDefined = cellHasValue(newRow, newCol);
+            startedDefined = cellHasValue(newRow, newCol);
         }
         switch (e.which) {
             case arrow.down.code:
@@ -177,10 +172,6 @@ module.exports = function (_grid) {
             grid.cellScrollModel.scrollIntoView(newRowCol.row, newRowCol.col);
         }
     });
-
-    function outsideMinMaxDrag(row, col) {
-        return row < 0 || row > grid.data.row.count() || col < 0 || col > grid.data.col.count();
-    }
 
     grid.eventLoop.bind('mousedown', function (e) {
         //assume the event has been annotated by the cell mouse model interceptor
@@ -283,8 +274,9 @@ module.exports = function (_grid) {
     };
 
     function maybeSelectHeaderFromSelection(range, deselect) {
+        var indexes;
         if (range.height === Infinity) {
-            var indexes = grid.data.col.indexes({from: range.left, length: range.width});
+            indexes = grid.data.col.indexes({from: range.left, length: range.width});
             if (deselect) {
                 grid.colModel.deselect(indexes);
             } else {
@@ -292,7 +284,7 @@ module.exports = function (_grid) {
             }
         }
         if (range.width === Infinity) {
-            var indexes = grid.data.row.indexes({from: range.top, length: range.height});
+            indexes = grid.data.row.indexes({from: range.top, length: range.height});
             if (deselect) {
                 grid.rowModel.deselect(indexes);
             } else {
@@ -316,8 +308,8 @@ module.exports = function (_grid) {
         syncSelectionToHeaders();
     };
 
-    function setSelectionToFocus() {
 
+    function setSelectionToFocus() {
         model.setSelection({top: model.focus.row, left: model.focus.col, height: 1, width: 1});
     }
 
@@ -369,7 +361,13 @@ module.exports = function (_grid) {
             }
             return selection;
         }
-    })
+    });
 
+    grid.eventLoop.bind('grid-col-change', function (e) {
+        if (e.action === 'move') {
+            setSelectionToFocus();
+            clearOtherSelections();
+        }
+    });
     return model;
 };

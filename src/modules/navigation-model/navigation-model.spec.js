@@ -20,14 +20,14 @@ describe('navigation-model', function () {
 
 
     function makeAndFireMouseDownForCell(r, c, shiftKey, metaKey) {
-        var mouseDown = mockEvent('mousedown');
+        var mousedown = mockEvent('mousedown');
         var col = c;
         var row = r;
-        mouseDown.shiftKey = shiftKey;
-        mouseDown.metaKey = metaKey;
-        mouseDown.clientX = col * 100 + 1;
-        mouseDown.clientY = row * 30 + 1;
-        grid.eventLoop.fire(mouseDown);
+        mousedown.shiftKey = shiftKey;
+        mousedown.metaKey = metaKey;
+        mousedown.clientX = col * 100 + 1;
+        mousedown.clientY = row * 30 + 1;
+        grid.eventLoop.fire(mousedown);
     }
 
     describe('focus', function () {
@@ -282,7 +282,7 @@ describe('navigation-model', function () {
         it('should clear others on mousedown', function () {
             selectCells(1, 2, 3, 4);
             makeAndFireMouseDownForCell(2, 2, false, true);
-            var oldSelections = model.otherSelections
+            var oldSelections = model.otherSelections;
             makeAndFireMouseDownForCell(2, 2, false, false);
             expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
             expect(model.otherSelections).toEqual([]);
@@ -303,7 +303,7 @@ describe('navigation-model', function () {
         it('should clear other selections on mousedown even with shift', function () {
             selectCells(1, 2, 3, 4);
             makeAndFireMouseDownForCell(2, 2, false, true);
-            var oldSelections = model.otherSelections
+            var oldSelections = model.otherSelections;
 
             makeAndFireMouseDownForCell(2, 2, true, false);
             expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
@@ -340,6 +340,14 @@ describe('navigation-model', function () {
         it('should not select merely on shift key down', function () {
             makeAndFireKeyDown(key.code.special.shift, true);
             expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
+        });
+
+        it('should clear on move event', function () {
+            model.setSelection({top: 1, left: 1, width: 2, height: 2});
+            model.otherSelections.push({top: 3, left: 4, width: 2, height: 2});
+            grid.colModel.move(1, 2);
+            expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
+            expect(model.otherSelections).toEqual([]);
         });
 
     });
@@ -404,8 +412,7 @@ describe('navigation-model', function () {
                 expect(spy.calls.count()).toBe(2);
                 expect(model._rowSelectionClasses.length).toBe(2);
                 cb();
-            }, 2)
-
+            }, 2);
         });
 
         it('should set a cell class for a selected col', function (cb) {
