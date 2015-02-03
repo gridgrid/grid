@@ -7,5 +7,3 @@ build
 tmp
 test-assets
 /coverage
-release
-release/bundle*.css
