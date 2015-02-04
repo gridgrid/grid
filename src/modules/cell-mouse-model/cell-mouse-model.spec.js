@@ -28,6 +28,16 @@ describe('cell-mouse-model', function () {
 
     var annotatedEvents = ['mousedown', 'mousemove', 'mouseup', 'click', 'dblclick'];
 
+    function startDrag(postDownFn) {
+            var mousedown = createEventWithXY('mousedown', 110, 40);
+            this.container.dispatchEvent(mousedown);
+            if (postDownFn) {
+                postDownFn();
+            }
+            var mousemove = createEventWithXY('mousemove', 111, 41);
+            window.dispatchEvent(mousemove);
+        }
+
     describe('general', function () {
         beforeEach(function () {
             beforeEachFunction.call(this);
@@ -121,16 +131,6 @@ describe('cell-mouse-model', function () {
             expect(dragSpy).toHaveBeenCalled();
 
         });
-
-        function startDrag(postDownFn) {
-            var mousedown = createEventWithXY('mousedown', 110, 40);
-            this.container.dispatchEvent(mousedown);
-            if (postDownFn) {
-                postDownFn();
-            }
-            var mousemove = createEventWithXY('mousemove', 111, 41);
-            window.dispatchEvent(mousemove);
-        }
 
         it('should fire grid-drag event on move that doesnt cross cell boundary', function () {
             var spy = jasmine.createSpy();
@@ -228,6 +228,52 @@ describe('cell-mouse-model', function () {
                 expect(event.realCol).toBe(0);
                 expect(event.virtualRow).toBe(0);
                 expect(event.virtualCol).toBe(0);
+            });
+        });
+
+        ddescribe('scroll on drag', function() {
+            function testScrollDrag (x, y, rowDiff, colDiff, done) {
+                var mousedown = createEventWithXY('mousedown', 110, 40);
+                this.container.dispatchEvent(mousedown);
+                var scroll = spyOn(this.grid.cellScrollModel, 'scrollTo').and.callThrough();
+                window.dispatchEvent(createEventWithXY('mousemove', 111, 41));
+                expect(scroll).not.toHaveBeenCalled();
+                var prevCol  = grid.cellScrollModel.col;
+                var prevRow  = grid.cellScrollModel.row;
+                window.dispatchEvent(createEventWithXY('mousemove', x, y));
+                setTimeout(function() {
+                    expect(scroll).toHaveBeenCalledWith(prevRow + rowDiff, prevCol + colDiff);
+                    scroll.calls.reset();
+                    setTimeout(function() {
+                        expect(scroll).toHaveBeenCalledWith(prevRow + rowDiff * 2, prevCol + colDiff * 2);
+                        scroll.calls.reset();
+                        var mouseup = createEventWithXY('mouseup', 111, 41);
+                        window.dispatchEvent(mouseup);
+                        setTimeout(function() {
+                            expect(scroll).not.toHaveBeenCalled();
+                            done();    
+                        }, 101);
+                    }, 101);
+                    
+                }, 101);
+            }
+
+            it('should scroll right if outside the window to the right', function(done) {
+                testScrollDrag.call(this, window.innerWidth + 1, 121, 0, 1, done);
+            });
+
+            it('should scroll done if outside the window to the bottom', function(done) {
+                testScrollDrag.call(this, 121, window.innerHeight + 1, 1, 0, done);
+            });
+
+            it('should scroll left if left of the unfixed range', function(done) {
+                grid.cellScrollModel.scrollTo(2, 2);
+                testScrollDrag.call(this, 1, 121, 0, -1, done);
+            });
+
+            it('should scroll right if outside the window to the right', function(done) {
+                grid.cellScrollModel.scrollTo(2, 2);
+                testScrollDrag.call(this, 121, 1, -1, 0, done);
             });
         });
     });

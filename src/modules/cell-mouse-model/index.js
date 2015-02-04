@@ -9,6 +9,7 @@ module.exports = function (_grid) {
     var model = {};
 
     var wasDragged = false;
+    var scrollInterval;
 
     model._annotateEvent = function annotateEvent(e) {
         switch (e.type) {
@@ -34,7 +35,7 @@ module.exports = function (_grid) {
         e.row = grid.virtual.row.toData(e.virtualRow);
         e.col = grid.virtual.col.toData(e.virtualCol);
         return e;
-    }
+    };
 
     model._annotateEventInternal = function (e) {
         var y = grid.viewPort.toGridY(e.clientY);
@@ -75,6 +76,30 @@ module.exports = function (_grid) {
                 dragStarted = true;
             }
 
+            grid.eventLoop.bindOnce('grid-drag', function (e) {
+                //if it gets here then we will try to auto scroll
+                var rowDiff = 0;
+                var colDiff = 0;
+                if(e.clientX > window.innerWidth){
+                    colDiff = 1;
+                } else if(grid.viewPort.toGridX(e.clientX) < grid.virtualPixelCellModel.fixedWidth()){
+                    colDiff = -1;
+                }
+                
+                if(e.clientY > window.innerHeight){
+                    rowDiff = 1;
+                } else if(grid.viewPort.toGridY(e.clientY) < grid.virtualPixelCellModel.fixedHeight()){
+                    rowDiff = -1;
+                }
+
+                clearInterval(scrollInterval);
+                if(rowDiff || colDiff){
+                    scrollInterval = grid.interval(function() {
+                        grid.cellScrollModel.scrollTo(grid.cellScrollModel.row + rowDiff, grid.cellScrollModel.col + colDiff);
+                    }, 100);
+                }
+
+            });
             createAndFireDragEvent('grid-drag', e);
 
             if (e.row !== lastDragRow || e.col !== lastDragCol) {
@@ -89,6 +114,7 @@ module.exports = function (_grid) {
         var unbindUp = grid.eventLoop.bind('mouseup', window, handleMouseUp);
 
         function handleMouseUp(e) {
+            clearInterval(scrollInterval);
             unbindMove();
             unbindUp();
 

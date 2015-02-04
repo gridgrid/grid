@@ -62,6 +62,7 @@ require('gulp-tasks-riq/browserify-omega')({
             output: 'riq-grid-app.js'
         }
     ],
-    dest: RELEASE_FOLDER
+    dest: RELEASE_FOLDER,
+    exorcise : true
 });
 

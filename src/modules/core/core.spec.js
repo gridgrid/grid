@@ -154,4 +154,44 @@ describe('grid-core', function () {
         expect(spy).toHaveBeenCalled();
     });
 
+    ddescribe('timeout/interval', function() {
+        it('should set a timeout', function() {
+            var spy = spyOn(window, 'setTimeout');
+            var fn = function  () {
+                
+            };
+            grid.timeout(fn, 1);
+            expect(spy).toHaveBeenCalledWith(fn , 1);
+        });
+
+         it('should set an interval', function() {
+            var spy = spyOn(window, 'setInterval');
+            var fn = function  () {
+                
+            };
+            grid.interval(fn, 1);
+            expect(spy).toHaveBeenCalledWith(fn , 1);
+        });
+
+         it('should clear timeout on destroy', function() {
+            var spy = spyOn(window, 'clearTimeout');
+            var fn = function  () {
+                
+            };
+            var id = grid.timeout(fn, 1);
+            grid.eventLoop.fire('grid-destroy');
+            expect(spy).toHaveBeenCalledWith(id);
+         });
+
+         it('should clear interval on destroy', function() {
+            var spy = spyOn(window, 'clearInterval');
+            var fn = function  () {
+                
+            };
+            var id = grid.interval(fn, 1);
+            grid.eventLoop.fire('grid-destroy');
+            expect(spy).toHaveBeenCalledWith(id);
+         });
+    });
+
 });

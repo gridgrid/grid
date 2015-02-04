@@ -280,6 +280,29 @@ module.exports = function () {
         }
     };
     addToSpace('view');
+    
+    var timeouts = [];
+    grid.timeout = function(){
+        var id = setTimeout.apply(window, arguments);
+        timeouts.push(id);
+        return id;
+    };
+    var intervals = [];
+    grid.interval = function(){
+        var id = setInterval.apply(window, arguments);
+        intervals.push(id);
+        return id;
+    };
+
+    grid.eventLoop.bind('grid-destroy', function () {
+        intervals.forEach(function (id) {
+            clearInterval(id);
+        });
+
+        timeouts.forEach(function (id) {
+            clearTimeout(id);
+        });
+    });
 
     grid.build = function (container) {
         setupTextareaForContainer(grid.textarea, container);

@@ -71,7 +71,6 @@ module.exports = function (_grid) {
         var isSeek = ctrlOrCmd(e);
         var isLeftwardEdge, isRightwardEdge, isUpwardEdge, isDownwardEdge, cellHasValue, startedDefined;
         if (isSeek) {
-            //intentionally using the fact the js doesn't scope these to the block to avoid doing the work when we don't need to
             cellHasValue = function (r, c) {
                 return !!grid.dataModel.get(r, c).formatted;
             };
