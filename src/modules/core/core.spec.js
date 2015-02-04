@@ -1,12 +1,12 @@
-describe('grid-core', function () {
+describe('grid-core', function() {
     require('../grid-spec-helper')();
     var $ = require('jquery');
     var grid;
-    beforeEach(function () {
+    beforeEach(function() {
         grid = this.buildSimpleGrid();
     });
 
-    it('should have the right models', function () {
+    it('should have the right models', function() {
         expect(grid).toHaveField('eventLoop');
         expect(grid).toHaveField('decorators');
         expect(grid).toHaveField('cellClasses');
@@ -26,7 +26,7 @@ describe('grid-core', function () {
         expect(grid).toHaveField('copyPaste');
     });
 
-    it('should have a main build function', function () {
+    it('should have a main build function', function() {
         var viewPortSize = spyOn(grid.viewPort, 'sizeToContainer');
         var viewBuild = spyOn(grid.viewLayer, 'build');
         var loopBuild = spyOn(grid.eventLoop, 'setContainer');
@@ -40,13 +40,13 @@ describe('grid-core', function () {
         return spyOn(grid.viewLayer, 'draw');
     }
 
-    it('should let me request a redraw', function () {
+    it('should let me request a redraw', function() {
         var draw = spyOn(grid.viewLayer, 'draw');
         grid.requestDraw();
         expect(draw).toHaveBeenCalled();
     });
 
-    it('should not draw on request if in event loop but should draw after', function () {
+    it('should not draw on request if in event loop but should draw after', function() {
         var draw = spyOnDraw();
         grid.eventLoop.addInterceptor(function inLoopFn(e) {
             if (e.type === 'test-event') {
@@ -63,16 +63,16 @@ describe('grid-core', function () {
         return $(this.container).find('.grid-textarea');
     }
 
-    it('should create the textarea on creation before build', function () {
+    it('should create the textarea on creation before build', function() {
         expect(this.grid.textarea).toBeAnElement();
     });
 
-    it('should have a focusable text area on build', function () {
+    it('should have a focusable text area on build', function() {
         grid.build(this.container);
         expect(findTextArea.call(this)).toBeAnElement();
     });
 
-    it('should pin the textarea to the edges and make it transparent', function () {
+    it('should pin the textarea to the edges and make it transparent', function() {
         grid.build(this.container);
 
         var area = findTextArea.call(this);
@@ -84,19 +84,19 @@ describe('grid-core', function () {
         expect(area[0].style.cursor).toBe('default');
     });
 
-    it('should prevent weird browser behavior on dragging the text', function () {
+    it('should prevent weird browser behavior on dragging the text', function() {
         grid.build(this.container);
         expect(findTextArea.call(this).attr('ondragstart')).toEqual('return false;');
     });
 
-    it('should add a class to the container on focus', function () {
+    it('should add a class to the container on focus', function() {
         grid.build(this.container);
         findTextArea.call(this).focus();
         expect(this.container).toHaveClass('focus');
         expect(grid.focused).toBe(true);
     });
 
-    it('should remove the focus class from the container on blur', function () {
+    it('should remove the focus class from the container on blur', function() {
         grid.build(this.container);
         findTextArea.call(this).focus();
         findTextArea.call(this).blur();
@@ -104,24 +104,24 @@ describe('grid-core', function () {
         expect(grid.focused).toBe(false);
     });
 
-    it('should not change the containers tabindex if it already has a value', function () {
+    it('should not change the containers tabindex if it already has a value', function() {
         this.container.tabIndex = 1;
         grid.build(this.container);
         expect(this.container.tabIndex).toBe(1);
     });
 
-    it('should give the container a tabindex if it doesnt already have one', function () {
+    it('should give the container a tabindex if it doesnt already have one', function() {
         grid.build(this.container);
         expect(this.container.tabIndex).toBe(-1);
     });
 
-    it('should focus the text area if the grid is focused', function () {
+    it('should focus the text area if the grid is focused', function() {
         grid.build(this.container);
         $(this.container).focus();
         expect(document.activeElement).toEqual(findTextArea.call(this)[0]);
     });
 
-    it('should select all text in the paste area when focused', function () {
+    it('should select all text in the paste area when focused', function() {
         grid.build(this.container);
         var textarea = findTextArea.call(this)[0];
         var select = spyOn(textarea, 'select');
@@ -129,14 +129,14 @@ describe('grid-core', function () {
         expect(select).toHaveBeenCalled();
     });
 
-    it('should let me create a dirty clean', function () {
+    it('should let me create a dirty clean', function() {
         var dirtyClean = grid.makeDirtyClean();
         expect(dirtyClean).toBeDirty();
         this.resetAllDirties();
         expect(dirtyClean).not.toBeDirty();
     });
 
-    it('should fire text area focus events', function () {
+    it('should fire text area focus events', function() {
         grid.build(this.container);
         grid.textarea.blur();
         var spy = jasmine.createSpy();
@@ -145,7 +145,7 @@ describe('grid-core', function () {
         expect(spy).toHaveBeenCalled();
     });
 
-    it('should fire text area blur events', function () {
+    it('should fire text area blur events', function() {
         grid.build(this.container);
         grid.textarea.focus();
         var spy = jasmine.createSpy();
@@ -154,44 +154,44 @@ describe('grid-core', function () {
         expect(spy).toHaveBeenCalled();
     });
 
-    ddescribe('timeout/interval', function() {
+    describe('timeout/interval', function() {
         it('should set a timeout', function() {
             var spy = spyOn(window, 'setTimeout');
-            var fn = function  () {
-                
+            var fn = function() {
+
             };
             grid.timeout(fn, 1);
-            expect(spy).toHaveBeenCalledWith(fn , 1);
+            expect(spy).toHaveBeenCalledWith(fn, 1);
         });
 
-         it('should set an interval', function() {
+        it('should set an interval', function() {
             var spy = spyOn(window, 'setInterval');
-            var fn = function  () {
-                
+            var fn = function() {
+
             };
             grid.interval(fn, 1);
-            expect(spy).toHaveBeenCalledWith(fn , 1);
+            expect(spy).toHaveBeenCalledWith(fn, 1);
         });
 
-         it('should clear timeout on destroy', function() {
+        it('should clear timeout on destroy', function() {
             var spy = spyOn(window, 'clearTimeout');
-            var fn = function  () {
-                
+            var fn = function() {
+
             };
             var id = grid.timeout(fn, 1);
             grid.eventLoop.fire('grid-destroy');
             expect(spy).toHaveBeenCalledWith(id);
-         });
+        });
 
-         it('should clear interval on destroy', function() {
+        it('should clear interval on destroy', function() {
             var spy = spyOn(window, 'clearInterval');
-            var fn = function  () {
-                
+            var fn = function() {
+
             };
             var id = grid.interval(fn, 1);
             grid.eventLoop.fire('grid-destroy');
             expect(spy).toHaveBeenCalledWith(id);
-         });
+        });
     });
 
 });

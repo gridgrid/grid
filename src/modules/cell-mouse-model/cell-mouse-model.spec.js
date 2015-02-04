@@ -1,6 +1,6 @@
 var mockEvent = require('../custom-event');
 
-describe('cell-mouse-model', function () {
+describe('cell-mouse-model', function() {
 
     require('../grid-spec-helper')();
     var model;
@@ -8,7 +8,7 @@ describe('cell-mouse-model', function () {
     var numCols = 10;
     var grid;
 
-    var beforeEachFunction = function (fixedR, fixedC, hRows, hCols) {
+    var beforeEachFunction = function(fixedR, fixedC, hRows, hCols) {
         grid = this.buildSimpleGrid(numRows, numCols, false, false, fixedR, fixedC, hRows, hCols);
         //set container without building to save perf
         grid.container = this.container;
@@ -29,23 +29,23 @@ describe('cell-mouse-model', function () {
     var annotatedEvents = ['mousedown', 'mousemove', 'mouseup', 'click', 'dblclick'];
 
     function startDrag(postDownFn) {
-            var mousedown = createEventWithXY('mousedown', 110, 40);
-            this.container.dispatchEvent(mousedown);
-            if (postDownFn) {
-                postDownFn();
-            }
-            var mousemove = createEventWithXY('mousemove', 111, 41);
-            window.dispatchEvent(mousemove);
+        var mousedown = createEventWithXY('mousedown', 110, 40);
+        this.container.dispatchEvent(mousedown);
+        if (postDownFn) {
+            postDownFn();
         }
+        var mousemove = createEventWithXY('mousemove', 111, 41);
+        window.dispatchEvent(mousemove);
+    }
 
-    describe('general', function () {
-        beforeEach(function () {
+    describe('general', function() {
+        beforeEach(function() {
             beforeEachFunction.call(this);
         });
 
-        it('should annotate mouse events with the cell they are on', function () {
+        it('should annotate mouse events with the cell they are on', function() {
             grid.cellScrollModel.scrollTo(1, 1);
-            annotatedEvents.forEach(function (type) {
+            annotatedEvents.forEach(function(type) {
                 var event = createEventWithXY(type, 110, 40);
                 model._annotateEvent(event);
                 expect(event).rowToBe(2);
@@ -57,11 +57,11 @@ describe('cell-mouse-model', function () {
             });
         });
 
-        it('should annotate mouse events with the cell they are on considering offset', function () {
+        it('should annotate mouse events with the cell they are on considering offset', function() {
             this.container.style.marginTop = '10px';
             this.container.style.marginLeft = '5px';
             grid.cellScrollModel.scrollTo(1, 1);
-            annotatedEvents.forEach(function (type) {
+            annotatedEvents.forEach(function(type) {
                 var event = createEventWithXY(type, 104, 39);
                 model._annotateEvent(event);
                 expect(event).rowToBe(1);
@@ -74,10 +74,10 @@ describe('cell-mouse-model', function () {
             });
         });
 
-        it('should annotate mouse events with the gridX and gridY', function () {
+        it('should annotate mouse events with the gridX and gridY', function() {
             this.container.style.marginLeft = '5px';
             this.container.style.marginTop = '10px';
-            annotatedEvents.forEach(function (type) {
+            annotatedEvents.forEach(function(type) {
                 var event = createEventWithXY(type, 110, 40);
                 model._annotateEvent(event);
                 expect(event).gridXToBe(105);
@@ -86,13 +86,13 @@ describe('cell-mouse-model', function () {
         });
 
 
-        it('should note when a click has not been dragged', function () {
+        it('should note when a click has not been dragged', function() {
             var click = createEventWithXY('click', 110, 40);
             grid.eventLoop.fire(click);
             expect(click.wasDragged).toBe(false);
         });
 
-        it('should note when a click has been dragged', function () {
+        it('should note when a click has been dragged', function() {
             startDrag.call(this);
             window.dispatchEvent(createEventWithXY('mouseup', 111, 41));
             var click = createEventWithXY('click', 110, 40);
@@ -100,7 +100,7 @@ describe('cell-mouse-model', function () {
             expect(click.wasDragged).toBe(true);
         });
 
-        it('should fire grid-drag-start on mousedown and then move', function () {
+        it('should fire grid-drag-start on mousedown and then move', function() {
             var spy = jasmine.createSpy();
             grid.eventLoop.bind('grid-drag-start', spy);
             startDrag.call(this, function postDownFn() {
@@ -115,7 +115,7 @@ describe('cell-mouse-model', function () {
             expect(dragEvent.clientX).toBe(110);
         });
 
-        it('should only fire grid-drag-start at the beginning', function () {
+        it('should only fire grid-drag-start at the beginning', function() {
             var dragSpy = jasmine.createSpy('drag');
             var startSpy = jasmine.createSpy('drag start');
             grid.eventLoop.bind('grid-drag-start', startSpy);
@@ -132,7 +132,7 @@ describe('cell-mouse-model', function () {
 
         });
 
-        it('should fire grid-drag event on move that doesnt cross cell boundary', function () {
+        it('should fire grid-drag event on move that doesnt cross cell boundary', function() {
             var spy = jasmine.createSpy();
             grid.eventLoop.bind('grid-drag', spy);
             startDrag.call(this);
@@ -148,7 +148,7 @@ describe('cell-mouse-model', function () {
 
         });
 
-        it('should fire grid-cell-drag event on move only when changing cells', function () {
+        it('should fire grid-cell-drag event on move only when changing cells', function() {
             var spy = jasmine.createSpy();
             grid.eventLoop.bind('grid-cell-drag', spy);
             startDrag.call(this);
@@ -170,7 +170,7 @@ describe('cell-mouse-model', function () {
             expect(spy).not.toHaveBeenCalled();
         });
 
-        it('should fire grid-drag-end event on mouseup', function () {
+        it('should fire grid-drag-end event on mouseup', function() {
             var spy = jasmine.createSpy();
             grid.eventLoop.bind('grid-drag-end', spy);
             startDrag.call(this);
@@ -188,7 +188,7 @@ describe('cell-mouse-model', function () {
             expect(dragEvent.gridX).toBe(111);
         });
 
-        it('should fire drag end if gets a mousemove without the mouse button down', function () {
+        it('should fire drag end if gets a mousemove without the mouse button down', function() {
             var spy = jasmine.createSpy();
             grid.eventLoop.bind('grid-drag-end', spy);
             startDrag.call(this);
@@ -199,14 +199,14 @@ describe('cell-mouse-model', function () {
         });
     });
 
-    describe('with headers', function () {
-        beforeEach(function () {
+    describe('with headers', function() {
+        beforeEach(function() {
             beforeEachFunction.call(this, 0, 0, 1, 1);
         });
 
-        it('should offset the event annotations for the headers', function () {
+        it('should offset the event annotations for the headers', function() {
             grid.cellScrollModel.scrollTo(2, 2);
-            annotatedEvents.forEach(function (type) {
+            annotatedEvents.forEach(function(type) {
                 var event = createEventWithXY(type, 110, 40);
                 model._annotateEvent(event);
                 expect(event).rowToBe(2);
@@ -218,8 +218,8 @@ describe('cell-mouse-model', function () {
             });
         });
 
-        it('should have negative values for row col event annotation if in headers', function () {
-            annotatedEvents.forEach(function (type) {
+        it('should have negative values for row col event annotation if in headers', function() {
+            annotatedEvents.forEach(function(type) {
                 var event = createEventWithXY(type, 95, 25);
                 model._annotateEvent(event);
                 expect(event).rowToBe(-1);
@@ -231,15 +231,15 @@ describe('cell-mouse-model', function () {
             });
         });
 
-        ddescribe('scroll on drag', function() {
-            function testScrollDrag (x, y, rowDiff, colDiff, done) {
+        describe('scroll on drag', function() {
+            function testScrollDrag(x, y, rowDiff, colDiff, done) {
                 var mousedown = createEventWithXY('mousedown', 110, 40);
                 this.container.dispatchEvent(mousedown);
                 var scroll = spyOn(this.grid.cellScrollModel, 'scrollTo').and.callThrough();
                 window.dispatchEvent(createEventWithXY('mousemove', 111, 41));
                 expect(scroll).not.toHaveBeenCalled();
-                var prevCol  = grid.cellScrollModel.col;
-                var prevRow  = grid.cellScrollModel.row;
+                var prevCol = grid.cellScrollModel.col;
+                var prevRow = grid.cellScrollModel.row;
                 window.dispatchEvent(createEventWithXY('mousemove', x, y));
                 setTimeout(function() {
                     expect(scroll).toHaveBeenCalledWith(prevRow + rowDiff, prevCol + colDiff);
@@ -251,12 +251,13 @@ describe('cell-mouse-model', function () {
                         window.dispatchEvent(mouseup);
                         setTimeout(function() {
                             expect(scroll).not.toHaveBeenCalled();
-                            done();    
+                            done();
                         }, 101);
                     }, 101);
-                    
+
                 }, 101);
             }
+
 
             it('should scroll right if outside the window to the right', function(done) {
                 testScrollDrag.call(this, window.innerWidth + 1, 121, 0, 1, done);
