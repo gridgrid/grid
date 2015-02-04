@@ -95,6 +95,7 @@ module.exports = function (_grid) {
                 var scrollBarOffset = e[layerCoordField];
 
                 decorator._unbindDrag = grid.eventLoop.bind('grid-drag', function (e) {
+                    grid.eventLoop.stopBubbling(e);
                     var gridCoord = viewPortClampFn(e[gridCoordField]);
                     var scrollBarRealClickCoord = gridCoord - scrollBarOffset;
                     var scrollCoord = getScrollPositionFromReal(scrollBarRealClickCoord, heightWidth, vertHorz);
