@@ -207,7 +207,17 @@ module.exports = function(_grid) {
             if (ctrlOrCmdPressed) {
                 addSelection(model.selection);
             }
-            model.setFocus(row, col, ctrlOrCmdPressed);
+
+            var focusRow = row;
+            if (focusRow < 0) {
+                focusRow = grid.view.row.toData(grid.rowModel.numHeaders());
+            }
+            var focusCol = col;
+            if (focusCol < 0) {
+                focusCol = grid.view.col.toData(grid.colModel.numHeaders());
+            }
+            model.setFocus(focusRow, focusCol, ctrlOrCmdPressed);
+
             if (row < 0 && col < 0) {
                 setSelectionFromPoints(0, 0, Infinity, Infinity, ctrlOrCmdPressed);
             } else if (row < 0) {
