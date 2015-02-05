@@ -1,13 +1,14 @@
 var mockEvent = require('../custom-event');
 var key = require('key');
 
-describe('navigation-model', function () {
+describe('navigation-model', function() {
     require('../grid-spec-helper')();
     var model;
     var grid;
-    var beforeEachFn = function (hRows, hCols, nRows, nCols) {
+    var beforeEachFn = function(hRows, hCols, nRows, nCols) {
         grid = this.buildSimpleGrid(nRows, nCols, undefined, undefined, undefined, undefined, hRows, hCols);
         model = grid.navigationModel;
+        grid.focused = true;
     };
 
 
@@ -17,7 +18,6 @@ describe('navigation-model', function () {
         moveDown.shiftKey = shiftKey;
         grid.eventLoop.fire(moveDown);
     }
-
 
     function makeAndFireMouseDownForCell(r, c, shiftKey, metaKey) {
         var mousedown = mockEvent('mousedown');
@@ -30,9 +30,9 @@ describe('navigation-model', function () {
         grid.eventLoop.fire(mousedown);
     }
 
-    describe('focus', function () {
+    describe('focus', function() {
         var focus;
-        beforeEach(function () {
+        beforeEach(function() {
             beforeEachFn.call(this);
             focus = model.focus;
         });
@@ -42,16 +42,16 @@ describe('navigation-model', function () {
             expect(focus).colToBe(c);
         }
 
-        it('should start at 0, 0', function () {
+        it('should start at 0, 0', function() {
             expectRowCol(0, 0);
         });
 
-        it('should let me set it', function () {
+        it('should let me set it', function() {
             model.setFocus(2, 3);
             expectRowCol(2, 3);
         });
 
-        it('should move around by one on keydowns', function () {
+        it('should move around by one on keydowns', function() {
             makeAndFireKeyDown(key.code.arrow.down.code);
             expectRowCol(1, 0);
             makeAndFireKeyDown(key.code.arrow.right.code);
@@ -62,7 +62,7 @@ describe('navigation-model', function () {
             expectRowCol(0, 0);
         });
 
-        it('should register a cell class for focus', function () {
+        it('should register a cell class for focus', function() {
             var spy = spyOn(grid.cellClasses, 'add');
             require('../navigation-model')(grid);
             expect(spy).toHaveBeenCalled();
@@ -72,35 +72,35 @@ describe('navigation-model', function () {
             expect(descriptor).classToBe('focus');
         });
 
-        describe('decorator', function () {
+        describe('decorator', function() {
             var decorator;
-            beforeEach(function () {
+            beforeEach(function() {
                 decorator = model.focusDecorator;
             });
-            it('should be added', function () {
+            it('should be added', function() {
                 expect(grid.decorators.getAlive()).toContain(decorator);
             });
 
-            it('should have a style class', function () {
+            it('should have a style class', function() {
                 expect(decorator.render()).toHaveClass('grid-focus-decorator');
             });
 
-            describe('should satisfy:', function () {
+            describe('should satisfy:', function() {
                 var ctx = {};
-                beforeEach(function () {
+                beforeEach(function() {
                     ctx.decorator = decorator;
                 });
                 require('../decorators/decorator-test-body')(ctx);
             });
 
-            it('should move when focus changes', function () {
+            it('should move when focus changes', function() {
                 model.setFocus(2, 3);
                 expect(decorator).topToBe(2);
                 expect(decorator).leftToBe(3);
             });
         });
 
-        it('should move the cell class on navigation', function () {
+        it('should move the cell class on navigation', function() {
             var spy = spyOn(grid.cellClasses, 'add');
             var model = require('../navigation-model')(grid);
             expect(spy).toHaveBeenCalled();
@@ -110,13 +110,13 @@ describe('navigation-model', function () {
             expect(descriptor).leftToBe(3);
         });
 
-        it('should try to scroll the cell into view on nav', function () {
+        it('should try to scroll the cell into view on nav', function() {
             var spy = spyOn(grid.cellScrollModel, 'scrollIntoView');
             model.setFocus(1, 1);
             expect(spy).toHaveBeenCalledWith(1, 1);
         });
 
-        it('should navigate on mousedown', function () {
+        it('should navigate on mousedown', function() {
             var mouseDown = mockEvent('mousedown');
             var col = 3;
             var row = 4;
@@ -127,7 +127,7 @@ describe('navigation-model', function () {
             expect(focus).colToBe(col);
         });
 
-        it('should fire an event on focus changes', function () {
+        it('should fire an event on focus changes', function() {
             var spy = jasmine.createSpy('focusListener');
             grid.eventLoop.bind('grid-focus-change', spy);
             model.setFocus(1, 1);
@@ -135,17 +135,20 @@ describe('navigation-model', function () {
         });
     });
 
-    describe('navFrom', function () {
+    describe('navFrom', function() {
 
 
-        describe('seek behavior', function () {
+        describe('seek behavior', function() {
 
-            beforeEach(function () {
+            beforeEach(function() {
                 beforeEachFn.call(this, undefined, undefined, 11, 11);
             });
 
             function getCoordFromCenter(rowOrCol, amount) {
-                var coord = {row: 5, col: 5};
+                var coord = {
+                    row: 5,
+                    col: 5
+                };
                 coord[rowOrCol] += amount;
                 return coord;
             }
@@ -158,8 +161,14 @@ describe('navigation-model', function () {
                 var thirdEmpty = getCoordFromCenter(rowOrCol, direction * 5);
                 thirdEmpty.data = '';
                 this.grid.dataModel.set([firstEmpty, secondEmpty, thirdEmpty]);
-                var forwardEvent = {which: directionCode, metaKey: true};
-                var backwardEvent = {which: backCode, metaKey: true};
+                var forwardEvent = {
+                    which: directionCode,
+                    metaKey: true
+                };
+                var backwardEvent = {
+                    which: backCode,
+                    metaKey: true
+                };
                 var firstExpect = getCoordFromCenter(rowOrCol, direction);
                 var secondExpect = getCoordFromCenter(rowOrCol, direction * 4);
                 var finalExpect = getCoordFromCenter(rowOrCol, direction * 5);
@@ -170,19 +179,19 @@ describe('navigation-model', function () {
                 expect(model._navFrom(secondExpect.row, secondExpect.col, backwardEvent)).toEqual(firstExpect);
             }
 
-            it('should seek the edge of the data left', function () {
+            it('should seek the edge of the data left', function() {
                 testSeek.call(this, 'col', -1, key.code.arrow.left.code, key.code.arrow.right.code);
             });
 
-            it('should seek the edge of the data right', function () {
+            it('should seek the edge of the data right', function() {
                 testSeek.call(this, 'col', 1, key.code.arrow.right.code, key.code.arrow.left.code);
             });
 
-            it('should seek the edge of the data up', function () {
+            it('should seek the edge of the data up', function() {
                 testSeek.call(this, 'row', -1, key.code.arrow.up.code, key.code.arrow.down.code);
             });
 
-            it('should seek the edge of the data down', function () {
+            it('should seek the edge of the data down', function() {
                 testSeek.call(this, 'row', 1, key.code.arrow.down.code, key.code.arrow.up.code);
             });
         });
@@ -190,7 +199,9 @@ describe('navigation-model', function () {
 
     function selectCells(sr, sc, er, ec, dontSetFocus) {
 
-        var dragStart = {type: 'grid-drag-start'};
+        var dragStart = {
+            type: 'grid-drag-start'
+        };
         dragStart.clientX = sc * 100 + 1;
         dragStart.clientY = sr * 30 + 1;
         grid.cellMouseModel._annotateEventInternal(dragStart);
@@ -198,45 +209,59 @@ describe('navigation-model', function () {
             model.setFocus(dragStart.row, dragStart.col); //simulate the mousedown effect
         }
         grid.eventLoop.fire(dragStart);
-        var drag = {type: 'grid-cell-drag'};
+        var drag = {
+            type: 'grid-cell-drag'
+        };
         drag.clientX = ec * 100 + 1;
         drag.clientY = er * 30 + 1;
         grid.cellMouseModel._annotateEventInternal(drag);
         grid.eventLoop.fire(drag);
     }
 
-    describe('selection', function () {
-        beforeEach(function () {
+    describe('selection', function() {
+        beforeEach(function() {
             beforeEachFn.call(this);
         });
 
-        describe('decorator', function () {
+        describe('decorator', function() {
             var ctx = {};
-            beforeEach(function () {
+            beforeEach(function() {
                 ctx.decorator = model._selectionDecorator;
             });
             require('../decorators/decorator-test-body')(ctx);
 
-            it('adds style class to rendered elem', function () {
+            it('adds style class to rendered elem', function() {
                 expect(ctx.decorator.render()).toHaveClass('grid-selection');
             });
 
-            it('should be added as a decorator', function () {
+            it('should be added as a decorator', function() {
                 expect(grid.decorators.getAlive()).toContain(ctx.decorator);
             });
 
-            it('should have the right defaults', function () {
+            it('should have the right defaults', function() {
                 expect(ctx.decorator).spaceToBe('data');
                 expect(ctx.decorator).unitsToBe('cell');
             });
 
-            it('should unbind on drag end', function () {
-                var dragStart = {type: 'grid-drag-start', row: 1, col: 2};
+            it('should unbind on drag end', function() {
+                var dragStart = {
+                    type: 'grid-drag-start',
+                    row: 1,
+                    col: 2
+                };
                 var unbind = this.spyOnUnbind();
                 ctx.decorator._onDragStart(dragStart);
-                var drag = {type: 'grid-cell-drag', row: 3, col: 4};
+                var drag = {
+                    type: 'grid-cell-drag',
+                    row: 3,
+                    col: 4
+                };
                 grid.eventLoop.fire(drag);
-                var dragEnd = {type: 'grid-drag-end', row: 2, col: 3};
+                var dragEnd = {
+                    type: 'grid-drag-end',
+                    row: 2,
+                    col: 3
+                };
                 grid.eventLoop.fire(dragEnd);
                 expect(unbind).toHaveBeenCalled();
                 expect(unbind.calls.count()).toBe(2);
@@ -244,42 +269,42 @@ describe('navigation-model', function () {
         });
 
 
-        it('should default to the focus', function () {
+        it('should default to the focus', function() {
             expect(model.selection).rangeToBe(0, 0, 1, 1);
         });
 
-        it('should select a range of cells on grid drag', function () {
+        it('should select a range of cells on grid drag', function() {
             model.setFocus(1, 2);
             selectCells(1, 2, 3, 4);
             expect(model.selection).rangeToBe(1, 2, 3, 3);
         });
 
-        it('should expand the selection from focus even if that isnt the initial mousedown', function () {
+        it('should expand the selection from focus even if that isnt the initial mousedown', function() {
             selectCells(1, 2, 3, 4, true);
             expect(model.selection).rangeToBe(0, 0, 4, 5);
         });
 
-        it('should clear on mousedown', function () {
+        it('should clear on mousedown', function() {
             selectCells(1, 2, 3, 4);
             makeAndFireMouseDownForCell(2, 2, false);
             expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
         });
 
-        it('should add to a list of selections on mousedown with ctrl/cmd', function () {
+        it('should add to a list of selections on mousedown with ctrl/cmd', function() {
             selectCells(1, 2, 3, 4);
             makeAndFireMouseDownForCell(2, 2, false, true);
             expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
             expect(model.otherSelections[0]).rangeToBe(1, 2, 3, 3);
         });
 
-        it('should not add to a list of selections on mousedown with ctrl/cmd and shift', function () {
+        it('should not add to a list of selections on mousedown with ctrl/cmd and shift', function() {
             selectCells(1, 2, 3, 4);
             makeAndFireMouseDownForCell(2, 2, true, true);
             expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 2, 1);
             expect(model.otherSelections).toEqual([]);
         });
 
-        it('should clear others on mousedown', function () {
+        it('should clear others on mousedown', function() {
             selectCells(1, 2, 3, 4);
             makeAndFireMouseDownForCell(2, 2, false, true);
             var oldSelections = model.otherSelections;
@@ -289,18 +314,18 @@ describe('navigation-model', function () {
             expect(this.grid.decorators.getAlive()).not.toContain(oldSelections[0]);
         });
 
-        it('should clear key nav if shift is not down', function () {
+        it('should clear key nav if shift is not down', function() {
             selectCells(1, 2, 3, 4);
             makeAndFireKeyDown(key.code.arrow.down.code);
             expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
         });
 
-        it('should set on mousedown if shift is held', function () {
+        it('should set on mousedown if shift is held', function() {
             makeAndFireMouseDownForCell(2, 2, true);
             expect(model.selection).rangeToBe(0, 0, 3, 3);
         });
 
-        it('should clear other selections on mousedown even with shift', function () {
+        it('should clear other selections on mousedown even with shift', function() {
             selectCells(1, 2, 3, 4);
             makeAndFireMouseDownForCell(2, 2, false, true);
             var oldSelections = model.otherSelections;
@@ -311,7 +336,7 @@ describe('navigation-model', function () {
             expect(this.grid.decorators.getAlive()).not.toContain(oldSelections[0]);
         });
 
-        it('should expand and shrink selection on key nav', function () {
+        it('should expand and shrink selection on key nav', function() {
             makeAndFireKeyDown(key.code.arrow.down.code, true);
             expect(model.selection).rangeToBe(0, 0, 2, 1);
             makeAndFireKeyDown(key.code.arrow.right.code, true);
@@ -323,7 +348,7 @@ describe('navigation-model', function () {
             expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
         });
 
-        it('should expand and shrink selection on key nav up', function () {
+        it('should expand and shrink selection on key nav up', function() {
             model.setFocus(1, 1);
             makeAndFireKeyDown(key.code.arrow.up.code, true);
             expect(model.selection).rangeToBe(0, 1, 2, 1);
@@ -337,14 +362,24 @@ describe('navigation-model', function () {
             expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
         });
 
-        it('should not select merely on shift key down', function () {
+        it('should not select merely on shift key down', function() {
             makeAndFireKeyDown(key.code.special.shift, true);
             expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
         });
 
-        it('should clear on move event', function () {
-            model.setSelection({top: 1, left: 1, width: 2, height: 2});
-            model.otherSelections.push({top: 3, left: 4, width: 2, height: 2});
+        it('should clear on move event', function() {
+            model.setSelection({
+                top: 1,
+                left: 1,
+                width: 2,
+                height: 2
+            });
+            model.otherSelections.push({
+                top: 3,
+                left: 4,
+                width: 2,
+                height: 2
+            });
             grid.colModel.move(1, 2);
             expect(model.selection).rangeToBe(model.focus.row, model.focus.col, 1, 1);
             expect(model.otherSelections).toEqual([]);
@@ -352,30 +387,30 @@ describe('navigation-model', function () {
 
     });
 
-    describe('headers / col row selection', function () {
-        beforeEach(function () {
+    describe('headers / col row selection', function() {
+        beforeEach(function() {
             beforeEachFn.call(this, 1, 1);
         });
         //row col selection
-        it('should select a whole col on header mousedown', function () {
+        it('should select a whole col on header mousedown', function() {
             makeAndFireMouseDownForCell(0, 3);
             expect(grid.colModel.getSelected()).toEqual([2]);
         });
 
 
-        it('should select a whole row on header mousedown', function () {
+        it('should select a whole row on header mousedown', function() {
             makeAndFireMouseDownForCell(3, 0);
             expect(grid.rowModel.getSelected()).toEqual([2]);
         });
 
-        it('should clear other selections on mousedown', function () {
+        it('should clear other selections on mousedown', function() {
             makeAndFireMouseDownForCell(3, 0);
             expect(grid.rowModel.getSelected()).toEqual([2]);
             makeAndFireMouseDownForCell(4, 0);
             expect(grid.rowModel.getSelected()).toEqual([3]);
         });
 
-        it('should add to the selection on mousedown if ctrl cmd held', function () {
+        it('should add to the selection on mousedown if ctrl cmd held', function() {
             makeAndFireMouseDownForCell(3, 0);
             expect(grid.rowModel.getSelected()).toEqual([2]);
             makeAndFireMouseDownForCell(4, 0, false, true);
@@ -383,16 +418,16 @@ describe('navigation-model', function () {
             expect(grid.rowModel.getSelected()).toContain(3);
         });
 
-        it('should select a range on shift click', function () {
+        it('should select a range on shift click', function() {
             makeAndFireMouseDownForCell(3, 0);
             makeAndFireMouseDownForCell(5, 0, true);
             expect(grid.rowModel.getSelected()).toEqual([2, 3, 4]);
         });
 
-        it('should set a cell class for a selected row', function (cb) {
+        it('should set a cell class for a selected row', function(cb) {
             var spy = spyOn(grid.cellClasses, 'add');
             grid.rowModel.select(0);
-            setTimeout(function () {
+            setTimeout(function() {
                 expect(spy).toHaveBeenCalled();
                 var cellClass = spy.calls.argsFor(0)[0];
                 expect(cellClass).unitsToBe('cell');
@@ -404,21 +439,21 @@ describe('navigation-model', function () {
 
         });
 
-        it('should not duplicate cell classes for row select', function (cb) {
+        it('should not duplicate cell classes for row select', function(cb) {
             grid.rowModel.select(0);
             var spy = spyOn(grid.cellClasses, 'add');
             grid.rowModel.select(1);
-            setTimeout(function () {
+            setTimeout(function() {
                 expect(spy.calls.count()).toBe(2);
                 expect(model._rowSelectionClasses.length).toBe(2);
                 cb();
             }, 2);
         });
 
-        it('should set a cell class for a selected col', function (cb) {
+        it('should set a cell class for a selected col', function(cb) {
             var spy = spyOn(grid.cellClasses, 'add');
             grid.colModel.select(0);
-            setTimeout(function () {
+            setTimeout(function() {
                 expect(spy).toHaveBeenCalled();
                 var decorator = spy.calls.argsFor(0)[0];
                 expect(decorator).unitsToBe('cell');
@@ -430,11 +465,11 @@ describe('navigation-model', function () {
 
         });
 
-        it('should not duplicate cell classes for col select', function (cb) {
+        it('should not duplicate cell classes for col select', function(cb) {
             grid.colModel.select(0);
             var spy = spyOn(grid.cellClasses, 'add');
             grid.colModel.select(1);
-            setTimeout(function () {
+            setTimeout(function() {
                 expect(spy.calls.count()).toBe(2);
                 expect(model._colSelectionClasses.length).toBe(2);
                 cb();
@@ -442,7 +477,7 @@ describe('navigation-model', function () {
 
         });
 
-        it('selection should clamp to data range', function () {
+        it('selection should clamp to data range', function() {
             selectCells(2, 2, 0, 0);
             expect(model.selection).rangeToBe(0, 0, 2, 2);
         });

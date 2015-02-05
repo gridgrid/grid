@@ -4,7 +4,7 @@ var util = require('../util');
 var rangeUtil = require('../range-util');
 var ctrlOrCmd = require('../ctrl-or-cmd');
 
-module.exports = function (_grid) {
+module.exports = function(_grid) {
     var grid = _grid;
 
     var model = {
@@ -21,7 +21,7 @@ module.exports = function (_grid) {
 
     model.focusDecorator = grid.decorators.create(0, 0, 1, 1);
     var focusDefaultRender = model.focusDecorator.render;
-    model.focusDecorator.render = function () {
+    model.focusDecorator.render = function() {
         var div = focusDefaultRender();
         div.setAttribute('class', 'grid-focus-decorator');
         return div;
@@ -56,11 +56,10 @@ module.exports = function (_grid) {
         } else {
             isEdgeToSeek = isForwardEdge;
         }
-        
-        while (goForward(newIndex) !== undefined && !isEdgeToSeek(newIndex = goForward(newIndex))) 
-        { // jshint ignore: line
+
+        while (goForward(newIndex) !== undefined && !isEdgeToSeek(newIndex = goForward(newIndex))) { // jshint ignore: line
             //empty
-        }        
+        }
         return newIndex;
     }
 
@@ -71,19 +70,19 @@ module.exports = function (_grid) {
         var isSeek = ctrlOrCmd(e);
         var isLeftwardEdge, isRightwardEdge, isUpwardEdge, isDownwardEdge, cellHasValue, startedDefined;
         if (isSeek) {
-            cellHasValue = function (r, c) {
+            cellHasValue = function(r, c) {
                 return !!grid.dataModel.get(r, c).formatted;
             };
-            isLeftwardEdge = function (c) {
+            isLeftwardEdge = function(c) {
                 return cellHasValue(newRow, c) && !cellHasValue(newRow, grid.data.left(c));
             };
-            isRightwardEdge = function (c) {
+            isRightwardEdge = function(c) {
                 return cellHasValue(newRow, c) && !cellHasValue(newRow, grid.data.right(c));
             };
-            isUpwardEdge = function (r) {
+            isUpwardEdge = function(r) {
                 return cellHasValue(r, newCol) && !cellHasValue(grid.data.up(r), newCol);
             };
-            isDownwardEdge = function (r) {
+            isDownwardEdge = function(r) {
                 return cellHasValue(r, newCol) && !cellHasValue(grid.data.down(r), newCol);
             };
             startedDefined = cellHasValue(newRow, newCol);
@@ -124,14 +123,17 @@ module.exports = function (_grid) {
         if (newCol === undefined) {
             newCol = col;
         }
-        return {row: newRow, col: newCol};
+        return {
+            row: newRow,
+            col: newCol
+        };
     }
 
     model._navFrom = navFrom;
 
 
-    grid.eventLoop.bind('keydown', function (e) {
-        if (!key.is(arrow, e.which)) {
+    grid.eventLoop.bind('keydown', function(e) {
+        if (!key.is(arrow, e.which) || !grid.focused) {
             return;
         }
         //focus logic
@@ -144,7 +146,12 @@ module.exports = function (_grid) {
             var newSelection;
             //stand in for if it's cleared
             if (model.selection.top === -1) {
-                newSelection = {top: model.focus.row, left: model.focus.col, height: 1, width: 1};
+                newSelection = {
+                    top: model.focus.row,
+                    left: model.focus.col,
+                    height: 1,
+                    width: 1
+                };
             } else {
                 newSelection = {
                     top: model.selection.top,
@@ -172,7 +179,10 @@ module.exports = function (_grid) {
         }
     });
 
-    grid.eventLoop.bind('mousedown', function (e) {
+    grid.eventLoop.bind('mousedown', function(e) {
+        if (!grid.focused) {
+            return;
+        }
         //assume the event has been annotated by the cell mouse model interceptor
         var row = e.row;
         var col = e.col;
@@ -217,12 +227,12 @@ module.exports = function (_grid) {
     //row col selection
     function handleRowColSelectionChange(rowOrCol) {
         var decoratorsField = ('_' + rowOrCol + 'SelectionClasses');
-        model[decoratorsField].forEach(function (selectionDecorator) {
+        model[decoratorsField].forEach(function(selectionDecorator) {
             grid.cellClasses.remove(selectionDecorator);
         });
         model[decoratorsField] = [];
 
-        grid[rowOrCol + 'Model'].getSelected().forEach(function (index) {
+        grid[rowOrCol + 'Model'].getSelected().forEach(function(index) {
             var virtualIndex = grid[rowOrCol + 'Model'].toVirtual(index);
             var top = rowOrCol === 'row' ? virtualIndex : 0;
             var left = rowOrCol === 'col' ? virtualIndex : 0;
@@ -232,18 +242,18 @@ module.exports = function (_grid) {
         });
     }
 
-    grid.eventLoop.bind('grid-row-selection-change', function () {
+    grid.eventLoop.bind('grid-row-selection-change', function() {
         handleRowColSelectionChange('row');
     });
 
-    grid.eventLoop.bind('grid-col-selection-change', function () {
+    grid.eventLoop.bind('grid-col-selection-change', function() {
         handleRowColSelectionChange('col');
     });
 
     function createAndAddSelectionDecorator() {
         var selection = grid.decorators.create.apply(this, arguments);
         var defaultRender = selection.render;
-        selection.render = function () {
+        selection.render = function() {
             var div = defaultRender();
             div.setAttribute('class', 'grid-selection');
             return div;
@@ -257,14 +267,14 @@ module.exports = function (_grid) {
     function syncSelectionToHeaders() {
         grid.colModel.clearSelected(true);
         grid.rowModel.clearSelected(true);
-        model.getAllSelections().forEach(function (selection) {
+        model.getAllSelections().forEach(function(selection) {
             if (selection) {
                 maybeSelectHeaderFromSelection(selection);
             }
         });
     }
 
-    model.getAllSelections = function () {
+    model.getAllSelections = function() {
         var selections = [];
         if (model.selection) {
             selections.push(model.selection);
@@ -275,7 +285,10 @@ module.exports = function (_grid) {
     function maybeSelectHeaderFromSelection(range, deselect) {
         var indexes;
         if (range.height === Infinity) {
-            indexes = grid.data.col.indexes({from: range.left, length: range.width});
+            indexes = grid.data.col.indexes({
+                from: range.left,
+                length: range.width
+            });
             if (deselect) {
                 grid.colModel.deselect(indexes);
             } else {
@@ -283,7 +296,10 @@ module.exports = function (_grid) {
             }
         }
         if (range.width === Infinity) {
-            indexes = grid.data.row.indexes({from: range.top, length: range.height});
+            indexes = grid.data.row.indexes({
+                from: range.top,
+                length: range.height
+            });
             if (deselect) {
                 grid.rowModel.deselect(indexes);
             } else {
@@ -309,7 +325,12 @@ module.exports = function (_grid) {
 
 
     function setSelectionToFocus() {
-        model.setSelection({top: model.focus.row, left: model.focus.col, height: 1, width: 1});
+        model.setSelection({
+            top: model.focus.row,
+            left: model.focus.col,
+            height: 1,
+            width: 1
+        });
     }
 
     function clearOtherSelections() {
@@ -328,10 +349,10 @@ module.exports = function (_grid) {
         model.setSelection(newSelection);
     }
 
-    selection._onDragStart = function (e) {
+    selection._onDragStart = function(e) {
         var fromRow = model.focus.row;
         var fromCol = model.focus.col;
-        var unbindDrag = grid.eventLoop.bind('grid-cell-drag', function (e) {
+        var unbindDrag = grid.eventLoop.bind('grid-cell-drag', function(e) {
             var toRow = e.row;
             var toCol = e.col;
             if (selection.left === 0 && selection.width === Infinity) {
@@ -343,7 +364,7 @@ module.exports = function (_grid) {
             //pass true to prevent clearing, if it were to be cleared the mousedown handles that
             setSelectionFromPoints(fromRow, fromCol, toRow, toCol, true);
         });
-        var unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function () {
+        var unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function() {
             unbindDrag();
             unbindDragEnd();
         });
@@ -354,15 +375,20 @@ module.exports = function (_grid) {
     model._selectionDecorator = selection;
 
     Object.defineProperty(model, 'selection', {
-        get: function () {
+        get: function() {
             if (selection.height === -1) { //cleared selection default to focus
-                return {top: model.focus.row, left: model.focus.col, height: 1, width: 1};
+                return {
+                    top: model.focus.row,
+                    left: model.focus.col,
+                    height: 1,
+                    width: 1
+                };
             }
             return selection;
         }
     });
 
-    grid.eventLoop.bind('grid-col-change', function (e) {
+    grid.eventLoop.bind('grid-col-change', function(e) {
         if (e.action === 'move') {
             setSelectionToFocus();
             clearOtherSelections();

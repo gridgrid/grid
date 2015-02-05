@@ -4,7 +4,7 @@ var debounce = require('../debounce');
 var rangeUtil = require('../range-util');
 var sanitize = require('sanitize-html');
 
-module.exports = function (_grid) {
+module.exports = function(_grid) {
     var grid = _grid;
     var model = {};
 
@@ -22,18 +22,21 @@ module.exports = function (_grid) {
         return selectionRange;
     }
 
-    grid.eventLoop.bind('copy', function (e) {
+    grid.eventLoop.bind('copy', function(e) {
         if (!grid.focused) {
+            if (e.target === grid.textarea) {
+                e.preventDefault();
+            }
             return;
         }
         //prepare for copy
         var copyTable = document.createElement('table');
         var selectionRange = getCopyPasteRange();
-        grid.data.iterate(selectionRange, function () {
+        grid.data.iterate(selectionRange, function() {
             var row = document.createElement('tr');
             copyTable.appendChild(row);
             return row;
-        }, function (r, c, row) {
+        }, function(r, c, row) {
             var data = grid.dataModel.getCopyData(r, c);
             var td = document.createElement('td');
             //sanitize the html pretty hard core for now just to allow spans with data attributes for our rich content use case
@@ -51,7 +54,7 @@ module.exports = function (_grid) {
         grid.textarea.select();
     });
 
-    grid.eventLoop.bind('paste', function (e) {
+    grid.eventLoop.bind('paste', function(e) {
         if (!grid.focused) {
             return;
         }
@@ -63,13 +66,13 @@ module.exports = function (_grid) {
         var pasteData = tsv.parse(e.clipboardData.getData('Text'));
 
 
-        setTimeout(function () {
+        setTimeout(function() {
             if (grid.textarea.querySelector('table')) {
                 pasteData = [];
-                [].forEach.call(grid.textarea.querySelectorAll('tr'), function (tr) {
+                [].forEach.call(grid.textarea.querySelectorAll('tr'), function(tr) {
                     var row = [];
                     pasteData.push(row);
-                    [].forEach.call(tr.querySelectorAll('td'), function (td) {
+                    [].forEach.call(tr.querySelectorAll('td'), function(td) {
                         row.push(td.innerHTML);
                     });
                 });
@@ -84,8 +87,8 @@ module.exports = function (_grid) {
                 //this will do nothing if no other selections as it will be an empty array
                 ranges = ranges.concat(grid.navigationModel.otherSelections);
             }
-            ranges.forEach(function (range) {
-                grid.data.iterate(range, function (r, c) {
+            ranges.forEach(function(range) {
+                grid.data.iterate(range, function(r, c) {
 
                     var offsetR = r - range.top;
                     var offsetC = c - range.left;
@@ -115,13 +118,13 @@ module.exports = function (_grid) {
 
     model._maybeSelectText = maybeSelectText;
 
-    grid.eventLoop.bind('keyup', function (e) {
+    grid.eventLoop.bind('keyup', function(e) {
         maybeSelectText();
     });
-    grid.eventLoop.bind('grid-focus', function (e) {
+    grid.eventLoop.bind('grid-focus', function(e) {
         maybeSelectText();
     });
-    grid.eventLoop.bind('mousedown', function (e) {
+    grid.eventLoop.bind('mousedown', function(e) {
         if (e.target !== grid.textarea) {
             return;
         }
