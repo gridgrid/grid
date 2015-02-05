@@ -32,11 +32,14 @@ module.exports = function(_grid) {
 
     //assumes a standardized wheel event that we create through the mousewheel package
     grid.eventLoop.bind('mousewheel', function handleMouseWheel(e) {
+        if (getScrollParent(e.target, grid.container) !== grid.container) {
+            return;
+        }
         var deltaY = e.deltaY;
         var deltaX = e.deltaX;
         model.scrollTo(model.top - deltaY, model.left - deltaX, true);
-        debouncedNotify();
         e.preventDefault();
+        debouncedNotify();
     });
 
     model.setScrollSize = function(h, w) {
@@ -211,6 +214,32 @@ module.exports = function(_grid) {
     grid.decorators.add(model.vertScrollBar);
     grid.decorators.add(model.horzScrollBar);
     /* END SCROLL BAR LOGIC */
+
+    function getScrollParent(elem, stopParent) {
+        stopParent = stopParent || document;
+        if (!elem) {
+            return stopParent;
+        }
+
+        var position = elem.style.position,
+            excludeStaticParent = position === 'absolute',
+            overflowRegex = /(auto|scroll)/,
+            scrollParent = elem;
+
+        while (!!(scrollParent = scrollParent.parentElement) && scrollParent !== stopParent) {
+            if (excludeStaticParent && scrollParent.style.position === 'static') {
+                continue;
+            }
+
+            var computedStyle = getComputedStyle(scrollParent);
+
+            if (overflowRegex.test(computedStyle.overflow + computedStyle.overflowY + computedStyle.overflowX)) {
+                break;
+            }
+        }
+
+        return position === 'fixed' || !scrollParent || scrollParent === elem ? elem.ownerDocument || stopParent : scrollParent;
+    }
 
     return model;
 };
