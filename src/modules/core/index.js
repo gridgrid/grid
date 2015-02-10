@@ -6,7 +6,7 @@ var passThrough = require('../pass-through');
 var capitalize = require('capitalize');
 
 
-module.exports = function () {
+module.exports = function() {
 
     var grid = {};
 
@@ -33,7 +33,7 @@ module.exports = function () {
     grid.copyPaste = require('../copy-paste')(grid);
 
     var drawRequested = false;
-    grid.requestDraw = function () {
+    grid.requestDraw = function() {
         if (!grid.eventLoop.isRunning) {
             grid.viewLayer.draw();
         } else {
@@ -41,18 +41,18 @@ module.exports = function () {
         }
     };
 
-    grid.eventLoop.bind('grid-draw', function () {
+    grid.eventLoop.bind('grid-draw', function() {
         drawRequested = false;
     });
 
-    grid.eventLoop.addExitListener(function () {
+    grid.eventLoop.addExitListener(function() {
         if (drawRequested) {
             grid.viewLayer.draw();
         }
     });
 
     function setupTextareaForContainer(textarea, container) {
-        textarea.addEventListener('focus', function () {
+        textarea.addEventListener('focus', function() {
             if (container) {
                 elementClass(container).add('focus');
             }
@@ -61,7 +61,7 @@ module.exports = function () {
             grid.eventLoop.fire('grid-focus');
         });
 
-        textarea.addEventListener('blur', function () {
+        textarea.addEventListener('blur', function() {
             if (container) {
                 elementClass(container).remove('focus');
             }
@@ -73,7 +73,7 @@ module.exports = function () {
         if (!container.getAttribute('tabIndex')) {
             container.tabIndex = -1;
         }
-        container.addEventListener('focus', function () {
+        container.addEventListener('focus', function() {
             if (textarea) {
                 textarea.focus();
             }
@@ -92,7 +92,7 @@ module.exports = function () {
         textarea.style.boxShadow = 'none';
         textarea.style.cursor = 'default';
         textarea.classList.add('grid-textarea');
-        textarea.select = function () {
+        textarea.select = function() {
             var range = document.createRange();
             range.selectNodeContents(textarea);
             window.getSelection().removeAllRanges();
@@ -101,10 +101,10 @@ module.exports = function () {
 
         textarea.setAttribute('ondragstart', 'return false;');
         Object.defineProperty(textarea, 'value', {
-            get: function () {
+            get: function() {
                 return textarea.innerText;
             },
-            set: function (val) {
+            set: function(val) {
                 textarea.innerText = val;
             }
         });
@@ -145,15 +145,15 @@ module.exports = function () {
 
     function addToDimension(dim, spaceName, getter) {
         //convert whatever space to virtual and use the row or col virtual getter
-        dim.get = function (idx) {
+        dim.get = function(idx) {
             return getter(this.toVirtual(idx));
         }.bind(dim);
         dim.next = iterateWhileHidden.bind(dim, 1);
         dim.prev = iterateWhileHidden.bind(dim, -1);
-        dim.clamp = function (idx) {
+        dim.clamp = function(idx) {
             return util.clamp(idx, 0, this.count() - 1);
         }.bind(dim);
-        dim.indexes = function () {
+        dim.indexes = function() {
             var opts;
             opts = arguments[0];
             opts = opts || {};
@@ -167,7 +167,7 @@ module.exports = function () {
             return indexes;
         };
 
-        dim.iterate = function () {
+        dim.iterate = function() {
             var opts;
             var fn;
             if (arguments.length === 2) {
@@ -176,7 +176,7 @@ module.exports = function () {
             } else {
                 fn = arguments[0];
             }
-            dim.indexes(opts).forEach(function (idx) {
+            dim.indexes(opts).forEach(function(idx) {
                 fn(idx);
             });
         };
@@ -190,10 +190,10 @@ module.exports = function () {
     function addToSpace(spaceName) {
         var space = grid[spaceName];
         space.iterate = iterateRange.bind(space);
-        addToDimension(space.col, spaceName, function (idx) {
+        addToDimension(space.col, spaceName, function(idx) {
             return grid.colModel.get(idx);
         });
-        addToDimension(space.row, spaceName, function (idx) {
+        addToDimension(space.row, spaceName, function(idx) {
             return grid.rowModel.get(idx);
         });
         space.up = space.row.prev;
@@ -205,24 +205,24 @@ module.exports = function () {
 
     grid.data = {
         col: {
-            toVirtual: function (dataCol) {
+            toVirtual: function(dataCol) {
                 return grid.colModel.toVirtual(dataCol);
             },
-            toView: function (dataCol) {
+            toView: function(dataCol) {
                 return grid.virtual.col.toView(this.toVirtual(dataCol));
             },
-            count: function () {
+            count: function() {
                 return grid.colModel.length();
             }
         },
         row: {
-            toVirtual: function (dataRow) {
+            toVirtual: function(dataRow) {
                 return grid.rowModel.toVirtual(dataRow);
             },
-            toView: function (dataRow) {
+            toView: function(dataRow) {
                 return grid.virtual.row.toView(this.toVirtual(dataRow));
             },
-            count: function () {
+            count: function() {
                 return grid.rowModel.length();
             }
         }
@@ -231,24 +231,24 @@ module.exports = function () {
 
     grid.virtual = {
         col: {
-            toData: function (virtualCol) {
+            toData: function(virtualCol) {
                 return grid.colModel.toData(virtualCol);
             },
-            toView: function (virtualCol) {
+            toView: function(virtualCol) {
                 return grid.viewPort.toRealCol(virtualCol);
             },
-            count: function () {
+            count: function() {
                 return grid.colModel.length(true);
             }
         },
         row: {
-            toData: function (virtualRow) {
+            toData: function(virtualRow) {
                 return grid.rowModel.toData(virtualRow);
             },
-            toView: function (virtualRow) {
+            toView: function(virtualRow) {
                 return grid.viewPort.toRealRow(virtualRow);
             },
-            count: function () {
+            count: function() {
                 return grid.rowModel.length(true);
             }
         }
@@ -257,61 +257,62 @@ module.exports = function () {
 
     grid.view = {
         col: {
-            toData: function (viewCol) {
+            toData: function(viewCol) {
                 return grid.virtual.col.toData(this.toVirtual(viewCol));
             },
-            toVirtual: function (viewCol) {
+            toVirtual: function(viewCol) {
                 return grid.viewPort.toVirtualCol(viewCol);
             },
-            count: function () {
+            count: function() {
                 return grid.viewPort.cols();
             }
         },
         row: {
-            toData: function (viewRow) {
+            toData: function(viewRow) {
                 return grid.virtual.row.toData(this.toVirtual(viewRow));
             },
-            toVirtual: function (viewRow) {
+            toVirtual: function(viewRow) {
                 return grid.viewPort.toVirtualRow(viewRow);
             },
-            count: function () {
+            count: function() {
                 return grid.viewPort.rows();
             }
         }
     };
     addToSpace('view');
-    
+
     var timeouts = [];
-    grid.timeout = function(){
+    grid.timeout = function() {
         var id = setTimeout.apply(window, arguments);
         timeouts.push(id);
         return id;
     };
     var intervals = [];
-    grid.interval = function(){
+    grid.interval = function() {
         var id = setInterval.apply(window, arguments);
         intervals.push(id);
         return id;
     };
 
-    grid.eventLoop.bind('grid-destroy', function () {
-        intervals.forEach(function (id) {
+    grid.eventLoop.bind('grid-destroy', function() {
+        intervals.forEach(function(id) {
             clearInterval(id);
         });
 
-        timeouts.forEach(function (id) {
+        timeouts.forEach(function(id) {
             clearTimeout(id);
         });
     });
 
-    grid.build = function (container) {
+    grid.build = function(container) {
         setupTextareaForContainer(grid.textarea, container);
         grid.viewPort.sizeToContainer(container);
         grid.viewLayer.build(container);
         grid.eventLoop.setContainer(container);
+        container.style.overflow = 'hidden';
     };
 
-    grid.makeDirtyClean = function () {
+    grid.makeDirtyClean = function() {
         return dirtyClean(grid);
     };
 
