@@ -1,7 +1,7 @@
 var EVENT_NAMES = ['mousewheel', 'wheel', 'DOMMouseScroll'];
 
 var api = {
-    getDelta: function (event, xaxis) {
+    getDelta: function(event, xaxis) {
         if (event.wheelDelta) { //for everything but firefox
             var delta = event.wheelDeltaY;
             if (xaxis) {
@@ -24,17 +24,17 @@ var api = {
     },
 
     //binds a cross browser normalized mousewheel event, and returns a function that will unbind the listener;
-    bind: function (elem, listener) {
-        var normalizedListener = function (e) {
+    bind: function(elem, listener) {
+        var normalizedListener = function(e) {
             listener(normalizeWheelEvent(e));
         };
 
-        EVENT_NAMES.forEach(function (name) {
+        EVENT_NAMES.forEach(function(name) {
             elem.addEventListener(name, normalizedListener);
         });
 
-        return function () {
-            EVENT_NAMES.forEach(function (name) {
+        return function() {
+            EVENT_NAMES.forEach(function(name) {
                 elem.removeEventListener(name, normalizedListener);
             });
         };
@@ -46,14 +46,22 @@ var api = {
 function normalizeWheelEvent(e) {
     var deltaX = api.getDelta(e, true);
     var deltaY = api.getDelta(e);
-    var newEvent = Object.create(e,
-        {
-            deltaY: {value: deltaY},
-            deltaX: {value: deltaX},
-            type: {value: 'mousewheel'}
-        });
+    var newEvent = Object.create(e, {
+        deltaY: {
+            value: deltaY
+        },
+        deltaX: {
+            value: deltaX
+        },
+        type: {
+            value: 'mousewheel'
+        },
+        target: {
+            value: e.target
+        }
+    });
 
-    newEvent.preventDefault = function () {
+    newEvent.preventDefault = function() {
         newEvent.defaultPrevented = true;
         if (e && e.preventDefault) {
             e.preventDefault();
