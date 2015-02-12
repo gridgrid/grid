@@ -88,8 +88,8 @@ module.exports = function(_grid) {
 
     //for now assumes data space
     model.scrollIntoView = function(dataRow, dataCol) {
-        dataRow = grid.data.row.clamp(grid.data.row.toVirtual(dataRow));
-        dataCol = grid.data.col.clamp(grid.data.col.toVirtual(dataCol));
+        dataRow = grid.virtual.row.clamp(grid.data.row.toVirtual(dataRow));
+        dataCol = grid.virtual.col.clamp(grid.data.col.toVirtual(dataCol));
         var newRow = getScrollToRowOrCol(dataRow, 'row', 'height');
         var newCol = getScrollToRowOrCol(dataCol, 'col', 'width');
         model.scrollTo(newRow, newCol);
