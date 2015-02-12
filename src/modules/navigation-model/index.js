@@ -360,6 +360,9 @@ module.exports = function(_grid) {
     }
 
     selection._onDragStart = function(e) {
+        if (!grid.focused) {
+            return;
+        }
         var fromRow = model.focus.row;
         var fromCol = model.focus.col;
         var unbindDrag = grid.eventLoop.bind('grid-cell-drag', function(e) {
