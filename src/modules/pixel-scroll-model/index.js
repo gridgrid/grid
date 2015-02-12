@@ -208,6 +208,13 @@ module.exports = function(_grid) {
         var scrollableViewWidth = getScrollableViewWidth();
         model.vertScrollBar.height = Math.max(scrollableViewHeight / grid.virtualPixelCellModel.totalHeight() * scrollableViewHeight, 20);
         model.horzScrollBar.width = Math.max(scrollableViewWidth / grid.virtualPixelCellModel.totalWidth() * scrollableViewWidth, 20);
+        if (model.vertScrollBar.height >= scrollableViewHeight) {
+            model.vertScrollBar.height = -1;
+        }
+
+        if (model.horzScrollBar.width >= scrollableViewWidth) {
+            model.horzScrollBar.width = -1;
+        }
         positionScrollBars();
     }
 

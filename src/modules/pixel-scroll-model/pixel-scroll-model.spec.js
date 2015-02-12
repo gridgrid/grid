@@ -217,6 +217,12 @@ describe('pixel-scroll-model', function() {
             expect(model.horzScrollBar).heightToBe(10);
         });
 
+        it('should hide when unneeded', function() {
+            scrollBeforeEachFn.call(this, 1000000, 1000000);
+            expect(model.vertScrollBar).heightToBe(-1);
+            expect(model.horzScrollBar).widthToBe(-1);
+        });
+
         it('should consider the min height when positioning', function() {
             scrollBeforeEachFn.call(this, 30, 90);
             model.scrollTo(Infinity, Infinity);
