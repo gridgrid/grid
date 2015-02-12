@@ -47,12 +47,20 @@ module.exports = function(_grid) {
         e.gridY = y;
     };
 
+    var lastMoveRow;
+    var lastMoveCol;
     grid.eventLoop.addInterceptor(function(e) {
         model._annotateEvent(e);
 
         if (e.type === 'mousedown') {
             if (e.currentTarget === grid.container) {
                 setupDragEventForMouseDown(e);
+            }
+        } else if (e.type === 'mousemove') {
+            if (e.row !== lastMoveRow || e.col !== lastMoveCol) {
+                createAndFireCustomMouseEvent('grid-cell-mouse-move', e);
+                lastMoveRow = e.row;
+                lastMoveCol = e.col;
             }
         }
     });
@@ -97,14 +105,14 @@ module.exports = function(_grid) {
 
             if (!dragStarted) {
                 wasDragged = true;
-                createAndFireDragEvent('grid-drag-start', downEvent);
+                createAndFireCustomMouseEvent('grid-drag-start', downEvent);
                 dragStarted = true;
             }
 
-            createAndFireDragEvent('grid-drag', e);
+            createAndFireCustomMouseEvent('grid-drag', e);
 
             if (e.row !== lastDragRow || e.col !== lastDragCol) {
-                createAndFireDragEvent('grid-cell-drag', e);
+                createAndFireCustomMouseEvent('grid-cell-drag', e);
 
                 lastDragRow = e.row;
                 lastDragCol = e.col;
@@ -119,14 +127,14 @@ module.exports = function(_grid) {
             unbindMove();
             unbindUp();
 
-            var dragEnd = createDragEventFromMouseEvent('grid-drag-end', e);
+            var dragEnd = createCustomEventFromMouseEvent('grid-drag-end', e);
 
             //row, col, x, and y should inherit
             grid.eventLoop.fire(dragEnd);
         }
     }
 
-    function createDragEventFromMouseEvent(type, e) {
+    function createCustomEventFromMouseEvent(type, e) {
         var event = customEvent(type, true, true);
         PROPS_TO_COPY_FROM_MOUSE_EVENTS.forEach(function(prop) {
             event[prop] = e[prop];
@@ -135,8 +143,8 @@ module.exports = function(_grid) {
         return event;
     }
 
-    function createAndFireDragEvent(type, e) {
-        var drag = createDragEventFromMouseEvent(type, e);
+    function createAndFireCustomMouseEvent(type, e) {
+        var drag = createCustomEventFromMouseEvent(type, e);
         if (e.target) {
             e.target.dispatchEvent(drag);
         } else {

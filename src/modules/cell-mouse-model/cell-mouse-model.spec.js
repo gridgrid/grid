@@ -170,6 +170,30 @@ describe('cell-mouse-model', function() {
             expect(spy).not.toHaveBeenCalled();
         });
 
+        it('should fire grid-cell-mouse-move event on move only when changing cells with no mousedown required', function() {
+            var spy = jasmine.createSpy();
+            grid.eventLoop.bind('grid-cell-mouse-move', spy);
+            var mousemove = createEventWithXY('mousemove', 201, 41);
+            this.container.dispatchEvent(mousemove);
+            expect(spy).toHaveBeenCalled();
+            var dragEvent = spy.calls.argsFor(0)[0];
+            expect(dragEvent.type).toBe('grid-cell-mouse-move');
+            expect(dragEvent).rowToBe(1);
+            expect(dragEvent).colToBe(2);
+            expect(dragEvent.clientY).toBe(41);
+            expect(dragEvent.clientX).toBe(201);
+            expect(dragEvent.gridY).toBe(41);
+            expect(dragEvent.gridX).toBe(201);
+            spy.calls.reset();
+            mousemove = createEventWithXY('mousemove', 202, 41);
+            this.container.dispatchEvent(mousemove);
+            expect(spy).not.toHaveBeenCalled();
+            spy.calls.reset();
+            mousemove = createEventWithXY('mousemove', 302, 41);
+            this.container.dispatchEvent(mousemove);
+            expect(spy).toHaveBeenCalled();
+        });
+
         it('should fire grid-drag-end event on mouseup', function() {
             var spy = jasmine.createSpy();
             grid.eventLoop.bind('grid-drag-end', spy);
