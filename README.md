@@ -3,9 +3,11 @@ riq-grid
 
 A highly scaleable grid component written in javscript
 
-To Run Local Example:
+**To Run Local Example:**
 
-prereqs: have npm installed (`brew install npm` or similar)
+have npm installed (`brew install npm` or similar)
+
+`cd <unzipped grid code folder>`
 
 `npm install -g gulp phantomjs bower npm-shrinkwrap`
 
