@@ -305,6 +305,7 @@ module.exports = function() {
     });
 
     grid.build = function(container) {
+        grid.container = container;
         setupTextareaForContainer(grid.textarea, container);
         grid.viewPort.sizeToContainer(container);
         grid.viewLayer.build(container);
