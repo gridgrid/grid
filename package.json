@@ -1,6 +1,6 @@
 {
     "name": "riq-grid",
-    "version": "0.9.8",
+    "version": "0.9.9",
     "main": "src/modules/riq-grid-entry.js",
     "publishConfig": {
         "registry": "https://registry.npmjs.org/"
