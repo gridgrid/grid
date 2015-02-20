@@ -1,0 +1,111 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'publish' ]
+2 info using npm@2.1.17
+3 info using node@v0.10.30
+4 verbose node symlink /usr/local/bin/node
+5 verbose publish [ '.' ]
+6 silly cache add args [ '.', null ]
+7 verbose cache add spec .
+8 silly cache add parsed spec { raw: '.',
+8 silly cache add   scope: null,
+8 silly cache add   name: null,
+8 silly cache add   rawSpec: '.',
+8 silly cache add   spec: '/Users/scamden/projects/riq-grid',
+8 silly cache add   type: 'directory' }
+9 verbose addLocalDirectory /Users/scamden/.npm/riq-grid/0.9.9/package.tgz not in flight; packing
+10 verbose getCacheStat cache creation not in flight; initializing
+11 verbose tar pack [ '/Users/scamden/.npm/riq-grid/0.9.9/package.tgz',
+11 verbose tar pack   '/Users/scamden/projects/riq-grid' ]
+12 verbose tarball /Users/scamden/.npm/riq-grid/0.9.9/package.tgz
+13 verbose folder /Users/scamden/projects/riq-grid
+14 info prepublish riq-grid@0.9.9
+15 verbose addLocalTarball adding from inside cache /Users/scamden/.npm/riq-grid/0.9.9/package.tgz
+16 silly cache afterAdd riq-grid@0.9.9
+17 verbose afterAdd /Users/scamden/.npm/riq-grid/0.9.9/package/package.json not in flight; writing
+18 verbose afterAdd /Users/scamden/.npm/riq-grid/0.9.9/package/package.json written
+19 silly publish { name: 'riq-grid',
+19 silly publish   version: '0.9.9',
+19 silly publish   main: 'src/modules/riq-grid-entry.js',
+19 silly publish   publishConfig: { registry: 'https://registry.npmjs.org/' },
+19 silly publish   engines: { node: '>=0.10.0' },
+19 silly publish   scripts: {},
+19 silly publish   dependencies:
+19 silly publish    { capitalize: '^0.5.0',
+19 silly publish      'element-class': '^0.1.1',
+19 silly publish      key: '^0.1.11',
+19 silly publish      'sanitize-html': '^1.5.1' },
+19 silly publish   devDependencies:
+19 silly publish    { aliasify: '^1.5.0',
+19 silly publish      gulp: '^3.8.0',
+19 silly publish      'gulp-tasks-riq': '^0.1.0',
+19 silly publish      'jasmine-tools-riq': '~0.1.0',
+19 silly publish      jquery: '^2.1.0',
+19 silly publish      'polyfill-function-prototype-bind': '0.0.1',
+19 silly publish      yargs: '^1.2.2' },
+19 silly publish   peerDependencies: { aliasify: '^1.5.0' },
+19 silly publish   browserify: { transform: [ 'aliasify' ] },
+19 silly publish   browser:
+19 silly publish    { angular: './bower_components/angular/angular.js',
+19 silly publish      'angular-route': './bower_components/angular-route/angular-route.js' },
+19 silly publish   aliasify: { aliases: { '@grid': './src/modules' } },
+19 silly publish   readme: 'riq-grid\n===\n\nA highly scaleable grid component written in javscript\n\n**To Run Local Example:**\n\nhave npm installed (`brew install npm` or similar)\n\n`cd <unzipped grid code folder>`\n\n`npm install -g gulp phantomjs bower npm-shrinkwrap`\n\nrun the dev server `gulp`\n\nhit localhost:8082 to see (very poorly styled) example grid\n\n',
+19 silly publish   readmeFilename: 'README.md',
+19 silly publish   gitHead: 'aef0e83ab63db748ef68a47331667ffebce28917',
+19 silly publish   description: 'riq-grid ===',
+19 silly publish   _id: 'riq-grid@0.9.9',
+19 silly publish   _shasum: '32efbc4b77647cb10c1a0d34b75c11962b70f721',
+19 silly publish   _from: '.' }
+20 silly mapToRegistry name riq-grid
+21 silly mapToRegistry using default registry
+22 silly mapToRegistry registry https://registry.npmjs.org/
+23 silly mapToRegistry uri https://registry.npmjs.org/riq-grid
+24 verbose publish registryBase https://registry.npmjs.org/
+25 silly publish uploading /Users/scamden/.npm/riq-grid/0.9.9/package.tgz
+26 verbose request uri https://registry.npmjs.org/riq-grid
+27 verbose request always-auth set; sending authorization
+28 info attempt registry request try #1 at 15:57:40
+29 verbose request id 457778d7e1949845
+30 http request PUT https://registry.npmjs.org/riq-grid
+31 http 403 https://registry.npmjs.org/riq-grid
+32 verbose headers { date: 'Fri, 20 Feb 2015 23:57:42 GMT',
+32 verbose headers   server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+32 verbose headers   'content-type': 'application/json',
+32 verbose headers   'cache-control': 'max-age=60',
+32 verbose headers   'content-length': '3242',
+32 verbose headers   'accept-ranges': 'bytes',
+32 verbose headers   via: '1.1 varnish',
+32 verbose headers   'x-served-by': 'cache-sjc3131-SJC',
+32 verbose headers   'x-cache': 'MISS',
+32 verbose headers   'x-cache-hits': '0',
+32 verbose headers   'x-timer': 'S1424476660.404653,VS0,VE1726',
+32 verbose headers   'keep-alive': 'timeout=10, max=50',
+32 verbose headers   connection: 'Keep-Alive' }
+33 verbose request invalidating /Users/scamden/.npm/registry.npmjs.org/riq-grid on PUT
+34 error publish Failed PUT 403
+35 verbose stack Error: forbidden cannot modify pre-existing version: 0.9.9
+35 verbose stack old={"name":"riq-grid","version":"0.9.9","main":"src/modules/riq-grid-entry.js","engines":{"node":">=0.10.0"},"scripts":{},"dependencies":{"capitalize":"^0.5.0","element-class":"^0.1.1","key":"^0.1.11","sanitize-html":"^1.5.1"},"devDependencies":{"aliasify":"^1.5.0","gulp":"^3.8.0","gulp-tasks-riq":"^0.1.0","jasmine-tools-riq":"~0.1.0","jquery":"^2.1.0","polyfill-function-prototype-bind":"0.0.1","yargs":"^1.2.2"},"peerDependencies":{"aliasify":"^1.5.0"},"browserify":{"transform":["aliasify"]},"browser":{"angular":"./bower_components/angular/angular.js","angular-route":"./bower_components/angular-route/angular-route.js"},"aliasify":{"aliases":{"@grid":"./src/modules"}},"gitHead":"27aaedf2eb0da1255a83c0a7612be88c934534a1","description":"riq-grid ===","_id":"riq-grid@0.9.9","_shasum":"69eaf26df801134dc7cc93dac68c3fbc9649f3ab","_from":".","_npmVersion":"2.1.17","_nodeVersion":"0.10.30","_npmUser":{"name":"scamden","email":"rusty.camden@gmail.com"},"maintainers":[{"name":"scamden","email":"rusty.camden@gmail.com"}],"dist":{"shasum":"69eaf26df801134dc7cc93dac68c3fbc9649f3ab","tarball":"http://registry.npmjs.org/riq-grid/-/riq-grid-0.9.9.tgz"}}
+35 verbose stack new={"name":"riq-grid","version":"0.9.9","main":"src/modules/riq-grid-entry.js","publishConfig":{"registry":"https://registry.npmjs.org/"},"engines":{"node":">=0.10.0"},"scripts":{},"dependencies":{"capitalize":"^0.5.0","element-class":"^0.1.1","key":"^0.1.11","sanitize-html":"^1.5.1"},"devDependencies":{"aliasify":"^1.5.0","gulp":"^3.8.0","gulp-tasks-riq":"^0.1.0","jasmine-tools-riq":"~0.1.0","jquery":"^2.1.0","polyfill-function-prototype-bind":"0.0.1","yargs":"^1.2.2"},"peerDependencies":{"aliasify":"^1.5.0"},"browserify":{"transform":["aliasify"]},"browser":{"angular":"./bower_components/angular/angular.js","angular-route":"./bower_components/angular-route/angular-route.js"},"aliasify":{"aliases":{"@grid":"./src/modules"}},"readme":"riq-grid\u000a===\u000a\u000aA highly scaleable grid component written in javscript\u000a\u000a**To Run Local Example:**\u000a\u000ahave npm installed (`brew install npm` or similar)\u000a\u000a`cd <unzipped grid code folder>`\u000a\u000a`npm install -g gulp phantomjs bower npm-shrinkwrap`\u000a\u000arun the dev server `gulp`\u000a\u000ahit localhost:8082 to see (very poorly styled) example grid\u000a\u000a","readmeFilename":"README.md","gitHead":"aef0e83ab63db748ef68a47331667ffebce28917","description":"riq-grid ===","_id":"riq-grid@0.9.9","_shasum":"32efbc4b77647cb10c1a0d34b75c11962b70f721","_from":".","_npmVersion":"2.1.17","_nodeVersion":"0.10.30","_npmUser":{"name":"scamden","email":"rusty.camden@gmail.com"},"maintainers":[{"name":"scamden","email":"rusty.camden@gmail.com"}],"dist":{"shasum":"32efbc4b77647cb10c1a0d34b75c11962b70f721","tarball":"http://registry.npmjs.org/riq-grid/-/riq-grid-0.9.9.tgz"}}: riq-grid
+35 verbose stack     at CachingRegistryClient.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:244:14)
+35 verbose stack     at Request._callback (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:172:14)
+35 verbose stack     at Request.self.callback (/usr/local/lib/node_modules/npm/node_modules/request/request.js:373:22)
+35 verbose stack     at Request.emit (events.js:98:17)
+35 verbose stack     at Request.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:1318:14)
+35 verbose stack     at Request.emit (events.js:117:20)
+35 verbose stack     at IncomingMessage.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:1266:12)
+35 verbose stack     at IncomingMessage.emit (events.js:117:20)
+35 verbose stack     at _stream_readable.js:938:16
+35 verbose stack     at process._tickCallback (node.js:419:13)
+36 verbose statusCode 403
+37 verbose pkgid riq-grid
+38 verbose cwd /Users/scamden/projects/riq-grid
+39 error Darwin 14.1.0
+40 error argv "node" "/usr/local/bin/npm" "publish"
+41 error node v0.10.30
+42 error npm  v2.1.17
+43 error code E403
+44 error forbidden cannot modify pre-existing version: 0.9.9
+44 error old={"name":"riq-grid","version":"0.9.9","main":"src/modules/riq-grid-entry.js","engines":{"node":">=0.10.0"},"scripts":{},"dependencies":{"capitalize":"^0.5.0","element-class":"^0.1.1","key":"^0.1.11","sanitize-html":"^1.5.1"},"devDependencies":{"aliasify":"^1.5.0","gulp":"^3.8.0","gulp-tasks-riq":"^0.1.0","jasmine-tools-riq":"~0.1.0","jquery":"^2.1.0","polyfill-function-prototype-bind":"0.0.1","yargs":"^1.2.2"},"peerDependencies":{"aliasify":"^1.5.0"},"browserify":{"transform":["aliasify"]},"browser":{"angular":"./bower_components/angular/angular.js","angular-route":"./bower_components/angular-route/angular-route.js"},"aliasify":{"aliases":{"@grid":"./src/modules"}},"gitHead":"27aaedf2eb0da1255a83c0a7612be88c934534a1","description":"riq-grid ===","_id":"riq-grid@0.9.9","_shasum":"69eaf26df801134dc7cc93dac68c3fbc9649f3ab","_from":".","_npmVersion":"2.1.17","_nodeVersion":"0.10.30","_npmUser":{"name":"scamden","email":"rusty.camden@gmail.com"},"maintainers":[{"name":"scamden","email":"rusty.camden@gmail.com"}],"dist":{"shasum":"69eaf26df801134dc7cc93dac68c3fbc9649f3ab","tarball":"http://registry.npmjs.org/riq-grid/-/riq-grid-0.9.9.tgz"}}
+44 error new={"name":"riq-grid","version":"0.9.9","main":"src/modules/riq-grid-entry.js","publishConfig":{"registry":"https://registry.npmjs.org/"},"engines":{"node":">=0.10.0"},"scripts":{},"dependencies":{"capitalize":"^0.5.0","element-class":"^0.1.1","key":"^0.1.11","sanitize-html":"^1.5.1"},"devDependencies":{"aliasify":"^1.5.0","gulp":"^3.8.0","gulp-tasks-riq":"^0.1.0","jasmine-tools-riq":"~0.1.0","jquery":"^2.1.0","polyfill-function-prototype-bind":"0.0.1","yargs":"^1.2.2"},"peerDependencies":{"aliasify":"^1.5.0"},"browserify":{"transform":["aliasify"]},"browser":{"angular":"./bower_components/angular/angular.js","angular-route":"./bower_components/angular-route/angular-route.js"},"aliasify":{"aliases":{"@grid":"./src/modules"}},"readme":"riq-grid\u000a===\u000a\u000aA highly scaleable grid component written in javscript\u000a\u000a**To Run Local Example:**\u000a\u000ahave npm installed (`brew install npm` or similar)\u000a\u000a`cd <unzipped grid code folder>`\u000a\u000a`npm install -g gulp phantomjs bower npm-shrinkwrap`\u000a\u000arun the dev server `gulp`\u000a\u000ahit localhost:8082 to see (very poorly styled) example grid\u000a\u000a","readmeFilename":"README.md","gitHead":"aef0e83ab63db748ef68a47331667ffebce28917","description":"riq-grid ===","_id":"riq-grid@0.9.9","_shasum":"32efbc4b77647cb10c1a0d34b75c11962b70f721","_from":".","_npmVersion":"2.1.17","_nodeVersion":"0.10.30","_npmUser":{"name":"scamden","email":"rusty.camden@gmail.com"},"maintainers":[{"name":"scamden","email":"rusty.camden@gmail.com"}],"dist":{"shasum":"32efbc4b77647cb10c1a0d34b75c11962b70f721","tarball":"http://registry.npmjs.org/riq-grid/-/riq-grid-0.9.9.tgz"}}: riq-grid
+45 error If you need help, you may report this error at:
+45 error     <http://github.com/npm/npm/issues>
+46 verbose exit [ 1, true ]
