@@ -1,6 +1,6 @@
 {
     "name": "riq-grid",
-    "version": "0.9.12",
+    "version": "0.9.13",
     "description": "A highly scaleable grid component written in javscript",
     "main": "src/modules/riq-grid-entry.js",
     "publishConfig": {
