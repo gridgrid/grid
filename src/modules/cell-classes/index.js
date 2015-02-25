@@ -2,25 +2,28 @@ var positionRange = require('../position-range');
 var makeDirtyClean = require('../dirty-clean');
 var addDirtyProps = require('../add-dirty-props');
 
-module.exports = function (_grid) {
+module.exports = function(_grid) {
     var grid = _grid;
 
     var dirtyClean = makeDirtyClean(grid);
     var descriptors = [];
 
     var api = {
-        add: function (descriptor) {
+        add: function(descriptor) {
             descriptors.push(descriptor);
             dirtyClean.setDirty();
         },
-        remove: function (descriptor) {
-            descriptors.splice(descriptors.indexOf(descriptor), 1);
-            dirtyClean.setDirty();
+        remove: function(descriptor) {
+            var index = descriptors.indexOf(descriptor);
+            if (index !== -1) {
+                descriptors.splice(index, 1);
+                dirtyClean.setDirty();
+            }
         },
-        getAll: function () {
+        getAll: function() {
             return descriptors.slice(0);
         },
-        create: function (top, left, className, height, width, space) {
+        create: function(top, left, className, height, width, space) {
             var thisDirtyClean = makeDirtyClean(grid);
             var descriptor = {};
             //mixins
