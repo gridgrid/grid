@@ -179,8 +179,15 @@ module.exports = function(_grid) {
         }
     });
 
+    function isNavableMouseEvent(e) {
+        var target = e.target;
+        //if there's no target let it through because that only happens in unit tests, 
+        //or if it happened in real world it wouldn't have a valid row or col and so wouldn't do anything anyway 
+        return !target || target === grid.textarea || (target.classList && target.classList.contains('grid-col-reorder'));
+    }
+
     grid.eventLoop.bind('mousedown', function(e) {
-        if (!grid.focused) {
+        if (!isNavableMouseEvent(e)) {
             return;
         }
         //assume the event has been annotated by the cell mouse model interceptor
@@ -360,7 +367,7 @@ module.exports = function(_grid) {
     }
 
     selection._onDragStart = function(e) {
-        if (!grid.focused) {
+        if (!isNavableMouseEvent(e)) {
             return;
         }
         var fromRow = model.focus.row;
