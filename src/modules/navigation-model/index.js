@@ -57,14 +57,16 @@ module.exports = function(_grid) {
             isEdgeToSeek = isForwardEdge;
         }
 
-        while (goForward(newIndex) !== undefined && !isEdgeToSeek(newIndex = goForward(newIndex))) { // jshint ignore: line
-            //empty
-        }
+
+        while (goForward(newIndex) !== undefined && !isEdgeToSeek(newIndex = goForward(newIndex))) /*eslint-disable no-empty*/ {
+            // empty
+        } /*eslint-enable no-empty*/
+
         return newIndex;
     }
 
     function navFrom(row, col, e) {
-        //if nothing changes great we'll stay where we are
+        // if nothing changes great we'll stay where we are
         var newRow = row;
         var newCol = col;
         var isSeek = ctrlOrCmd(e);
@@ -136,15 +138,15 @@ module.exports = function(_grid) {
         if (!key.is(arrow, e.which) || !grid.focused) {
             return;
         }
-        //focus logic
+        // focus logic
 
         if (!e.shiftKey) {
             var newFocus = navFrom(model.focus.row, model.focus.col, e);
             model.setFocus(newFocus.row, newFocus.col, e);
         } else {
-            //selection logic
+            // selection logic
             var newSelection;
-            //stand in for if it's cleared
+            // stand in for if it's cleared
             if (model.selection.top === -1) {
                 newSelection = {
                     top: model.focus.row,
@@ -181,8 +183,8 @@ module.exports = function(_grid) {
 
     function isNavableMouseEvent(e) {
         var target = e.target;
-        //if there's no target let it through because that only happens in unit tests, 
-        //or if it happened in real world it wouldn't have a valid row or col and so wouldn't do anything anyway 
+        // if there's no target let it through because that only happens in unit tests,
+        // or if it happened in real world it wouldn't have a valid row or col and so wouldn't do anything anyway
         return !target || target === grid.textarea || (target.classList && target.classList.contains('grid-col-reorder'));
     }
 
@@ -190,7 +192,7 @@ module.exports = function(_grid) {
         if (!isNavableMouseEvent(e)) {
             return;
         }
-        //assume the event has been annotated by the cell mouse model interceptor
+        // assume the event has been annotated by the cell mouse model interceptor
         var row = e.row;
         var col = e.col;
 
@@ -241,7 +243,7 @@ module.exports = function(_grid) {
 
     model._rowSelectionClasses = [];
     model._colSelectionClasses = [];
-    //row col selection
+    // row col selection
     function handleRowColSelectionChange(rowOrCol) {
         var decoratorsField = ('_' + rowOrCol + 'SelectionClasses');
         model[decoratorsField].forEach(function(selectionDecorator) {
@@ -336,7 +338,7 @@ module.exports = function(_grid) {
         selection.left = newSelection.left;
         selection.height = height;
         selection.width = width;
-        //select the columns to match
+        // select the columns to match
         syncSelectionToHeaders();
     };
 
@@ -352,8 +354,8 @@ module.exports = function(_grid) {
 
     function clearOtherSelections() {
         grid.decorators.remove(model.otherSelections);
-        syncSelectionToHeaders();
         model.otherSelections = [];
+        syncSelectionToHeaders();
     }
 
     function setSelectionFromPoints(fromRow, fromCol, toRow, toCol, dontClearOthers) {
@@ -381,7 +383,7 @@ module.exports = function(_grid) {
             if (selection.top === 0 && selection.height === Infinity) {
                 toRow = Infinity;
             }
-            //pass true to prevent clearing, if it were to be cleared the mousedown handles that
+            // pass true to prevent clearing, if it were to be cleared the mousedown handles that
             setSelectionFromPoints(fromRow, fromCol, toRow, toCol, true);
         });
         var unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function() {
@@ -396,7 +398,7 @@ module.exports = function(_grid) {
 
     Object.defineProperty(model, 'selection', {
         get: function() {
-            if (selection.height === -1) { //cleared selection default to focus
+            if (selection.height === -1) { // cleared selection default to focus
                 return {
                     top: model.focus.row,
                     left: model.focus.col,

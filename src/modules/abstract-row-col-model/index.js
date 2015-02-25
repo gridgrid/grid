@@ -28,8 +28,12 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
     }, 1);
 
     function updateDescriptorIndices() {
+        selected = [];
         descriptors.forEach(function(descriptor, i) {
             descriptor.index = i;
+            if (descriptor.selected) {
+                selected.push(i);
+            }
         });
     }
 
@@ -47,7 +51,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                     numFixed++;
                     numHeaders++;
                 } else {
-                    //if the column is fixed and the last one added is fixed (we only allow fixed at the beginning for now)
+                    // if the column is fixed and the last one added is fixed (we only allow fixed at the beginning for now)
                     if (descriptor.fixed) {
                         if (!descriptors.length || descriptors[descriptors.length - 1].fixed) {
                             numFixed++;
@@ -114,27 +118,37 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                 descriptors: removed
             });
         },
-        move: function(fromIndexes, target) {
-
+        move: function(fromIndexes, target, after) {
             if (!util.isArray(fromIndexes)) {
                 fromIndexes = [fromIndexes];
             }
-            var toValue = descriptors[target];
-            var removed = fromIndexes.sort(function compareNumbers(a, b) {
-                return b - a;
-            }).map(function(fromIndex) {
-                var removedDescriptors = descriptors.splice(fromIndex, 1);
-                return removedDescriptors[0];
 
-            });
-            removed.reverse();
-            var spliceArgs = [descriptors.indexOf(toValue) + 1, 0].concat(removed);
-            descriptors.splice.apply(descriptors, spliceArgs);
-            updateDescriptorIndices();
-            setDescriptorsDirty({
-                action: 'move',
-                descriptors: removed.concat(toValue)
-            });
+            if (fromIndexes.length === 1) {
+                // the single move case is easier and doesn't require the after hint
+                var from = fromIndexes[0];
+                descriptors.splice(target, 0, descriptors.splice(from, 1)[0]);
+                setDescriptorsDirty({
+                    action: 'move',
+                    descriptors: [api.get(from), api.get(target)]
+                });
+            } else {
+                var toValue = descriptors[target];
+                var removed = fromIndexes.sort(function compareNumbers(a, b) {
+                    return b - a;
+                }).map(function(fromIndex) {
+                    var removedDescriptors = descriptors.splice(fromIndex, 1);
+                    return removedDescriptors[0];
+
+                });
+                removed.reverse();
+                var spliceArgs = [descriptors.indexOf(toValue) + (after ? 1 : 0), 0].concat(removed);
+                descriptors.splice.apply(descriptors, spliceArgs);
+                updateDescriptorIndices();
+                setDescriptorsDirty({
+                    action: 'move',
+                    descriptors: removed.concat(toValue)
+                });
+            }
         },
         numHeaders: function() {
             return numHeaders;
@@ -190,7 +204,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
             }
         },
         clearSelected: function() {
-            //have to make a copy or we are iterating the same array we're removing from yikes.
+            // have to make a copy or we are iterating the same array we're removing from yikes.
             return api.deselect(api.getSelected().slice(0));
         },
         getSelected: function() {
@@ -208,13 +222,6 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                     fixed = _fixed;
                 }
             });
-            //
-            //            Object.defineProperty(descriptor, 'index', {
-            //                enumerable: true,
-            //                get: function () {
-            //                    return descriptors.indexOf(descriptor);
-            //                }
-            //            });
 
             addDirtyProps(descriptor, ['builder'], [builderDirtyClean]);
             descriptor.builder = builder;
@@ -246,7 +253,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
 
     };
 
-    //basically height or width
+    // basically height or width
     api[lengthName] = function(index) {
         var descriptor = descriptors[index];
         if (!descriptor) {
@@ -261,7 +268,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
         return descriptor[lengthName] || api.defaultSize;
     };
 
-    //row or col get
+    // row or col get
     api[name] = function(index) {
         return descriptors[index + numHeaders];
     };
