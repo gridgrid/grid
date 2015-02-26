@@ -14,13 +14,13 @@ module.exports = function(_grid) {
     model._annotateEvent = function annotateEvent(e) {
         switch (e.type) {
             case 'click':
+            case 'dblclick':
                 e.wasDragged = wasDragged;
                 /* jshint -W086 */
             case 'mousedown':
                 /* jshint +W086 */
             case 'mousemove':
             case 'mouseup':
-            case 'dblclick':
                 model._annotateEventInternal(e);
                 break;
 

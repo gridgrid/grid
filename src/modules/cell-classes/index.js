@@ -26,14 +26,14 @@ module.exports = function(_grid) {
         create: function(top, left, className, height, width, space) {
             var thisDirtyClean = makeDirtyClean(grid);
             var descriptor = {};
-            //mixins
+            // mixins
             positionRange(descriptor, thisDirtyClean, dirtyClean);
             addDirtyProps(descriptor, ['class'], [thisDirtyClean, dirtyClean]);
 
-            //all of these are optional
+            // all of these are optional
             descriptor.top = top;
             descriptor.left = left;
-            //default to single cell ranges
+            // default to single cell ranges
             descriptor.height = height || 1;
             descriptor.width = width || 1;
             descriptor.class = className;
