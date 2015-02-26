@@ -12,19 +12,18 @@ module.exports = function(_grid) {
     var scrollInterval;
 
     model._annotateEvent = function annotateEvent(e) {
+        /*eslint-disable no-fallthrough*/
         switch (e.type) {
             case 'click':
             case 'dblclick':
                 e.wasDragged = wasDragged;
-                /* jshint -W086 */
             case 'mousedown':
-                /* jshint +W086 */
             case 'mousemove':
             case 'mouseup':
                 model._annotateEventInternal(e);
                 break;
-
         }
+        /*eslint-enable no-fallthrough*/
     };
 
     model._annotateEventFromViewCoords = function(e, viewRow, viewCol) {
@@ -66,7 +65,7 @@ module.exports = function(_grid) {
     });
 
     grid.eventLoop.bind('grid-drag', function(e) {
-        //if it gets here then we will try to auto scroll
+        // if it gets here then we will try to auto scroll
         var rowDiff = 0;
         var colDiff = 0;
         if (e.clientX > window.innerWidth) {
@@ -97,7 +96,7 @@ module.exports = function(_grid) {
         var dragStarted = false;
         var unbindMove = grid.eventLoop.bind('mousemove', window, function(e) {
             if (dragStarted && !e.which) {
-                //got a move event without mouse down which means we somehow missed the mouseup
+                // got a move event without mouse down which means we somehow missed the mouseup
                 console.log('mousemove unbind, how on earth do these happen?');
                 handleMouseUp(e);
                 return;
@@ -129,7 +128,7 @@ module.exports = function(_grid) {
 
             var dragEnd = createCustomEventFromMouseEvent('grid-drag-end', e);
 
-            //row, col, x, and y should inherit
+            // row, col, x, and y should inherit
             grid.eventLoop.fire(dragEnd);
         }
     }
