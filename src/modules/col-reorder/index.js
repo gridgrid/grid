@@ -25,6 +25,9 @@ module.exports = function(_grid) {
             if (e.realCol < grid.colModel.numFixed() || !wasSelectedAtMousedown) {
                 return;
             }
+            if (e.enableAutoScroll) {
+                e.enableAutoScroll();
+            }
             // we want to be the only draggers
             grid.eventLoop.stopBubbling(e);
 

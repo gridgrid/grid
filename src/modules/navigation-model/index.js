@@ -372,6 +372,9 @@ module.exports = function(_grid) {
         if (!isNavableMouseEvent(e)) {
             return;
         }
+        if (e.enableAutoScroll) {
+            e.enableAutoScroll();
+        }
         var fromRow = model.focus.row;
         var fromCol = model.focus.col;
         var unbindDrag = grid.eventLoop.bind('grid-cell-drag', function(e) {

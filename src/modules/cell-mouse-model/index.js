@@ -64,36 +64,32 @@ module.exports = function(_grid) {
         }
     });
 
-    grid.eventLoop.bind('grid-drag', function(e) {
-        // if it gets here then we will try to auto scroll
-        var rowDiff = 0;
+    function calculateColScrollDiff(e) {
         var colDiff = 0;
         if (e.clientX > window.innerWidth) {
             colDiff = 1;
         } else if (grid.viewPort.toGridX(e.clientX) < grid.virtualPixelCellModel.fixedWidth()) {
             colDiff = -1;
         }
+        return colDiff;
+    }
 
+    function calculateRowScrollDiff(e) {
+        var rowDiff = 0;
         if (e.clientY > window.innerHeight) {
             rowDiff = 1;
         } else if (grid.viewPort.toGridY(e.clientY) < grid.virtualPixelCellModel.fixedHeight()) {
             rowDiff = -1;
         }
-
-        clearInterval(scrollInterval);
-        if (rowDiff || colDiff) {
-            scrollInterval = grid.interval(function() {
-                grid.cellScrollModel.scrollTo(grid.cellScrollModel.row + rowDiff, grid.cellScrollModel.col + colDiff);
-            }, 100);
-        }
-
-    });
+        return rowDiff;
+    }
 
     function setupDragEventForMouseDown(downEvent) {
         wasDragged = false;
         var lastDragRow = downEvent.row;
         var lastDragCol = downEvent.col;
         var dragStarted = false;
+        var unbindAutoScrollDrag;
         var unbindMove = grid.eventLoop.bind('mousemove', window, function(e) {
             if (dragStarted && !e.which) {
                 // got a move event without mouse down which means we somehow missed the mouseup
@@ -104,7 +100,28 @@ module.exports = function(_grid) {
 
             if (!dragStarted) {
                 wasDragged = true;
-                createAndFireCustomMouseEvent('grid-drag-start', downEvent);
+                createAndFireCustomMouseEvent('grid-drag-start', downEvent, function annotateDragStart(dragStart) {
+                    var initialRowDiff = calculateRowScrollDiff(e);
+                    var initialColDiff = calculateColScrollDiff(e);
+                    dragStart.enableAutoScroll = function() {
+                        if (unbindAutoScrollDrag) {
+                            unbindAutoScrollDrag();
+                        }
+                        unbindAutoScrollDrag = grid.eventLoop.bind('grid-drag', function(e) {
+                            // if it gets here then we will try to auto scroll
+                            var rowDiff = initialRowDiff ? 0 : calculateRowScrollDiff(e);
+                            var colDiff = initialColDiff ? 0 : calculateColScrollDiff(e);
+
+                            clearInterval(scrollInterval);
+                            if (rowDiff || colDiff) {
+                                scrollInterval = grid.interval(function() {
+                                    grid.cellScrollModel.scrollTo(grid.cellScrollModel.row + rowDiff, grid.cellScrollModel.col + colDiff);
+                                }, 100);
+                            }
+
+                        });
+                    };
+                });
                 dragStarted = true;
             }
 
@@ -125,6 +142,9 @@ module.exports = function(_grid) {
             clearInterval(scrollInterval);
             unbindMove();
             unbindUp();
+            if (unbindAutoScrollDrag) {
+                unbindAutoScrollDrag();
+            }
 
             var dragEnd = createCustomEventFromMouseEvent('grid-drag-end', e);
 
@@ -142,8 +162,11 @@ module.exports = function(_grid) {
         return event;
     }
 
-    function createAndFireCustomMouseEvent(type, e) {
+    function createAndFireCustomMouseEvent(type, e, annotateEvent) {
         var drag = createCustomEventFromMouseEvent(type, e);
+        if (annotateEvent) {
+            drag = annotateEvent(drag) || drag;
+        }
         if (e.target) {
             e.target.dispatchEvent(drag);
         } else {

@@ -259,6 +259,9 @@ describe('cell-mouse-model', function() {
             function testScrollDrag(x, y, rowDiff, colDiff, done) {
                 var mousedown = createEventWithXY('mousedown', 110, 40);
                 this.container.dispatchEvent(mousedown);
+                this.grid.eventLoop.bind('grid-drag-start', function(e) {
+                    e.enableAutoScroll && e.enableAutoScroll();
+                });
                 var scroll = spyOn(this.grid.cellScrollModel, 'scrollTo').and.callThrough();
                 window.dispatchEvent(createEventWithXY('mousemove', 111, 41));
                 expect(scroll).not.toHaveBeenCalled();

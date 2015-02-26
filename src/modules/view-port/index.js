@@ -4,7 +4,7 @@ var capitalize = require('capitalize');
 var addDirtyProps = require('../add-dirty-props');
 var debounce = require('../debounce');
 
-module.exports = function (_grid) {
+module.exports = function(_grid) {
     var grid = _grid;
     var dirtyClean = require('../dirty-clean')(grid);
     var container;
@@ -14,41 +14,44 @@ module.exports = function (_grid) {
     viewPort.cols = 0;
     viewPort.isDirty = dirtyClean.isDirty;
 
-    //these probably trigger reflow so we may need to think about caching the value and updating it at on draws or something
+    // these probably trigger reflow so we may need to think about caching the value and updating it at on draws or something
     function getFirstClientRect() {
         return container && container.getClientRects && container.getClientRects() && container.getClientRects()[0] || {};
     }
 
     Object.defineProperty(viewPort, 'top', {
         enumerable: true,
-        get: function () {
+        get: function() {
             return getFirstClientRect().top || 0;
         }
     });
 
     Object.defineProperty(viewPort, 'left', {
         enumerable: true,
-        get: function () {
+        get: function() {
             return getFirstClientRect().left || 0;
         }
     });
 
-    viewPort.toGridX = function (clientX) {
+    viewPort.toGridX = function(clientX) {
         return clientX - viewPort.left;
     };
 
-    viewPort.toGridY = function (clientY) {
+    viewPort.toGridY = function(clientY) {
         return clientY - viewPort.top;
     };
 
 
-    var fixed = {rows: 0, cols: 0};
+    var fixed = {
+        rows: 0,
+        cols: 0
+    };
 
     function getFixed(rowOrCol) {
         return fixed[rowOrCol + 's'];
     }
 
-    viewPort.sizeToContainer = function (elem) {
+    viewPort.sizeToContainer = function(elem) {
         container = elem;
         viewPort.width = elem.offsetWidth;
         viewPort.height = elem.offsetHeight;
@@ -57,45 +60,45 @@ module.exports = function (_grid) {
         grid.eventLoop.fire('grid-viewport-change');
     };
 
-    viewPort._onResize = debounce(function () {
+    viewPort._onResize = debounce(function() {
         viewPort._resize();
     }, 200);
 
-    grid.eventLoop.bind('grid-destroy', function () {
+    grid.eventLoop.bind('grid-destroy', function() {
         clearTimeout(viewPort._onResize.timeout);
         clearTimeout(shortDebouncedResize.timeout);
     });
 
-    viewPort._resize = function () {
+    viewPort._resize = function() {
         if (container) {
             viewPort.sizeToContainer(container);
         }
     };
 
-    var shortDebouncedResize = debounce(function () {
+    var shortDebouncedResize = debounce(function() {
         viewPort._resize();
     }, 1);
 
     viewPort.shortDebouncedResize = shortDebouncedResize;
 
 
-    grid.eventLoop.bind('resize', window, function () {
+    grid.eventLoop.bind('resize', window, function() {
         //we don't bind the handler directly so that tests can mock it out
         viewPort._onResize();
     });
 
-    grid.eventLoop.bind('grid-row-change', function () {
+    grid.eventLoop.bind('grid-row-change', function() {
         fixed.rows = grid.rowModel.numFixed();
         shortDebouncedResize();
     });
 
-    grid.eventLoop.bind('grid-col-change', function () {
+    grid.eventLoop.bind('grid-col-change', function() {
         fixed.cols = grid.colModel.numFixed();
         shortDebouncedResize();
     });
 
     function convertRealToVirtual(coord, rowOrCol, coordIsVirtual) {
-        //could cache this on changes i.e. row-change or col-change events
+        // could cache this on changes i.e. row-change or col-change events
         var numFixed = getFixed(rowOrCol);
         if (coord < numFixed) {
             return coord;
@@ -103,8 +106,8 @@ module.exports = function (_grid) {
         return coord + (coordIsVirtual ? -1 : 1) * grid.cellScrollModel[rowOrCol];
     }
 
-// converts a viewport row or column to a real row or column 
-// clamps it if the column would be outside the range
+    // converts a viewport row or column to a real row or column
+    // clamps it if the column would be outside the range
     function getVirtualRowColUnsafe(realCoord, rowOrCol) {
         return convertRealToVirtual(realCoord, rowOrCol);
     }
@@ -114,11 +117,11 @@ module.exports = function (_grid) {
         return grid.virtualPixelCellModel['clamp' + capitalize(rowOrCol)](virtualRowCol);
     }
 
-    viewPort.toVirtualRow = function (r) {
+    viewPort.toVirtualRow = function(r) {
         return getVirtualRowColClamped(r, 'row');
     };
 
-    viewPort.toVirtualCol = function (c) {
+    viewPort.toVirtualCol = function(c) {
         return getVirtualRowColClamped(c, 'col');
     };
 
@@ -131,39 +134,39 @@ module.exports = function (_grid) {
         return util.clamp(virtualCoord - grid.cellScrollModel[rowOrCol], numFixed, maxViewPortIndex, true);
     }
 
-    viewPort.rowIsInView = function (virtualRow) {
+    viewPort.rowIsInView = function(virtualRow) {
         var realRow = viewPort.toRealRow(virtualRow);
         return !isNaN(realRow) && getLengthBetweenViewCoords(0, realRow, 'row', 'height', true) < viewPort.height;
     };
 
-    viewPort.colIsInView = function (virtualCol) {
+    viewPort.colIsInView = function(virtualCol) {
         var realCol = viewPort.toRealCol(virtualCol);
         return !isNaN(realCol) && getLengthBetweenViewCoords(0, realCol, 'col', 'width', true) < viewPort.width;
     };
 
 
-//default unclamped cause that seems to be the more likely use case converting this direction
-    viewPort.toRealRow = function (virtualRow) {
+    // default unclamped cause that seems to be the more likely use case converting this direction
+    viewPort.toRealRow = function(virtualRow) {
         return getRealRowColClamped(virtualRow, 'row');
     };
 
-    viewPort.toRealCol = function (virtualCol) {
+    viewPort.toRealCol = function(virtualCol) {
         return getRealRowColClamped(virtualCol, 'col');
     };
 
-    viewPort.clampRow = function (r) {
+    viewPort.clampRow = function(r) {
         return util.clamp(r, 0, viewPort.rows - 1);
     };
 
-    viewPort.clampCol = function (c) {
+    viewPort.clampCol = function(c) {
         return util.clamp(c, 0, viewPort.cols - 1);
     };
 
-    viewPort.clampY = function (y) {
+    viewPort.clampY = function(y) {
         return util.clamp(y, 0, viewPort.height);
     };
 
-    viewPort.clampX = function (x) {
+    viewPort.clampX = function(x) {
         return util.clamp(x, 0, viewPort.width);
     };
 
@@ -191,15 +194,15 @@ module.exports = function (_grid) {
         return getLengthBetweenViewCoords(0, endCoord, rowOrCol, heightOrWidth);
     }
 
-    viewPort.getRowTop = function (viewPortCoord) {
+    viewPort.getRowTop = function(viewPortCoord) {
         return getTopOrLeft(viewPortCoord, 'row', 'height');
     };
 
-    viewPort.getColLeft = function (viewPortCol) {
+    viewPort.getColLeft = function(viewPortCol) {
         return getTopOrLeft(viewPortCol, 'col', 'width');
     };
 
-    viewPort.toPx = function (realCellRange) {
+    viewPort.toPx = function(realCellRange) {
         return {
             top: viewPort.getRowTop(realCellRange.top),
             left: viewPort.getColLeft(realCellRange.left),
@@ -209,7 +212,7 @@ module.exports = function (_grid) {
     };
 
     function getRowOrColFromPosition(pos, rowOrCol, heightOrWidth, returnVirtual) {
-        //we could do this slighly faster with binary search to get log(n) instead of n, but will only do it if we actually need to optimize this
+        // we could do this slighly faster with binary search to get log(n) instead of n, but will only do it if we actually need to optimize this
         var rowOrColCap = capitalize(rowOrCol);
         var viewMax = viewPort[rowOrCol + 's'];
         var toVirtual = viewPort['toVirtual' + rowOrColCap];
@@ -227,27 +230,27 @@ module.exports = function (_grid) {
         return NaN;
     }
 
-    viewPort.getVirtualRowByTop = function (top) {
+    viewPort.getVirtualRowByTop = function(top) {
         return getRowOrColFromPosition(top, 'row', 'height', true);
     };
 
-    viewPort.getVirtualColByLeft = function (left) {
+    viewPort.getVirtualColByLeft = function(left) {
         return getRowOrColFromPosition(left, 'col', 'width', true);
     };
 
-    viewPort.getRowByTop = function (top) {
+    viewPort.getRowByTop = function(top) {
         return getRowOrColFromPosition(top, 'row', 'height');
     };
 
-    viewPort.getColByLeft = function (left) {
+    viewPort.getColByLeft = function(left) {
         return getRowOrColFromPosition(left, 'col', 'width');
     };
 
-    viewPort.getRowHeight = function (viewPortRow) {
+    viewPort.getRowHeight = function(viewPortRow) {
         return grid.virtualPixelCellModel.height(viewPort.toVirtualRow(viewPort.clampRow(viewPortRow)));
     };
 
-    viewPort.getColWidth = function (viewPortCol) {
+    viewPort.getColWidth = function(viewPortCol) {
         return grid.virtualPixelCellModel.width(viewPort.toVirtualCol(viewPort.clampCol(viewPortCol)));
     };
 
@@ -270,8 +273,8 @@ module.exports = function (_grid) {
         return intersection;
     }
 
-    viewPort.intersect = function (range) {
-        //assume virtual cells for now
+    viewPort.intersect = function(range) {
+        // assume virtual cells for now
         var intersection = intersectRowsOrCols({}, range, 'top', 'row', 'height');
         if (!intersection) {
             return null;
@@ -292,7 +295,7 @@ module.exports = function (_grid) {
             fixedLength += lengthMethod(fixed);
         }
 
-        //it might be safer to actually sum the lengths in the virtualPixelCellModel but for now here is ok
+        // it might be safer to actually sum the lengths in the virtualPixelCellModel but for now here is ok
         for (var index = numFixed; index < lengthModel.length(true); index++) {
             var lengthOfIindex = lengthMethod(index);
             windowLength += lengthOfIindex;
@@ -310,7 +313,7 @@ module.exports = function (_grid) {
     }
 
 
-    viewPort.iterateCells = function (cellFn, optionalRowFn, optionalMaxRow, optionalMaxCol) {
+    viewPort.iterateCells = function(cellFn, optionalRowFn, optionalMaxRow, optionalMaxCol) {
         optionalMaxRow = optionalMaxRow || Infinity;
         optionalMaxCol = optionalMaxCol || Infinity;
         for (var r = 0; r < Math.min(viewPort.rows, optionalMaxRow); r++) {
