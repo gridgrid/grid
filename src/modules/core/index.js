@@ -10,7 +10,7 @@ module.exports = function() {
 
     var grid = {};
 
-    //the order here matters because some of these depend on each other
+    // the order here matters because some of these depend on each other
     grid.eventLoop = require('../event-loop')(grid);
     grid.decorators = require('../decorators')(grid);
     grid.cellClasses = require('../cell-classes')(grid);
@@ -24,7 +24,7 @@ module.exports = function() {
     grid.viewPort = require('../view-port')(grid);
     grid.viewLayer = require('../view-layer')(grid);
 
-    //things with logic that also register decorators (slightly less core than the other models)
+    // things with logic that also register decorators (slightly less core than the other models)
     grid.navigationModel = require('../navigation-model')(grid);
     grid.pixelScrollModel = require('../pixel-scroll-model')(grid);
     grid.colResize = require('../col-resize')(grid);
@@ -110,9 +110,6 @@ module.exports = function() {
         });
         return textarea;
     }
-
-    var spaces = ['virtual', 'data', 'view'];
-
 
     function iterateRange() {
         //expects to be called with the space as its this
