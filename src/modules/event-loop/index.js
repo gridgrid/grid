@@ -31,7 +31,7 @@ var eventLoop = function(_grid) {
         unbindAll = function() {
             unbindMouseWheelFn();
 
-            //have to copy the array since the unbind will actually remove itself from the array which modifies it mid iteration
+            // have to copy the array since the unbind will actually remove itself from the array which modifies it mid iteration
             domUnbindFns.slice(0).forEach(function(unbind) {
                 unbind();
             });
@@ -86,7 +86,7 @@ var eventLoop = function(_grid) {
             };
         } else {
             var listener = loopWith(handler);
-            //make sure the elem can receive events
+            // make sure the elem can receive events
             if (elem.style) {
                 elem.style.pointerEvents = 'auto';
             }

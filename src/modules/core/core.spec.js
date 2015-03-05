@@ -1,3 +1,5 @@
+var mockEvent = require('../custom-event');
+
 describe('grid-core', function() {
     require('../grid-spec-helper')();
     var $ = require('jquery');
@@ -62,27 +64,6 @@ describe('grid-core', function() {
     function findTextArea() {
         return $(this.container).find('.grid-textarea');
     }
-
-    it('should create the textarea on creation before build', function() {
-        expect(this.grid.textarea).toBeAnElement();
-    });
-
-    it('should have a focusable text area on build', function() {
-        grid.build(this.container);
-        expect(findTextArea.call(this)).toBeAnElement();
-    });
-
-    it('should pin the textarea to the edges and make it transparent', function() {
-        grid.build(this.container);
-
-        var area = findTextArea.call(this);
-        expect(area).toBePositioned(0, 0, 0, 0);
-        expect(area[0].style.background).toBe('transparent');
-        expect(area[0].style.color).toBe('transparent');
-        expect(area[0].style.border).toBe('none');
-        expect(area[0].style.boxShadow).toBe('none');
-        expect(area[0].style.cursor).toBe('default');
-    });
 
     it('should prevent weird browser behavior on dragging the text', function() {
         grid.build(this.container);
@@ -191,6 +172,63 @@ describe('grid-core', function() {
             var id = grid.interval(fn, 1);
             grid.eventLoop.fire('grid-destroy');
             expect(spy).toHaveBeenCalledWith(id);
+        });
+    });
+
+    describe('textarea', function() {
+
+        it('should be created on grid creation before build', function() {
+            expect(this.grid.textarea).toBeAnElement();
+        });
+
+        it('should be in the dom on build', function() {
+            grid.build(this.container);
+            expect(findTextArea.call(this)).toBeAnElement();
+        });
+
+        it('should be pinned to the top left and transparent', function() {
+            grid.build(this.container);
+
+            var area = findTextArea.call(this);
+            expect(area).toBePositioned(0, 0, 'auto', 'auto');
+            expect(area[0].style.zIndex).toBe('0');
+            expect(area[0].style.background).toBe('transparent');
+            expect(area[0].style.color).toBe('transparent');
+            expect(area[0].style.border).toBe('none');
+            expect(area[0].style.boxShadow).toBe('none');
+            expect(area[0].style.cursor).toBe('default');
+        });
+
+        it('have width 0 height 0 to start', function() {
+            grid.build(this.container);
+            var area = this.grid.textarea;
+            expect($(area).width()).toBe(0);
+            expect($(area).height()).toBe(0);
+        });
+
+        it('should listen for mousedown and temporarily show the text area', function() {
+            grid.build(this.container);
+            var area = this.grid.textarea;
+            var event = mockEvent('mousedown');
+            event.button = 2;
+            this.container.dispatchEvent(event);
+            expect($(area).width()).toBe($(this.container).width());
+            expect($(area).height()).toBe($(this.container).height());
+        });
+
+        it('should reset the width and height to 0 after mousedown', function(done) {
+            grid.build(this.container);
+            var area = this.grid.textarea;
+            var event = mockEvent('mousedown');
+            event.button = 2;
+            this.container.dispatchEvent(event);
+            var self = this;
+            setTimeout(function() {
+                expect($(area).width()).toBe(0);
+                expect($(area).height()).toBe(0);
+                done();
+            }, 2);
+
         });
     });
 

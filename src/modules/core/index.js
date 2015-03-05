@@ -69,6 +69,22 @@ module.exports = function() {
             grid.eventLoop.fire('grid-blur');
         });
 
+        var widthResetTimeout;
+        grid.eventLoop.addInterceptor(function(e) {
+            if (e.type !== 'mousedown' || e.button !== 2) {
+                return;
+            }
+            textarea.style.width = '100%';
+            textarea.style.height = '100%';
+            textarea.style.zIndex = 1;
+            clearTimeout(widthResetTimeout);
+            widthResetTimeout = setTimeout(function() {
+                textarea.style.zIndex = 0;
+                textarea.style.width = '0px';
+                textarea.style.height = '0px';
+            }, 1);
+        });
+
         container.appendChild(textarea);
         if (!container.getAttribute('tabIndex')) {
             container.tabIndex = -1;
@@ -85,7 +101,11 @@ module.exports = function() {
         var textarea = document.createElement('div');
         textarea.setAttribute('dts', 'grid-textarea');
         textarea.setAttribute('contenteditable', 'true');
-        util.position(textarea, 0, 0, 0, 0);
+        util.position(textarea, 0, 0);
+        textarea.style.width = '0px';
+        textarea.style.height = '0px';
+        textarea.style.zIndex = 0;
+
         textarea.style.background = 'transparent';
         textarea.style.color = 'transparent';
         textarea.style.border = 'none';
@@ -105,7 +125,7 @@ module.exports = function() {
                 return textarea.innerText;
             },
             set: function(val) {
-                textarea.innerText = val;
+                textarea.textContent = val;
             }
         });
         return textarea;

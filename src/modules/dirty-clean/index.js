@@ -1,28 +1,28 @@
-module.exports = function (_grid) {
+module.exports = function(_grid) {
     var grid = _grid;
     var dirty = true;
 
-    grid.eventLoop.bind('grid-draw', function () {
+    grid.eventLoop.bind('grid-draw', function() {
         api.setClean();
     });
 
 
     var api = {
-        isDirty: function () {
+        isDirty: function() {
             return dirty;
         },
-        isClean: function () {
+        isClean: function() {
             return !dirty;
         },
-        setDirty: function () {
+        setDirty: function() {
             dirty = true;
-            //when things are initalizing sometimes this doesn't exist yet
-            //we have to hope that at the end of initialization the grid will call request draw itself
+            // when things are initalizing sometimes this doesn't exist yet
+            // we have to hope that at the end of initialization the grid will call request draw itself
             if (grid.requestDraw) {
                 grid.requestDraw();
             }
         },
-        setClean: function () {
+        setClean: function() {
             dirty = false;
         }
     };

@@ -3,7 +3,7 @@ var debounce = require('../debounce');
 var util = require('../util');
 
 
-module.exports = function (_grid) {
+module.exports = function(_grid) {
     var viewLayer = {};
 
 
@@ -37,18 +37,18 @@ module.exports = function (_grid) {
     grid.cellClasses.add(fixedColClasses);
 
 
-    grid.eventLoop.bind('grid-col-change', function () {
+    grid.eventLoop.bind('grid-col-change', function() {
         fixedColClasses.left = grid.colModel.numFixed() - 1;
         rowHeaderClasses.width = grid.colModel.numHeaders();
     });
 
-    grid.eventLoop.bind('grid-row-change', function () {
+    grid.eventLoop.bind('grid-row-change', function() {
         fixedRowClasses.top = grid.rowModel.numFixed() - 1;
         colHeaderClasses.height = grid.rowModel.numHeaders();
     });
 
 
-    viewLayer.build = function (elem) {
+    viewLayer.build = function(elem) {
         cleanup();
 
         container = elem;
@@ -58,7 +58,6 @@ module.exports = function (_grid) {
         cellContainer.setAttribute('class', GRID_CELL_CONTAINER_BASE_CLASS);
         util.position(cellContainer, 0, 0, 0, 0);
         cellContainer.style.zIndex = 0;
-        cellContainer.style.pointerEvents = 'none';
 
         decoratorContainer = document.createElement('div');
         decoratorContainer.setAttribute('dts', 'grid-decorators');
@@ -96,11 +95,11 @@ module.exports = function (_grid) {
     }
 
     //only draw once per js turn, may need to create a synchronous version
-    viewLayer.draw = debounce(function () {
+    viewLayer.draw = debounce(function() {
         viewLayer._draw();
     }, 1);
 
-    viewLayer._draw = function () {
+    viewLayer._draw = function() {
         //return if we haven't built yet
         if (!container) {
             return;
@@ -143,7 +142,7 @@ module.exports = function (_grid) {
         return borderWidth || 1;
     }
 
-    viewLayer._drawCells = function () {
+    viewLayer._drawCells = function() {
         measureBorderWidth();
         var bWidth = getBorderWidth();
         var headerRows = grid.rowModel.numHeaders();
@@ -224,7 +223,7 @@ module.exports = function (_grid) {
             row.style.top = top + 'px';
         });
 
-        rows.forEach(function (row) {
+        rows.forEach(function(row) {
             row.style.width = totalVisibleCellWidth + 'px';
         });
 
@@ -245,11 +244,11 @@ module.exports = function (_grid) {
         cells = [];
         rows = [];
         var row;
-        grid.viewPort.iterateCells(function (r, c) {
+        grid.viewPort.iterateCells(function(r, c) {
             var cell = buildDivCell();
             cells[r][c] = cell;
             row.appendChild(cell);
-        }, function (r) {
+        }, function(r) {
             cells[r] = [];
             row = document.createElement('div');
             row.setAttribute('class', 'grid-row');
@@ -275,7 +274,7 @@ module.exports = function (_grid) {
     /* END CELL LOGIC */
 
     /* COL BUILDER LOGIC */
-    viewLayer._buildCols = function () {
+    viewLayer._buildCols = function() {
         builtCols = {};
         for (var c = 0; c < grid.colModel.length(true); c++) {
             var builder = grid.colModel.get(c).builder;
@@ -293,7 +292,7 @@ module.exports = function (_grid) {
      *  for now we only build headers
      * */
 
-    viewLayer._buildRows = function () {
+    viewLayer._buildRows = function() {
         builtRows = {};
         for (var r = 0; r < grid.rowModel.numHeaders(); r++) {
             var builder = grid.rowModel.get(r).builder;
@@ -345,9 +344,9 @@ module.exports = function (_grid) {
         return range;
     }
 
-    viewLayer._drawDecorators = function (cellsPositionOrSizeChanged) {
+    viewLayer._drawDecorators = function(cellsPositionOrSizeChanged) {
         var aliveDecorators = grid.decorators.getAlive();
-        aliveDecorators.forEach(function (decorator) {
+        aliveDecorators.forEach(function(decorator) {
 
             var boundingBox = decorator.boundingBox;
             if (!boundingBox) {
@@ -371,13 +370,12 @@ module.exports = function (_grid) {
                             positionCellDecoratorFromViewCellRange(decorator, boundingBox);
                             break;
                     }
-                }
-                else if (decorator.space === 'virtual' || decorator.space === 'data') {
+                } else if (decorator.space === 'virtual' || decorator.space === 'data') {
                     switch (decorator.units) {
                         case 'px':
                             break;
                         case 'cell':
-                        /* jshint -W086 */
+                            /* jshint -W086 */
                         default:
                             var range = createRangeForDescriptor(decorator);
                             var realCellRange = grid.viewPort.intersect(range);
@@ -387,7 +385,7 @@ module.exports = function (_grid) {
                                 positionDecorator(boundingBox, -1, -1, -1, -1);
                             }
                             break;
-                        /* jshint +W086 */
+                            /* jshint +W086 */
                     }
 
                 }
@@ -398,7 +396,7 @@ module.exports = function (_grid) {
     };
 
     function removeDecorators(decorators) {
-        decorators.forEach(function (decorator) {
+        decorators.forEach(function(decorator) {
             var boundingBox = decorator.boundingBox;
             if (boundingBox) {
                 //if they rendered an element previously we attached it to the bounding box as the only child
@@ -417,31 +415,30 @@ module.exports = function (_grid) {
     /* END DECORATOR LOGIC */
 
     /* CELL CLASSES LOGIC */
-    viewLayer._drawCellClasses = function () {
-        grid.viewPort.iterateCells(function (r, c) {
+    viewLayer._drawCellClasses = function() {
+        grid.viewPort.iterateCells(function(r, c) {
             cells[r][c].className = '';
         });
-        grid.cellClasses.getAll().forEach(function (descriptor) {
+        grid.cellClasses.getAll().forEach(function(descriptor) {
             var range = createRangeForDescriptor(descriptor);
             var intersection = grid.viewPort.intersect(range);
             if (intersection) {
-                rowLoop:
-                    for (var r = 0; r < intersection.height; r++) {
-                        for (var c = 0; c < intersection.width; c++) {
-                            var row = intersection.top + r;
-                            var col = intersection.left + c;
+                rowLoop: for (var r = 0; r < intersection.height; r++) {
+                    for (var c = 0; c < intersection.width; c++) {
+                        var row = intersection.top + r;
+                        var col = intersection.left + c;
 
-                            var cellRow = cells[row];
-                            if (!cellRow) {
-                                continue rowLoop;
-                            }
-                            var cell = cellRow[col];
-                            if (!cell) {
-                                continue;
-                            }
-                            cell.className = (cell.className ? cell.className + ' ' : '') + descriptor.class;
+                        var cellRow = cells[row];
+                        if (!cellRow) {
+                            continue rowLoop;
                         }
+                        var cell = cellRow[col];
+                        if (!cell) {
+                            continue;
+                        }
+                        cell.className = (cell.className ? cell.className + ' ' : '') + descriptor.class;
                     }
+                }
             }
         });
     };
@@ -462,7 +459,7 @@ module.exports = function (_grid) {
         }
     }
 
-    grid.eventLoop.bind('grid-destroy', function () {
+    grid.eventLoop.bind('grid-destroy', function() {
         viewLayer.destroy();
         clearTimeout(viewLayer.draw.timeout);
     });
