@@ -334,6 +334,15 @@ module.exports = function() {
         return dirtyClean(grid);
     };
 
+    grid.eventIsOnCells = function(e) {
+        var target = e.target;
+        return target && (target.classList &&
+                (target.classList.contains('grid-col-reorder') ||
+                    target.classList.contains('grid-cell')
+                )) ||
+            target === grid.textarea;
+    }
+
     grid.textarea = createFocusTextArea();
 
     return grid;
