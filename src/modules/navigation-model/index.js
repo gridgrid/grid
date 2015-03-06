@@ -418,11 +418,16 @@ module.exports = function(_grid) {
         }
     });
 
-    grid.eventLoop.bind('grid-col-change', function(e) {
-        if (e.action === 'move') {
-            setSelectionToFocus();
-            clearOtherSelections();
+    function clearSelectionFromModelChange(e) {
+        if (e.action === 'size') { // don't clear for resize but all other changes for now will clear selection
+            return;
         }
-    });
+        setSelectionToFocus();
+        clearOtherSelections();
+
+    }
+
+    grid.eventLoop.bind('grid-col-change', clearSelectionFromModelChange);
+    grid.eventLoop.bind('grid-row-change', clearSelectionFromModelChange);
     return model;
 };

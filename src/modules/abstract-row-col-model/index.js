@@ -113,6 +113,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                     return descriptor;
                 }
             });
+            updateDescriptorIndices();
             setDescriptorsDirty({
                 action: 'remove',
                 descriptors: removed
