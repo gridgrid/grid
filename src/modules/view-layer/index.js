@@ -149,6 +149,7 @@ module.exports = function(_grid) {
         var headerCols = grid.colModel.numHeaders();
         var totalVisibleCellWidth = 0;
         var lastVirtualCol;
+        var lastVirtualRow;
         grid.viewPort.iterateCells(function drawCell(r, c) {
             var cell = cells[r][c];
             var width = grid.viewPort.getColWidth(c);
@@ -205,7 +206,7 @@ module.exports = function(_grid) {
                     data: data
                 });
             }
-            //if we didn't get a child from the builder use a regular text node
+            // if we didn't get a child from the builder use a regular text node
             if (!cellChild) {
                 cellChild = document.createTextNode(data.formatted);
             }
@@ -213,10 +214,13 @@ module.exports = function(_grid) {
         }, function drawRow(r) {
             var height = grid.viewPort.getRowHeight(r);
             var row = rows[r];
-            if (height == 0) {
+            var virtualRow = grid.view.row.toVirtual(r);
+            // seeing the same virtual row twice means we've been clamped and it's time to hide the row
+            if (height === 0 || lastVirtualRow === virtualRow) {
                 row.style.display = 'none';
                 return;
             }
+            lastVirtualRow = virtualRow;
             row.style.display = '';
             row.style.height = height + bWidth + 'px';
             var top = grid.viewPort.getRowTop(r);

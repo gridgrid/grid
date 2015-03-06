@@ -1,45 +1,46 @@
 {
-    "name": "riq-grid",
-    "version": "0.9.19",
-    "description": "A highly scaleable grid component written in javscript",
-    "main": "src/modules/riq-grid-entry.js",
-    "publishConfig": {
-        "registry": "https://registry.npmjs.org/"
-    },
-    "engines": {
-        "node": ">=0.10.0"
-    },
-    "scripts": {},
-    "dependencies": {
-        "capitalize": "^0.5.0",
-        "element-class": "^0.1.1",
-        "key": "^0.1.11",
-        "sanitize-html": "^1.5.1"
-    },
-    "devDependencies": {
-        "aliasify": "^1.5.0",
-        "gulp": "^3.8.0",
-        "gulp-tasks-riq": "^0.1.0",
-        "jasmine-tools-riq": "~0.1.0",
-        "jquery": "^2.1.0",
-        "polyfill-function-prototype-bind": "0.0.1",
-        "yargs": "^1.2.2"
-    },
-    "peerDependencies": {
-        "aliasify": "^1.5.0"
-    },
-    "browserify": {
-        "transform": [
-            "aliasify"
-        ]
-    },
-    "browser": {
-        "angular": "./bower_components/angular/angular.js",
-        "angular-route": "./bower_components/angular-route/angular-route.js"
-    },
-    "aliasify": {
-        "aliases": {
-            "@grid": "./src/modules"
-        }
+  "name": "riq-grid",
+  "version": "0.9.19",
+  "description": "A highly scaleable grid component written in javscript",
+  "main": "src/modules/riq-grid-entry.js",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {},
+  "dependencies": {
+    "capitalize": "^0.5.0",
+    "element-class": "^0.1.1",
+    "key": "^0.1.11",
+    "sanitize-html": "^1.5.1"
+  },
+  "devDependencies": {
+    "aliasify": "^1.5.0",
+    "gulp": "^3.8.0",
+    "gulp-tasks-riq": "^0.1.0",
+    "jasmine-tools-riq": "~0.1.0",
+    "jquery": "^2.1.0",
+    "karma-jasmine-jquery": "~0.1.1",
+    "polyfill-function-prototype-bind": "0.0.1",
+    "yargs": "^1.2.2"
+  },
+  "peerDependencies": {
+    "aliasify": "^1.5.0"
+  },
+  "browserify": {
+    "transform": [
+      "aliasify"
+    ]
+  },
+  "browser": {
+    "angular": "./bower_components/angular/angular.js",
+    "angular-route": "./bower_components/angular-route/angular-route.js"
+  },
+  "aliasify": {
+    "aliases": {
+      "@grid": "./src/modules"
     }
+  }
 }

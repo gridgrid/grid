@@ -1,10 +1,10 @@
-module.exports = function (config) {
+module.exports = function(config) {
     config.set({
 
         // base path that will be used to resolve all patterns (eg. files, exclude)
         basePath: '',
 
-        frameworks: ['browserify', 'jasmine'],
+        frameworks: ['browserify', 'jasmine-jquery', 'jasmine'],
 
         files: [
             'node_modules/polyfill-function-prototype-bind/bind.js',
