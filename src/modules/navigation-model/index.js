@@ -377,6 +377,8 @@ module.exports = function(_grid) {
         }
         var fromRow = model.focus.row;
         var fromCol = model.focus.col;
+        var startCol = e.col;
+        var startRow = e.row;
         var unbindDrag = grid.eventLoop.bind('grid-cell-drag', function(e) {
             var toRow = e.row;
             var toCol = e.col;
@@ -386,6 +388,17 @@ module.exports = function(_grid) {
             if (selection.top === 0 && selection.height === Infinity) {
                 toRow = Infinity;
             }
+            var fixedRows = grid.rowModel.numFixed(true);
+            if (startRow < fixedRows && toRow > fixedRows) {
+                startRow = toRow = grid.rowModel.numFixed();
+                grid.cellScrollModel.scrollTo(0, grid.cellScrollModel.col);
+            }
+            var fixedCols = grid.colModel.numFixed(true);
+            if (startCol < fixedCols && toCol > fixedCols) {
+                startCol = toCol = grid.colModel.numFixed();
+                grid.cellScrollModel.scrollTo(grid.cellScrollModel.row, 0);
+            }
+
             // pass true to prevent clearing, if it were to be cleared the mousedown handles that
             setSelectionFromPoints(fromRow, fromCol, toRow, toCol, true);
         });

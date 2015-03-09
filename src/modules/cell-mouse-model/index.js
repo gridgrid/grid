@@ -101,16 +101,22 @@ module.exports = function(_grid) {
             if (!dragStarted) {
                 wasDragged = true;
                 createAndFireCustomMouseEvent('grid-drag-start', downEvent, function annotateDragStart(dragStart) {
-                    var initialRowDiff = calculateRowScrollDiff(e);
-                    var initialColDiff = calculateColScrollDiff(e);
+                    var onlyFixedRows = !calculateRowScrollDiff(e);
+                    var onlyFixedCols = !calculateColScrollDiff(e);
                     dragStart.enableAutoScroll = function() {
                         if (unbindAutoScrollDrag) {
                             unbindAutoScrollDrag();
                         }
                         unbindAutoScrollDrag = grid.eventLoop.bind('grid-drag', function(e) {
                             // if it gets here then we will try to auto scroll
-                            var rowDiff = initialRowDiff ? 0 : calculateRowScrollDiff(e);
-                            var colDiff = initialColDiff ? 0 : calculateColScrollDiff(e);
+                            var newRowDiff = calculateRowScrollDiff(e);
+                            onlyFixedRows = !newRowDiff;
+                            var rowDiff = onlyFixedRows ? 0 : newRowDiff;
+
+
+                            var newColDiff = calculateColScrollDiff;
+                            onlyFixedCols = !newColDiff;
+                            var colDiff = onlyFixedCols ? 0 : newColDiff(e);
 
                             clearInterval(scrollInterval);
                             if (rowDiff || colDiff) {

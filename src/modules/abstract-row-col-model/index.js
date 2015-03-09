@@ -154,8 +154,8 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
         numHeaders: function() {
             return numHeaders;
         },
-        numFixed: function() {
-            return numFixed;
+        numFixed: function(excludeHeaders) {
+            return numFixed - (excludeHeaders ? numHeaders : 0);
         },
         toVirtual: function(dataIndex) {
             return dataIndex + api.numHeaders();
