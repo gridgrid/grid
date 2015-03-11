@@ -18,12 +18,12 @@ module.exports = function(_grid) {
     var GRID_VIEW_ROOT_CLASS = 'js-grid-view-root';
     var CELL_CLASS = 'grid-cell';
 
-    var cells; //matrix of rendered cell elements;
-    var rows; //array of all rendered rows
-    var builtCols; //map from col index to an array of built elements for the column to update on scroll
-    var builtRows; //map from row index to an array of built elements for the row to update on scroll
+    var cells; // matrix of rendered cell elements;
+    var rows; // array of all rendered rows
+    var builtCols; // map from col index to an array of built elements for the column to update on scroll
+    var builtRows; // map from row index to an array of built elements for the row to update on scroll
 
-    //add the cell classes through the standard method
+    // add the cell classes through the standard method
     grid.cellClasses.add(grid.cellClasses.create(0, 0, CELL_CLASS, Infinity, Infinity, 'virtual'));
 
     var rowHeaderClasses = grid.cellClasses.create(0, 0, 'grid-header grid-row-header', Infinity, 0, 'virtual');
@@ -77,7 +77,7 @@ module.exports = function(_grid) {
 
 
     function measureBorderWidth() {
-        //read the border width, for the rare case of larger than 1px borders, otherwise the draw will default to 1
+        // read the border width, for the rare case of larger than 1px borders, otherwise the draw will default to 1
         if (borderWidth) {
             return;
         }
@@ -94,13 +94,13 @@ module.exports = function(_grid) {
         return borderWidth;
     }
 
-    //only draw once per js turn, may need to create a synchronous version
+    // only draw once per js turn, may need to create a synchronous version
     viewLayer.draw = debounce(function() {
         viewLayer._draw();
     }, 1);
 
     viewLayer._draw = function() {
-        //return if we haven't built yet
+        // return if we haven't built yet
         if (!container) {
             return;
         }
@@ -154,14 +154,14 @@ module.exports = function(_grid) {
             var cell = cells[r][c];
             var width = grid.viewPort.getColWidth(c);
             var virtualCol = grid.viewPort.toVirtualCol(c);
-            //if we got the same vCol we've been clamped and its time to hide this cell
-            //also hide the cell if its width is zero cause ya...
-            if (width == 0 || virtualCol === lastVirtualCol) {
+            // if we got the same vCol we've been clamped and its time to hide this cell
+            // also hide the cell if its width is zero cause ya...
+            if (width === 0 || virtualCol === lastVirtualCol) {
                 cell.style.display = 'none';
                 return;
             }
             if (r === 0) {
-                //calculate width for rows later but only do it one time (so on the first row)
+                // calculate width for rows later but only do it one time (so on the first row)
                 totalVisibleCellWidth += width;
             }
 
@@ -184,7 +184,7 @@ module.exports = function(_grid) {
             } else {
                 data = grid.dataModel.get(grid.rowModel.toData(virtualRow), grid.colModel.toData(virtualCol));
             }
-            //artificially only get builders for row headers for now
+            // artificially only get builders for row headers for now
             var builder = virtualRow < headerRows && grid.rowModel.get(virtualRow).builder || undefined;
             var hasRowBuilder = true;
             if (!builder) {
@@ -292,7 +292,7 @@ module.exports = function(_grid) {
     };
     /* END COL BUILDER LOGIC */
 
-    /* ROW BUILDER LOGIC 
+    /* ROW BUILDER LOGIC
      *  for now we only build headers
      * */
 
@@ -403,10 +403,10 @@ module.exports = function(_grid) {
         decorators.forEach(function(decorator) {
             var boundingBox = decorator.boundingBox;
             if (boundingBox) {
-                //if they rendered an element previously we attached it to the bounding box as the only child
+                // if they rendered an element previously we attached it to the bounding box as the only child
                 var renderedElement = boundingBox.firstChild;
                 if (renderedElement) {
-                    //create a destroy dom event that bubbles
+                    // create a destroy dom event that bubbles
                     var destroyEvent = customEvent('decorator-destroy', true);
                     renderedElement.dispatchEvent(destroyEvent);
                 }

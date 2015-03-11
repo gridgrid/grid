@@ -125,8 +125,8 @@ var eventLoop = function(_grid) {
     }
 
     var mainLoop = loopWith(function(e) {
-        //have to copy the array because handlers can unbind themselves which modifies the array
-        //we use some so that we can break out of the loop if need be
+        // have to copy the array because handlers can unbind themselves which modifies the array
+        // we use some so that we can break out of the loop if need be
         getHandlers(e.type).slice(0).some(function(handler) {
             handler(e);
             if (e.gridStopBubbling) {

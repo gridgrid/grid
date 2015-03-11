@@ -507,6 +507,10 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
         });
     });
 
+    describe('expansion', function() {
+
+    });
+
 }
 
 module.exports = testAbstractModel;

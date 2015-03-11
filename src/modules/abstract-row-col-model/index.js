@@ -15,6 +15,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
     var builderDirtyClean = makeDirtyClean(grid);
     var selected = [];
 
+
     function setDescriptorsDirty(eventOptional) {
         var event = eventOptional || {};
         event.type = 'grid-' + name + '-change';

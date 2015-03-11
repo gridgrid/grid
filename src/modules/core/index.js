@@ -138,7 +138,7 @@ module.exports = function() {
         var rowFn = args.rowFn;
         var cellFn = args.cellFn;
         var rowResult;
-        for (var r = range.top; r < range.top + range.height; r = this.row.next(r)) {
+        for (var r = range.top; r < range.top + range.height; r = this.row.[next](r)) {
             rowResult = undefined;
             if (rowFn) {
                 rowResult = rowFn(r);
@@ -198,7 +198,7 @@ module.exports = function() {
             });
         };
 
-        //have data to data be passthrough for example
+        // have data to data be passthrough for example
         dim['to' + capitalize(spaceName)] = passThrough;
 
         return dim;
