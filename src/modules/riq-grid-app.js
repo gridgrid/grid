@@ -52,13 +52,22 @@ angular.module('riqGridApp', [])
                 var expansionColDescriptor = grid.colModel.get(0);
                 expansionColDescriptor.builder = grid.colModel.createBuilder(function(ctx) {
                     var a = document.createElement('a');
-                    a.text = '>';
                     a.style.cursor = "pointer";
                     grid.eventLoop.bind('click', a, function() {
                         var row = grid.rowModel.get(grid.view.row.toVirtual(ctx.viewRow));
                         row.expanded = !row.expanded;
                     });
                     return a;
+                }, function update(elem, ctx) {
+                    var row = grid.rowModel.get(ctx.virtualRow);
+                    if (!row.children) {
+                        elem.textContent = '';
+                    } else if (row.expanded) {
+                        elem.textContent = "V";
+                    } else {
+                        elem.textContent = ">"
+                    }
+                    return elem;
                 });
                 grid.colModel.get(0).width = 30;
                 grid.colModel.get(1).builder = builder;
