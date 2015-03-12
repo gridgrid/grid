@@ -285,7 +285,9 @@ module.exports = function(_grid) {
             if (builder) {
                 builtCols[c] = [];
                 for (var realRow = 0; realRow < grid.viewPort.rows; realRow++) {
-                    builtCols[c][realRow] = builder.render();
+                    builtCols[c][realRow] = builder.render({
+                        viewRow: realRow
+                    });
                 }
             }
         }
@@ -303,7 +305,9 @@ module.exports = function(_grid) {
             if (builder) {
                 builtRows[r] = [];
                 for (var realCol = 0; realCol < grid.viewPort.cols; realCol++) {
-                    builtRows[r][realCol] = builder.render();
+                    builtRows[r][realCol] = builder.render({
+                        viewCol: realCol
+                    });
                 }
             }
         }

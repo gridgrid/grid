@@ -224,6 +224,34 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                     fixed = _fixed;
                 }
             });
+            var expanded = false;
+            Object.defineProperty(descriptor, 'expanded', {
+                get: function() {
+                    return expanded;
+                },
+                set: function(exp) {
+                    if (!descriptor.children) {
+                        return;
+                    }
+                    expanded = exp;
+                    if (expanded) {
+                        var spliceArgs = [descriptor.index + 1, 0].concat(descriptor.children)
+                        descriptors.splice.apply(descriptors, spliceArgs);
+                        updateDescriptorIndices();
+                        setDescriptorsDirty({
+                            action: 'add',
+                            descriptors: descriptor.children
+                        });
+                    } else {
+                        descriptors.splice(descriptor.index + 1, descriptor.children.length);
+                        updateDescriptorIndices();
+                        setDescriptorsDirty({
+                            action: 'remove',
+                            descriptors: [descriptor.children]
+                        });
+                    }
+                }
+            });
 
             addDirtyProps(descriptor, ['builder'], [builderDirtyClean]);
             descriptor.builder = builder;

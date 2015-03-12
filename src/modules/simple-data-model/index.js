@@ -1,6 +1,6 @@
 var util = require('../util');
 
-module.exports = function (_grid) {
+module.exports = function(_grid) {
     var grid = _grid;
 
     var cellData = [];
@@ -8,7 +8,7 @@ module.exports = function (_grid) {
     var sortedCol;
     var ascending;
     var dirtyClean = require('../dirty-clean')(grid);
-    var internalSet = function (data, r, c, datum) {
+    var internalSet = function(data, r, c, datum) {
         if (!data[r]) {
             data[r] = [];
         }
@@ -18,23 +18,30 @@ module.exports = function (_grid) {
 
     var api = {
         isDirty: dirtyClean.isDirty,
-        set: function (r, c, datum) {
+        set: function(r, c, datum) {
             var data = arguments[0];
             if (!util.isArray(data)) {
                 if (typeof datum === 'string') {
-                    datum = {value: datum.replace('[rR]', '').replace('[cC]', '').split(' ')};
+                    datum = {
+                        value: datum.replace('[rR]', '').replace('[cC]', '').split(' ')
+                    };
                 }
-                data = [{row: r, col: c, data: datum}];
+                data = [{
+                    row: r,
+                    col: c,
+                    data: datum
+                }];
             }
-            data.forEach(function (change) {
+            data.forEach(function(change) {
                 internalSet(cellData, change.row, change.col, change.data);
             });
         },
-        setHeader: function (r, c, datum) {
+        setHeader: function(r, c, datum) {
             internalSet(headerData, r, c, datum);
         },
-        get: function (r, c) {
-            var dataRow = cellData[grid.rowModel.row(r).dataRow];
+        get: function(r, c) {
+            var rowDescriptor = grid.rowModel.row(r);
+            var dataRow = cellData[rowDescriptor.dataRow];
             var datum = dataRow && dataRow[grid.colModel.col(c).dataCol];
             var value = datum && datum.value;
             if (value === undefined) {
@@ -42,13 +49,13 @@ module.exports = function (_grid) {
             }
             return {
                 value: value,
-                formatted: (value && 'r' + value[0] + ' c' + value[1]) || ''
+                formatted: (value && (rowDescriptor.dataLayer ? ' s' + rowDescriptor.dataLayer + ' ' : '') + 'r' + value[0] + ' c' + value[1]) || ''
             };
         },
-        getCopyData: function (r, c) {
+        getCopyData: function(r, c) {
             return api.get(r, c).formatted;
         },
-        getHeader: function (r, c) {
+        getHeader: function(r, c) {
             var dataRow = headerData[grid.rowModel.get(r).dataRow];
 
             var datum = dataRow && dataRow[grid.colModel.get(c).dataCol];
@@ -59,9 +66,9 @@ module.exports = function (_grid) {
             };
         },
 
-        toggleSort: function (c) {
+        toggleSort: function(c) {
             var retVal = -1;
-            var compareMethod = function (val1, val2) {
+            var compareMethod = function(val1, val2) {
                 return val1 < (val2) ? retVal : -1 * retVal;
             };
             if (c === sortedCol) {
@@ -73,7 +80,7 @@ module.exports = function (_grid) {
                 sortedCol = c;
                 ascending = true;
             }
-            cellData.sort(function (dataRow1, dataRow2) {
+            cellData.sort(function(dataRow1, dataRow2) {
                 if (!dataRow1 || !dataRow1[c]) {
                     return retVal;
                 }

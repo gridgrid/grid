@@ -1,6 +1,6 @@
 var util = require('../util');
 
-module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows, fixedCols, preSetupFn, headerRows, headerCols) {
+module.exports = function(numRows, numCols, varyHeights, varyWidths, fixedRows, fixedCols, preSetupFn, headerRows, headerCols) {
 
     var grid = require('../core')();
 
@@ -21,8 +21,7 @@ module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows,
             if (r < headerRows) {
                 row.dataRow = r;
                 row.header = true;
-            }
-            else if (r < fixedRows + headerRows) { //returns false for undefined luckily
+            } else if (r < fixedRows + headerRows) { // returns false for undefined luckily
                 row.fixed = true;
             }
             if (util.isArray(varyHeights)) {
@@ -52,11 +51,14 @@ module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows,
                         cols.push(col);
                     }
                     if (c < headerCols || r < headerRows) {
-                        grid.dataModel.setHeader(r, c, {value: [r, c]});
+                        grid.dataModel.setHeader(r, c, {
+                            value: [r, c]
+                        });
                     } else {
-                        grid.dataModel.set(dataRow, dataCol, {value: [dataRow, dataCol]});
+                        grid.dataModel.set(dataRow, dataCol, {
+                            value: [dataRow, dataCol]
+                        });
                     }
-                    
                 }
             }
         }
