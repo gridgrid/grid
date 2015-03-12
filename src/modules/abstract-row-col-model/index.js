@@ -234,6 +234,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                         return;
                     }
                     expanded = exp;
+                    // we never look for changes to the children, if you need to change it, remove and add the row again
                     if (expanded) {
                         var spliceArgs = [descriptor.index + 1, 0].concat(descriptor.children)
                         descriptors.splice.apply(descriptors, spliceArgs);
