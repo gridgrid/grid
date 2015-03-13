@@ -1,5 +1,5 @@
 var addDirtyProps = require('../add-dirty-props');
-module.exports = function (range, dirtyClean, parentDirtyClean) {
+module.exports = function(range, dirtyClean, parentDirtyClean) {
     range = range || {}; //allow mixin functionality
     range.isDirty = dirtyClean.isDirty;
 
@@ -10,7 +10,7 @@ module.exports = function (range, dirtyClean, parentDirtyClean) {
     }
 
     addDirtyProps(range, watchedProperties, dirtyCleans);
-    //defaults
+    // defaults
     range.units = 'cell';
     range.space = 'data';
 

@@ -225,6 +225,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                 }
             });
             var expanded = false;
+            var expandedClass;
             Object.defineProperty(descriptor, 'expanded', {
                 get: function() {
                     return expanded;
@@ -243,6 +244,13 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                             action: 'add',
                             descriptors: descriptor.children
                         });
+                        var top = name === 'row' ? descriptor.index : 0;
+                        var left = name === 'col' ? descriptor.index : 0;
+                        var height = name === 'row' ? 1 : Infinity;
+                        var width = name === 'col' ? 1 : Infinity;
+                        expandedClass = grid.cellClasses.create(top, left, 'grid-expanded', height, width, 'virtual');
+                        grid.cellClasses.add(expandedClass);
+
                     } else {
                         descriptors.splice(descriptor.index + 1, descriptor.children.length);
                         updateDescriptorIndices();
@@ -250,6 +258,9 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                             action: 'remove',
                             descriptors: [descriptor.children]
                         });
+                        if (expandedClass) {
+                            grid.cellClasses.remove(expandedClass);
+                        }
                     }
                 }
             });
