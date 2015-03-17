@@ -282,11 +282,14 @@ module.exports = function(_grid) {
         builtCols = {};
         for (var c = 0; c < grid.colModel.length(true); c++) {
             var builder = grid.colModel.get(c).builder;
+            var oldElems = builtCols[c];
+
             if (builder) {
                 builtCols[c] = [];
                 for (var realRow = 0; realRow < grid.viewPort.rows; realRow++) {
                     builtCols[c][realRow] = builder.render({
-                        viewRow: realRow
+                        viewRow: realRow,
+                        previousElement: oldElems && oldElems[realRow]
                     });
                 }
             }
@@ -302,11 +305,14 @@ module.exports = function(_grid) {
         builtRows = {};
         for (var r = 0; r < grid.rowModel.numHeaders(); r++) {
             var builder = grid.rowModel.get(r).builder;
+            var oldElems = builtRows[r];
+
             if (builder) {
                 builtRows[r] = [];
                 for (var realCol = 0; realCol < grid.viewPort.cols; realCol++) {
                     builtRows[r][realCol] = builder.render({
-                        viewCol: realCol
+                        viewCol: realCol,
+                        previousElement: oldElems && oldElems[realCol]
                     });
                 }
             }
