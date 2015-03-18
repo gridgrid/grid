@@ -279,10 +279,11 @@ module.exports = function(_grid) {
 
     /* COL BUILDER LOGIC */
     viewLayer._buildCols = function() {
+        var previouslyBuiltCols = builtCols;
         builtCols = {};
         for (var c = 0; c < grid.colModel.length(true); c++) {
             var builder = grid.colModel.get(c).builder;
-            var oldElems = builtCols[c];
+            var oldElems = previouslyBuiltCols && previouslyBuiltCols[c];
 
             if (builder) {
                 builtCols[c] = [];
@@ -302,10 +303,11 @@ module.exports = function(_grid) {
      * */
 
     viewLayer._buildRows = function() {
+        var previouslyBuiltRows = builtRows;
         builtRows = {};
         for (var r = 0; r < grid.rowModel.numHeaders(); r++) {
             var builder = grid.rowModel.get(r).builder;
-            var oldElems = builtRows[r];
+            var oldElems = previouslyBuiltRows && previouslyBuiltRows[r];
 
             if (builder) {
                 builtRows[r] = [];
