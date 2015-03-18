@@ -43,6 +43,10 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
         isDirty: dirtyClean.isDirty,
         defaultSize: defaultSize,
         add: function(toAdd) {
+            if (!toAdd) {
+                return;
+            }
+
             if (!util.isArray(toAdd)) {
                 toAdd = [toAdd];
             }
@@ -70,6 +74,10 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
             });
         },
         addHeaders: function(toAdd) {
+            if (!toAdd) {
+                return;
+            }
+
             if (!util.isArray(toAdd)) {
                 toAdd = [toAdd];
             }
