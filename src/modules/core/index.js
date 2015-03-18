@@ -6,8 +6,7 @@ var passThrough = require('../pass-through');
 var capitalize = require('capitalize');
 
 
-module.exports = function() {
-
+module.exports = function(opts) {
     var grid = {};
 
     // the order here matters because some of these depend on each other
@@ -28,7 +27,9 @@ module.exports = function() {
     grid.navigationModel = require('../navigation-model')(grid);
     grid.pixelScrollModel = require('../pixel-scroll-model')(grid);
     grid.colResize = require('../col-resize')(grid);
-    grid.colReorder = require('../col-reorder')(grid);
+    if (!(opts && opts.col && opts.col.disableReorder)) {
+        grid.colReorder = require('../col-reorder')(grid);
+    }
     grid.showHiddenCols = require('../show-hidden-cols')(grid);
     grid.copyPaste = require('../copy-paste')(grid);
 
