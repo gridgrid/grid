@@ -73,6 +73,10 @@ module.exports = function(_grid) {
         var isLeftwardEdge, isRightwardEdge, isUpwardEdge, isDownwardEdge, cellHasValue, startedDefined;
         if (isSeek) {
             cellHasValue = function(r, c) {
+                if (r === undefined || c === undefined) {
+                    return false;
+                }
+
                 return !!grid.dataModel.get(r, c).formatted;
             };
             isLeftwardEdge = function(c) {

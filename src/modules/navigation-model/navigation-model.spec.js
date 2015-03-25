@@ -144,23 +144,21 @@ describe('navigation-model', function() {
                 beforeEachFn.call(this, undefined, undefined, 11, 11);
             });
 
+            function getCoordFromPoint(rowOrCol, coord, amount) {
+                coord[rowOrCol] += amount;
+                return coord;
+            }
+
             function getCoordFromCenter(rowOrCol, amount) {
                 var coord = {
                     row: 5,
                     col: 5
                 };
-                coord[rowOrCol] += amount;
-                return coord;
+
+                return getCoordFromPoint(rowOrCol, coord, amount);
             }
 
             function testSeek(rowOrCol, direction, directionCode, backCode) {
-                var firstEmpty = getCoordFromCenter(rowOrCol, direction * 2);
-                firstEmpty.data = '';
-                var secondEmpty = getCoordFromCenter(rowOrCol, direction * 3);
-                secondEmpty.data = '';
-                var thirdEmpty = getCoordFromCenter(rowOrCol, direction * 5);
-                thirdEmpty.data = '';
-                this.grid.dataModel.set([firstEmpty, secondEmpty, thirdEmpty]);
                 var forwardEvent = {
                     which: directionCode,
                     metaKey: true
@@ -172,6 +170,21 @@ describe('navigation-model', function() {
                 var firstExpect = getCoordFromCenter(rowOrCol, direction);
                 var secondExpect = getCoordFromCenter(rowOrCol, direction * 4);
                 var finalExpect = getCoordFromCenter(rowOrCol, direction * 5);
+
+                // test contiguous data
+                // start at the center of the grid and seek; should go all the way to the edge of the grid
+                expect(model._navFrom(5, 5, forwardEvent)).toEqual(finalExpect);
+
+                // non-contiguous data
+                // start at the center of the grid and seek; should stop at the edges of the data
+                var firstEmpty = getCoordFromCenter(rowOrCol, direction * 2);
+                firstEmpty.data = '';
+                var secondEmpty = getCoordFromCenter(rowOrCol, direction * 3);
+                secondEmpty.data = '';
+                var thirdEmpty = getCoordFromCenter(rowOrCol, direction * 5);
+                thirdEmpty.data = '';
+                this.grid.dataModel.set([firstEmpty, secondEmpty, thirdEmpty]);
+
                 expect(model._navFrom(5, 5, forwardEvent)).toEqual(firstExpect);
                 expect(model._navFrom(firstExpect.row, firstExpect.col, forwardEvent)).toEqual(secondExpect);
                 expect(model._navFrom(secondExpect.row, secondExpect.col, forwardEvent)).toEqual(finalExpect);
