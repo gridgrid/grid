@@ -46,7 +46,7 @@ module.exports = function(_grid) {
                     'span': ['data-*']
                 }
             });
-            td.innerHTML = data;
+            td.innerHTML = data || '&nbsp;';
             row.appendChild(td);
         });
 
@@ -96,10 +96,11 @@ module.exports = function(_grid) {
                     if (!singlePasteValue && (pasteData[offsetR] === undefined || pasteData[offsetR][offsetC] === undefined)) {
                         return;
                     }
+                    var pasteValue = singlePasteValue || pasteData[offsetR][offsetC];
                     dataChanges.push({
                         row: r,
                         col: c,
-                        data: singlePasteValue || pasteData[offsetR][offsetC],
+                        data: pasteValue && pasteValue.trim(),
                         paste: true
                     });
                 });

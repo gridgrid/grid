@@ -203,7 +203,7 @@ describe('grid-core', function() {
             grid.build(this.container);
             var area = this.grid.textarea;
             expect($(area).width()).toBe(0);
-            expect($(area).height()).toBe(0);
+            expect($(area).height()).toBe(1);
         });
 
         it('should listen for mousedown and temporarily show the text area', function() {
@@ -225,7 +225,7 @@ describe('grid-core', function() {
             var self = this;
             setTimeout(function() {
                 expect($(area).width()).toBe(0);
-                expect($(area).height()).toBe(0);
+                expect($(area).height()).toBe(1);
                 done();
             }, 2);
 

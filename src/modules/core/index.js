@@ -82,7 +82,7 @@ module.exports = function(opts) {
             widthResetTimeout = setTimeout(function() {
                 textarea.style.zIndex = 0;
                 textarea.style.width = '0px';
-                textarea.style.height = '0px';
+                textarea.style.height = '1px';
             }, 1);
         });
 
@@ -104,7 +104,7 @@ module.exports = function(opts) {
         textarea.setAttribute('contenteditable', 'true');
         util.position(textarea, 0, 0);
         textarea.style.width = '0px';
-        textarea.style.height = '0px';
+        textarea.style.height = '1px';
         textarea.style.zIndex = 0;
 
         textarea.style.background = 'transparent';
