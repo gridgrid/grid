@@ -433,6 +433,20 @@ module.exports = function(_grid) {
         }
     });
 
+    model.getAllSelectedRanges = function() {
+        var selectionRange = grid.navigationModel.selection;
+        // valid selection range cannot go to -1
+        if (selectionRange.top === -1) {
+            selectionRange = {
+                top: grid.navigationModel.focus.row,
+                left: grid.navigationModel.focus.col,
+                width: 1,
+                height: 1
+            };
+        }
+        return [selectionRange].concat(model.otherSelections);
+    };
+
     function clearSelectionFromModelChange(e) {
         if (e.action === 'size') { // don't clear for resize but all other changes for now will clear selection
             return;

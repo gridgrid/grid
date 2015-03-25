@@ -346,5 +346,9 @@ module.exports = function(opts) {
 
     grid.textarea = createFocusTextArea();
 
+    grid.destroy = function() {
+        grid.eventLoop.fire('grid-destroy');
+    };
+
     return grid;
 };
