@@ -29,17 +29,23 @@ module.exports = function(_grid) {
             }
             return;
         }
-        //prepare for copy
+        // prepare for copy
         var copyTable = document.createElement('table');
         var selectionRange = getCopyPasteRange();
+        var gotNull = false;
         grid.data.iterate(selectionRange, function() {
             var row = document.createElement('tr');
             copyTable.appendChild(row);
             return row;
         }, function(r, c, row) {
             var data = grid.dataModel.getCopyData(r, c);
+
+            // intentional == checks null or undefined
+            if (data == null) {
+                return gotNull = true; // this breaks the col loop
+            }
             var td = document.createElement('td');
-            //sanitize the html pretty hard core for now just to allow spans with data attributes for our rich content use case
+            // sanitize the html pretty hard core for now just to allow spans with data attributes for our rich content use case
             data = sanitize(data, {
                 allowedTags: ['span'],
                 allowedAttributes: {
@@ -49,9 +55,13 @@ module.exports = function(_grid) {
             td.innerHTML = data || '&nbsp;';
             row.appendChild(td);
         });
-
-        grid.textarea.innerHTML = copyTable.outerHTML;
-        grid.textarea.select();
+        if (!gotNull) {
+            grid.textarea.innerHTML = copyTable.outerHTML;
+            grid.textarea.select();
+            setTimeout(function() {
+                grid.eventLoop.fire('grid-copy');
+            }, 1);
+        }
     });
 
     grid.eventLoop.bind('paste', function(e) {

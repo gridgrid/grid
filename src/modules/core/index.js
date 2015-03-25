@@ -139,14 +139,19 @@ module.exports = function(opts) {
         var rowFn = args.rowFn;
         var cellFn = args.cellFn;
         var rowResult;
-        for (var r = range.top; r < range.top + range.height; r = this.row.next(r)) {
+        rowloop: for (var r = range.top; r < range.top + range.height; r = this.row.next(r)) {
             rowResult = undefined;
             if (rowFn) {
                 rowResult = rowFn(r);
             }
-            for (var c = range.left; c < range.left + range.width; c = this.col.next(c)) {
+            colloop: for (var c = range.left; c < range.left + range.width; c = this.col.next(c)) {
                 if (cellFn) {
-                    cellFn(r, c, rowResult);
+                    var result = cellFn(r, c, rowResult);
+                    if (result === false) {
+                        break rowloop;
+                    } else if (result === true) {
+                        break colloop;
+                    }
                 }
             }
         }
