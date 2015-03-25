@@ -171,10 +171,12 @@ describe('navigation-model', function() {
                 var secondExpect = getCoordFromCenter(rowOrCol, direction * 4);
                 var finalExpect = getCoordFromCenter(rowOrCol, direction * 5);
 
-                // contiguous data
+                // test contiguous data
+                // start at the center of the grid and seek; should go all the way to the edge of the grid
                 expect(model._navFrom(5, 5, forwardEvent)).toEqual(finalExpect);
 
                 // non-contiguous data
+                // start at the center of the grid and seek; should stop at the edges of the data
                 var firstEmpty = getCoordFromCenter(rowOrCol, direction * 2);
                 firstEmpty.data = '';
                 var secondEmpty = getCoordFromCenter(rowOrCol, direction * 3);
