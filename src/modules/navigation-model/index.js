@@ -58,7 +58,13 @@ module.exports = function(_grid) {
         }
 
 
-        while (goForward(newIndex) !== undefined && !isEdgeToSeek(newIndex = goForward(newIndex))) /*eslint-disable no-empty*/ {
+        while (true) /*eslint-disable no-empty*/ {
+            if (goForward(newIndex) !== undefined && !isEdgeToSeek(newIndex = goForward(newIndex))) {
+                continue;
+            }
+            else {
+                break;
+            }
             // empty
         } /*eslint-enable no-empty*/
 
@@ -73,6 +79,10 @@ module.exports = function(_grid) {
         var isLeftwardEdge, isRightwardEdge, isUpwardEdge, isDownwardEdge, cellHasValue, startedDefined;
         if (isSeek) {
             cellHasValue = function(r, c) {
+                if (r === undefined || c === undefined) {
+                    return false;
+                }
+
                 return !!grid.dataModel.get(r, c).formatted;
             };
             isLeftwardEdge = function(c) {
