@@ -58,13 +58,7 @@ module.exports = function(_grid) {
         }
 
 
-        while (true) /*eslint-disable no-empty*/ {
-            if (goForward(newIndex) !== undefined && !isEdgeToSeek(newIndex = goForward(newIndex))) {
-                continue;
-            }
-            else {
-                break;
-            }
+        while (goForward(newIndex) !== undefined && !isEdgeToSeek(newIndex = goForward(newIndex))) /*eslint-disable no-empty*/ {
             // empty
         } /*eslint-enable no-empty*/
 
