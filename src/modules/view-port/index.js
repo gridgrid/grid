@@ -309,7 +309,7 @@ module.exports = function(_grid) {
             }
 
         }
-        return maxSize + numFixed + 1;
+        return Math.min(maxSize + numFixed + 1, grid.virtual[lengthModel.width ? 'col' : 'row'].count());
     }
 
 
