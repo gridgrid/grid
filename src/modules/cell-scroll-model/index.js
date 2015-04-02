@@ -25,7 +25,7 @@ module.exports = function(_grid) {
     grid.eventLoop.bind('grid-row-change', function(e) {
         switch (e.action) {
             case 'remove':
-                model.scrollTo(0, 0);
+                model.scrollTo(0, model.col);
                 break;
         }
     });
