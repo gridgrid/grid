@@ -177,7 +177,13 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
             if (!util.isArray(indexes)) {
                 indexes = [indexes];
             }
-            var changes = indexes.map(function(idx) {
+            var changes = indexes.filter(function(idx) {
+                var hasDescriptor = !!api[name](idx);
+                if (!hasDescriptor) {
+                    console.warn('Tried to select index that had no descriptor', idx);
+                }
+                return hasDescriptor;
+            }).map(function(idx) {
                 var descriptor = api[name](idx);
                 if (!descriptor.selected) {
                     descriptor.selected = true;
@@ -193,7 +199,13 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
             if (!util.isArray(indexes)) {
                 indexes = [indexes];
             }
-            var changes = indexes.map(function(idx) {
+            var changes = indexes.filter(function(idx) {
+                var hasDescriptor = !!api[name](idx);
+                if (!hasDescriptor) {
+                    console.warn('Tried to deselect index that had no descriptor', idx);
+                }
+                return hasDescriptor;
+            }).map(function(idx) {
                 var descriptor = api[name](idx);
                 if (descriptor.selected) {
                     descriptor.selected = false;
