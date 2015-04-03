@@ -141,15 +141,7 @@ module.exports = function(_grid) {
     model.horzScrollBar.height = scrollBarWidth;
 
     function getMaxScroll(heightWidth) {
-        var rowOrCol = heightWidth === 'height' ? 'row' : 'col';
-        var scrollLength = model[heightWidth];
-        var viewScrollHeightOrWidth = getViewScrollHeightOrWidth(heightWidth);
-        var firstScrollableCell = grid[rowOrCol + 'Model'].numFixed();
-        while (scrollLength > viewScrollHeightOrWidth - 10) {
-            scrollLength -= grid.virtualPixelCellModel[heightWidth](firstScrollableCell);
-            firstScrollableCell++;
-        }
-        return model[heightWidth] - scrollLength;
+        return model[heightWidth] - 1;
     }
 
     model._getMaxScroll = getMaxScroll;

@@ -199,8 +199,8 @@ module.exports = function(opts) {
             } else {
                 fn = arguments[0];
             }
-            dim.indexes(opts).forEach(function(idx) {
-                fn(idx);
+            dim.indexes(opts).some(function(idx) {
+                return fn(idx);
             });
         };
 
