@@ -5,7 +5,6 @@ var rangeUtil = require('../range-util');
 var passThrough = require('../pass-through');
 var capitalize = require('capitalize');
 
-
 module.exports = function(opts) {
     var grid = {};
 

@@ -41,6 +41,11 @@ module.exports = function(_grid) {
         },
         get: function(r, c) {
             var rowDescriptor = grid.rowModel.row(r);
+            if (!rowDescriptor) {
+                return {
+                    formatted: ''
+                };
+            }
             var dataRow = cellData[rowDescriptor.dataRow];
             var datum = dataRow && dataRow[grid.colModel.col(c).dataCol];
             var value = datum && datum.value;

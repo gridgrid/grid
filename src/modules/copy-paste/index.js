@@ -31,13 +31,21 @@ module.exports = function(_grid) {
         }
         // prepare for copy
         var copyTable = document.createElement('table');
+        var tableBody = document.createElement('tbody');
+        copyTable.appendChild(tableBody);
+        var tsvData = [];
         var selectionRange = getCopyPasteRange();
         var gotNull = false;
         grid.data.iterate(selectionRange, function() {
             var row = document.createElement('tr');
-            copyTable.appendChild(row);
-            return row;
-        }, function(r, c, row) {
+            tableBody.appendChild(row);
+            var array = [];
+            tsvData.push(array);
+            return {
+                row: row,
+                array: array
+            };
+        }, function(r, c, rowResult) {
             var data = grid.dataModel.getCopyData(r, c);
 
             // intentional == checks null or undefined
@@ -45,19 +53,15 @@ module.exports = function(_grid) {
                 return gotNull = true; // this breaks the col loop
             }
             var td = document.createElement('td');
-            // sanitize the html pretty hard core for now just to allow spans with data attributes for our rich content use case
-            data = sanitize(data, {
-                allowedTags: ['span'],
-                allowedAttributes: {
-                    'span': ['data-*']
-                }
-            });
-            td.innerHTML = data || '&nbsp;';
-            row.appendChild(td);
+            // sanitize the html pretty hard core for now just to allow spans with data attributes for our rich content use case           
+            td.innerHTML = data || ' ';
+            rowResult.row.appendChild(td);
+            rowResult.array.push(td.textContent);
         });
         if (!gotNull) {
-            grid.textarea.innerHTML = copyTable.outerHTML;
-            grid.textarea.select();
+            e.clipboardData.setData('text/plain', tsv.stringify(tsvData));
+            e.clipboardData.setData('text/html', copyTable.outerHTML);
+            e.preventDefault();
             setTimeout(function() {
                 grid.eventLoop.fire('grid-copy');
             }, 1);
@@ -73,13 +77,16 @@ module.exports = function(_grid) {
             console.warn('no clipboard data on paste event');
             return;
         }
-        var pasteData = tsv.parse(e.clipboardData.getData('Text'));
-
+        var pasteData = tsv.parse(e.clipboardData.getData('text/plain'));
+        var pasteHtml = e.clipboardData.getData('text/html');
+        e.preventDefault();
 
         setTimeout(function() {
-            if (grid.textarea.querySelector('table')) {
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = pasteHtml;
+            if (tempDiv.querySelector('table')) {
                 pasteData = [];
-                [].forEach.call(grid.textarea.querySelectorAll('tr'), function(tr) {
+                [].forEach.call(tempDiv.querySelectorAll('tr'), function(tr) {
                     var row = [];
                     pasteData.push(row);
                     [].forEach.call(tr.querySelectorAll('td'), function(td) {
@@ -94,7 +101,7 @@ module.exports = function(_grid) {
             }
             var ranges = [selectionRange];
             if (singlePasteValue) {
-                //this will do nothing if no other selections as it will be an empty array
+                // this will do nothing if no other selections as it will be an empty array
                 ranges = ranges.concat(grid.navigationModel.otherSelections);
             }
             ranges.forEach(function(range) {
@@ -122,7 +129,7 @@ module.exports = function(_grid) {
 
     var maybeSelectText = debounce(function maybeSelectTextInner() {
         if ((!model.isSelectionDisabled || !model.isSelectionDisabled()) && grid.focused) {
-            grid.textarea.value = 'gridtext';
+            grid.textarea.value = grid.dataModel.get(grid.navigationModel.focus.row, grid.navigationModel.focus.col).formatted || '.';
             grid.textarea.select();
         }
     }, 1)
