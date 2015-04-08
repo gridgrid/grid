@@ -150,10 +150,16 @@ module.exports = function(_grid) {
         var totalVisibleCellWidth = 0;
         var lastVirtualCol;
         var lastVirtualRow;
+        // these get calculated once per col and are then cached to save a factor of numRows calls per column
+        var widths = [];
+        var lefts = [];
+        var virtualCols = [];
+
         grid.viewPort.iterateCells(function drawCell(r, c) {
             var cell = cells[r][c];
-            var width = grid.viewPort.getColWidth(c);
-            var virtualCol = grid.viewPort.toVirtualCol(c);
+            // only calculate these once per column since they can't change during draw
+            var width = widths[c] || (widths[c] = grid.viewPort.getColWidth(c));
+            var virtualCol = virtualCols[c] || (virtualCols[c] = grid.viewPort.toVirtualCol(c));
             // if we got the same vCol we've been clamped and its time to hide this cell
             // also hide the cell if its width is zero cause ya...
             if (width === 0 || virtualCol === lastVirtualCol) {
@@ -168,14 +174,12 @@ module.exports = function(_grid) {
             lastVirtualCol = virtualCol;
             cell.style.display = '';
             cell.style.width = width + bWidth + 'px';
-
-            var left = grid.viewPort.getColLeft(c);
+            // only calculate these once per column since they can't change during draw
+            var left = lefts[c] || (lefts[c] = grid.viewPort.getColLeft(c));
 
             cell.style.left = left + 'px';
 
-            while (cell.firstChild) {
-                cell.removeChild(cell.firstChild);
-            }
+
             var virtualRow = grid.viewPort.toVirtualRow(r);
 
             var data;
@@ -208,9 +212,17 @@ module.exports = function(_grid) {
             }
             // if we didn't get a child from the builder use a regular text node
             if (!cellChild) {
-                cellChild = document.createTextNode(data.formatted);
+                viewLayer.setTextContent(cell, data.formatted);
+            } else {
+                var notSameElem = cell.firstChild !== cellChild;
+                if (cell.firstChild && notSameElem) {
+                    cell.removeChild(cell.firstChild);
+                }
+                if (notSameElem) {
+                    cell.appendChild(cellChild);
+                }
+
             }
-            cell.appendChild(cellChild);
         }, function drawRow(r) {
             var height = grid.viewPort.getRowHeight(r);
             var row = rows[r];
@@ -462,6 +474,13 @@ module.exports = function(_grid) {
     /* END CELL CLASSES LOGIC*/
 
     viewLayer.destroy = cleanup;
+    viewLayer.setTextContent = function(elem, text) {
+        if (elem.firstChild && elem.firstChild.nodeType === 3) {
+            elem.firstChild.nodeValue = text;
+        } else {
+            elem.textContent = text;
+        }
+    };
 
     function cleanup() {
         removeDecorators(grid.decorators.getAlive().concat(grid.decorators.popAllDead()));
