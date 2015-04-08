@@ -445,29 +445,8 @@ module.exports = function(_grid) {
     /* CELL CLASSES LOGIC */
     viewLayer._drawCellClasses = function() {
         grid.viewPort.iterateCells(function(r, c) {
-            cells[r][c].className = '';
-        });
-        grid.cellClasses.getAll().forEach(function(descriptor) {
-            var range = createRangeForDescriptor(descriptor);
-            var intersection = grid.viewPort.intersect(range);
-            if (intersection) {
-                rowLoop: for (var r = 0; r < intersection.height; r++) {
-                    for (var c = 0; c < intersection.width; c++) {
-                        var row = intersection.top + r;
-                        var col = intersection.left + c;
-
-                        var cellRow = cells[row];
-                        if (!cellRow) {
-                            continue rowLoop;
-                        }
-                        var cell = cellRow[col];
-                        if (!cell) {
-                            continue;
-                        }
-                        cell.className = (cell.className ? cell.className + ' ' : '') + descriptor.class;
-                    }
-                }
-            }
+            var classes = grid.cellClasses.getCachedClasses(grid.view.row.toVirtual(r), grid.view.col.toVirtual(c));
+            cells[r][c].className = classes.join(' ');
         });
     };
 

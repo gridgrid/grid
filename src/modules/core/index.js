@@ -20,6 +20,10 @@ module.exports = function(opts) {
     grid.cellMouseModel = require('../cell-mouse-model')(grid);
 
     grid.viewPort = require('../view-port')(grid);
+
+    addUtilsToCore(); // this has to happen here for things not to break, view layer will add cell classes and that cache requires the utils
+
+
     grid.viewLayer = require('../view-layer')(grid);
 
     // things with logic that also register decorators (slightly less core than the other models)
@@ -131,191 +135,195 @@ module.exports = function(opts) {
         return textarea;
     }
 
-    function iterateRange() {
-        //expects to be called with the space as its this
-        var args = rangeUtil.getArgs(arguments);
-        var range = args.range;
-        var rowFn = args.rowFn;
-        var cellFn = args.cellFn;
-        var rowResult;
-        rowloop: for (var r = range.top; r < range.top + range.height; r = this.row.next(r)) {
-            rowResult = undefined;
-            if (rowFn) {
-                rowResult = rowFn(r);
-            }
-            colloop: for (var c = range.left; c < range.left + range.width; c = this.col.next(c)) {
-                if (cellFn) {
-                    var result = cellFn(r, c, rowResult);
-                    if (result === false) {
-                        break rowloop;
-                    } else if (result === true) {
-                        break colloop;
+    function addUtilsToCore() {
+        function iterateRange() {
+            // expects to be called with the space as its this
+            var args = rangeUtil.getArgs(arguments);
+            var range = args.range;
+            var rowFn = args.rowFn;
+            var cellFn = args.cellFn;
+            var rowResult;
+            rowloop: for (var r = range.top; r < range.top + range.height; r = this.row.next(r)) {
+                rowResult = undefined;
+                if (rowFn) {
+                    rowResult = rowFn(r);
+                }
+                colloop: for (var c = range.left; c < range.left + range.width; c = this.col.next(c)) {
+                    if (cellFn) {
+                        var result = cellFn(r, c, rowResult);
+                        if (result === false) {
+                            break rowloop;
+                        } else if (result === true) {
+                            break colloop;
+                        }
                     }
                 }
             }
         }
-    }
 
-    function iterateWhileHidden(step, start) {
-        step = step || 1;
-        for (var i = start + step; i < this.count() && i >= 0; i += step) {
-            if (!this.get(i).hidden) {
-                return i;
+        function iterateWhileHidden(step, start) {
+            step = step || 1;
+            for (var i = start + step; i < this.count() && i >= 0; i += step) {
+                if (!this.get(i).hidden) {
+                    return i;
+                }
             }
         }
-    }
 
-    function addToDimension(dim, spaceName, getter) {
-        //convert whatever space to virtual and use the row or col virtual getter
-        dim.get = function(idx) {
-            return getter(this.toVirtual(idx));
-        }.bind(dim);
-        dim.next = iterateWhileHidden.bind(dim, 1);
-        dim.prev = iterateWhileHidden.bind(dim, -1);
-        dim.clamp = function(idx) {
-            return util.clamp(idx, 0, this.count() - 1);
-        }.bind(dim);
-        dim.indexes = function() {
-            var opts;
-            opts = arguments[0];
-            opts = opts || {};
-            opts.from = opts.from || 0;
-            var count = this.count();
-            opts.to = opts.to + 1 || (opts.length && opts.length + opts.from) || count;
-            var indexes = [];
-            for (var idx = Math.max(opts.from, 0); idx < Math.min(opts.to, count); idx = opts.reverse ? this.prev(idx) : this.next(idx)) {
-                indexes.push(idx);
-            }
-            return indexes;
-        };
-
-        dim.iterate = function() {
-            var opts;
-            var fn;
-            if (arguments.length === 2) {
+        function addToDimension(dim, spaceName, getter) {
+            //convert whatever space to virtual and use the row or col virtual getter
+            dim.get = function(idx) {
+                return getter(this.toVirtual(idx));
+            }.bind(dim);
+            dim.next = iterateWhileHidden.bind(dim, 1);
+            dim.prev = iterateWhileHidden.bind(dim, -1);
+            dim.clamp = function(idx) {
+                return util.clamp(idx, 0, this.count() - 1);
+            }.bind(dim);
+            dim.indexes = function() {
+                var opts;
                 opts = arguments[0];
-                fn = arguments[1];
-            } else {
-                fn = arguments[0];
-            }
-            dim.indexes(opts).some(function(idx) {
-                return fn(idx);
+                opts = opts || {};
+                opts.from = opts.from || 0;
+                var count = this.count();
+                opts.to = opts.to + 1 || (opts.length && opts.length + opts.from) || count;
+                var indexes = [];
+                for (var idx = Math.max(opts.from, 0); idx < Math.min(opts.to, count); idx = opts.reverse ? this.prev(idx) : this.next(idx)) {
+                    indexes.push(idx);
+                }
+                return indexes;
+            };
+
+            dim.iterate = function() {
+                var opts;
+                var fn;
+                if (arguments.length === 2) {
+                    opts = arguments[0];
+                    fn = arguments[1];
+                } else {
+                    fn = arguments[0];
+                }
+                dim.indexes(opts).some(function(idx) {
+                    return fn(idx);
+                });
+            };
+
+            // have data to data be passthrough for example
+            dim['to' + capitalize(spaceName)] = passThrough;
+
+            return dim;
+        }
+
+        function addToSpace(spaceName) {
+            var space = grid[spaceName];
+            space.iterate = iterateRange.bind(space);
+            addToDimension(space.col, spaceName, function(idx) {
+                return grid.colModel.get(idx);
             });
+            addToDimension(space.row, spaceName, function(idx) {
+                return grid.rowModel.get(idx);
+            });
+            space.up = space.row.prev;
+            space.down = space.row.next;
+            space.left = space.col.prev;
+            space.right = space.col.next;
+        }
+
+
+        grid.data = {
+            col: {
+                toVirtual: function(dataCol) {
+                    return grid.colModel.toVirtual(dataCol);
+                },
+                toView: function(dataCol) {
+                    return grid.virtual.col.toView(this.toVirtual(dataCol));
+                },
+                count: function() {
+                    return grid.colModel.length();
+                }
+            },
+            row: {
+                toVirtual: function(dataRow) {
+                    return grid.rowModel.toVirtual(dataRow);
+                },
+                toView: function(dataRow) {
+                    return grid.virtual.row.toView(this.toVirtual(dataRow));
+                },
+                count: function() {
+                    return grid.rowModel.length();
+                }
+            }
         };
+        addToSpace('data');
 
-        // have data to data be passthrough for example
-        dim['to' + capitalize(spaceName)] = passThrough;
+        grid.virtual = {
+            col: {
+                toData: function(virtualCol) {
+                    return grid.colModel.toData(virtualCol);
+                },
+                toView: function(virtualCol) {
+                    return grid.viewPort.toRealCol(virtualCol);
+                },
+                count: function() {
+                    return grid.colModel.length(true);
+                }
+            },
+            row: {
+                toData: function(virtualRow) {
+                    return grid.rowModel.toData(virtualRow);
+                },
+                toView: function(virtualRow) {
+                    return grid.viewPort.toRealRow(virtualRow);
+                },
+                count: function() {
+                    return grid.rowModel.length(true);
+                }
+            }
+        };
+        addToSpace('virtual');
 
-        return dim;
+        grid.view = {
+            col: {
+                toData: function(viewCol) {
+                    return grid.virtual.col.toData(this.toVirtual(viewCol));
+                },
+                toVirtual: function(viewCol) {
+                    return grid.viewPort.toVirtualCol(viewCol);
+                },
+                count: function() {
+                    return grid.viewPort.cols();
+                }
+            },
+            row: {
+                toData: function(viewRow) {
+                    return grid.virtual.row.toData(this.toVirtual(viewRow));
+                },
+                toVirtual: function(viewRow) {
+                    return grid.viewPort.toVirtualRow(viewRow);
+                },
+                count: function() {
+                    return grid.viewPort.rows();
+                }
+            }
+        };
+        addToSpace('view');
+
+        timeouts = [];
+        grid.timeout = function() {
+            var id = setTimeout.apply(window, arguments);
+            timeouts.push(id);
+            return id;
+        };
+        intervals = [];
+        grid.interval = function() {
+            var id = setInterval.apply(window, arguments);
+            intervals.push(id);
+            return id;
+        };
     }
 
-    function addToSpace(spaceName) {
-        var space = grid[spaceName];
-        space.iterate = iterateRange.bind(space);
-        addToDimension(space.col, spaceName, function(idx) {
-            return grid.colModel.get(idx);
-        });
-        addToDimension(space.row, spaceName, function(idx) {
-            return grid.rowModel.get(idx);
-        });
-        space.up = space.row.prev;
-        space.down = space.row.next;
-        space.left = space.col.prev;
-        space.right = space.col.next;
-    }
-
-
-    grid.data = {
-        col: {
-            toVirtual: function(dataCol) {
-                return grid.colModel.toVirtual(dataCol);
-            },
-            toView: function(dataCol) {
-                return grid.virtual.col.toView(this.toVirtual(dataCol));
-            },
-            count: function() {
-                return grid.colModel.length();
-            }
-        },
-        row: {
-            toVirtual: function(dataRow) {
-                return grid.rowModel.toVirtual(dataRow);
-            },
-            toView: function(dataRow) {
-                return grid.virtual.row.toView(this.toVirtual(dataRow));
-            },
-            count: function() {
-                return grid.rowModel.length();
-            }
-        }
-    };
-    addToSpace('data');
-
-    grid.virtual = {
-        col: {
-            toData: function(virtualCol) {
-                return grid.colModel.toData(virtualCol);
-            },
-            toView: function(virtualCol) {
-                return grid.viewPort.toRealCol(virtualCol);
-            },
-            count: function() {
-                return grid.colModel.length(true);
-            }
-        },
-        row: {
-            toData: function(virtualRow) {
-                return grid.rowModel.toData(virtualRow);
-            },
-            toView: function(virtualRow) {
-                return grid.viewPort.toRealRow(virtualRow);
-            },
-            count: function() {
-                return grid.rowModel.length(true);
-            }
-        }
-    };
-    addToSpace('virtual');
-
-    grid.view = {
-        col: {
-            toData: function(viewCol) {
-                return grid.virtual.col.toData(this.toVirtual(viewCol));
-            },
-            toVirtual: function(viewCol) {
-                return grid.viewPort.toVirtualCol(viewCol);
-            },
-            count: function() {
-                return grid.viewPort.cols();
-            }
-        },
-        row: {
-            toData: function(viewRow) {
-                return grid.virtual.row.toData(this.toVirtual(viewRow));
-            },
-            toVirtual: function(viewRow) {
-                return grid.viewPort.toVirtualRow(viewRow);
-            },
-            count: function() {
-                return grid.viewPort.rows();
-            }
-        }
-    };
-    addToSpace('view');
-
-    var timeouts = [];
-    grid.timeout = function() {
-        var id = setTimeout.apply(window, arguments);
-        timeouts.push(id);
-        return id;
-    };
-    var intervals = [];
-    grid.interval = function() {
-        var id = setInterval.apply(window, arguments);
-        intervals.push(id);
-        return id;
-    };
-
+    var intervals;
+    var timeouts;
     grid.eventLoop.bind('grid-destroy', function() {
         intervals.forEach(function(id) {
             clearInterval(id);

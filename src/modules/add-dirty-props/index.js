@@ -8,8 +8,11 @@ module.exports = function(obj, props, dirtyCleans) {
                 return val;
             },
             set: function(_val) {
-                var isChanged = _val !== val;
-
+                var oldVal = val;
+                var isChanged = _val !== oldVal
+                if (isChanged && prop.preDirty) {
+                    prop.preDirty();
+                }
                 val = _val;
 
                 if (isChanged) {
@@ -17,7 +20,7 @@ module.exports = function(obj, props, dirtyCleans) {
                         dirtyClean.setDirty();
                     });
                     if (prop.onDirty) {
-                        prop.onDirty();
+                        prop.onDirty(_val, oldVal);
                     }
                 }
             }
