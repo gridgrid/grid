@@ -189,7 +189,7 @@ module.exports = function(_grid) {
         var target = e.target;
         // if there's no target let it through because that only happens in unit tests,
         // or if it happened in real world it wouldn't have a valid row or col and so wouldn't do anything anyway
-        return !target || grid.eventIsOnCells(e);
+        return !target || grid.eventIsOnCells(e) && e.button !== 2;
     }
 
     grid.eventLoop.bind('mousedown', function(e) {
