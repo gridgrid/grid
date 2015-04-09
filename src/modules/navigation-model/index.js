@@ -447,12 +447,16 @@ module.exports = function(_grid) {
         return [selectionRange].concat(model.otherSelections);
     };
 
+    model.clearSelection = function() {
+        clearOtherSelections();
+        setSelectionToFocus();
+    }
+
     function clearSelectionFromModelChange(e) {
         if (e.action === 'size') { // don't clear for resize but all other changes for now will clear selection
             return;
         }
-        setSelectionToFocus();
-        clearOtherSelections();
+        model.clearSelection();
 
     }
 

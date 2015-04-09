@@ -29,6 +29,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
     }, 1);
 
     function updateDescriptorIndices() {
+        var oldSelected = selected;
         selected = [];
         descriptors.forEach(function(descriptor, i) {
             descriptor.index = i;
@@ -36,6 +37,17 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                 selected.push(i);
             }
         });
+        if (selected.length !== oldSelected.length) {
+            fireSelectionChange();
+        }
+        selected.sort();
+        oldSelected.sort();
+        var change = oldSelected.some(function(idx, i) {
+            return idx !== selected[i];
+        });
+        if (change) {
+            fireSelectionChange();
+        }
     }
 
     var api = {
