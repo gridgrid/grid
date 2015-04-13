@@ -291,7 +291,7 @@ module.exports = function(opts) {
                     return grid.viewPort.toVirtualCol(viewCol);
                 },
                 count: function() {
-                    return grid.viewPort.cols();
+                    return grid.viewPort.cols;
                 }
             },
             row: {
@@ -302,7 +302,7 @@ module.exports = function(opts) {
                     return grid.viewPort.toVirtualRow(viewRow);
                 },
                 count: function() {
-                    return grid.viewPort.rows();
+                    return grid.viewPort.rows;
                 }
             }
         };
