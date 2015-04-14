@@ -217,9 +217,7 @@ module.exports = function(_grid) {
             }
             setSelectionFromPoints(fromRow, fromCol, toRow, toCol, ctrlOrCmdPressed);
         } else {
-            if (ctrlOrCmdPressed) {
-                addSelection(model.selection);
-            }
+
 
             var focusRow = row;
             if (focusRow < 0) {
@@ -229,17 +227,44 @@ module.exports = function(_grid) {
             if (focusCol < 0) {
                 focusCol = grid.view.col.toData(grid.colModel.numHeaders());
             }
-            model.setFocus(focusRow, focusCol, ctrlOrCmdPressed);
 
+            var headerSelectionRange;
             if (row < 0 && col < 0) {
-                setSelectionFromPoints(0, 0, Infinity, Infinity, ctrlOrCmdPressed);
+                headerSelectionRange = rangeUtil.createFromPoints(0, 0, Infinity, Infinity);
             } else if (row < 0) {
-                setSelectionFromPoints(0, col, Infinity, col, ctrlOrCmdPressed);
+                headerSelectionRange = rangeUtil.createFromPoints(0, col, Infinity, col);
             } else if (col < 0) {
-                setSelectionFromPoints(row, 0, row, Infinity, ctrlOrCmdPressed);
+                headerSelectionRange = rangeUtil.createFromPoints(row, 0, row, Infinity);
+
+            }
+            if (headerSelectionRange) {
+                var prevSelection = findSelectionByRange(headerSelectionRange);
+                if (prevSelection && ctrlOrCmdPressed) {
+                    removeSelection(prevSelection);
+                } else {
+                    if (ctrlOrCmdPressed && !selectionIsFocus(model.selection)) {
+                        addSelection(model.selection);
+                    } else {
+                        clearOtherSelections();
+                    }
+                    model.setFocus(focusRow, focusCol, ctrlOrCmdPressed);
+                    model.setSelection(headerSelectionRange);
+                }
+
+            } else {
+                if (ctrlOrCmdPressed) {
+                    addSelection(model.selection);
+                }
+                model.setFocus(focusRow, focusCol, ctrlOrCmdPressed);
             }
         }
     });
+
+    function findSelectionByRange(range) {
+        return model.getAllSelections().filter(function(selection) {
+            return selection.top === range.top && selection.left === range.left && selection.width === range.width && selection.height === range.height;
+        })[0];
+    }
 
     function addSelection(range) {
         model.otherSelections.push(createAndAddSelectionDecorator(range.top, range.left, range.height, range.width));
@@ -331,10 +356,14 @@ module.exports = function(_grid) {
         }
     }
 
+    function selectionIsFocus(selection) {
+        return selection.height === 1 && selection.width === 1 && !model.otherSelections.length;
+    }
+
     model.setSelection = function setSelection(newSelection) {
         var height = newSelection.height;
         var width = newSelection.width;
-        if (height === 1 && width === 1 && !model.otherSelections.length) {
+        if (selectionIsFocus(newSelection)) {
             height = -1;
             width = -1;
         }
@@ -359,6 +388,25 @@ module.exports = function(_grid) {
     function clearOtherSelections() {
         grid.decorators.remove(model.otherSelections);
         model.otherSelections = [];
+        syncSelectionToHeaders();
+    }
+
+    function removeSelection(selection) {
+        if (selection === model.selection) {
+            if (model.otherSelections.length) {
+                var lastSelection = model.otherSelections.pop();
+                grid.decorators.remove(lastSelection);
+                model.setSelection(lastSelection);
+            } else {
+                setSelectionToFocus();
+            }
+        } else {
+            var index = model.otherSelections.indexOf(selection);
+            if (index !== -1) {
+                model.otherSelections.splice(index, 1);
+                grid.decorators.remove(selection);
+            }
+        }
         syncSelectionToHeaders();
     }
 

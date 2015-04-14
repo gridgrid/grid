@@ -15,7 +15,7 @@ module.exports = function(_grid) {
         headerDecorator._onMousedown = function(e) {
             wasSelectedAtMousedown = grid.data.col.get(e.col).selected;
             if (wasSelectedAtMousedown) {
-                grid.eventLoop.stopBubbling(e);
+                // grid.eventLoop.stopBubbling(e);
             }
         }
 
