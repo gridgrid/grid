@@ -1,5 +1,6 @@
 var elementClass = require('element-class');
 var util = require('../util');
+var ctrlOrCmd = require('../ctrl-or-cmd');
 
 
 module.exports = function(_grid) {
@@ -14,8 +15,8 @@ module.exports = function(_grid) {
         var wasSelectedAtMousedown = false;
         headerDecorator._onMousedown = function(e) {
             wasSelectedAtMousedown = grid.data.col.get(e.col).selected;
-            if (wasSelectedAtMousedown) {
-                // grid.eventLoop.stopBubbling(e);
+            if (wasSelectedAtMousedown && !ctrlOrCmd(e)) {
+                grid.eventLoop.stopBubbling(e);
             }
         }
 

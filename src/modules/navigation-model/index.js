@@ -239,7 +239,7 @@ module.exports = function(_grid) {
             }
             if (headerSelectionRange) {
                 var prevSelection = findSelectionByRange(headerSelectionRange);
-                if (prevSelection && ctrlOrCmdPressed) {
+                if (prevSelection) {
                     removeSelection(prevSelection);
                 } else {
                     if (ctrlOrCmdPressed && !selectionIsFocus(model.selection)) {
