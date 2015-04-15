@@ -210,7 +210,20 @@ module.exports = function(_grid) {
             var fromCol = model.focus.col;
             var toRow = row;
             var toCol = col;
-            selectFromFocusToCell(fromRow, fromCol, toRow, toCol, ctrlOrCmdPressed);
+            var wasSelected;
+            if (toRow < 0) {
+                wasSelected = grid.data.col.get(toCol).selected;
+                fromRow = 0;
+                toRow = Infinity;
+
+            }
+            if (toCol < 0) {
+                wasSelected = grid.data.row.get(toRow).selected;
+                fromCol = 0;
+                toCol = Infinity;
+            }
+
+            selectFromFocusToCell(fromRow, fromCol, toRow, toCol, ctrlOrCmdPressed, wasSelected);
         } else {
 
 
@@ -250,19 +263,8 @@ module.exports = function(_grid) {
         }
     });
 
-    function selectFromFocusToCell(fromRow, fromCol, toRow, toCol, ctrlOrCmdPressed) {
-        var wasSelected;
-        if (toRow < 0) {
-            wasSelected = grid.data.col.get(toCol).selected;
-            fromRow = 0;
-            toRow = Infinity;
+    function selectFromFocusToCell(fromRow, fromCol, toRow, toCol, ctrlOrCmdPressed, wasSelected) {
 
-        }
-        if (toCol < 0) {
-            fromCol = 0;
-            toCol = Infinity;
-            wasSelected = grid.data.row.get(toRow).selected;
-        }
         if (!wasSelected || !model.checkboxMode) {
             setSelectionFromPoints(fromRow, fromCol, toRow, toCol, ctrlOrCmdPressed);
         } else {
@@ -507,22 +509,37 @@ module.exports = function(_grid) {
         var fromCol = model.focus.col;
         var startCol = e.col;
         var startRow = e.row;
+        var wasSelected;
+        var toRow, toCol;
+        if (startRow < 0) {
+            // these are notted because mousedwon actually inverts the intial selection
+            wasSelected = !grid.data.col.get(startCol).selected;
+            fromRow = 0;
+            toRow = Infinity;
+
+        }
+        if (startCol < 0) {
+            // these are notted because mousedwon actually inverts the intial selection
+            wasSelected = !grid.data.row.get(startRow).selected;
+            fromCol = 0;
+            toCol = Infinity;
+        }
         var unbindDrag = grid.eventLoop.bind('grid-cell-drag', function(e) {
-            var toRow = e.row;
-            var toCol = e.col;
+            toRow = toRow !== Infinity ? e.row : toRow;
+            toCol = toCol !== Infinity ? e.col : toCol;
 
             var fixedRows = grid.rowModel.numFixed(true);
-            if (startRow < fixedRows && toRow > fixedRows) {
+            if (startRow < fixedRows && toRow > fixedRows && toRow !== Infinity) {
                 startRow = toRow = grid.rowModel.numFixed();
                 grid.cellScrollModel.scrollTo(0, grid.cellScrollModel.col);
             }
             var fixedCols = grid.colModel.numFixed(true);
-            if (startCol < fixedCols && toCol > fixedCols) {
+            if (startCol < fixedCols && toCol > fixedCols && toCol !== Infinity) {
                 startCol = toCol = grid.colModel.numFixed();
                 grid.cellScrollModel.scrollTo(grid.cellScrollModel.row, 0);
             }
 
-            selectFromFocusToCell(fromRow, fromCol, toRow, toCol, true); // always pass true because if it was to be cleared mousedown should have handled that
+            selectFromFocusToCell(fromRow, fromCol, toRow, toCol, true, wasSelected); // always pass true because if it was to be cleared mousedown should have handled that
         });
         var unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function() {
             unbindDrag();
