@@ -28,7 +28,7 @@ module.exports = function(_grid) {
     };
     grid.decorators.add(model.focusDecorator);
 
-    model.setFocus = function setFocus(row, col, dontClearSelection) {
+    model.setFocus = function setFocus(row, col, dontClearSelection, dontSetSelection) {
         row = grid.data.row.clamp(row);
         col = grid.data.col.clamp(col);
         var changed = row !== model.focus.row || col !== model.focus.col;
@@ -42,7 +42,9 @@ module.exports = function(_grid) {
         if (!dontClearSelection) {
             clearOtherSelections();
         }
-        setSelectionToFocus();
+        if (!dontSetSelection) {
+            setSelectionToFocus();
+        }
         if (changed) {
             grid.eventLoop.fire('grid-focus-change');
         }
@@ -208,28 +210,7 @@ module.exports = function(_grid) {
             var fromCol = model.focus.col;
             var toRow = row;
             var toCol = col;
-            var wasSelected;
-            if (row < 0) {
-                fromRow = 0;
-                toRow = Infinity;
-                wasSelected = grid.data.col.get(col).selected;
-            }
-            if (col < 0) {
-                fromCol = 0;
-                toCol = Infinity;
-                wasSelected = grid.data.row.get(row).selected;
-            }
-            if (!wasSelected || !model.checkboxMode) {
-                setSelectionFromPoints(fromRow, fromCol, toRow, toCol, ctrlOrCmdPressed);
-            } else {
-                var range = rangeUtil.createFromPoints(fromRow, fromCol, toRow, toCol);
-                var prevSelections = findFullRowOrColSelections(range);
-                if (prevSelections.length) {
-                    prevSelections.forEach(function(prevSelection) {
-                        removeFullRowOrColFromSelection(prevSelection, range);
-                    });
-                }
-            }
+            selectFromFocusToCell(fromRow, fromCol, toRow, toCol, ctrlOrCmdPressed);
         } else {
 
 
@@ -248,7 +229,8 @@ module.exports = function(_grid) {
                 if (prevSelections.length) {
                     prevSelections.forEach(function(prevSelection) {
                         removeFullRowOrColFromSelection(prevSelection, headerSelectionRange);
-                    })
+                    });
+                    model.setFocus(focusRow, focusCol, true, true);
                 } else {
                     if (ctrlOrCmdPressed && !selectionIsFocus(model.selection)) {
                         addSelection(model.selection);
@@ -267,6 +249,32 @@ module.exports = function(_grid) {
             }
         }
     });
+
+    function selectFromFocusToCell(fromRow, fromCol, toRow, toCol, ctrlOrCmdPressed) {
+        var wasSelected;
+        if (toRow < 0) {
+            wasSelected = grid.data.col.get(toCol).selected;
+            fromRow = 0;
+            toRow = Infinity;
+
+        }
+        if (toCol < 0) {
+            fromCol = 0;
+            toCol = Infinity;
+            wasSelected = grid.data.row.get(toRow).selected;
+        }
+        if (!wasSelected || !model.checkboxMode) {
+            setSelectionFromPoints(fromRow, fromCol, toRow, toCol, ctrlOrCmdPressed);
+        } else {
+            var range = rangeUtil.createFromPoints(fromRow, fromCol, toRow, toCol);
+            var prevSelections = findFullRowOrColSelections(range);
+            if (prevSelections.length) {
+                prevSelections.forEach(function(prevSelection) {
+                    removeFullRowOrColFromSelection(prevSelection, range);
+                });
+            }
+        }
+    }
 
     function createHeaderSelectionRange(row, col) {
         var headerSelectionRange;
@@ -514,16 +522,7 @@ module.exports = function(_grid) {
                 grid.cellScrollModel.scrollTo(grid.cellScrollModel.row, 0);
             }
 
-            if (selection.left === 0 && selection.width === Infinity) {
-                toCol = Infinity;
-            }
-            if (selection.top === 0 && selection.height === Infinity) {
-                toRow = Infinity;
-            }
-
-
-            // pass true to prevent clearing, if it were to be cleared the mousedown handles that
-            setSelectionFromPoints(fromRow, fromCol, toRow, toCol, true);
+            selectFromFocusToCell(fromRow, fromCol, toRow, toCol, true); // always pass true because if it was to be cleared mousedown should have handled that
         });
         var unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function() {
             unbindDrag();
