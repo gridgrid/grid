@@ -108,6 +108,8 @@ module.exports = function(opts) {
         util.position(textarea, 0, 0);
         textarea.style.width = '0px';
         textarea.style.height = '1px';
+        textarea.style.maxWidth = '100%';
+        textarea.style.maxHeight = '100%';
         textarea.style.zIndex = 0;
 
         textarea.style.background = 'transparent';
