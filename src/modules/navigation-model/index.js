@@ -239,7 +239,7 @@ module.exports = function(_grid) {
             var headerSelectionRange = createHeaderSelectionRange(row, col);
             if (headerSelectionRange) {
                 var prevSelections = findFullRowOrColSelections(headerSelectionRange);
-                if (prevSelections.length) {
+                if (prevSelections.length && model.checkboxMode) {
                     prevSelections.forEach(function(prevSelection) {
                         removeFullRowOrColFromSelection(prevSelection, headerSelectionRange);
                     });
