@@ -242,6 +242,7 @@ module.exports = function(_grid) {
                 if (prevSelection) {
                     removeSelection(prevSelection);
                 } else {
+                    ctrlOrCmdPressed = true; //pretend the user used command for header clicks
                     if (ctrlOrCmdPressed && !selectionIsFocus(model.selection)) {
                         addSelection(model.selection);
                     } else {
