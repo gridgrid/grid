@@ -208,15 +208,28 @@ module.exports = function(_grid) {
             var fromCol = model.focus.col;
             var toRow = row;
             var toCol = col;
+            var wasSelected;
             if (row < 0) {
                 fromRow = 0;
                 toRow = Infinity;
+                wasSelected = grid.data.col.get(col).selected;
             }
             if (col < 0) {
                 fromCol = 0;
                 toCol = Infinity;
+                wasSelected = grid.data.row.get(row).selected;
             }
-            setSelectionFromPoints(fromRow, fromCol, toRow, toCol, ctrlOrCmdPressed);
+            if (!wasSelected || !model.checkboxMode) {
+                setSelectionFromPoints(fromRow, fromCol, toRow, toCol, ctrlOrCmdPressed);
+            } else {
+                var range = rangeUtil.createFromPoints(fromRow, fromCol, toRow, toCol);
+                var prevSelections = findFullRowOrColSelections(range);
+                if (prevSelections.length) {
+                    prevSelections.forEach(function(prevSelection) {
+                        removeFullRowOrColFromSelection(prevSelection, range);
+                    });
+                }
+            }
         } else {
 
 
@@ -229,19 +242,13 @@ module.exports = function(_grid) {
                 focusCol = grid.view.col.toData(grid.colModel.numHeaders());
             }
 
-            var headerSelectionRange;
-            if (row < 0 && col < 0) {
-                headerSelectionRange = rangeUtil.createFromPoints(0, 0, Infinity, Infinity);
-            } else if (row < 0) {
-                headerSelectionRange = rangeUtil.createFromPoints(0, col, Infinity, col);
-            } else if (col < 0) {
-                headerSelectionRange = rangeUtil.createFromPoints(row, 0, row, Infinity);
-
-            }
+            var headerSelectionRange = createHeaderSelectionRange(row, col);
             if (headerSelectionRange) {
-                var prevSelection = findSelectionByRange(headerSelectionRange);
-                if (prevSelection) {
-                    removeSelection(prevSelection);
+                var prevSelections = findFullRowOrColSelections(headerSelectionRange);
+                if (prevSelections.length) {
+                    prevSelections.forEach(function(prevSelection) {
+                        removeFullRowOrColFromSelection(prevSelection, headerSelectionRange);
+                    })
                 } else {
                     if (ctrlOrCmdPressed && !selectionIsFocus(model.selection)) {
                         addSelection(model.selection);
@@ -261,10 +268,70 @@ module.exports = function(_grid) {
         }
     });
 
+    function createHeaderSelectionRange(row, col) {
+        var headerSelectionRange;
+        if (row < 0 && col < 0) {
+            headerSelectionRange = rangeUtil.createFromPoints(0, 0, Infinity, Infinity);
+        } else if (row < 0) {
+            headerSelectionRange = rangeUtil.createFromPoints(0, col, Infinity, col);
+        } else if (col < 0) {
+            headerSelectionRange = rangeUtil.createFromPoints(row, 0, row, Infinity);
+        }
+        return headerSelectionRange;
+    }
+
     function findSelectionByRange(range) {
         return model.getAllSelections().filter(function(selection) {
-            return selection.top === range.top && selection.left === range.left && selection.width === range.width && selection.height === range.height;
+            return rangeUtil.equal(selection, range);
         })[0];
+    }
+
+    function addOrSetSelection(selection) {
+        if (!selectionIsFocus(model.selection)) {
+            addSelection(selection);
+        } else {
+            model.setSelection(selection);
+        }
+    }
+
+
+
+    function removeFullRowOrColFromSelection(selection, rowOrCol) {
+
+        if (rowOrCol.width === Infinity) { //row
+            var newSelections = [];
+            if (selection.top < rowOrCol.top) { //we need a selection for the top portion
+                newSelections.push({
+                    top: selection.top,
+                    height: rowOrCol.top - selection.top,
+                    left: selection.left,
+                    width: selection.width
+                });
+            }
+
+            var bottomRow = selection.top + selection.height - 1;
+            if (bottomRow > rowOrCol.top + rowOrCol.height - 1) { //we need a selection for the bottom portion
+                newSelections.push({
+                    top: rowOrCol.top + rowOrCol.height,
+                    height: bottomRow - (rowOrCol.top + rowOrCol.height - 1),
+                    left: selection.left,
+                    width: selection.width
+                });
+            }
+            removeSelection(selection);
+            newSelections.forEach(addOrSetSelection);
+            syncSelectionToHeaders();
+        }
+
+        if (rowOrCol.height === Infinity) { //col
+        }
+    }
+
+    function findFullRowOrColSelections(range) {
+        return model.getAllSelections().filter(function(selection) {
+            return (selection.height === Infinity && selection.top === range.top && selection.height === range.height && rangeUtil.intersect([selection.left, selection.width], [range.left, range.width])) ||
+                (selection.width === Infinity && selection.left === range.left && selection.width === range.width && rangeUtil.intersect([selection.top, selection.height], [range.top, range.height]));
+        });
     }
 
     function addSelection(range) {
@@ -393,7 +460,7 @@ module.exports = function(_grid) {
     }
 
     function removeSelection(selection) {
-        if (selection === model.selection) {
+        if (rangeUtil.equal(selection, model.selection)) {
             if (model.otherSelections.length) {
                 var lastSelection = model.otherSelections.pop();
                 grid.decorators.remove(lastSelection);

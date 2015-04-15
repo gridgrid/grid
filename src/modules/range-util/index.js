@@ -1,6 +1,6 @@
 module.exports = {
     //takes a point and a length as the ranges in array form
-    intersect: function (range1, range2) {
+    intersect: function(range1, range2) {
         var range2Start = range2[0];
         var range1Start = range1[0];
         var range1End = range1Start + range1[1] - 1;
@@ -16,7 +16,7 @@ module.exports = {
         ];
     },
     //takes a point and a length as the ranges in array form
-    union: function (range1, range2) {
+    union: function(range1, range2) {
         if (!range1) {
             return range2;
         }
@@ -29,13 +29,12 @@ module.exports = {
         var range1End = range1Start + range1[1] - 1;
         var resultStart = (range1Start < range2Start ? range1Start : range2Start);
         return [
-            resultStart,
-            (range1End > range2End ? range1End : range2End) - resultStart + 1
+            resultStart, (range1End > range2End ? range1End : range2End) - resultStart + 1
         ];
     },
 
     //takes two row, col points and creates a normal position range
-    createFromPoints: function (r1, c1, r2, c2) {
+    createFromPoints: function(r1, c1, r2, c2) {
         var range = {};
         if (r1 < r2) {
             range.top = r1;
@@ -54,7 +53,7 @@ module.exports = {
         }
         return range;
     },
-    iterate: function () {
+    iterate: function() {
         var args = this.getArgs(arguments);
         var range = args.range;
         var cellFn = args.cellFn;
@@ -71,7 +70,7 @@ module.exports = {
             }
         }
     },
-    getArgs: function (args) {
+    getArgs: function(args) {
         var range = args[0];
         var cellFn;
         var rowFn;
@@ -81,7 +80,13 @@ module.exports = {
             cellFn = args[2];
             rowFn = args[1];
         }
-        return {range: range, cellFn: cellFn, rowFn: rowFn};
+        return {
+            range: range,
+            cellFn: cellFn,
+            rowFn: rowFn
+        };
+    },
+    equal: function(r1, r2) {
+        return r1.top === r2.top && r1.left === r2.left && r1.width === r2.width && r1.height === r2.height;
     }
 };
-
