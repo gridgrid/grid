@@ -200,7 +200,8 @@ module.exports = function(_grid) {
         var row = e.row;
         var col = e.col;
 
-        var ctrlOrCmdPressed = ctrlOrCmd(e);
+        // if we're in checkbox mode pretend the user held command for header mousedowns only 
+        var ctrlOrCmdPressed = model.checkboxMode && (row < 0 || col < 0) || ctrlOrCmd(e);
 
         if (e.shiftKey) {
             var fromRow = model.focus.row;
@@ -242,7 +243,6 @@ module.exports = function(_grid) {
                 if (prevSelection) {
                     removeSelection(prevSelection);
                 } else {
-                    ctrlOrCmdPressed = true; //pretend the user used command for header clicks
                     if (ctrlOrCmdPressed && !selectionIsFocus(model.selection)) {
                         addSelection(model.selection);
                     } else {
