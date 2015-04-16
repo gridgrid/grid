@@ -240,9 +240,13 @@ module.exports = function(_grid) {
             if (headerSelectionRange) {
                 var prevSelections = findFullRowOrColSelections(headerSelectionRange);
                 if (prevSelections.length && model.checkboxMode) {
+                    var selectAll = headerSelectionRange.width === Infinity && headerSelectionRange.height === Infinity && !(grid.rowModel.allSelected() || grid.colModel.allSelected());
                     prevSelections.forEach(function(prevSelection) {
                         removeFullRowOrColFromSelection(prevSelection, headerSelectionRange);
                     });
+                    if (selectAll) {
+                        model.setSelection(headerSelectionRange);
+                    }
                     model.setFocus(focusRow, focusCol, true, true);
                 } else {
                     if (ctrlOrCmdPressed && !selectionIsFocus(model.selection)) {

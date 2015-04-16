@@ -244,6 +244,9 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
         getSelected: function() {
             return selected;
         },
+        allSelected: function() {
+            return api.getSelected().length === api.length();
+        },
         create: function(builder) {
             var descriptor = {};
             var fixed = false;
