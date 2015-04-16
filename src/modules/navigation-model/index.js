@@ -363,14 +363,22 @@ module.exports = function(_grid) {
         });
         model[decoratorsField] = [];
 
-        grid[rowOrCol + 'Model'].getSelected().forEach(function(index) {
-            var virtualIndex = grid[rowOrCol + 'Model'].toVirtual(index);
-            var top = rowOrCol === 'row' ? virtualIndex : 0;
-            var left = rowOrCol === 'col' ? virtualIndex : 0;
+        if (grid[rowOrCol + 'Model'].allSelected()) {
+            var top = rowOrCol === 'row' ? Infinity : 0;
+            var left = rowOrCol === 'col' ? Infinity : 0;
             var decorator = grid.cellClasses.create(top, left, 'selected', 1, 1, 'virtual');
             grid.cellClasses.add(decorator);
             model[decoratorsField].push(decorator);
-        });
+        } else {
+            grid[rowOrCol + 'Model'].getSelected().forEach(function(index) {
+                var virtualIndex = grid[rowOrCol + 'Model'].toVirtual(index);
+                var top = rowOrCol === 'row' ? virtualIndex : 0;
+                var left = rowOrCol === 'col' ? virtualIndex : 0;
+                var decorator = grid.cellClasses.create(top, left, 'selected', 1, 1, 'virtual');
+                grid.cellClasses.add(decorator);
+                model[decoratorsField].push(decorator);
+            });
+        }
     }
 
     grid.eventLoop.bind('grid-row-selection-change', function() {
