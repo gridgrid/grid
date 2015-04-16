@@ -7,7 +7,11 @@ module.exports = function(_grid) {
     var model = {
         top: 0,
         left: 0,
-        maxScroll: {}
+        maxScroll: {},
+        maxIsAllTheWayFor: {
+            height: false,
+            width: false
+        }
     };
     var scrollBarWidth = 10;
 
@@ -141,7 +145,18 @@ module.exports = function(_grid) {
     model.horzScrollBar.height = scrollBarWidth;
 
     function getMaxScroll(heightWidth) {
-        return model[heightWidth] - 1;
+        if (model.maxIsAllTheWayFor[heightWidth]) {
+            return model[heightWidth] - 1;
+        }
+        var rowOrCol = heightWidth === 'height' ? 'row' : 'col';
+        var scrollLength = model[heightWidth];
+        var viewScrollHeightOrWidth = getViewScrollHeightOrWidth(heightWidth);
+        var firstScrollableCell = grid[rowOrCol + 'Model'].numFixed();
+        while (scrollLength > viewScrollHeightOrWidth - 10) {
+            scrollLength -= grid.virtualPixelCellModel[heightWidth](firstScrollableCell); - firstScrollableCell++;
+        }
+        return model[heightWidth] - scrollLength;
+
     }
 
     model._getMaxScroll = getMaxScroll;

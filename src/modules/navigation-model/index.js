@@ -308,19 +308,20 @@ module.exports = function(_grid) {
 
     function removeFullRowOrColFromSelection(selection, rowOrCol) {
 
-        if (rowOrCol.width === Infinity) { //row
+        if (rowOrCol.width === Infinity) { // row
             var newSelections = [];
-            if (selection.top < rowOrCol.top) { //we need a selection for the top portion
-                newSelections.push({
+            if (selection.top < rowOrCol.top) { // we need a selection for the top portion
+                var newSelection = {
                     top: selection.top,
                     height: rowOrCol.top - selection.top,
                     left: selection.left,
                     width: selection.width
-                });
+                };
+                newSelections.push(newSelection);
             }
 
             var bottomRow = selection.top + selection.height - 1;
-            if (bottomRow > rowOrCol.top + rowOrCol.height - 1) { //we need a selection for the bottom portion
+            if (bottomRow > rowOrCol.top + rowOrCol.height - 1) { // we need a selection for the bottom portion
                 newSelections.push({
                     top: rowOrCol.top + rowOrCol.height,
                     height: bottomRow - (rowOrCol.top + rowOrCol.height - 1),
@@ -333,14 +334,14 @@ module.exports = function(_grid) {
             syncSelectionToHeaders();
         }
 
-        if (rowOrCol.height === Infinity) { //col
+        if (rowOrCol.height === Infinity) { // col
         }
     }
 
     function findFullRowOrColSelections(range) {
         return model.getAllSelections().filter(function(selection) {
-            return (selection.height === Infinity && selection.top === range.top && selection.height === range.height && rangeUtil.intersect([selection.left, selection.width], [range.left, range.width])) ||
-                (selection.width === Infinity && selection.left === range.left && selection.width === range.width && rangeUtil.intersect([selection.top, selection.height], [range.top, range.height]));
+            return (selection.height === Infinity && selection.top === 0 && rangeUtil.intersect([selection.left, selection.width], [range.left, range.width])) ||
+                (selection.width === Infinity && selection.left === 0 && rangeUtil.intersect([selection.top, selection.height], [range.top, range.height]));
         });
     }
 
