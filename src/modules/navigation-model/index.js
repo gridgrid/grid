@@ -551,7 +551,9 @@ module.exports = function(_grid) {
                 startCol = toCol = grid.colModel.numFixed();
                 grid.cellScrollModel.scrollTo(grid.cellScrollModel.row, 0);
             }
-
+            if (isNaN(toRow) || isNaN(toCol)) {
+                return; //don't try to select when NaN
+            }
             selectFromFocusToCell(fromRow, fromCol, toRow, toCol, true, wasSelected); // always pass true because if it was to be cleared mousedown should have handled that
         });
         var unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function() {
