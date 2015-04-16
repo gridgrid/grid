@@ -1,7 +1,7 @@
 var elementClass = require('element-class');
 var util = require('../util');
 var ctrlOrCmd = require('../ctrl-or-cmd');
-
+var key = require('key');
 
 module.exports = function(_grid) {
     var grid = _grid;
@@ -57,6 +57,11 @@ module.exports = function(_grid) {
 
             grid.decorators.add(api._dragRects);
 
+            headerDecorator._unbindKeyDown = grid.eventLoop.bind('keyup', function(e) {
+                if (key.is(key.code.special.esc, e.which)) {
+                    removeDecoratorsAndUnbind();
+                }
+            });
 
             headerDecorator._unbindDrag = grid.eventLoop.bind('grid-drag', function(e) {
                 api._dragRects.forEach(function(dragRect) {
@@ -80,11 +85,16 @@ module.exports = function(_grid) {
                     return grid.data.col.toVirtual(dataCol);
                 }), grid.viewPort.toVirtualCol(targetCol), api._targetCol.moveAfter);
 
+                removeDecoratorsAndUnbind();
+            });
+
+            function removeDecoratorsAndUnbind() {
                 var removedDecs = api._dragRects.concat(api._targetCol);
                 grid.decorators.remove(removedDecs);
                 headerDecorator._unbindDrag();
                 headerDecorator._unbindDragEnd();
-            });
+                headerDecorator._unbindKeyDown();
+            }
         };
 
         headerDecorator.postRender = function(div) {

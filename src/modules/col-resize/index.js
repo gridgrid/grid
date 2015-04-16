@@ -1,3 +1,5 @@
+var key = require('key');
+
 module.exports = function(_grid) {
     var grid = _grid;
 
@@ -29,16 +31,27 @@ module.exports = function(_grid) {
                 headerDecorator._dragLine.left = Math.max(e.gridX, minX);
             });
 
+            headerDecorator._unbindKeyDown = grid.eventLoop.bind('keyup', function(e) {
+                if (key.is(key.code.special.esc, e.which)) {
+                    removeDecoratorsAndUnbind();
+                }
+            });
+
             headerDecorator._unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function(e) {
                 var newWidth = headerDecorator._dragLine.left - headerDecorator.getDecoratorLeft();
                 grid.view.col.get(col).width = newWidth;
                 grid.colModel.getSelected().forEach(function(dataIdx) {
                     grid.data.col.get(dataIdx).width = newWidth;
                 });
+                removeDecoratorsAndUnbind();
+            });
+
+            function removeDecoratorsAndUnbind() {
                 grid.decorators.remove(headerDecorator._dragLine);
                 headerDecorator._unbindDrag();
                 headerDecorator._unbindDragEnd();
-            });
+                headerDecorator._unbindKeyDown();
+            }
         };
 
         headerDecorator.postRender = function(div) {
