@@ -35,6 +35,10 @@ var eventLoop = function(_grid) {
             domUnbindFns.slice(0).forEach(function(unbind) {
                 unbind();
             });
+
+            Object.keys(handlersByName).forEach(function(key) {
+                handlersByName[key] = [];
+            });
         };
     };
 

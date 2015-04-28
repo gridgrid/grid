@@ -48,8 +48,8 @@ module.exports = function(_grid) {
             }
 
             if (!fromPixelModel) {
-                var top = grid.virtualPixelCellModel.height(0, model.row - 1);
-                var left = grid.virtualPixelCellModel.width(0, model.col - 1);
+                var top = grid.virtualPixelCellModel.height(grid.rowModel.numFixed(), model.row + grid.rowModel.numFixed() - 1);
+                var left = grid.virtualPixelCellModel.width(grid.colModel.numFixed(), model.col + grid.colModel.numFixed() - 1);
                 grid.pixelScrollModel.scrollTo(top, left, true);
             }
         }

@@ -1,25 +1,28 @@
 module.exports = angular.module('grid-decorator', [])
-    .factory('GridDecoratorSrvc', function ($compile) {
+    .factory('GridDecoratorSrvc', function($compile) {
         var GridDecoratorSrvc = {
-            render: function (opts) {
+            render: function(opts) {
                 var compiled = $compile(opts.template)(opts.$scope);
-                compiled.on('decorator-destroy', function () {
+                opts.$scope.$apply();
+
+                // this absolutely has to happend after apply or the binding is to the wrong element (in fact anything you need to do has to happen after the apply)
+                compiled.on('decorator-destroy', function() {
                     opts.$scope.$destroy();
-                    //unbind in a timeout to allow any other listeners to fire first
-                    setTimeout(function () {
+                    // unbind in a timeout to allow any other listeners to fire first
+                    setTimeout(function() {
+                        compiled.remove();
                         compiled.off('decorator-destroy');
                     }, 1);
                 });
-                opts.$scope.$apply();
                 if (opts.events) {
                     compiled[0].style.pointerEvents = 'all';
                 }
                 return compiled[0];
             },
-            headerDecorators: function (grid, model) {
+            headerDecorators: function(grid, model) {
                 var origAnnotate = model.annotateDecorator;
-                model.annotateDecorator = function (dec) {
-                    dec.render = function () {
+                model.annotateDecorator = function(dec) {
+                    dec.render = function() {
                         return GridDecoratorSrvc.render(dec.renderOpts);
                     };
                     if (origAnnotate) {

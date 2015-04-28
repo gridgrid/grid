@@ -6,7 +6,10 @@ var passThrough = require('../pass-through');
 var capitalize = require('capitalize');
 
 module.exports = function(opts) {
-    var grid = {};
+    function GridMarker() {
+
+    }
+    var grid = new GridMarker();
 
     // the order here matters because some of these depend on each other
     grid.eventLoop = require('../event-loop')(grid);
