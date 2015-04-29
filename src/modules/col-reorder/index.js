@@ -57,11 +57,7 @@ module.exports = function(_grid) {
 
             grid.decorators.add(api._dragRects);
 
-            headerDecorator._unbindKeyDown = grid.eventLoop.bind('keyup', function(e) {
-                if (key.is(key.code.special.esc, e.which)) {
-                    removeDecoratorsAndUnbind();
-                }
-            });
+            headerDecorator._unbindKeyDown = grid.escapeStack && grid.escapeStack.addEscapeHandler(removeDecoratorsAndUnbind);
 
             headerDecorator._unbindDrag = grid.eventLoop.bind('grid-drag', function(e) {
                 api._dragRects.forEach(function(dragRect) {
@@ -93,7 +89,8 @@ module.exports = function(_grid) {
                 grid.decorators.remove(removedDecs);
                 headerDecorator._unbindDrag();
                 headerDecorator._unbindDragEnd();
-                headerDecorator._unbindKeyDown();
+                headerDecorator._unbindKeyDown && headerDecorator._unbindKeyDown();
+                return true; // for the escape stack
             }
         };
 
