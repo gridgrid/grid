@@ -290,6 +290,20 @@ module.exports = function(_grid) {
     /* END CELL LOGIC */
 
     /* COL BUILDER LOGIC */
+
+    function destroyRenderedElems(oldElems) {
+        if (!oldElems) {
+            return;
+        }
+        oldElems.forEach(function(oldElem) {
+            if (!oldElem) {
+                return;
+            }
+            var destroyEvent = customEvent('grid-rendered-elem-destroy', true);
+            oldElem.dispatchEvent(destroyEvent);
+        });
+    }
+
     viewLayer._buildCols = function() {
         var previouslyBuiltCols = builtCols;
         builtCols = {};
@@ -299,6 +313,7 @@ module.exports = function(_grid) {
 
             if (builder) {
                 builtCols[c] = [];
+                destroyRenderedElems(oldElems);
                 for (var realRow = 0; realRow < grid.viewPort.rows; realRow++) {
                     builtCols[c][realRow] = builder.render({
                         viewRow: realRow,
@@ -323,6 +338,7 @@ module.exports = function(_grid) {
 
             if (builder) {
                 builtRows[r] = [];
+                destroyRenderedElems(oldElems);
                 for (var realCol = 0; realCol < grid.viewPort.cols; realCol++) {
                     builtRows[r][realCol] = builder.render({
                         viewCol: realCol,
@@ -461,8 +477,19 @@ module.exports = function(_grid) {
         }
     };
 
+    function destroyPreviouslyBuilt(built) {
+        if (!built) {
+            return;
+        }
+        Object.keys(built).forEach(function(key) {
+            destroyRenderedElems(built[key]);
+        });
+    }
+
     function cleanup() {
         removeDecorators(grid.decorators.getAlive().concat(grid.decorators.popAllDead()));
+        destroyPreviouslyBuilt(builtCols);
+        destroyPreviouslyBuilt(builtRows);
         if (!container) {
             return;
         }

@@ -52,13 +52,13 @@ describe('decorators', function () {
     });
 
     it('should let me create a decorator with values', function () {
-        var d = decorators.create(2, 3, 4, 5, 'px', 'real');
+        var d = decorators.create(2, 3, 4, 5, 'px', 'view');
         expect(d).topToBe(2);
         expect(d).leftToBe(3);
         expect(d).heightToBe(4);
         expect(d).widthToBe(5);
         expect(d).unitsToBe('px');
-        expect(d).spaceToBe('real');
+        expect(d).spaceToBe('view');
     });
 
 
