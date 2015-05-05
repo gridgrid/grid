@@ -468,7 +468,6 @@ module.exports = function(_grid) {
 
     /* END CELL CLASSES LOGIC*/
 
-    viewLayer.destroy = cleanup;
     viewLayer.setTextContent = function(elem, text) {
         if (elem.firstChild && elem.firstChild.nodeType === 3) {
             elem.firstChild.nodeValue = text;
@@ -501,8 +500,9 @@ module.exports = function(_grid) {
     }
 
     grid.eventLoop.bind('grid-destroy', function() {
-        viewLayer.destroy();
+        cleanup();
         clearTimeout(viewLayer.draw.timeout);
+        viewLayer.draw = require('../no-op');
     });
 
     return viewLayer;
