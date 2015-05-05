@@ -351,7 +351,7 @@ describe('view-layer', function() {
         });
 
         it('should remove all grid elements on destroy', function() {
-            view.destroy();
+            grid.eventLoop.fire('grid-destroy');
             //one because the text area will still be there
             expect(container.children.length).toBe(1);
         });
@@ -424,7 +424,7 @@ describe('view-layer', function() {
                 decorator.getDiv().addEventListener('decorator-destroy', spy);
                 grid.decorators.add(decorator);
                 this.onDraw(function() {
-                    view.destroy();
+                    grid.eventLoop.fire('grid-destroy');
                     expectDestroySpyToBeCalledAndDecoratorToBeOutOfTheDom(spy);
                     done();
                 });
