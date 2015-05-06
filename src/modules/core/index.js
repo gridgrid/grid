@@ -105,16 +105,15 @@ module.exports = function(opts) {
 
 
     function createFocusTextArea() {
-        var textarea = document.createElement('div');
+        var textarea = document.createElement('textarea');
         textarea.setAttribute('dts', 'grid-textarea');
-        textarea.setAttribute('contenteditable', 'true');
         util.position(textarea, 0, 0);
         textarea.style.width = '0px';
         textarea.style.height = '1px';
         textarea.style.maxWidth = '100%';
         textarea.style.maxHeight = '100%';
-        textarea.style.overflow = 'hidden';
         textarea.style.zIndex = 0;
+        textarea.style.overflow = 'hidden';
 
         textarea.style.background = 'transparent';
         textarea.style.color = 'transparent';
@@ -122,22 +121,8 @@ module.exports = function(opts) {
         textarea.style.boxShadow = 'none';
         textarea.style.cursor = 'default';
         textarea.classList.add('grid-textarea');
-        textarea.select = function() {
-            var range = document.createRange();
-            range.selectNodeContents(textarea);
-            window.getSelection().removeAllRanges();
-            window.getSelection().addRange(range);
-        };
-
         textarea.setAttribute('ondragstart', 'return false;');
-        Object.defineProperty(textarea, 'value', {
-            get: function() {
-                return textarea.innerText;
-            },
-            set: function(val) {
-                textarea.textContent = val;
-            }
-        });
+
         return textarea;
     }
 
