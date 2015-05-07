@@ -332,6 +332,11 @@ module.exports = function(opts) {
         grid.viewLayer.build(container);
         grid.eventLoop.setContainer(container);
         container.style.overflow = 'hidden';
+        // the container should never actually scroll, but the browser does automatically sometimes so let's reset it when that happens
+        container.addEventListener('scroll', function() {
+            container.scrollTop = 0;
+            container.scrollLeft = 0;
+        });
     };
 
     grid.makeDirtyClean = function() {
