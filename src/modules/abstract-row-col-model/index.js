@@ -128,17 +128,24 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
             }
         },
         clear: function(includeHeaders) {
-            var removed = descriptors.slice(0).map(function(descriptor) {
-                if (includeHeaders || !descriptor.header) {
-                    api.remove(descriptor, true);
-                    return descriptor;
-                }
-            });
+            var removed;
+            if (includeHeaders) {
+                removed = descriptors;
+                descriptors = [];
+                numFixed = 0;
+                numHeaders = 0;
+            } else {
+                removed = descriptors.slice(numHeaders);
+                descriptors = descriptors.slice(0, numHeaders);
+                numFixed = numHeaders;
+            }
             updateDescriptorIndices();
-            setDescriptorsDirty({
-                action: 'remove',
-                descriptors: removed
-            });
+            if (removed && removed.length) {
+                setDescriptorsDirty({
+                    action: 'remove',
+                    descriptors: removed
+                });
+            }
         },
         move: function(fromIndexes, target, after) {
             if (!util.isArray(fromIndexes)) {
