@@ -30,7 +30,13 @@ module.exports = function(_grid) {
 
     model.setFocus = function setFocus(row, col, dontClearSelection, dontSetSelection) {
         row = grid.data.row.clamp(row);
+        if (typeof row !== 'number' || isNaN(row)) {
+            row = model.focus.row;
+        }
         col = grid.data.col.clamp(col);
+        if (typeof col !== 'number' || isNaN(col)) {
+            col = model.focus.col;
+        }
         var changed = row !== model.focus.row || col !== model.focus.col;
         model.focus.row = row;
         model.focus.col = col;
@@ -141,12 +147,23 @@ module.exports = function(_grid) {
 
     model.handleTabEvent = function(e) {
         var newCol = model.focus.col;
+        var newRow = model.focus.row;
         if (!e || !e.shiftKey) {
-            newCol = grid.data.right(newCol) || newCol;
+            if (newCol === grid.data.col.count() - 1) {
+                newRow = grid.data.down(newRow);
+                newCol = 0;
+            } else {
+                newCol = grid.data.right(newCol);
+            }
         } else {
-            newCol = grid.data.left(newCol) || newCol;
+            if (newCol === 0) {
+                newRow = grid.data.up(newRow);
+                newCol = grid.data.col.count() - 1;
+            } else {
+                newCol = grid.data.left(newCol);
+            }
         }
-        model.setFocus(model.focus.row, newCol);
+        model.setFocus(newRow, newCol);
         e.preventDefault();
     }
 
