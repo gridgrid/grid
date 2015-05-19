@@ -117,7 +117,7 @@ module.exports = function(_grid) {
                     }
                 });
 
-                decorator._unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function(e) {
+                decorator._unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function() {
                     decorator._unbindDrag();
                     decorator._unbindDragEnd();
                 });

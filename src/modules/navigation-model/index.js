@@ -139,9 +139,28 @@ module.exports = function(_grid) {
 
     model._navFrom = navFrom;
 
+    model.handleTabEvent = function(e) {
+        var newCol = model.focus.col;
+        if (!e || !e.shiftKey) {
+            newCol = grid.data.right(newCol) || newCol;
+        } else {
+            newCol = grid.data.left(newCol) || newCol;
+        }
+        model.setFocus(model.focus.row, newCol);
+        e.preventDefault();
+    }
 
     grid.eventLoop.bind('keydown', function(e) {
-        if (!key.is(arrow, e.which) || !grid.focused) {
+        if (!grid.focused) {
+            return;
+        }
+        // handle tab
+        if (key.is(key.code.special.tab, e.which)) {
+            model.handleTabEvent(e);
+            return;
+        }
+
+        if (!key.is(arrow, e.which)) {
             return;
         }
         // focus logic

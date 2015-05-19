@@ -6,7 +6,6 @@ var util = require('../util');
 module.exports = function(_grid) {
     var viewLayer = {};
 
-
     var grid = _grid;
     var container;
     var root;
