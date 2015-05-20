@@ -95,29 +95,50 @@ module.exports = function(_grid) {
             if (pasteData.length === 1 && pasteData[0].length === 1) {
                 singlePasteValue = pasteData[0][0];
             }
-            var ranges = [selectionRange];
+
             if (singlePasteValue) {
                 // this will do nothing if no other selections as it will be an empty array
+                var ranges = [selectionRange];
                 ranges = ranges.concat(grid.navigationModel.otherSelections);
-            }
-            ranges.forEach(function(range) {
-                grid.data.iterate(range, function(r, c) {
-
-                    var offsetR = r - range.top;
-                    var offsetC = c - range.left;
-
-                    if (!singlePasteValue && (pasteData[offsetR] === undefined || pasteData[offsetR][offsetC] === undefined)) {
-                        return;
-                    }
-                    var pasteValue = singlePasteValue || pasteData[offsetR][offsetC];
-                    dataChanges.push({
-                        row: r,
-                        col: c,
-                        data: pasteValue && pasteValue.trim(),
-                        paste: true
+                ranges.forEach(function(range) {
+                    grid.data.iterate(range, function(r, c) {
+                        var pasteValue = singlePasteValue;
+                        dataChanges.push({
+                            row: r,
+                            col: c,
+                            data: pasteValue && pasteValue.trim(),
+                            paste: true
+                        });
                     });
                 });
-            });
+            } else {
+                var top = selectionRange.top;
+                var left = selectionRange.left;
+
+                pasteData.forEach(function(row, r) {
+                    row.forEach(function(pasteValue, c) {
+                        if (pasteValue == undefined) {
+                            return;
+                        }
+                        dataChanges.push({
+                            row: r + top,
+                            col: c + left,
+                            data: pasteValue && pasteValue.trim(),
+                            paste: true
+                        });
+                    });
+                });
+                var newSelection = {
+                    top: top,
+                    left: left,
+                    height: pasteData.length,
+                    width: pasteData[0].length
+                };
+
+                grid.navigationModel.clearSelection()
+                grid.navigationModel.setSelection(newSelection)
+            }
+
 
             grid.dataModel.set(dataChanges);
         }, 1);
