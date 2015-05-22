@@ -58,6 +58,9 @@ function normalizeWheelEvent(e) {
         },
         target: {
             value: e.target
+        },
+        currentTarget: {
+            value: e.currentTarget
         }
     });
 

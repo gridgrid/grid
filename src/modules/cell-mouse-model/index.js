@@ -8,7 +8,6 @@ module.exports = function(_grid) {
 
     var model = {};
 
-    var wasDragged = false;
     var scrollInterval;
 
     model._annotateEvent = function annotateEvent(e) {
@@ -16,7 +15,6 @@ module.exports = function(_grid) {
         switch (e.type) {
             case 'click':
             case 'dblclick':
-                e.wasDragged = wasDragged;
             case 'mousedown':
             case 'mousemove':
             case 'mouseup':
@@ -50,7 +48,6 @@ module.exports = function(_grid) {
     var lastMoveCol;
     grid.eventLoop.addInterceptor(function(e) {
         model._annotateEvent(e);
-
         if (e.type === 'mousedown') {
             if (e.currentTarget === grid.container) {
                 setupDragEventForMouseDown(e);
@@ -85,12 +82,15 @@ module.exports = function(_grid) {
     }
 
     function setupDragEventForMouseDown(downEvent) {
-        wasDragged = false;
         var lastDragRow = downEvent.row;
         var lastDragCol = downEvent.col;
         var dragStarted = false;
         var unbindAutoScrollDrag;
+        var lastX = downEvent.clientX;
+        var lastY = downEvent.clientY;
         var unbindMove = grid.eventLoop.bind('mousemove', window, function(e) {
+
+
             if (dragStarted && !e.which) {
                 // got a move event without mouse down which means we somehow missed the mouseup
                 console.log('mousemove unbind, how on earth do these happen?');
@@ -99,7 +99,9 @@ module.exports = function(_grid) {
             }
 
             if (!dragStarted) {
-                wasDragged = true;
+                if (lastX === e.clientX && lastY === e.clientY) {
+                    console.error('Got a mouse move event with ', e.clientX, ',', e.clientY, ' when the last position was ', lastX, ',', lastY);
+                }
                 createAndFireCustomMouseEvent('grid-drag-start', downEvent, function annotateDragStart(dragStart) {
                     var onlyFixedRows = !calculateRowScrollDiff(e);
                     var onlyFixedCols = !calculateColScrollDiff(e);
