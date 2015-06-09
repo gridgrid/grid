@@ -43,6 +43,14 @@ module.exports = function(_grid) {
         return headerDecorator;
     }
 
+    function maybeRemoveDecorator(col) {
+        if (api._decorators[col]) {
+            var decorator = api._decorators[col];
+            grid.decorators.remove(decorator);
+            api._decorators[col] = undefined;
+        }
+    }
+
     grid.eventLoop.bind('grid-col-change', function(e) {
         if (e.action === 'hide' || e.action === 'add') {
             e.descriptors.forEach(function(descriptor) {
@@ -59,13 +67,12 @@ module.exports = function(_grid) {
                         decCol = lastHiddenCol - 1;
 
                     }
+                    maybeRemoveDecorator(col);
                     var decorator = createDecorator(decCol, rightSide);
                     grid.decorators.add(decorator);
                     api._decorators[col] = decorator;
                 } else {
-                    var decorator = api._decorators[col];
-                    grid.decorators.remove(decorator);
-                    api._decorators[col] = undefined;
+                    maybeRemoveDecorator(col);
                 }
             });
         }
