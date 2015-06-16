@@ -1,8 +1,8 @@
 {
-  "name": "riq-grid",
+  "name": "grid",
   "version": "0.12.2",
   "description": "A highly scalable grid component written in javscript",
-  "main": "src/modules/riq-grid-entry.js",
+  "main": "src/modules/grid-entry.js",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },

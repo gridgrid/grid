@@ -1,7 +1,9 @@
-riq-grid
+grid
 ===
 
 A highly scaleable grid component written in javscript
+
+Note: while Grid is fully functional it is still in beta. Use at your own risk and please file any issues on GitHub.
 
 **To Run Local Example:**
 

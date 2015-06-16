@@ -16,7 +16,7 @@ require('gulp-tasks-riq/default')();
 
 require('gulp-tasks-riq/images')({src: config.paths.src.images, dest: config.paths.dest.release.images});
 
-require('gulp-tasks-riq/index')({src: config.paths.src.index, dest: config.paths.dest.release.index, styles: 'riq-grid.css', scripts: config.filenames.build.scripts});
+require('gulp-tasks-riq/index')({src: config.paths.src.index, dest: config.paths.dest.release.index, styles: 'grid.css', scripts: config.filenames.build.scripts});
 
 var karmaConf;
 require('../karma.conf.js')({
@@ -54,12 +54,12 @@ require('gulp-tasks-riq/watch')({
 require('gulp-tasks-riq/browserify-omega')({
     bundleConfigs: [
         {
-            entries: ['./' + MODULES_FOLDER + '/riq-grid-entry.js'],
-            output: 'riq-grid.js'
+            entries: ['./' + MODULES_FOLDER + '/grid-entry.js'],
+            output: 'grid.js'
         },
         {
-            entries: ['./' + MODULES_FOLDER + '/riq-grid-app.js'],
-            output: 'riq-grid-app.js'
+            entries: ['./' + MODULES_FOLDER + '/grid-app.js'],
+            output: 'grid-app.js'
         }
     ],
     dest: RELEASE_FOLDER,

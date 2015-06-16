@@ -1,9 +1,9 @@
 module.exports =
-    angular.module('riq-grid', [
+    angular.module('grid', [
         require('./angular-decorator').name,
         require('./angular-builder').name
     ])
-    .factory('RiqGridSrvc', function() {
+    .factory('GridSrvc', function() {
         return {
             core: require('./core')
         };

@@ -4,8 +4,8 @@ var makeSimpleGrid = require('./simple-grid');
 require('angular');
 var debounce = require('./debounce');
 
-angular.module('riqGridApp', [])
-    .directive('riqGridApp', function($compile) {
+angular.module('gridApp', [])
+    .directive('gridApp', function($compile) {
         return {
             restrict: 'E',
             replace: true,

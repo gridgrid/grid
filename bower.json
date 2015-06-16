@@ -1,5 +1,5 @@
 {
-    "name": "riq-grid",
+    "name": "grid",
     "private": true,
     "dependencies": {
         "angular": "1.3.15",

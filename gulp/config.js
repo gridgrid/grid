@@ -3,7 +3,7 @@ global.BUILD_FOLDER = 'release';
 global.RELEASE_FOLDER = 'release';
 global.TMP_FOLDER = 'tmp';
 var packageJsonPath = 'package.json';
-var srcModules = './' + SRC_FOLDER + '/modules/node_modules/riq-grid/';
+var srcModules = './' + SRC_FOLDER + '/modules/node_modules/grid/';
 
 
 global.config = {
@@ -14,17 +14,17 @@ global.config = {
             assets: [SRC_FOLDER + '/assets/**/*', '!' + SRC_FOLDER + '/assets/images/**/*'],
             images: SRC_FOLDER + '/assets/images/**/*',
             scripts: SRC_FOLDER + '/modules/**/*.js',
-            appStyles: SRC_FOLDER + '/styles/riq-grid-prototype.scss',
-            releaseStyles: SRC_FOLDER + '/styles/riq-grid.scss',
+            appStyles: SRC_FOLDER + '/styles/grid-prototype.scss',
+            releaseStyles: SRC_FOLDER + '/styles/grid.scss',
             stylesGlob: SRC_FOLDER + '/styles/**/*.scss',
             templates: SRC_FOLDER + '/modules/**/*.html',
-            riqGridTemplates: srcModules + '**/*.html',
+            gridTemplates: srcModules + '**/*.html',
             templatesHTML: SRC_FOLDER + '/modules/**/*.html',
             templatesCompiled: TMP_FOLDER,
             livereload: [BUILD_FOLDER + '/**/*', '!' + BUILD_FOLDER + '/assets/**/*'],
-            riqGridApp: './' + SRC_FOLDER + '/modules/riq-grid-app.js',
-            riqGridPrototypeApp: './' + SRC_FOLDER + '/modules/proto/riq-grid-prototype-app.js',
-            riqGridModule: './' + SRC_FOLDER + '/modules/riq-grid-entry.js'
+            gridApp: './' + SRC_FOLDER + '/modules/grid-app.js',
+            gridPrototypeApp: './' + SRC_FOLDER + '/modules/proto/grid-prototype-app.js',
+            gridModule: './' + SRC_FOLDER + '/modules/grid-entry.js'
         },
         release: RELEASE_FOLDER,
         dest: {
@@ -49,16 +49,16 @@ global.config = {
     filenames: {
         build: {
             styles: 'bundle.css',
-            scripts: 'riq-grid-app.js',
-            angularApp: 'riqGridApp'
+            scripts: 'grid-app.js',
+            angularApp: 'gridApp'
         },
         release: {
-            styles: 'riq-grid.css',
-            scripts: 'riq-grid.js'
+            styles: 'grid.css',
+            scripts: 'grid.js'
         },
         prototype: {
             styles: 'bundle.css',
-            scripts: 'riq-grid-prototype-app.js',
+            scripts: 'grid-prototype-app.js',
             angularApp: 'prototype-harness'
         },
         templates: {
