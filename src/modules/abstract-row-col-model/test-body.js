@@ -235,6 +235,33 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
                 this.results = [orig1, orig, orig2, orig3];
             });
 
+            it('indices to one of the moved positions', function() {
+                var orig = model.get(0);
+                var orig1 = model.get(1);
+                var orig2 = model.get(2);
+                var orig3 = model.get(3);
+                model.move([1, 2], 2, true);
+                this.results = [orig, orig1, orig2, orig3];
+            });
+
+            it('separated indices to one of the moved positions', function() {
+                var orig = model.get(0);
+                var orig1 = model.get(1);
+                var orig2 = model.get(2);
+                var orig3 = model.get(3);
+                model.move([1, 3], 3, true);
+                this.results = [orig, orig2, orig1, orig3];
+            });
+
+            it('indices to one of the moved positions when moving from 0', function() {
+                var orig = model.get(0);
+                var orig1 = model.get(1);
+                var orig2 = model.get(2);
+                var orig3 = model.get(3);
+                model.move([0, 1], 1, true);
+                this.results = [orig, orig1, orig2, orig3];
+            });
+
             afterEach(function() {
                 this.results.forEach(function(result, i) {
                     expect(model.get(i)).toBe(result);

@@ -161,6 +161,11 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                     descriptors: [api.get(from), api.get(target)]
                 });
             } else {
+                while (fromIndexes.indexOf(target) !== -1 && target !== -1) {
+                    target--;
+                    after = true;
+                }
+
                 var toValue = descriptors[target];
                 var removed = fromIndexes.sort(function compareNumbers(a, b) {
                     return b - a;
