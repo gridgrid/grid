@@ -63,7 +63,7 @@ module.exports = function(_grid) {
 
     function calculateColScrollDiff(e) {
         var colDiff = 0;
-        if (e.clientX > window.innerWidth) {
+        if (e.clientX > (grid.container && grid.container.getBoundingClientRect().right || window.innerWidth)) {
             colDiff = 1;
         } else if (grid.viewPort.toGridX(e.clientX) < grid.virtualPixelCellModel.fixedWidth()) {
             colDiff = -1;
@@ -73,7 +73,7 @@ module.exports = function(_grid) {
 
     function calculateRowScrollDiff(e) {
         var rowDiff = 0;
-        if (e.clientY > window.innerHeight) {
+        if (e.clientY > (grid.container && grid.container.getBoundingClientRect().bottom || window.innerHeight)) {
             rowDiff = 1;
         } else if (grid.viewPort.toGridY(e.clientY) < grid.virtualPixelCellModel.fixedHeight()) {
             rowDiff = -1;

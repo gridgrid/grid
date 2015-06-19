@@ -241,6 +241,7 @@ describe('cell-mouse-model', function() {
         });
 
         describe('scroll on drag', function() {
+
             function testScrollDrag(x, y, rowDiff, colDiff, done) {
                 var mousedown = createEventWithXY('mousedown', 110, 40);
                 this.container.dispatchEvent(mousedown);
@@ -272,11 +273,21 @@ describe('cell-mouse-model', function() {
 
 
             it('should scroll right if outside the window to the right', function(done) {
+                document.body.removeChild(this.container)
                 testScrollDrag.call(this, window.innerWidth + 1, 121, 0, 1, done);
             });
 
             it('should scroll done if outside the window to the bottom', function(done) {
+                document.body.removeChild(this.container)
                 testScrollDrag.call(this, 121, window.innerHeight + 1, 1, 0, done);
+            });
+
+            it('should scroll right if outside the bounding rect to the right', function(done) {
+                testScrollDrag.call(this, grid.container.getBoundingClientRect().right + 1, 121, 0, 1, done);
+            });
+
+            it('should scroll done if outside the bounding rect to the bottom', function(done) {
+                testScrollDrag.call(this, 121, grid.container.getBoundingClientRect().bottom + 1, 1, 0, done);
             });
 
             it('should scroll left if left of the unfixed range', function(done) {

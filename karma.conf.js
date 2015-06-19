@@ -23,7 +23,20 @@ module.exports = function(config) {
 
         autoWatch: true,
 
-        browsers: ['PhantomJS'],
+
+        browsers: ['PhantomJS_custom'],
+
+        customLaunchers: {
+            'PhantomJS_custom': {
+                base: 'PhantomJS',
+                options: {
+                    viewportSize: {
+                        width: 400,
+                        height: 500
+                    }
+                }
+            }
+        },
 
         browserNoActivityTimeout: 3000000,
 
