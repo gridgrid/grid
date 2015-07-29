@@ -239,7 +239,7 @@ module.exports = function(_grid) {
         var col = e.col;
 
         // if we're in checkbox mode pretend the user held command for header mousedowns only 
-        var ctrlOrCmdPressed = model.checkboxMode && (row < 0 || col < 0) || ctrlOrCmd(e);
+        var ctrlOrCmdPressed = model.checkboxMode && ((row < 0 && colSelectable(col)) || col < 0) || ctrlOrCmd(e);
 
         if (e.shiftKey) {
             var fromRow = model.focus.row;
@@ -248,9 +248,12 @@ module.exports = function(_grid) {
             var toCol = col;
             var wasSelected;
             if (toRow < 0) {
-                wasSelected = grid.data.col.get(toCol).selected;
-                fromRow = 0;
-                toRow = Infinity;
+                var colDescriptor = grid.data.col.get(toCol);
+                if (colDescriptor.selectable !== false) {
+                    wasSelected = colDescriptor.selected;
+                    fromRow = 0;
+                    toRow = Infinity;
+                }
 
             }
             if (toCol < 0) {
@@ -318,12 +321,19 @@ module.exports = function(_grid) {
         }
     }
 
+    function colSelectable(col) {
+        var colDescriptor = grid.data.col.get(col);
+        return colDescriptor && colDescriptor.selectable !== false;
+    }
+
     function createHeaderSelectionRange(row, col) {
         var headerSelectionRange;
         if (row < 0 && col < 0) {
             headerSelectionRange = rangeUtil.createFromPoints(0, 0, Infinity, Infinity);
         } else if (row < 0) {
-            headerSelectionRange = rangeUtil.createFromPoints(0, col, Infinity, col);
+            if (colSelectable(col)) {
+                headerSelectionRange = rangeUtil.createFromPoints(0, col, Infinity, col);
+            }
         } else if (col < 0) {
             headerSelectionRange = rangeUtil.createFromPoints(row, 0, row, Infinity);
         }
@@ -576,6 +586,9 @@ module.exports = function(_grid) {
         var unbindDrag = grid.eventLoop.bind('grid-cell-drag', function(e) {
             toRow = toRow !== Infinity ? e.row : toRow;
             toCol = toCol !== Infinity ? e.col : toCol;
+            if (toCol !== Infinity && !colSelectable(toCol)) {
+                return;
+            }
 
             var fixedRows = grid.rowModel.numFixed(true);
             if (startRow < fixedRows && toRow > fixedRows && toRow !== Infinity) {

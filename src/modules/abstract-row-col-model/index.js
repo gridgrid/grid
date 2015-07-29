@@ -209,7 +209,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                 return hasDescriptor;
             }).map(function(idx) {
                 var descriptor = api[name](idx);
-                if (!descriptor.selected) {
+                if (!descriptor.selected && descriptor.selectable !== false) {
                     descriptor.selected = true;
                     selected.push(idx);
                     return idx;

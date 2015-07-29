@@ -26,6 +26,11 @@ module.exports = function(_grid) {
             if (e.realCol < grid.colModel.numFixed() || !wasSelectedAtMousedown) {
                 return;
             }
+
+            var colDescriptor = grid.view.col.get(e.realCol);
+            if (!colDescriptor || colDescriptor.selectable === false) {
+                return;
+            }
             if (e.enableAutoScroll) {
                 e.enableAutoScroll();
             }
