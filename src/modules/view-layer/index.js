@@ -392,7 +392,8 @@ module.exports = function(_grid) {
         aliveDecorators.forEach(function(decorator) {
 
             var boundingBox = decorator.boundingBox;
-            if (!boundingBox) {
+            var hasBeenRendered = !!boundingBox;
+            if (!hasBeenRendered) {
                 boundingBox = document.createElement('div');
                 boundingBox.style.pointerEvents = 'none';
                 decorator.boundingBox = boundingBox;
@@ -403,7 +404,7 @@ module.exports = function(_grid) {
                 }
             }
 
-            if (decorator.isDirty() || cellsPositionOrSizeChanged) {
+            if (decorator.isDirty() || cellsPositionOrSizeChanged || !hasBeenRendered) {
                 if (decorator.space === 'real') {
                     switch (decorator.units) {
                         case 'px':
