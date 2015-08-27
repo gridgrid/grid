@@ -1,10 +1,13 @@
-module.exports =
-    angular.module('grid', [
-        require('./angular-decorator').name,
-        require('./angular-builder').name
-    ])
-    .factory('GridSrvc', function() {
-        return {
-            core: require('./core')
-        };
-    });
+var moduleName = 'grid';
+module.exports = moduleName;
+
+angular.module(moduleName, [
+    require('./angular-decorator'),
+    require('./angular-builder')
+])
+
+.factory('GridSrvc', function() {
+    return {
+        core: require('./core')
+    };
+});
