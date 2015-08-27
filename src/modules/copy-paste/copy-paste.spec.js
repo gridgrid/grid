@@ -126,7 +126,7 @@ describe('copy-paste', function() {
             this.grid.navigationModel.setSelection(selectionRange);
             this.grid.textarea.blur();
             var e = fireCopy.call(this);
-            expect(this.grid.textarea.innerText).not.toContain('r1 c2');
+            expect(this.grid.textarea.textContent).not.toContain('r1 c2');
         });
 
 
