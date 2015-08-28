@@ -7,7 +7,7 @@ angular.module(moduleName, [])
     var GridDecoratorSrvc = {
         render: function(opts) {
             var compiled = $compile(opts.template)(opts.$scope);
-            opts.$scope.$apply();
+            opts.$scope.$digest();
 
             // this absolutely has to happend after apply or the binding is to the wrong element (in fact anything you need to do has to happen after the apply)
             compiled.on('decorator-destroy', function() {

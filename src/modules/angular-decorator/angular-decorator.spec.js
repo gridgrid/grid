@@ -73,10 +73,10 @@ describe('angular-decorator', function() {
             expect(linkSpy).toHaveBeenCalledWith(this.$scope);
         });
 
-        it('should call safe apply on compile', function() {
-            var apply = spyOn(this.$scope, '$apply');
+        it('should call digest on compile', function() {
+            var $digest = spyOn(this.$scope, '$digest');
             this.render();
-            expect(apply).toHaveBeenCalled();
+            expect($digest).toHaveBeenCalled();
         });
 
         it('should return the compiled elem', function() {
