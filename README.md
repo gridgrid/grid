@@ -39,7 +39,7 @@ The grid handles most complexity for you. There are only three user supplied req
 ##### row and column descriptors
 Row and column descriptors are objects that tell the grid how wide or high to make your cells. They also control things like whether or not a column is hidden and describe the overall dimensions of the grid.
 
-```
+``` javascript
 	// add some columns
     var colDescriptors = [];
     var colDescriptor;
@@ -77,7 +77,7 @@ if you support user data entry and want paste to work you should also implement 
 
 Here's a basic read only implementation:
 
-```
+``` javascript
 // use the grid's default dirty clean implementation almost always
 // (it will automatically be set clean on each draw by the grid)
 var dataDirtyClean = grid.makeDirtyClean();
@@ -113,7 +113,7 @@ grid.dataModel = {
 ##### call build
 Finally we just need to tell the grid to set itself up in a container of our choosing:
 
-```
+``` javascript
 var container = document.createElement('div');
 container.style.width = '800px';
 container.style.height = '800px';
