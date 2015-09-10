@@ -27,7 +27,7 @@ if not using angular
 `var core = require('grid/src/modules/core')`
 
 
-#### Usage
+#### Usage (Quick Start Version)
 
 ##### Create a grid instance
 `var grid = core();` or in angular `var grid = GridSrvc.core();`
