@@ -8,7 +8,8 @@ Note: while Grid is fully functional it is still in beta. Use at your own risk a
 Also the grid is currently packaged for use with browserify. If you need a build for a non browserify (or webpack) environment please open an issue on github.
 
 
-#### Installation
+installation
+===
 `npm install --save grid`
 
 if using angular the wrapping module can simply be accessed:
@@ -27,14 +28,15 @@ if not using angular
 `var core = require('grid/src/modules/core')`
 
 
-#### Usage (Quick Start Version)
+example / quick start
+===
 
-##### Create a grid instance
+##### create a grid instance
 `var grid = core();` or in angular `var grid = GridSrvc.core();`
 
 The grid handles most complexity for you. There are only three user supplied requirements to a get a grid up and running
 
-##### Row and Column Descriptors
+##### row and column descriptors
 Row and column descriptors are objects that tell the grid how wide or high to make your cells. They also control things like whether or not a column is hidden and describe the overall dimensions of the grid.
 
 ```
@@ -108,7 +110,7 @@ grid.dataModel = {
 };
 ```
 
-##### Call Build
+##### call build
 Finally we just need to tell the grid to set itself up in a container of our choosing:
 
 ```
