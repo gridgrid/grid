@@ -120,3 +120,27 @@ container.style.height = '800px';
 document.body.appendChild(container);
 grid.build(container);
 ```
+
+concepts
+===
+
+Many of the apis in the grid utilize two concepts when referencing coordinates: spaces and units. It's good to understand these before using the more advanced features.
+
+## spaces
+Coordinates in the grid exist in one of three spaces.
+
+**virtual** - represents all of the data in your grid including the headers. for example, if you have a grid with one header row, then `(0, 20)` in the `'virtual'` space references the column 20 of the header. `(1, 20)` would reference column 20 of the first data row.
+
+**data** - very similar to virtual but does not include the headers. so `(0,20)` references the first row of data at the 20th column and technically `(-1, 20)` would represent the 20th column in the header although negative indexes are rarely used
+
+**view** - the view space represents the actual dom nodes that are rendered for the grid's virtualization. the grid's implementation renders enough cells to fill the entire viewport and no more (usually around 20-30 rows and 10 cols depending on sizes). in this space `(0,20)` would reference the dom cell at column 20 of the first row. even if you scroll the grid it will always point at that cell, so a view coordinate can be translated to different virtual coordinates depending on the scroll. you could think of view coordinates as a correlary for `position: fixed` in css
+
+## units
+Units in the grid are straightforward. They are either
+
+**px** - pixels, so `(0,0)` in the view space is the very top left pixel of the grid no matter the scroll, whereas `(0,0)` in the virtual space is the top left pixel only when the grid hasn't been scrolled, and would technically refer to a pixel out of view if the grid has been scrolled
+
+or
+
+**cell** - cells, so `(0,0)` in the view space represents the top left cell regardless of scroll, and `(0,0)` in the virtual space would represent an off screen cell if scrolled and top left if not scrolled
+
