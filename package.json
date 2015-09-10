@@ -23,6 +23,7 @@
     "jquery": "^2.1.0",
     "karma-jasmine-jquery": "~0.1.1",
     "polyfill-function-prototype-bind": "0.0.1",
+    "requestanimationframe": "0.0.22",
     "yargs": "^1.2.2"
   },
   "peerDependencies": {

@@ -1,6 +1,8 @@
-module.exports = function () {
+require('requestanimationframe');
+
+module.exports = function() {
     var $ = require('jquery');
-    beforeEach(function () {
+    beforeEach(function() {
 
         this.CONTAINER_WIDTH = 800;
         this.CONTAINER_HEIGHT = 500;
@@ -19,38 +21,43 @@ module.exports = function () {
         $('body').append(this.container);
 
         var self = this;
-        this.buildSimpleGrid = function (numRows, numCols, varyHeight, varyWidths, fixedRows, fixedCols, headerRows, headerCols) {
+        this.buildSimpleGrid = function(numRows, numCols, varyHeight, varyWidths, fixedRows, fixedCols, headerRows, headerCols) {
             maybeDestroyGrid();
-            this.grid = require('../simple-grid')(numRows || 100, numCols || 10, varyHeight, varyWidths, fixedRows, fixedCols, function (grid) {
+            this.grid = require('../simple-grid')(numRows || 100, numCols || 10, varyHeight, varyWidths, fixedRows, fixedCols, function(grid) {
                 self.resizeSpy = spyOn(grid.viewPort, '_resize');
             }, headerRows, headerCols);
             this.grid.viewPort.sizeToContainer(this.container);
             this.grid.eventLoop.setContainer(this.container);
             return this.grid;
         };
-        this.viewBuild = function () {
+        this.viewBuild = function() {
             this.grid.build(this.container);
             return this.container;
         };
-        this.onDraw = function (fn) {
+        this.onDraw = function(fn) {
             var self = this;
-            var unbind = this.grid.eventLoop.bind('grid-draw', function () {
-                setTimeout(function () {
+            var unbind = this.grid.eventLoop.bind('grid-draw', function() {
+                setTimeout(function() {
                     fn.call(self);
                 }, 1);
                 unbind();
             });
         };
-        this.resetAllDirties = function () {
+        this.resetAllDirties = function() {
             this.grid.eventLoop.fire('grid-draw');
         };
-        this.makeFakeRange = function (t, l, h, w) {
-            return {top: t, left: l, height: h, width: w};
+        this.makeFakeRange = function(t, l, h, w) {
+            return {
+                top: t,
+                left: l,
+                height: h,
+                width: w
+            };
         };
-        this.spyOnUnbind = function () {
+        this.spyOnUnbind = function() {
             var unbind = jasmine.createSpy();
             var bind = this.grid.eventLoop.bind;
-            this.grid.eventLoop.bind = function () {
+            this.grid.eventLoop.bind = function() {
                 bind.apply(bind, arguments);
                 return unbind;
             };
@@ -66,10 +73,9 @@ module.exports = function () {
         }
     }
 
-    afterEach(function () {
+    afterEach(function() {
         $('.js-grid-container').remove();
         maybeDestroyGrid.call(this);
     });
 
 };
-        

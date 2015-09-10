@@ -93,10 +93,18 @@ module.exports = function(_grid) {
         return borderWidth;
     }
 
-    // only draw once per js turn, may need to create a synchronous version
-    viewLayer.draw = debounce(function() {
+    // only draw once per js turn but at least once per animation, may need to create a synchronous version
+    var debouncedDraw = debounce(function() {
+        cancelAnimationFrame(animationFrame);
         viewLayer._draw();
     }, 1);
+
+    var animationFrame;
+    viewLayer.draw = function() {
+        cancelAnimationFrame(animationFrame);
+        requestAnimationFrame(viewLayer._draw);
+        debouncedDraw();
+    }
 
     viewLayer._draw = function() {
         // return if we haven't built yet
