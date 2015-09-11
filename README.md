@@ -144,3 +144,109 @@ or
 
 **cell** - cells, so `(0,0)` in the view space represents the top left cell regardless of scroll, and `(0,0)` in the virtual space would represent an off screen cell if scrolled and top left if not scrolled
 
+using custom html
+===
+
+There are two ways to get non text (read html) into a grid:
+
+## decorators
+Decorators are great for adding a piece of one-off ui that doesn't relate directly to the content of a cell or doesn't need to be in every row of a column or vice versa. For example, the grid internally uses decorators to render the focus and selection highlight as well as resize handles.
+
+**basic decorator**
+``` javascript
+	var top = 1,
+    left = 2,
+    height = 1,
+    width = 1,
+    unit = 'cell',
+    space = 'view';
+    var d = grid.decorators.create(top, left, height, width, unit, space);
+
+    // return some element
+    d.render = function() {
+        var a = document.createElement('a')
+        a.textContent = 'link Text!'
+        return a;
+    };
+    grid.decorators.add(d);
+```
+
+Puts a link over the cell at row 1 col 2 that doesn’t move with the scroll (why you would do this is questionable but it's just an example).
+
+You can do more complicated things like render 
+
+**angular directive decorator**
+``` javascript
+angular.module('myCoolGrid', [require('grid')])
+
+  .controller('MyGridCtrl', function($scope, GridSrvc, GridDecoratorSrvc) {
+      var grid = GridSrvc.core();
+
+      // do row col and datamodel setup...
+
+      var top = 20,
+          left = 10,
+          height = 2,
+          width = 2,
+          unit = 'cell',
+          space = 'virtual';
+      var d = grid.decorators.create(top, left, height, width, unit, space);
+
+      // return some element
+      d.render = function() {
+          var scope = $scope.$new();
+          scope.interestingData = 'INTERESTING DATA!!!';
+          return GridDecoratorSrvc.render({
+              $scope: scope,
+              template: '<my-directive data="interestingData"></my-directive>',
+              events: true
+          });
+      };
+      grid.decorators.add(d);
+  });
+```
+
+This will put your compiled directive in a box that spans from `row 20-22` and `col 10-12`, and moves appropriately with the scroll. The `events` flag lets the grid know that this decorator is interactable and should receive mouse events. (Otherwise pointer events are set to none.) The GridDecoratorSrvc takes care of destroying the scope and properly removing elements to avoid memory leaks with angular. You definitely should use it for any angular decorators.
+
+
+## builders
+Builders help you to get html into the actual cells of a given row or column instead of the text that would have been rendered.
+
+
+**basic builders**
+``` javascript
+var builder = grid.colModel.createBuilder(function render() {
+    return angular.element('<a href="#"></a>')[0];
+}, function update(elem, ctx) {
+    grid.viewLayer.setTextContent(elem, ctx.data.formatted);
+    return elem;
+});
+var colDescriptor = grid.colModel.create(builder);
+```
+
+have `<a>` tags in your cells for all the rows in that column
+
+**angular cell builder**
+
+``` javascript
+angular.module('myCoolGrid', [require('grid')])
+
+.controller('MyGridCtrl', function($scope, GridSrvc, GridBuilderSrvc) {
+    var grid = GridSrvc.core();
+
+    // do row col and datamodel setup...
+
+    grid.colModel.create(grid.colModel.createBuilder(function render(ctx) {
+        return GridBuilderSrvc.render($scope, '<my-directive data="interestingData"></my-directive>');
+    }, function update(elem, ctx) {
+        var scope = angular.element(elem).scope();
+        scope.interestingData = ctx.data.formatted;
+        scope.$digest();
+        return elem;
+    }));
+});
+```
+
+The GridBuilderSrvc handles destroying the scope and properly removing the elements to prevent memory leaks.
+
+Note: it's important for the update function of a builder to be extremely fast. Call `scope.$digest` not `scope.$apply`, and  use `grid.viewLayer.setTextContent` not `elem.innerHTML` where possible
