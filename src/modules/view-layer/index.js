@@ -94,15 +94,21 @@ module.exports = function(_grid) {
     }
 
     // only draw once per js turn but at least once per animation, may need to create a synchronous version
-    var debouncedDraw = debounce(function() {
-        cancelAnimationFrame(animationFrame);
+    var debouncedDraw = debounce(function debouncedDraw() {
+        cancelLastAnimationFrame();
         viewLayer._draw();
     }, 1);
 
+    function cancelLastAnimationFrame() {
+        cancelAnimationFrame(animationFrame);
+    }
+
     var animationFrame;
     viewLayer.draw = function() {
-        cancelAnimationFrame(animationFrame);
-        requestAnimationFrame(viewLayer._draw);
+        cancelLastAnimationFrame();
+        animationFrame = requestAnimationFrame(function animationFrameDraw() {
+            viewLayer._draw();
+        });
         debouncedDraw();
     }
 
@@ -112,7 +118,7 @@ module.exports = function(_grid) {
             return;
         }
 
-        var rebuilt = grid.viewPort.isDirty();
+        var rebuilt = grid.viewPort.isDirty() || !cells;
         if (rebuilt) {
             viewLayer._buildCells(cellContainer);
         }
@@ -510,7 +516,7 @@ module.exports = function(_grid) {
     grid.eventLoop.bind('grid-destroy', function() {
         cleanup();
         clearTimeout(viewLayer.draw.timeout);
-        cancelAnimationFrame(animationFrame);
+        cancelLastAnimationFrame();
         viewLayer.draw = require('../no-op');
     });
 
