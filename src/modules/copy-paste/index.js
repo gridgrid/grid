@@ -115,14 +115,21 @@ module.exports = function(_grid) {
                 var top = selectionRange.top;
                 var left = selectionRange.left;
 
+
                 pasteData.forEach(function(row, r) {
+                    var dataRow = r + top;
+                    if (dataRow > grid.data.row.count() - 1) {
+                        return;
+                    }
                     row.forEach(function(pasteValue, c) {
-                        if (pasteValue == undefined) {
+                        var dataCol = c + left;
+                        //intention == to match null and undefined
+                        if (pasteValue == undefined || dataCol > grid.data.col.count() - 1) {
                             return;
                         }
                         dataChanges.push({
-                            row: r + top,
-                            col: c + left,
+                            row: dataRow,
+                            col: dataCol,
                             data: pasteValue && pasteValue.trim(),
                             paste: true
                         });
