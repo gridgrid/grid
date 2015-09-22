@@ -510,6 +510,7 @@ module.exports = function(_grid) {
     grid.eventLoop.bind('grid-destroy', function() {
         cleanup();
         clearTimeout(viewLayer.draw.timeout);
+        cancelAnimationFrame(animationFrame);
         viewLayer.draw = require('../no-op');
     });
 
