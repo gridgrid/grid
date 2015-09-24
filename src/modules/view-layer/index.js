@@ -114,9 +114,10 @@ module.exports = function(_grid) {
 
     viewLayer._draw = function() {
         // return if we haven't built yet
-        if (!container) {
+        if (!container || grid.destroyed) {
             return;
         }
+
 
         var rebuilt = grid.viewPort.isDirty() || !cells;
         if (rebuilt) {
@@ -268,7 +269,6 @@ module.exports = function(_grid) {
         while (cellContainer.firstChild) {
             cellContainer.removeChild(cellContainer.firstChild);
         }
-
 
         cells = [];
         rows = [];

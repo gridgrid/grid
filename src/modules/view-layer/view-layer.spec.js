@@ -134,7 +134,7 @@ describe('view-layer', function() {
 
         });
 
-        it('shouldnt call build cells if viewport isnt dirty', function(done) {
+        xit('shouldnt call build cells if viewport isnt dirty', function(done) {
             this.resetAllDirties();
             var spy = spyOn(view, '_buildCells');
             view.draw();
@@ -315,17 +315,6 @@ describe('view-layer', function() {
             grid.cellScrollModel.scrollTo(5, 6);
             this.onDraw(function() {
                 expectFirstCellText(getCellText(5, 6));
-                done();
-            });
-        });
-
-        it('shouldnt call draw cells if cell scroll model isnt dirty', function(done) {
-
-            this.resetAllDirties();
-            var spy = spyOn(view, '_drawCells');
-            view.draw();
-            this.onDraw(function() {
-                expect(spy).not.toHaveBeenCalled();
                 done();
             });
         });

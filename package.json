@@ -21,6 +21,7 @@
     "gulp-tasks-riq": "^0.1.0",
     "jasmine-tools-riq": "~0.1.0",
     "jquery": "^2.1.0",
+    "karma-chrome-launcher": "~0.1.4",
     "karma-jasmine-jquery": "~0.1.1",
     "polyfill-function-prototype-bind": "0.0.1",
     "requestanimationframe": "0.0.22",

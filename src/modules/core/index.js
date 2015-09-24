@@ -356,6 +356,7 @@ module.exports = function(opts) {
 
     grid.destroy = function() {
         grid.eventLoop.fire('grid-destroy');
+        grid.destroyed = true;
     };
 
     return grid;

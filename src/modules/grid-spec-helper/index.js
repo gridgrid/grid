@@ -22,7 +22,7 @@ module.exports = function() {
 
         var self = this;
         this.buildSimpleGrid = function(numRows, numCols, varyHeight, varyWidths, fixedRows, fixedCols, headerRows, headerCols) {
-            maybeDestroyGrid();
+            maybeDestroyGrid.call(this);
             this.grid = require('../simple-grid')(numRows || 100, numCols || 10, varyHeight, varyWidths, fixedRows, fixedCols, function(grid) {
                 self.resizeSpy = spyOn(grid.viewPort, '_resize');
             }, headerRows, headerCols);
@@ -69,7 +69,7 @@ module.exports = function() {
         var grid = this.grid;
         if (grid) {
             grid.eventLoop.fire('grid-destroy');
-            grid = undefined;
+            this.grid = undefined;
         }
     }
 
