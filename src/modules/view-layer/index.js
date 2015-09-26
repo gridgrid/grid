@@ -100,15 +100,17 @@ module.exports = function(_grid) {
     }, 1);
 
     function cancelLastAnimationFrame() {
-        cancelAnimationFrame(animationFrame);
+        if (animationFrame) {
+            cancelAnimationFrame(animationFrame);
+        }
     }
 
     var animationFrame;
     viewLayer.draw = function() {
         cancelLastAnimationFrame();
-        animationFrame = requestAnimationFrame(function animationFrameDraw() {
-            viewLayer._draw();
-        });
+        // animationFrame = requestAnimationFrame(function animationFrameDraw() {
+        //     viewLayer._draw();
+        // });
         debouncedDraw();
     }
 
@@ -119,7 +121,7 @@ module.exports = function(_grid) {
         }
 
 
-        var rebuilt = grid.viewPort.isDirty() || !cells;
+        var rebuilt = grid.viewPort.isDirty();
         if (rebuilt) {
             viewLayer._buildCells(cellContainer);
         }

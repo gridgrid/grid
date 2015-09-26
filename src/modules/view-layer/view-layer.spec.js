@@ -134,7 +134,7 @@ describe('view-layer', function() {
 
         });
 
-        xit('shouldnt call build cells if viewport isnt dirty', function(done) {
+        it('shouldnt call build cells if viewport isnt dirty', function(done) {
             this.resetAllDirties();
             var spy = spyOn(view, '_buildCells');
             view.draw();
