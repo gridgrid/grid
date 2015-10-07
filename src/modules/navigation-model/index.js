@@ -11,7 +11,8 @@ module.exports = function(_grid) {
         focus: {
             row: 0,
             col: 0
-        }
+        },
+        checkboxModeFor: {}
     };
 
     model.otherSelections = [];
@@ -230,6 +231,10 @@ module.exports = function(_grid) {
         return !target || grid.eventIsOnCells(e) && e.button !== 2;
     }
 
+    function isCheckboxModeForRowCol(row, col) {
+        return model.checkboxModeFor.rows && col < 0 || (row < 0 && colSelectable(col)) && model.checkboxModeFor.cols
+    }
+
     grid.eventLoop.bind('mousedown', function(e) {
         if (!isNavableMouseEvent(e)) {
             return;
@@ -239,7 +244,8 @@ module.exports = function(_grid) {
         var col = e.col;
 
         // if we're in checkbox mode pretend the user held command for header mousedowns only 
-        var ctrlOrCmdPressed = model.checkboxMode && ((row < 0 && colSelectable(col)) || col < 0) || ctrlOrCmd(e);
+        var isCheckboxMode = isCheckboxModeForRowCol(row, col);
+        var ctrlOrCmdPressed = isCheckboxMode || ctrlOrCmd(e);
 
         if (e.shiftKey) {
             var fromRow = model.focus.row;
@@ -278,7 +284,7 @@ module.exports = function(_grid) {
             var headerSelectionRange = createHeaderSelectionRange(row, col);
             if (headerSelectionRange) {
                 var prevSelections = findFullRowOrColSelections(headerSelectionRange);
-                if (prevSelections.length && model.checkboxMode) {
+                if (prevSelections.length && isCheckboxMode) {
                     var selectAll = headerSelectionRange.width === Infinity && headerSelectionRange.height === Infinity && !(grid.rowModel.allSelected() || grid.colModel.allSelected());
                     prevSelections.forEach(function(prevSelection) {
                         removeFullRowOrColFromSelection(prevSelection, headerSelectionRange);
@@ -307,8 +313,9 @@ module.exports = function(_grid) {
     });
 
     function selectFromFocusToCell(fromRow, fromCol, toRow, toCol, ctrlOrCmdPressed, wasSelected) {
-
-        if (!wasSelected || !model.checkboxMode) {
+        var isCheckboxMode = (fromRow === 0 && toRow === Infinity && model.checkboxModeFor.cols) ||
+            (fromCol === 0 && toCol === Infinity && model.checkboxModeFor.rows);
+        if (!wasSelected || !isCheckboxMode) {
             setSelectionFromPoints(fromRow, fromCol, toRow, toCol, ctrlOrCmdPressed);
         } else {
             var range = rangeUtil.createFromPoints(fromRow, fromCol, toRow, toCol);
