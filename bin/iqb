@@ -67,13 +67,13 @@ case $command in
     "build:js")   $self prep && $BROWSERIFY_CMD $ENTRY_POINT -d | $EXORCIST_CMD release/${DEFAULT_NAME}.js.map > release/${DEFAULT_NAME}.js ;;
 
     # scss feature
-    "watch:scss") $self prep && $WATCH_CMD --silent 'src/**/*.scss' -c "$self build:scss"  ;;
+    "watch:scss") $self prep && $self build:scss && $WATCH_CMD --silent 'src/**/*.scss' -c "$self build:scss"  ;;
     "build:scss") [ -f src/${DEFAULT_NAME}.scss ] && $self prep && $SASS_CMD src/${DEFAULT_NAME}.scss > release/${DEFAULT_NAME}.css ;;
 
     # app feature
     "watch:html") $self build:html && $WATCH_CMD --silent app/* -c "$self build:html" ;;
     "build:html") $self prep && cp app/index.html release/ ;;
-    "watch:app")  $self prep && $WATCHIFY_CMD app/index.js -d -o "$EXORCIST_CMD release/app.js.map > release/app.js" ;;
+    "watch:app")  $self prep && $self build:app && $WATCHIFY_CMD app/index.js -d -o "$EXORCIST_CMD release/app.js.map > release/app.js" ;;
     "build:app")  $self prep && $BROWSERIFY_CMD app/index.js -d | $EXORCIST_CMD release/app.js.map > release/app.js ;;
     "livereload") $self prep && $WATCH_CMD --silent release/* -c 'curl -s http://localhost:35729/changed\?files\=index.html' ;;
 
