@@ -1,0 +1,35 @@
+#!/bin/bash
+
+if [ ! $(which docker-machine) ]; then
+    echo 'This script requires docker-machine'
+    exit;
+fi
+
+# make sure docker is available
+docker ps &> /dev/null
+if [ $? -gt 0 ]; then
+    echo "Error connecting to docker daemon"
+    echo "Did you remember to start and select a docker machine?"
+    echo '    eval $(docker-machine env dev)'
+    exit 1;
+fi
+
+# find out some important numbers
+host_machine_ip=192.168.99.1
+docker_machine_ip=$(docker-machine ssh $DOCKER_MACHINE_NAME "ip -o -4 addr list docker0" | awk '{print $4}' | cut -d/ -f1)
+karma_port=$(echo $1 | cut -d\: -f3 | cut -d/ -f1)
+
+# punch a hole in the firewall
+docker-machine ssh $DOCKER_MACHINE_NAME "sudo /usr/local/sbin/iptables -A PREROUTING -t nat -i docker0 -p tcp --dport $karma_port -j DNAT --to $host_machine_ip:$karma_port"
+
+# change the karma url string and start the browser
+karma_url=$(echo $1 | sed "s,127.0.0.1,$docker_machine_ip,g" | sed "s,localhost,$docker_machine_ip,g")
+
+echo "Starting headless browser..."
+exec docker run \
+    --rm \
+    -e KARMA_URL="$karma_url" \
+    --name browser \
+    relateiq/headlessbrowser:latest
+
+

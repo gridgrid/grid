@@ -1,0 +1,131 @@
+#!/bin/bash
+
+####################################################################
+# Feature Management
+#
+# This script doesn't really contribute to the build itself,
+# but provides a simple interface to enable/disable certain build
+# features
+####################################################################
+
+featcmd=$1
+shift
+featname=$1
+shift
+
+function print-usage() {
+    echo ${1:-"No feature name specified"}
+    echo "Usage: "
+    echo "    iqproj feat enable|disable featurename"
+    exit 1;
+}
+
+if [ -z "$featname" ]; then
+    print-usage;
+fi
+
+case $featname in
+    'app')
+        npm_packages=(
+            browserify
+            browserify-istanbul
+            karma
+            jasmine
+            karma-jasmine
+            karma-browserify
+            karma-chrome-launcher
+            karma-phantomjs-launcher
+            watchify
+            exorcist
+            phantomjs
+            express
+            tiny-lr
+            connect-livereload
+            node-sass
+        )
+
+        case $featcmd in
+            'enable')
+                # install dependencies
+                npm install --save-dev "${npm_packages[@]}"
+                npm uninstall --save-dev tape
+
+                # create some app scaffolding... not super useful but meh
+                mkdir -p app
+                touch app/index.js
+                if [ ! -f app/index.html ]; then
+                    echo "<html><body>it works</body></html>" > app/index.html
+                fi
+
+                # update the npm scripts
+                tmpfile=$(mktemp -t XXXXXXXX)
+                cat package.json | jq '.scripts.test = "bin/iqb karma"' | jq '.scripts.preversion = "bin/iqb karma"' > $tmpfile
+                mv $tmpfile package.json 
+
+                echo
+                echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                echo "!!! WARNING: testing framework switched to karma; tape tests won't work in karma."
+                echo "!!! You will need to update all *.spec.js files accordingly.                     "
+                echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                ;;
+            'disable')
+                npm install --save-dev tape
+                npm uninstall --save-dev "${npm_packages[@]}"
+
+                # update the npm scripts
+                tmpfile=$(mktemp -t XXXXXXXX)
+                cat package.json | jq '.scripts.test = "bin/iqb test"' | jq '.scripts.preversion = "bin/iqb test"' > $tmpfile
+                mv $tmpfile package.json 
+
+                echo
+                echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                echo "!!! WARNING: testing framework switched to tape; karma tests won't work in tape."
+                echo "!!! You will need to update all *.spec.js files accordingly.                     "
+                echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                ;;
+            *)
+                print-usage "feat: unknown command $featcmd"
+                exit 1;
+                ;;
+        esac
+    ;;
+
+    'headless')
+        case $featcmd in
+            'enable')
+                npm install --save-dev karma-script-launcher
+                npm uninstall --save-dev phantomjs karma-phantomjs-launcher
+                tmpfile=$(mktemp -t XXXXXXXX)
+                cat karma.conf.json | jq '.browsers = ["bin/headless"]' > $tmpfile
+                mv $tmpfile karma.conf.json
+                ;;
+            'disable')
+                npm uninstall --save-dev karma-script-launcher
+                npm install --save-dev phantomjs karma-phantomjs-launcher
+                tmpfile=$(mktemp -t XXXXXXXX)
+                cat karma.conf.json | jq '.browsers = ["PhantomJS"]' > $tmpfile
+                mv $tmpfile karma.conf.json
+                ;;
+            *)
+                print-usage "feat: unknown command $featcmd"
+                exit 1;
+                ;;
+        esac
+    ;;
+
+
+    *)
+        echo "Unknown feature $featname";
+        exit 1;
+    ;;
+esac
+
+featflag="false"
+if [ "$featcmd" = "enable" ]; then
+    featflag="true"
+fi
+
+tmpfile=$(mktemp -t XXXXXXXX)
+cat package.json | jq ".iqproj += { $featname: $featflag }" > $tmpfile;
+mv $tmpfile package.json
+

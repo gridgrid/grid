@@ -2,8 +2,9 @@
 .sass-cache
 **/node_modules/**
 !**/node_modules/@grid
-/bower_components/**/node_modules
+bower_components/
 build
+node_modules
 tmp
 test-assets
 /coverage
