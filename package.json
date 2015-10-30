@@ -57,10 +57,6 @@
       "aliasify"
     ]
   },
-  "browser": {
-    "angular": "./bower_components/angular/angular.js",
-    "angular-route": "./bower_components/angular-route/angular-route.js"
-  },
   "aliasify": {
     "aliases": {
       "@grid": "./src/modules"
