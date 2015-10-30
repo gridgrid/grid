@@ -6,8 +6,8 @@
   "basePath": "",
   "files": [
     "node_modules/polyfill-function-prototype-bind/bind.js",
-    "bower_components/angular/angular.js",
-    "bower_components/angular-mocks/angular-mocks.js",
+    "node_modules/angular/angular.js",
+    "node_modules/angular-mocks/angular-mocks.js",
     "src/modules/grid-spec-helper/matchers.js",
     "src/**/*.spec.js"
   ],
