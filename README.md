@@ -31,6 +31,8 @@ if not using angular
 example / quick start
 ===
 
+To run the sample app locally, run `npm start` and hit http://localhost:8082
+
 ##### create a grid instance
 `var grid = core();` or in angular `var grid = GridSrvc.core();`
 
