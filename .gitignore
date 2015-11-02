@@ -4,6 +4,7 @@
 !**/node_modules/@grid
 bower_components/
 build
+node_modules
 tmp
 test-assets
 /coverage

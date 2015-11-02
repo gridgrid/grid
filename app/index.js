@@ -1,8 +1,8 @@
 'use strict';
 
-var makeSimpleGrid = require('./simple-grid');
+var makeSimpleGrid = require('../src/modules/simple-grid');
 require('angular');
-var debounce = require('./debounce');
+var debounce = require('../src/modules/debounce');
 
 angular.module('gridApp', [])
     .directive('gridApp', function($compile) {
