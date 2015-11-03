@@ -13,9 +13,9 @@
     "app": true
   },
   "scripts": {
-    "test": "bin/iqb karma",
+    "test": "bin/iqb test",
     "start": "bin/iqb start",
-    "preversion": "bin/iqb karma"
+    "preversion": "bin/iqb test"
   },
   "dependencies": {
     "angular": "~1.4.7",
