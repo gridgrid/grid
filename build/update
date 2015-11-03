@@ -5,12 +5,22 @@
 #
 # This script does an in-place update of core system files including
 # the `iqb` task runner and core system tasks
+#
+# By default, this script updates only the handful of core system
+# files.  To update any other files you can run
+#
+#     iqb update <filenames>
+#
+# For example, to pull the updated .gitignore and .eslintrc:
+#
+#     iqb update .eslintrc .gitignore
+#
 ####################################################################
 
 if [ ! -z "$(git status -s)" ]; then
-    echo 
+    echo
     echo '!! You have uncommitted changes.  Please stash or commit your changes before updating'
-    echo 
+    echo
     exit 1
 fi
 
@@ -38,12 +48,9 @@ else
 fi
 
 if [ ! -z "$(git status -s)" ]; then
-    echo 'Committing updates...'
     git add -A
     git commit -m "update bedrock"
-    echo
-    echo 
-    echo '-- Done --'
+    echo '---- Done -----'
 else
     echo 'Already up to date'
 fi

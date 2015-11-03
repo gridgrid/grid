@@ -20,6 +20,25 @@ function print-usage() {
     exit 1;
 }
 
+function write-index-template() {
+    module_name=$(cat package.json | jq -r .name)
+
+cat << EOF > app/index.html
+    <html>
+        <head>
+            <title>$module_name</title>
+            <link rel="stylesheet" type="text/css" href="$module_name.scss" />
+        </head>
+        <body>
+            <h1>It Works!</h1>
+
+            <script src="app.js"></script>
+        </body>
+    </html>
+EOF
+
+}
+
 if [ -z "$featname" ]; then
     print-usage;
 fi
@@ -54,7 +73,7 @@ case $featname in
                 mkdir -p app
                 touch app/index.js
                 if [ ! -f app/index.html ]; then
-                    echo "<html><body>it works</body></html>" > app/index.html
+                    write-index-template
                 fi
 
                 # update the npm scripts
