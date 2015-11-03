@@ -22,7 +22,7 @@ fi
 git fetch bedrock
 
 if [ -z "$1" ]; then
-    system-files=(
+    system-files=( \
         bin/iqb \
         bin/headless \
         build/feat \
