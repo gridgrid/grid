@@ -20,9 +20,12 @@ function print-usage() {
     exit 1;
 }
 
-function write-index-template() {
+function write-app-templates() {
     module_name=$(cat package.json | jq -r .name)
 
+    #################################
+    # app/index.html
+    if [ ! -f app/index.html ]; then
 cat << EOF > app/index.html
     <html>
         <head>
@@ -36,6 +39,17 @@ cat << EOF > app/index.html
         </body>
     </html>
 EOF
+    fi
+
+    #################################
+    # app/index.js
+    if [ ! -f app/index.js ]; then
+cat << EOF > app/index.js
+var $module_name = require('../src');
+
+console.log('$module_name initialized: ', $module_name);
+EOF
+    fi
 
 }
 
@@ -61,6 +75,7 @@ case $featname in
             tiny-lr
             connect-livereload
             node-sass
+            yargs
         )
 
         case $featcmd in
@@ -71,10 +86,7 @@ case $featname in
 
                 # create some app scaffolding... not super useful but meh
                 mkdir -p app
-                touch app/index.js
-                if [ ! -f app/index.html ]; then
-                    write-index-template
-                fi
+                write-app-templates
 
                 # update the npm scripts
                 tmpfile=$(mktemp -t XXXXXXXX)

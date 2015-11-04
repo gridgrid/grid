@@ -1,6 +1,23 @@
 #!/bin/bash -e
 
 #################################################################################
+# environment checks for parallel and jq
+# TODO: don't check on *every* run...that's a lot of checks
+which parallel > /dev/null
+if [ $? -gt 0 ]; then
+    echo "!! parallel not found.  installing..."
+    brew install parallel
+    mkdir -p ~/.parallel
+    touch ~/.parallel/will-cite
+fi
+
+which jq > /dev/null
+if [ $? -gt 0 ]; then
+    echo "!! jq not found.  installing..."
+    brew install jq
+fi
+
+#################################################################################
 # configuration (export because `parallel`)
 export TAPE_CMD=node_modules/tape/bin/tape
 export KARMA_CMD=node_modules/karma/bin/karma
@@ -102,11 +119,11 @@ case $command in
         features=("$self watch:test")
 
         if [ "$FEAT_APP" = "true" ]; then
-            features+=(\
-                "$self watch:app" \
-                "$self watch:html" \
-                "$self watch:scss" \
-                "$self watch:js" \
+            features+=(
+                "$self watch:app"
+                "$self watch:html"
+                "$self watch:scss"
+                "$self watch:js"
                 "$self serve"
             );
         fi
@@ -118,11 +135,11 @@ case $command in
         features=("$self assets" "$self test")
 
         if [ "$FEAT_APP" = "true" ]; then
-            features+=( \
-                "$self build:scss" \
-                "$self build:js" \
-                "$self build:app" \
-                "$self build:html" \
+            features+=(
+                "$self build:scss"
+                "$self build:js"
+                "$self build:app"
+                "$self build:html"
             );
         fi
 
