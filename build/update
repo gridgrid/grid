@@ -1,0 +1,56 @@
+#!/bin/bash
+
+####################################################################
+# System Update
+#
+# This script does an in-place update of core system files including
+# the `iqb` task runner and core system tasks
+#
+# By default, this script updates only the handful of core system
+# files.  To update any other files you can run
+#
+#     iqb update <filenames>
+#
+# For example, to pull the updated .gitignore and .eslintrc:
+#
+#     iqb update .eslintrc .gitignore
+#
+####################################################################
+
+if [ ! -z "$(git status -s)" ]; then
+    echo
+    echo '!! You have uncommitted changes.  Please stash or commit your changes before updating'
+    echo
+    exit 1
+fi
+
+git remote | grep bedrock > /dev/null
+if [ $? -gt 0 ]; then
+    git remote add bedrock git://github.com/relateiq/bedrock.git -t iqproj
+fi
+
+git fetch bedrock
+
+if [ -z "$1" ]; then
+    system_files=(
+        bin/iqb
+        bin/headless
+        build/feat
+        build/start-server
+        build/update
+    )
+
+    # update the core system files
+    git checkout bedrock/iqproj "${system_files[@]}"
+else
+    # update one specific file (or set of files)
+    git checkout bedrock/iqproj "$@"
+fi
+
+if [ ! -z "$(git status -s)" ]; then
+    git add -A
+    git commit -m "update bedrock"
+    echo '---- Done -----'
+else
+    echo 'Already up to date'
+fi

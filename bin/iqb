@@ -1,6 +1,24 @@
-#!/bin/bash -e
+#!/bin/bash
 
-# export these things because parallel
+#################################################################################
+# environment checks for parallel and jq
+# TODO: don't check on *every* run...that's a lot of checks
+which parallel > /dev/null
+if [ $? -gt 0 ]; then
+    echo "!! parallel not found.  installing..."
+    brew install parallel
+    mkdir -p ~/.parallel
+    touch ~/.parallel/will-cite
+fi
+
+which jq > /dev/null
+if [ $? -gt 0 ]; then
+    echo "!! jq not found.  installing..."
+    brew install jq
+fi
+
+#################################################################################
+# configuration (export because `parallel`)
 export TAPE_CMD=node_modules/tape/bin/tape
 export KARMA_CMD=node_modules/karma/bin/karma
 export BROWSERIFY_CMD=node_modules/browserify/bin/cmd.js
@@ -15,29 +33,45 @@ export ENTRY_POINT=$(cat package.json | jq -r .main);
 export DEFAULT_NAME=$(cat package.json | jq -r .name);
 
 # configuration settings
-export FEAT_BROWSERIFY=$(cat package.json | jq -r .iqproj.browserify)
-export FEAT_SCSS=$(cat package.json | jq -r .iqproj.scss)
 export FEAT_APP=$(cat package.json | jq -r .iqproj.app)
 
 self=$0
 command=$1
 shift
 
-echo "# RUN $command $*"
+#################################################################################
+# utilities
+function find-next-open-port() {
+    for port in $(seq $1 $(($1 + 1000))); do
+        echo "\035" | /usr/bin/nc 127.0.0.1 $port > /dev/null
+        if [ $? -gt 0 ]; then 
+            echo $port
+            return 0
+        fi
+    done
+    return 1
+}
+
+#################################################################################
+# informational messages
+echo "# RUN $command $@"
+
+# essential prep
+# iqb outputs all build artifacts to the release/ folder
+mkdir -p release/
 
 # super basic override functionality.  allow shipping with a base task,
 # but allow that task to be overridden by creating a file in build/commandname
 # BONUS: also lets you add new commands (written in any language!)
 if [ -f "build/$command" ]; then
     echo "** Override: $command (build/$command)"
-    exec build/$command $*
+    exec build/$command "$@"
 fi
 
-# basic build commands for getting up and running quickly:
-#   * unit test running with tape
-#   * local server
-#   * clean/prep tasks
-#   * individual build/watch steps for templates, assets, scss, and js (browserify)
+#################################################################################
+# Built-in [standard] commands
+# Any of these can be overridden by creating a `build/<taskname>` file
+set -e
 case $command in
     # npm lifecycle commands
     "test")
@@ -49,9 +83,8 @@ case $command in
         ;;
 
     # basic housekeeping tasks
-    "prep")       mkdir -p release ;;
     "clean")      rm -rf release/* ;;
-    "assets")     [ -d assets ] && $self prep && cp -R assets release ;;
+    "assets")     [ -d src/assets ] && cp -R src/assets release ;;
 
     # testing
     "watch:test") 
@@ -63,32 +96,39 @@ case $command in
         ;;
 
     # browserify feature
-    "watch:js")   $self prep && $WATCHIFY_CMD $ENTRY_POINT -d -o "$EXORCIST_CMD release/${DEFAULT_NAME}.js.map > release/${DEFAULT_NAME}.js" ;;
-    "build:js")   $self prep && $BROWSERIFY_CMD $ENTRY_POINT -d | $EXORCIST_CMD release/${DEFAULT_NAME}.js.map > release/${DEFAULT_NAME}.js ;;
+    "watch:js")   $WATCHIFY_CMD $ENTRY_POINT -d -o "$EXORCIST_CMD release/${DEFAULT_NAME}.js.map > release/${DEFAULT_NAME}.js" ;;
+    "build:js")   $BROWSERIFY_CMD $ENTRY_POINT -d | $EXORCIST_CMD release/${DEFAULT_NAME}.js.map > release/${DEFAULT_NAME}.js ;;
 
     # scss feature
-    "watch:scss") $self prep && $self build:scss && $WATCH_CMD --silent 'src/**/*.scss' -c "$self build:scss"  ;;
-    "build:scss") [ -f src/${DEFAULT_NAME}.scss ] && $self prep && $SASS_CMD src/${DEFAULT_NAME}.scss > release/${DEFAULT_NAME}.css ;;
+    "watch:scss") $self build:scss && $WATCH_CMD --silent 'src/**/*.scss' -c "$self build:scss" ;;
+    "build:scss")
+        [ -f src/scss/${DEFAULT_NAME}.scss ] && $SASS_CMD src/scss/${DEFAULT_NAME}.scss > release/${DEFAULT_NAME}.css
+        [ -f src/scss/app.scss ] && $SASS_CMD src/scss/app.scss > release/app.css
+        ;;
 
     # app feature
     "watch:html") $self build:html && $WATCH_CMD --silent app/* -c "$self build:html" ;;
-    "build:html") $self prep && cp app/index.html release/ ;;
-    "watch:app")  $self prep && $self build:app && $WATCHIFY_CMD app/index.js -d -o "$EXORCIST_CMD release/app.js.map > release/app.js" ;;
-    "build:app")  $self prep && $BROWSERIFY_CMD app/index.js -d | $EXORCIST_CMD release/app.js.map > release/app.js ;;
-    "livereload") $self prep && $WATCH_CMD --silent release/* -c 'curl -s http://localhost:35729/changed\?files\=index.html' ;;
+    "build:html") cp app/index.html release/ ;;
+    "watch:app")  $self build:app && $WATCHIFY_CMD app/index.js -d -o "$EXORCIST_CMD release/app.js.map > release/app.js" ;;
+    "build:app")  $BROWSERIFY_CMD app/index.js -d | $EXORCIST_CMD release/app.js.map > release/app.js ;;
+    "livereload") $WATCH_CMD --silent release/* -c "curl -s http://localhost:${1:-35729}/changed\?files\=index.html" ;;
+    "serve")
+        SRV_PORT=$(find-next-open-port 8080)
+        LR_PORT=$(find-next-open-port 35729)
+        $PARALLEL_CMD ::: "$self start-server $SRV_PORT $LR_PORT" "$self livereload $LR_PORT"
+        ;;
 
     # entry points
     "start"|"watch")
-        features=("$self watch:test")
+        features=("$self assets" "$self watch:test")
 
         if [ "$FEAT_APP" = "true" ]; then
-            features+=(\
-                "$self watch:app" \
-                "$self watch:html" \
-                "$self watch:scss" \
-                "$self watch:js" \
-                "$self serve" \
-                "$self livereload" \
+            features+=(
+                "$self watch:app"
+                "$self watch:html"
+                "$self watch:scss"
+                "$self watch:js"
+                "$self serve"
             );
         fi
 
@@ -99,16 +139,15 @@ case $command in
         features=("$self assets" "$self test")
 
         if [ "$FEAT_APP" = "true" ]; then
-            features+=( \
-                "$self build:scss" \
-                "$self build:js" \
-                "$self build:app" \
-                "$self build:html" \
+            features+=(
+                "$self build:scss"
+                "$self build:js"
+                "$self build:app"
+                "$self build:html"
             );
         fi
 
         $self clean &&
-        $self prep &&
         $PARALLEL_CMD ::: "${features[@]}"
         ;;
 
