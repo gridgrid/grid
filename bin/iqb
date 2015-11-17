@@ -77,6 +77,8 @@ fi
 #################################################################################
 # Built-in [standard] commands
 # Any of these can be overridden by creating a `build/<taskname>` file
+START_TIME=$(node -e "console.log(+new Date())")
+
 set -e
 case $command in
     # npm lifecycle commands
@@ -108,8 +110,8 @@ case $command in
     # scss feature
     "watch:scss") $self build:scss && $WATCH_CMD --silent 'src/**/*.scss' -c "$self build:scss" ;;
     "build:scss")
-        [ -f src/scss/${DEFAULT_NAME}.scss ] && $SASS_CMD src/scss/${DEFAULT_NAME}.scss > release/${DEFAULT_NAME}.css
-        [ -f src/scss/app.scss ] && $SASS_CMD src/scss/app.scss > release/app.css
+        [ -f src/scss/${DEFAULT_NAME}.scss ] && ($SASS_CMD src/scss/${DEFAULT_NAME}.scss > release/${DEFAULT_NAME}.css || exit 1);
+        [ -f src/scss/app.scss ] && ($SASS_CMD src/scss/app.scss > release/app.css || exit 1);
         ;;
 
     # app feature
@@ -162,5 +164,9 @@ case $command in
         exit 1
 esac
 
-echo "---DONE: $command $*"
+END_TIME=$(node -e "console.log(+new Date())")
+ELAPSED=$(( $END_TIME - $START_TIME ))
+TIMESTR=$(node -e "console.log($ELAPSED < 1000 ? $ELAPSED + 'ms' : ($ELAPSED / 1000.0) + 's')");
+
+echo "---DONE [ $TIMESTR ] $command $*"
 
