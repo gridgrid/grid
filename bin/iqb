@@ -1,5 +1,15 @@
 #!/bin/bash
 
+self=$0
+command=$1
+shift
+
+# allow normal shell commands to be executed (eg: npm install)
+# # when the script is used as an ENTRYPOINT for a docker container
+if [ "$command" = "exec" ]; then
+    exec "$@"
+fi
+
 #################################################################################
 # environment checks for parallel and jq
 # TODO: don't check on *every* run...that's a lot of checks
@@ -29,15 +39,11 @@ export SASS_CMD=node_modules/node-sass/bin/node-sass
 PARALLEL_CMD='parallel --line-buffer --halt 2'
 
 # read some names out of the package.json
-export ENTRY_POINT=$(cat package.json | jq -r .main);
-export DEFAULT_NAME=$(cat package.json | jq -r .name);
+export ENTRY_POINT=$(jq -r .main package.json);
+export DEFAULT_NAME=$(jq -r .name package.json);
 
 # configuration settings
-export FEAT_APP=$(cat package.json | jq -r .iqproj.app)
-
-self=$0
-command=$1
-shift
+export FEAT_APP=$(jq -r .iqproj.app package.json)
 
 #################################################################################
 # utilities
