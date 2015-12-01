@@ -34,9 +34,9 @@ module.exports = function(_grid) {
         model.maxScroll.width = getMaxScroll('width');
     }
 
-    //assumes a standardized wheel event that we create through the mousewheel package
+    // assumes a standardized wheel event that we create through the mousewheel package
     grid.eventLoop.bind('mousewheel', function handleMouseWheel(e) {
-        if (getScrollParent(e.target, grid.container) !== grid.container) {
+        if (getScrollElementFromTarget(e.target, grid.container) !== grid.container) {
             return;
         }
         var deltaY = e.deltaY;
@@ -229,7 +229,7 @@ module.exports = function(_grid) {
     grid.decorators.add(model.horzScrollBar);
     /* END SCROLL BAR LOGIC */
 
-    function getScrollParent(elem, stopParent) {
+    function getScrollElementFromTarget(elem, stopParent) {
         stopParent = stopParent || document;
         if (!elem) {
             return stopParent;
@@ -240,16 +240,16 @@ module.exports = function(_grid) {
             overflowRegex = /(auto|scroll)/,
             scrollParent = elem;
 
-        while (!!(scrollParent = scrollParent.parentElement) && scrollParent !== stopParent) {
-            if (excludeStaticParent && scrollParent.style.position === 'static') {
-                continue;
+        while (!!scrollParent && scrollParent !== stopParent) {
+            if (!(excludeStaticParent && scrollParent.style.position === 'static')) {
+                var computedStyle = getComputedStyle(scrollParent);
+
+                if (overflowRegex.test(computedStyle.overflow + computedStyle.overflowY + computedStyle.overflowX)) {
+                    break;
+                }
             }
 
-            var computedStyle = getComputedStyle(scrollParent);
-
-            if (overflowRegex.test(computedStyle.overflow + computedStyle.overflowY + computedStyle.overflowX)) {
-                break;
-            }
+            scrollParent = scrollParent.parentElement;
         }
 
         return position === 'fixed' || !scrollParent || scrollParent === elem ? elem.ownerDocument || stopParent : scrollParent;
