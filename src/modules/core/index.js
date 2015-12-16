@@ -301,12 +301,18 @@ module.exports = function(opts) {
 
         timeouts = [];
         grid.timeout = function() {
+            if (grid.destroyed) {
+                return;
+            }
             var id = setTimeout.apply(window, arguments);
             timeouts.push(id);
             return id;
         };
         intervals = [];
         grid.interval = function() {
+            if (grid.destroyed) {
+                return;
+            }
             var id = setInterval.apply(window, arguments);
             intervals.push(id);
             return id;

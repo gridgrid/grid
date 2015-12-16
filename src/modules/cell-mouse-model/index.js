@@ -100,7 +100,7 @@ module.exports = function(_grid) {
 
             if (!dragStarted) {
                 if (lastX === e.clientX && lastY === e.clientY) {
-                    console.error('Got a mouse move event with ', e.clientX, ',', e.clientY, ' when the last position was ', lastX, ',', lastY);
+                    console.warn('Got a mouse move event with ', e.clientX, ',', e.clientY, ' when the last position was ', lastX, ',', lastY);
                 }
                 createAndFireCustomMouseEvent('grid-drag-start', downEvent, function annotateDragStart(dragStart) {
                     var onlyFixedRows = !calculateRowScrollDiff(e);
