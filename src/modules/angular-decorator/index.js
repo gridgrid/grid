@@ -3,7 +3,7 @@ module.exports = moduleName;
 
 angular.module(moduleName, [])
 
-.factory('GridDecoratorSrvc', function($compile) {
+.factory('GridDecoratorSrvc', ['$compile', function($compile) {
     var GridDecoratorSrvc = {
         render: function(opts) {
             var compiled = $compile(opts.template)(opts.$scope);
@@ -38,6 +38,6 @@ angular.module(moduleName, [])
         }
     };
     return GridDecoratorSrvc
-})
+}])
 
 ;

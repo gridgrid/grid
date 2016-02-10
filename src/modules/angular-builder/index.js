@@ -3,7 +3,7 @@ module.exports = moduleName;
 
 angular.module(moduleName, [])
 
-.factory('GridBuilderSrvc', function($compile) {
+.factory('GridBuilderSrvc', ['$compile', function($compile) {
     var GridBuilderSrvc = {};
 
     GridBuilderSrvc.destroy = function(elem) {
@@ -35,4 +35,4 @@ angular.module(moduleName, [])
     };
 
     return GridBuilderSrvc;
-});
+}]);
