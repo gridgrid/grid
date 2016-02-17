@@ -1,45 +1,35 @@
 var mockEvent = require('../custom-event');
 var specHelper = require('../grid-spec-helper');
 
-describe('col-resize', function () {
+describe('col-resize', function() {
     var $ = require('jquery');
 
 
     specHelper();
     var grid;
     var colResize;
-    beforeEach(function () {
+    beforeEach(function() {
         grid = this.buildSimpleGrid();
         colResize = grid.colResize;
     });
 
-    describe('should satisfy', function () {
-        var ctx = {};
-        beforeEach(function () {
-            ctx.headerDecorators = colResize;
-        });
-
-        //covers the decorator interface
-        require('../header-decorators/test-body')(ctx);
-    });
-
-    describe('decorator', function () {
+    describe('decorator', function() {
         var ctx = {};
         var viewCol = 1;
-        beforeEach(function () {
+        beforeEach(function() {
             ctx.decorator = colResize._decorators[viewCol];
         });
 
-        it('should have a styleable class', function () {
+        it('should have a styleable class', function() {
             expect(ctx.decorator.render()).toHaveClass('col-resize');
         });
 
-        it('should center on the right side of its bounding box', function (done) {
+        it('should center on the right side of its bounding box', function(done) {
             this.viewBuild();
             var style = document.createElement('style');
             style.innerHTML = '.col-resize{width : 6px}';
             document.body.appendChild(style);
-            this.onDraw(function () {
+            this.onDraw(function() {
                 var $rendered = $(ctx.decorator.boundingBox.firstChild);
                 var $box = $(ctx.decorator.boundingBox);
                 var width = $rendered.width();
@@ -51,27 +41,27 @@ describe('col-resize', function () {
             });
         });
 
-        it('should bind a drag event on render', function () {
+        it('should bind a drag event on render', function() {
             var spy = spyOn(grid.eventLoop, 'bind');
             var dragElem = ctx.decorator.render();
             expect(spy).toHaveBeenBoundWith('grid-drag-start', dragElem);
         });
 
-        describe('drag', function () {
+        describe('drag', function() {
             var dragCtx = {};
             var dragStart = 100;
-            beforeEach(function () {
+            beforeEach(function() {
                 var e = mockEvent('grid-drag-start', true);
                 e.gridX = dragStart;
                 ctx.decorator._onDragStart(e);
                 dragCtx.decorator = ctx.decorator._dragLine;
             });
 
-            it('should add a decorator', function () {
+            it('should add a decorator', function() {
                 expect(grid.decorators.getAlive()).toContain(ctx.decorator._dragLine);
             });
 
-            it('should be 1px wide and as tall as teh view', function () {
+            it('should be 1px wide and as tall as teh view', function() {
                 expect(dragCtx.decorator).topToBe(0);
                 expect(dragCtx.decorator).widthToBe(1);
                 expect(dragCtx.decorator).heightToBe(Infinity);
@@ -79,7 +69,7 @@ describe('col-resize', function () {
                 expect(dragCtx.decorator).spaceToBe('real');
             });
 
-            it('should render with a styleable class', function () {
+            it('should render with a styleable class', function() {
                 expect(dragCtx.decorator.render()).toHaveClass('grid-drag-line');
             });
 
@@ -91,15 +81,17 @@ describe('col-resize', function () {
                 return gridX;
             }
 
-            it('should move the left on grid drag', function () {
+            it('should move the left on grid drag', function() {
                 var gridX = fireDrag(dragStart + 10);
                 expect(dragCtx.decorator).leftToBe(gridX);
             });
 
-            it('should min out at decorator left + 10', function (done) {
-                $(this.container).css({'margin-left': '10px'});
+            it('should min out at decorator left + 10', function(done) {
+                $(this.container).css({
+                    'margin-left': '10px'
+                });
                 this.viewBuild();
-                this.onDraw(function () {
+                this.onDraw(function() {
                     var drag = mockEvent('grid-drag');
                     var decoratorLeft = grid.viewPort.toGridX(ctx.decorator.boundingBox.getClientRects()[0].left);
                     var gridX = decoratorLeft;
@@ -112,19 +104,19 @@ describe('col-resize', function () {
 
             });
 
-            it('should remove the decorator on drag end', function () {
+            it('should remove the decorator on drag end', function() {
                 grid.eventLoop.fire(mockEvent('grid-drag-end'));
                 expect(grid.decorators.popAllDead()).toContain(dragCtx.decorator);
             });
 
-            it('should set the col width on drag-end', function () {
+            it('should set the col width on drag-end', function() {
                 fireDrag(dragStart + 10);
                 grid.eventLoop.fire(mockEvent('grid-drag-end'));
                 var colObj = grid.colModel.get(viewCol);
                 expect(colObj).widthToBe(dragStart + 10);
             });
 
-            it('should set the col width on drag-end for all selected cols', function () {
+            it('should set the col width on drag-end for all selected cols', function() {
                 var newWidth = dragStart + 10;
                 fireDrag(newWidth);
                 var selected = viewCol + 2;
@@ -135,7 +127,7 @@ describe('col-resize', function () {
                 expect(grid.colModel.get(selected)).widthToBe(newWidth);
             });
 
-            it('should set the correct width if scrolled', function () {
+            it('should set the correct width if scrolled', function() {
                 var colScroll = 1;
                 grid.cellScrollModel.scrollTo(0, colScroll);
                 fireDrag(dragStart + 10);
@@ -144,7 +136,7 @@ describe('col-resize', function () {
                 expect(colObj).widthToBe(dragStart + 10);
             });
 
-            describe('should satisfy', function () {
+            describe('should satisfy', function() {
                 require('../decorators/decorator-test-body')(dragCtx);
             });
         });

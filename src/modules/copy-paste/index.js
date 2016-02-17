@@ -1,5 +1,6 @@
 var tsv = require('../tsv');
 var debounce = require('../debounce');
+var innerText = require('inner-text-shim');
 
 module.exports = function(_grid) {
     var grid = _grid;
@@ -43,16 +44,19 @@ module.exports = function(_grid) {
                 array: array
             };
         }, function(r, c, rowResult) {
-            var data = grid.dataModel.getCopyData(r, c);
+            var data = grid.dataModel.get(r, c, true);
 
             // intentional == checks null or undefined
             if (data == null) {
                 return gotNull = true; // this breaks the col loop
             }
             var td = document.createElement('td');
-            td.innerHTML = data || ' ';
+            if (data.value) {
+                td.setAttribute('grid-data', JSON.stringify(data.value));
+            }
+            td.innerHTML = data.formatted.replace(/\n/g, '<br>') || ' ';
             rowResult.row.appendChild(td);
-            rowResult.array.push(td.textContent);
+            rowResult.array.push(data.formatted);
         });
         if (!gotNull) {
             e.clipboardData.setData('text/plain', tsv.stringify(tsvData));
@@ -79,14 +83,29 @@ module.exports = function(_grid) {
 
         setTimeout(function() {
             var tempDiv = document.createElement('div');
+            if (pasteHtml.match(/<meta name=ProgId content=Excel.Sheet>/)) {
+                pasteHtml = pasteHtml.replace(/\n/g, '');
+            }
             tempDiv.innerHTML = pasteHtml;
-            if (tempDiv.querySelector('table')) {
+            var table = tempDiv.querySelector('table');
+            if (table) {
+                table.style.whiteSpace = 'pre';
                 pasteData = [];
                 [].forEach.call(tempDiv.querySelectorAll('tr'), function(tr) {
                     var row = [];
                     pasteData.push(row);
                     [].forEach.call(tr.querySelectorAll('td'), function(td) {
-                        row.push(td.innerHTML);
+                        var gridData = td.getAttribute('grid-data');
+                        if (gridData) {
+                            try {
+                                row.push(JSON.parse(gridData));
+                            } catch (error) {
+                                console.warn('somehow couldn\'t parse grid data');
+                            }
+                        } else {
+                            var text = innerText(td);
+                            row.push(text && text.trim());
+                        }
                     });
                 });
             }
@@ -106,7 +125,7 @@ module.exports = function(_grid) {
                         dataChanges.push({
                             row: r,
                             col: c,
-                            data: pasteValue && pasteValue.trim(),
+                            data: pasteValue,
                             paste: true
                         });
                     });
@@ -123,14 +142,14 @@ module.exports = function(_grid) {
                     }
                     row.forEach(function(pasteValue, c) {
                         var dataCol = c + left;
-                        //intention == to match null and undefined
+                        // intention == to match null and undefined
                         if (pasteValue == undefined || dataCol > grid.data.col.count() - 1) {
                             return;
                         }
                         dataChanges.push({
                             row: dataRow,
                             col: dataCol,
-                            data: pasteValue && pasteValue.trim(),
+                            data: pasteValue,
                             paste: true
                         });
                     });
@@ -142,8 +161,8 @@ module.exports = function(_grid) {
                     width: pasteData[0].length
                 };
 
-                grid.navigationModel.clearSelection()
-                grid.navigationModel.setSelection(newSelection)
+                grid.navigationModel.clearSelection();
+                grid.navigationModel.setSelection(newSelection);
             }
 
 

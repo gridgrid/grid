@@ -34,8 +34,7 @@ describe('copy-paste', function() {
                 };
             }
         });
-
-        this.tableString = '<table><tbody><tr><td>r1 c2</td><td>r1 c3</td></tr><tr><td>r2 c2</td><td>r2 c3</td></tr></tbody></table>';
+        this.tableString = '<table><tbody><tr><td grid-data="[1,2]">r1 c2</td><td grid-data="[1,3]">r1 c3</td></tr><tr><td grid-data="[2,2]">r2 c2</td><td grid-data="[2,3]">r2 c3</td></tr></tbody></table>';
     });
 
     function expectProperRanges(expectFn, async) {
@@ -83,7 +82,7 @@ describe('copy-paste', function() {
         });
     }
 
-    describe('copy', function() {
+    ('copy', function() {
         function fireCopy() {
             var e = {
                 type: 'copy'
@@ -97,9 +96,10 @@ describe('copy-paste', function() {
         }
 
         expectProperRanges(function expectCopyDataForRange(selectionRange) {
-            var spy = spyOn(this.grid.dataModel, 'getCopyData').and.callThrough();
+            var spy = spyOn(this.grid.dataModel, 'get').and.callThrough();
             fireCopy.call(this);
             expect(spy).toHaveBeenCalled();
+            expect(spy.calls.argsFor(0)[2]).toBe(true); //make sure it's called with the copy flag
             expect(spy).toHaveBeenCalledWithAllPointsInRange(selectionRange);
         });
 
@@ -114,6 +114,20 @@ describe('copy-paste', function() {
             var e = fireCopy.call(this);
             expect(e.clipboardData.setData).toHaveBeenCalledWith('text/plain', 'r1 c2\tr1 c3\nr2 c2\tr2 c3');
             expect(e.clipboardData.setData).toHaveBeenCalledWith('text/html', this.tableString);
+        });
+
+        it('should replace \n with <br> in copied html', function() {
+            this.grid.dataModel.set(1, 2, ['something\nwith lines', '2']);
+            var selectionRange = {
+                top: 1,
+                left: 2,
+                width: 2,
+                height: 2
+            };
+            this.grid.navigationModel.setSelection(selectionRange);
+            var e = fireCopy.call(this);
+            expect(e.clipboardData.setData).toHaveBeenCalledWith('text/plain', '"rsomething\nwith lines c2"\tr1 c3\nr2 c2\tr2 c3');
+            expect(e.clipboardData.setData).toHaveBeenCalledWith('text/html', '<table><tbody><tr><td grid-data="[&quot;something\\nwith lines&quot;,&quot;2&quot;]">rsomething<br>with lines c2</td><td grid-data="[1,3]">r1 c3</td></tr><tr><td grid-data="[2,2]">r2 c2</td><td grid-data="[2,3]">r2 c3</td></tr></tbody></table>');
         });
 
         it('should not paste if textarea isnt focused', function() {
@@ -215,9 +229,9 @@ describe('copy-paste', function() {
             return e;
         }
 
-        function expectPasteForRange(ranges, cb, mockGetData, expectedData) {
+        function expectPasteForRange(ranges, cb, mockGetData, expectedData, getDataOverride) {
             var spy = spyOn(this.grid.dataModel, 'set');
-            var e = firePaste.call(this, expectedData)
+            var e = firePaste.call(this, getDataOverride || expectedData)
             if (mockGetData) {
                 e.clipboardData.getData.and.returnValue();
             }
@@ -232,7 +246,7 @@ describe('copy-paste', function() {
                             expect(args).toContain({
                                 row: r,
                                 col: c,
-                                data: expectedData || 'r' + r + ' c' + c,
+                                data: util.isArray(expectedData) && expectedData[r - range.top][c - range.left] || expectedData || 'r' + r + ' c' + c,
                                 paste: true
                             });
                         }
@@ -263,8 +277,16 @@ describe('copy-paste', function() {
                 height: 2
             };
             this.grid.navigationModel.setSelection(selectionRange);
-            this.grid.textarea.innerHTML = this.tableString;
-            expectPasteForRange.call(this, selectionRange, cb, true);
+            expectPasteForRange.call(this, selectionRange, cb, true, [
+                [
+                    [1, 2],
+                    [1, 3]
+                ],
+                [
+                    [2, 2],
+                    [2, 3]
+                ]
+            ], this.tableString);
         });
 
         it('should paste an area smaller than the selection', function(cb) {

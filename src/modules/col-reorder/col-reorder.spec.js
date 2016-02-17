@@ -14,16 +14,6 @@ describe('col-reorder', function() {
         beforeEachFn.call(this);
     });
 
-    describe('should satisfy', function() {
-        var ctx = {};
-        beforeEach(function() {
-            ctx.headerDecorators = colReorder;
-        });
-
-        //covers the decorator interface
-        require('../header-decorators/test-body')(ctx);
-    });
-
     describe('decorator', function() {
         var ctx = {};
         var col = 1;

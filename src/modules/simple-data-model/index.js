@@ -12,7 +12,9 @@ module.exports = function(_grid) {
         if (!data[r]) {
             data[r] = [];
         }
-        data[r][c] = datum;
+        data[r][c] = {
+            value: datum
+        };
         dirtyClean.setDirty();
     };
 
@@ -22,14 +24,13 @@ module.exports = function(_grid) {
             var data = arguments[0];
             if (!util.isArray(data)) {
                 if (typeof datum === 'string') {
-                    datum = {
-                        value: datum.replace('[rR]', '').replace('[cC]', '').split(' ')
-                    };
+                    datum = datum.replace('[rR]', '').replace('[cC]', '').split(' ');
                 }
                 data = [{
                     row: r,
                     col: c,
                     data: datum
+
                 }];
             }
             data.forEach(function(change) {
