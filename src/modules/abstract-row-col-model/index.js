@@ -14,6 +14,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
     var dirtyClean = makeDirtyClean(grid);
     var builderDirtyClean = makeDirtyClean(grid);
     var selected = [];
+    var dragReadyClasses = [];
 
 
     function setDescriptorsDirty(eventOptional) {
@@ -210,6 +211,11 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
             }).map(function(idx) {
                 var descriptor = api[name](idx);
                 if (!descriptor.selected && descriptor.selectable !== false) {
+
+                    var dragReadyClass = grid.cellClasses.create(-1, idx, 'grid-col-drag-ready');
+                    grid.cellClasses.add(dragReadyClass);
+                    dragReadyClasses.push(dragReadyClass);
+
                     descriptor.selected = true;
                     selected.push(idx);
                     return idx;
@@ -239,6 +245,12 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
             });
             if (changes.length && !dontFire) {
                 fireSelectionChange();
+            }
+            if (changes.length && dragReadyClasses.length) {
+                dragReadyClasses.forEach(function(cssClass) {
+                    grid.cellClasses.remove(cssClass);
+                });
+                dragReadyClasses = [];
             }
         },
         toggleSelect: function(index) {
@@ -273,6 +285,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
             });
             var expanded = false;
             var expandedClass;
+
             Object.defineProperty(descriptor, 'expanded', {
                 get: function() {
                     return expanded;
