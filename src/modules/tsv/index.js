@@ -1,9 +1,9 @@
-module.exports.stringify = function (data) {
+module.exports.stringify = function(data) {
     var string = '';
-    data.forEach(function (row, r) {
-        row.forEach(function (value, c) {
+    data.forEach(function(row, r) {
+        row.forEach(function(value, c) {
             if (value.indexOf('\n') !== -1 || value.indexOf('\t') !== -1 || value.indexOf('"') !== -1) {
-                //replace " with "" to escape and wrap the whole value in quotes 
+                //replace " with "" to escape and wrap the whole value in quotes
                 value = '"' + value.replace(/"/g, '""') + '"';
             }
             string += value;
@@ -32,13 +32,13 @@ function DSVToArray(strData, strDelimiter) {
     var objPattern = new RegExp(
         (
             // Delimiters.
-        "(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
+            "(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
 
             // Quoted fields.
-        "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
+            "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
 
             // Standard fields.
-        "([^\"\\" + strDelimiter + "\\r\\n]+))"
+            "([^\"\\" + strDelimiter + "\\r\\n]+))"
         ),
         "gi"
     );
@@ -46,7 +46,9 @@ function DSVToArray(strData, strDelimiter) {
 
     // Create an array to hold our data. Give the array
     // a default empty first row.
-    var arrData = [[]];
+    var arrData = [
+        []
+    ];
 
     // Create an array to hold our individual pattern
     // matching groups.
@@ -103,10 +105,12 @@ function DSVToArray(strData, strDelimiter) {
     }
 
     // Return the parsed data.
-    return (arrData[0].length || !strData) && ( arrData ) || [[strData]];
+    return (arrData[0].length || !strData) && (arrData) || [
+        [strData]
+    ];
 }
 
 
-module.exports.parse = function (string) {
+module.exports.parse = function(string) {
     return DSVToArray(string, '\t');
 };

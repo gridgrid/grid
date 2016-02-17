@@ -1,28 +1,28 @@
-function testHeaderDecorators() {
-    describe('header-decorators', function (ctx) {
+function testHeaderDecorators(ctx) {
+    describe('header-decorators', function() {
         var tools = require('jasmine-tools-riq');
         require('../grid-spec-helper')();
         var grid;
-        beforeEach(function () {
+        beforeEach(function() {
             var self = this;
             grid = ctx && this.grid || this.buildSimpleGrid();
-            tools.lazyLoad(this, 'headerDecorators', function () {
+            tools.lazyLoad(this, 'headerDecorators', function() {
                 return ctx && ctx.headerDecorators || require('../header-decorators')(grid, self.headerDecoratorModel);
-            })
+            });
         });
 
-        describe('decorator', function () {
+        describe('decorator', function() {
             var ctx = {};
             var viewCol = 1;
-            beforeEach(function () {
+            beforeEach(function() {
                 ctx.decorator = this.headerDecorators._decorators[viewCol];
             });
 
-            describe('should satisfy', function () {
+            describe('should satisfy', function() {
                 require('../decorators/decorator-test-body')(ctx);
             });
 
-            it('should have the right range', function () {
+            it('should have the right range', function() {
                 expect(ctx.decorator).topToBe(0);
                 expect(ctx.decorator).heightToBe(1);
                 expect(ctx.decorator).widthToBe(1);
@@ -40,16 +40,19 @@ function testHeaderDecorators() {
             }
         }
 
-        it('should make viewport cols decorators', function () {
+        it('should make viewport cols decorators', function() {
             expectCorrectDecorators.call(this);
         });
 
-        it('should still have the right number of decorators after viewport changes', function () {
-            grid.viewPort.sizeToContainer({offsetWidth: 200, offsetHeight: 300});
+        it('should still have the right number of decorators after viewport changes', function() {
+            grid.viewPort.sizeToContainer({
+                offsetWidth: 200,
+                offsetHeight: 300
+            });
             expectCorrectDecorators.call(this);
         });
 
-        it('should call an optional annotate function', function () {
+        it('should call an optional annotate function', function() {
             var spy = jasmine.createSpy();
             this.headerDecorators.annotateDecorator = spy;
             grid.viewPort.cols = grid.viewPort.cols + 1;
@@ -57,7 +60,7 @@ function testHeaderDecorators() {
             expect(spy).toHaveBeenCalled();
         });
 
-        it('should call makeDecorator on the api so it can be overridden if need be', function () {
+        it('should call makeDecorator on the api so it can be overridden if need be', function() {
 
             var spy = spyOn(this.headerDecorators, 'makeDecorator').and.callThrough();
             grid.viewPort.cols = grid.viewPort.cols + 1;
@@ -66,9 +69,9 @@ function testHeaderDecorators() {
         });
 
 
-        it('should call an optional isNeeded', function () {
+        it('should call an optional isNeeded', function() {
             this.headerDecoratorModel = {};
-            this.headerDecoratorModel.isNeeded = function (c) {
+            this.headerDecoratorModel.isNeeded = function(c) {
                 if (c === 0) {
                     return false;
                 }

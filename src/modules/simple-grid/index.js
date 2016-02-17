@@ -51,13 +51,9 @@ module.exports = function(numRows, numCols, varyHeights, varyWidths, fixedRows, 
                         cols.push(col);
                     }
                     if (c < headerCols || r < headerRows) {
-                        grid.dataModel.setHeader(r, c, {
-                            value: [r, c]
-                        });
+                        grid.dataModel.setHeader(r, c, [r, c]);
                     } else {
-                        grid.dataModel.set(dataRow, dataCol, {
-                            value: [dataRow, dataCol]
-                        });
+                        grid.dataModel.set(dataRow, dataCol, [dataRow, dataCol]);
                     }
                 }
             }
