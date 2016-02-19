@@ -1,6 +1,6 @@
 {
   "name": "grid",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "A highly scalable grid component written in javscript",
   "main": "src/modules/grid-entry.js",
   "publishConfig": {
