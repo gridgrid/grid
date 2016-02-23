@@ -14,18 +14,18 @@ describe('angular-decorator', function() {
             var compileObj;
             var self = this;
             angular.module(moduleName).config(function($provide) {
-                $provide.decorator('$compile', function($delegate) {
-                    self.origCompile = $delegate;
-                    if (!compileObj) {
-                        compileObj = {
-                            $compile: $delegate
-                        };
-                        spyOn(compileObj, '$compile').and.callThrough();
-                    }
-                    return compileObj.$compile;
-                });
+                    $provide.decorator('$compile', function($delegate) {
+                        self.origCompile = $delegate;
+                        if (!compileObj) {
+                            compileObj = {
+                                $compile: $delegate
+                            };
+                            spyOn(compileObj, '$compile').and.callThrough();
+                        }
+                        return compileObj.$compile;
+                    });
 
-            })
+                })
                 .run(function($templateCache) {
                     $templateCache.put('foo.html', '<div></div>');
                 });
@@ -114,7 +114,6 @@ describe('angular-decorator', function() {
                 events: true,
                 template: '<foo></foo>'
             });
-            console.log(rendered);
             expect(rendered.style.pointerEvents).toEqual('all');
         });
     });

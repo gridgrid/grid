@@ -33,7 +33,7 @@ describe('simple-data-model', function() {
         dataModel.set([{
             row: 0,
             col: 0,
-            data: data
+            value: data
         }]);
         expect(dataModel.get(0, 0).formatted).toEqual('roW coL');
     });

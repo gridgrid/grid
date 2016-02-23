@@ -29,12 +29,12 @@ module.exports = function(_grid) {
                 data = [{
                     row: r,
                     col: c,
-                    data: datum
+                    value: datum
 
                 }];
             }
             data.forEach(function(change) {
-                internalSet(cellData, change.row, change.col, change.data);
+                internalSet(cellData, change.row, change.col, change.value);
             });
         },
         setHeader: function(r, c, datum) {
@@ -50,9 +50,6 @@ module.exports = function(_grid) {
             var dataRow = cellData[rowDescriptor.dataRow];
             var datum = dataRow && dataRow[grid.colModel.col(c).dataCol];
             var value = datum && datum.value;
-            if (value === undefined) {
-                console.log((value && 'r' + value[0] + ' c' + value[1]) || '');
-            }
             return {
                 value: value,
                 formatted: (value && (rowDescriptor.dataLayer ? ' s' + rowDescriptor.dataLayer + ' ' : '') + 'r' + value[0] + ' c' + value[1]) || ''
