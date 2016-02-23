@@ -246,7 +246,8 @@ describe('copy-paste', function() {
                             expect(args).toContain({
                                 row: r,
                                 col: c,
-                                data: util.isArray(expectedData) && expectedData[r - range.top][c - range.left] || expectedData || 'r' + r + ' c' + c,
+                                value: util.isArray(expectedData) && expectedData[r - range.top][c - range.left] || undefined,
+                                formatted: typeof expectedData === 'string' && expectedData || 'r' + r + ' c' + c,
                                 paste: true
                             });
                         }

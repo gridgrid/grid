@@ -178,11 +178,11 @@ describe('navigation-model', function() {
                 // non-contiguous data
                 // start at the center of the grid and seek; should stop at the edges of the data
                 var firstEmpty = getCoordFromCenter(rowOrCol, direction * 2);
-                firstEmpty.data = '';
+                firstEmpty.formatted = '';
                 var secondEmpty = getCoordFromCenter(rowOrCol, direction * 3);
-                secondEmpty.data = '';
+                secondEmpty.formatted = '';
                 var thirdEmpty = getCoordFromCenter(rowOrCol, direction * 5);
-                thirdEmpty.data = '';
+                thirdEmpty.formatted = '';
                 this.grid.dataModel.set([firstEmpty, secondEmpty, thirdEmpty]);
 
                 expect(model._navFrom(5, 5, forwardEvent)).toEqual(firstExpect);

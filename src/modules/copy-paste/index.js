@@ -68,6 +68,23 @@ module.exports = function(_grid) {
         }
     });
 
+    function makePasteDataChange(r, c, data) {
+        var value, formatted;
+        if (typeof data === 'string') {
+            formatted = data;
+        } else {
+            value = data.value;
+            formatted = data.formatted;
+        }
+        return {
+            row: r,
+            col: c,
+            value: value,
+            formatted: formatted,
+            paste: true
+        };
+    }
+
     grid.eventLoop.bind('paste', function(e) {
         if (!grid.focused) {
             return;
@@ -95,17 +112,18 @@ module.exports = function(_grid) {
                     var row = [];
                     pasteData.push(row);
                     [].forEach.call(tr.querySelectorAll('td'), function(td) {
+                        var dataResult = {};
                         var gridData = td.getAttribute('grid-data');
                         if (gridData) {
                             try {
-                                row.push(JSON.parse(gridData));
+                                dataResult.value = JSON.parse(gridData);
                             } catch (error) {
                                 console.warn('somehow couldn\'t parse grid data');
                             }
-                        } else {
-                            var text = innerText(td);
-                            row.push(text && text.trim());
                         }
+                        var text = innerText(td);
+                        dataResult.formatted = text && text.trim();
+                        row.push(dataResult);
                     });
                 });
             }
@@ -121,13 +139,7 @@ module.exports = function(_grid) {
                 ranges = ranges.concat(grid.navigationModel.otherSelections);
                 ranges.forEach(function(range) {
                     grid.data.iterate(range, function(r, c) {
-                        var pasteValue = singlePasteValue;
-                        dataChanges.push({
-                            row: r,
-                            col: c,
-                            data: pasteValue,
-                            paste: true
-                        });
+                        dataChanges.push(makePasteDataChange(r, c, singlePasteValue));
                     });
                 });
             } else {
@@ -146,12 +158,7 @@ module.exports = function(_grid) {
                         if (pasteValue == undefined || dataCol > grid.data.col.count() - 1) {
                             return;
                         }
-                        dataChanges.push({
-                            row: dataRow,
-                            col: dataCol,
-                            data: pasteValue,
-                            paste: true
-                        });
+                        dataChanges.push(makePasteDataChange(dataRow, dataCol, pasteValue));
                     });
                 });
                 var newSelection = {
