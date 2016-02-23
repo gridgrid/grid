@@ -5,25 +5,27 @@ var key = require('key');
 
 module.exports = function(_grid) {
     var grid = _grid;
-
     var api = {};
-    var headerDecorator = {};
     var wasSelectedAtMousedown = false;
 
-    grid.eventLoop.bind('grid-drag-start', headerDecorator._onDragStart);
-    grid.eventLoop.bind('mousedown', headerDecorator._onMousedown);
+    function isTargetingColHeader(e) {
+        return e && (e.row < 0 || e.col < 0);
+    }
 
-    headerDecorator._onMousedown = function(e) {
+    api._onMousedown = function(e) {
+        if (!isTargetingColHeader(e)) {
+            return;
+        }
+
         wasSelectedAtMousedown = grid.data.col.get(e.col).selected;
         if (wasSelectedAtMousedown && !ctrlOrCmd(e)) {
             grid.eventLoop.stopBubbling(e);
         }
-        wasSelectedAtMousedown = false
     }
 
-    headerDecorator._onDragStart = function(e) {
+    api._onDragStart = function(e) {
 
-        if (e.realCol < grid.colModel.numFixed() || !wasSelectedAtMousedown) {
+        if (!isTargetingColHeader(e) || e.realCol < grid.colModel.numFixed() || !wasSelectedAtMousedown) {
             return;
         }
 
@@ -37,7 +39,7 @@ module.exports = function(_grid) {
         // we want to be the only draggers
         grid.eventLoop.stopBubbling(e);
 
-        var startCol = headerDecorator.left;
+        var startCol = e.virtualCol;
 
         // create the target line
         api._targetCol = grid.decorators.create(0, undefined, Infinity, 1, 'cell', 'real');
@@ -52,7 +54,7 @@ module.exports = function(_grid) {
         api._dragRects = selected.map(function(dataCol) {
             var viewCol = grid.data.col.toView(dataCol);
             var dragRect = grid.decorators.create(0, undefined, Infinity, undefined, 'px', 'real');
-            dragRect.colOffset = e.gridX - api._decorators[viewCol].getDecoratorLeft();
+            dragRect.colOffset = e.gridX - grid.viewPort.getColLeft(viewCol);
             dragRect.postRender = function(div) {
                 div.setAttribute('class', 'grid-drag-rect');
             };
@@ -62,9 +64,9 @@ module.exports = function(_grid) {
 
         grid.decorators.add(api._dragRects);
 
-        headerDecorator._unbindKeyDown = grid.escapeStack && grid.escapeStack.addEscapeHandler(removeDecoratorsAndUnbind);
+        api._unbindKeyDown = grid.escapeStack && grid.escapeStack.addEscapeHandler(removeDecoratorsAndUnbind);
 
-        headerDecorator._unbindDrag = grid.eventLoop.bind('grid-drag', function(e) {
+        api._unbindDrag = grid.eventLoop.bind('grid-drag', function(e) {
             api._dragRects.forEach(function(dragRect) {
                 dragRect.left = util.clamp(e.gridX - dragRect.colOffset, grid.viewPort.getColLeft(grid.colModel.numFixed()), Infinity);
             });
@@ -75,11 +77,9 @@ module.exports = function(_grid) {
             } else {
                 elementClass(api._targetCol._renderedElem).remove('right');
             }
-
-
         });
 
-        headerDecorator._unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function() {
+        api._unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function() {
             var targetCol = api._targetCol.left;
 
             grid.colModel.move(selected.map(function(dataCol) {
@@ -92,12 +92,15 @@ module.exports = function(_grid) {
         function removeDecoratorsAndUnbind() {
             var removedDecs = api._dragRects.concat(api._targetCol);
             grid.decorators.remove(removedDecs);
-            headerDecorator._unbindDrag();
-            headerDecorator._unbindDragEnd();
-            headerDecorator._unbindKeyDown && headerDecorator._unbindKeyDown();
+            api._unbindDrag();
+            api._unbindDragEnd();
+            api._unbindKeyDown && api._unbindKeyDown();
             return true; // for the escape stack
         }
     };
+
+    grid.eventLoop.bind('grid-drag-start', api._onDragStart);
+    grid.eventLoop.bind('mousedown', api._onMousedown);
 
     return api;
 };

@@ -325,6 +325,16 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                 }
             });
 
+            var isBuiltActionable = true;
+            Object.defineProperty(descriptor, 'isBuiltActionable', {
+                get: function() {
+                    return isBuiltActionable;
+                },
+                set: function(boolean) {
+                    isBuiltActionable = boolean;
+                }
+            });
+
             addDirtyProps(descriptor, ['builder'], [builderDirtyClean]);
             descriptor.builder = builder;
 

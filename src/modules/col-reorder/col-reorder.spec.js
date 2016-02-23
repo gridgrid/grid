@@ -5,44 +5,28 @@ describe('col-reorder', function() {
 
     require('../grid-spec-helper')();
     var grid;
-    var colReorder;
     var beforeEachFn = function(fixedR, fixedC) {
-        grid = this.buildSimpleGrid(undefined, undefined, undefined, undefined, fixedR, fixedC);
-        colReorder = grid.colReorder;
+        grid = this.buildSimpleGrid(undefined, undefined, undefined, undefined, fixedR, fixedC, 1);
     };
+
     beforeEach(function() {
         beforeEachFn.call(this);
     });
 
     describe('decorator', function() {
-        var ctx = {};
         var col = 1;
-        beforeEach(function() {
-            ctx.decorator = colReorder._decorators[col];
-        });
-
-        it('should have a styleable class', function() {
-            expect(ctx.decorator.render()).toHaveClass('grid-col-reorder');
-        });
-
-        it('should bind a drag event on render', function() {
-            var spy = spyOn(grid.eventLoop, 'bind');
-            var dragElem = ctx.decorator.render();
-            expect(spy).toHaveBeenBoundWith('grid-drag-start', dragElem);
-        });
-
         var dragStart = 105;
 
         function startDrag() {
             var e = mockEvent('grid-drag-start', true);
             e.gridX = dragStart;
+            e.row = -1;
             var viewCol = grid.viewPort.getColByLeft(e.gridX);
             grid.cellMouseModel._annotateEventFromViewCoords(e, 0, viewCol);
             grid.colModel.select(e.col);
             var mousedown = grid.cellMouseModel._annotateEventFromViewCoords(mockEvent('mousedown'), 0, viewCol);
-            ctx.decorator._onMousedown(mousedown);
-            ctx.decorator._onDragStart(e);
-
+            grid.colReorder._onMousedown(mousedown);
+            grid.colReorder._onDragStart(e);
         }
 
         function fireDrag(x) {
@@ -57,23 +41,20 @@ describe('col-reorder', function() {
         describe('drag', function() {
             var dragCtx = {};
 
-
             beforeEach(function() {
                 grid.colModel.select(col);
                 grid.colModel.select(3);
                 startDrag();
-                dragCtx.decorator = colReorder._dragRects[0];
+                dragCtx.decorator = grid.colReorder._dragRects[0];
             });
-
 
             it('should add a decorator', function() {
                 expect(grid.decorators.getAlive()).toContain(dragCtx.decorator);
             });
 
             it('should add a decorator for each selected col', function() {
-
-                expect(grid.decorators.getAlive()).toContain(colReorder._dragRects[0]);
-                expect(grid.decorators.getAlive()).toContain(colReorder._dragRects[1]);
+                expect(grid.decorators.getAlive()).toContain(grid.colReorder._dragRects[0]);
+                expect(grid.decorators.getAlive()).toContain(grid.colReorder._dragRects[1]);
             });
 
             it('should be 1px wide and as tall as the view', function() {
@@ -90,19 +71,19 @@ describe('col-reorder', function() {
             it('should set width on drag start', function() {
                 grid.colModel.get(col).width = 10;
                 startDrag();
-                expect(colReorder._dragRects[0]).widthToBe(10);
+                expect(grid.colReorder._dragRects[0]).widthToBe(10);
             });
 
             it('should move the left on grid drag', function() {
                 fireDrag(dragStart + 5);
-                var colLeft = 0;
+                var colLeft = 100;
                 expect(dragCtx.decorator).leftToBe(colLeft + 5);
             });
 
             describe('target col', function() {
                 var targetCtx = {};
                 beforeEach(function() {
-                    targetCtx.decorator = colReorder._targetCol;
+                    targetCtx.decorator = grid.colReorder._targetCol;
                     targetCtx.decorator.render(); //mock the render so we don't have to wait for the entire view in test
                     fireDrag(205);
                 });
@@ -173,20 +154,19 @@ describe('col-reorder', function() {
         describe('fixed cols', function() {
             beforeEach(function() {
                 beforeEachFn.call(this, 1, 3);
-                ctx.decorator = colReorder._decorators[col];
             });
 
             it('should not drag fixed columns', function() {
                 startDrag();
-                expect(grid.decorators.getAlive()).not.toContain(ctx.decorator._dragRect);
+                expect(grid.decorators.getAlive()).not.toContain(grid.colReorder._dragRect);
             });
 
             it('should not allow me to drag into the fixed range', function() {
                 dragStart = 305;
                 startDrag();
                 fireDrag(105);
-                expect(colReorder._targetCol).leftToBe(3);
-                expect(colReorder._dragRects[0]).leftToBe(grid.viewPort.getColLeft(3));
+                expect(grid.colReorder._targetCol).leftToBe(3);
+                expect(grid.colReorder._dragRects[0]).leftToBe(grid.viewPort.getColLeft(3));
             });
         });
 

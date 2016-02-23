@@ -1,4 +1,4 @@
-module.exports = function (_grid, model) {
+module.exports = function(_grid, model) {
     var grid = _grid;
 
     var api = model || {};
@@ -7,8 +7,7 @@ module.exports = function (_grid, model) {
     function makeDecorator(col) {
         var decorator = grid.decorators.create(0, col, 1, 1, 'cell', 'real');
 
-
-        decorator.getDecoratorLeft = function () {
+        decorator.getDecoratorLeft = function() {
             var firstRect = decorator.boundingBox && decorator.boundingBox.getClientRects() && decorator.boundingBox.getClientRects()[0] || {};
             return grid.viewPort.toGridX(firstRect.left) || 0;
         };
@@ -16,7 +15,6 @@ module.exports = function (_grid, model) {
         if (api.annotateDecorator) {
             api.annotateDecorator(decorator);
         }
-
 
         return decorator;
     }
@@ -36,7 +34,7 @@ module.exports = function (_grid, model) {
         }
     }
 
-    grid.eventLoop.bind('grid-viewport-change', function () {
+    grid.eventLoop.bind('grid-viewport-change', function() {
         ensureDecoratorPerCol();
     });
     ensureDecoratorPerCol();

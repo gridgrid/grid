@@ -33,6 +33,5 @@ module.exports = {
             elem.style.right = r + 'px';
         }
         elem.style.position = 'absolute';
-
     }
 };

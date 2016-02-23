@@ -468,6 +468,31 @@ module.exports = function(_grid) {
 
     /* END CELL CLASSES LOGIC*/
 
+    viewLayer.eventIsOnCells = function(e) {
+        var target = e.target;
+
+        if (!target) {
+            return false;
+        }
+        if (target.classList && target.classList.contains('grid-cell') || target === grid.textarea) {
+            // on an actual grid-cell
+            return true;
+        }
+
+        var renderedColElement = builtCols && builtCols[e.realCol];
+        var renderedRowElement = builtRows && builtRows[e.realRow];
+
+        if (renderedColElement && !grid.view.col.get(e.realCol).isBuiltActionable) {
+            var elem = renderedColElement[e.realRow];
+            return isTargetInElem(target, elem);
+        } else if (renderedRowElement && !grid.view.row.get(e.realRow).isBuiltActionable) {
+            var elem = renderedRowElement[e.realCol];
+            return isTargetInElem(target, elem);
+        }
+
+        return false;
+    }
+
     viewLayer.setTextContent = function(elem, text) {
         if (elem.firstChild && elem.firstChild.nodeType === 3) {
             elem.firstChild.nodeValue = text;
@@ -497,6 +522,17 @@ module.exports = function(_grid) {
             var root = querySelectorAll[i];
             container.removeChild(root);
         }
+    }
+
+    function isTargetInElem(target, elem) {
+        var t = target;
+        while (t && t.classList && !t.classList.contains('grid-container')) {
+            if (t === elem) {
+                return true;
+            }
+            t = t.parentElement;
+        }
+        return false;
     }
 
     grid.eventLoop.bind('grid-destroy', function() {
