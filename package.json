@@ -1,83 +1,83 @@
 {
-  "name": "grid",
-  "version": "1.7.0",
-  "description": "A highly scalable grid component written in javscript",
-  "main": "src/modules/grid-entry.js",
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
-  },
-  "engines": {
-    "node": ">=0.10.0"
-  },
-  "iqproj": {
-    "app": true
-  },
-  "scripts": {
-    "test": "bin/iqb karma",
-    "start": "bin/iqb start",
-    "preversion": "bin/iqb karma"
-  },
-  "dependencies": {
-    "angular": "~1.4.7",
-    "angular-mocks": "~1.4.7",
-    "angular-route": "~1.4.7",
-    "capitalize": "^0.5.0",
-    "element-class": "^0.1.1",
-    "inner-text-shim": "~1.0.1",
-    "key": "^0.1.11"
-  },
-  "devDependencies": {
-    "aliasify": "^1.5.0",
-    "browserify": "~12.0.1",
-    "browserify-istanbul": "~0.2.1",
-    "chokidar-cli": "~1.1.1",
-    "connect-livereload": "~0.5.3",
-    "exorcist": "~0.4.0",
-    "express": "~4.13.3",
-    "jasmine": "~2.3.2",
-    "jasmine-tools-riq": "~0.1.0",
-    "jquery": "^2.1.0",
-    "karma": "~0.13.14",
-    "karma-browserify": "~4.4.0",
-    "karma-chrome-launcher": "~0.2.1",
-    "karma-jasmine": "~0.3.6",
-    "karma-jasmine-jquery": "~0.1.1",
-    "karma-phantomjs-launcher": "~0.2.1",
-    "node-sass": "~3.4.1",
-    "phantomjs": "~1.9.18",
-    "polyfill-function-prototype-bind": "0.0.1",
-    "tiny-lr": "~0.2.1",
-    "watchify": "~3.6.0",
-    "yargs": "^1.2.2"
-  },
-  "peerDependencies": {
-    "aliasify": "^1.5.0"
-  },
-  "browserify": {
-    "transform": [
-      "aliasify"
-    ]
-  },
-  "aliasify": {
-    "aliases": {
-      "@grid": "./src/modules"
-    }
-  },
-  "browserify-shim": {},
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/relateiq/grid.git"
-  },
-  "keywords": [
-    "grid",
-    "spreadsheet",
-    "virtual",
-    "scroll"
-  ],
-  "author": "Sterling Camden",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/relateiq/grid/issues"
-  },
-  "homepage": "https://github.com/relateiq/grid"
+    "name": "grid",
+    "version": "1.7.0",
+    "description": "A highly scalable grid component written in javscript",
+    "main": "src/modules/grid-entry.js",
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/"
+    },
+    "engines": {
+        "node": ">=0.10.0"
+    },
+    "iqproj": {
+        "app": true
+    },
+    "scripts": {
+        "test": "bin/iqb test",
+        "start": "bin/iqb start",
+        "preversion": "bin/iqb test"
+    },
+    "dependencies": {
+        "angular": "~1.4.7",
+        "angular-mocks": "~1.4.7",
+        "angular-route": "~1.4.7",
+        "capitalize": "^0.5.0",
+        "element-class": "^0.1.1",
+        "inner-text-shim": "~1.0.1",
+        "key": "^0.1.11"
+    },
+    "devDependencies": {
+        "aliasify": "^1.5.0",
+        "browserify": "~12.0.1",
+        "browserify-istanbul": "~0.2.1",
+        "chokidar-cli": "~1.1.1",
+        "connect-livereload": "~0.5.3",
+        "exorcist": "~0.4.0",
+        "express": "~4.13.3",
+        "jasmine": "~2.3.2",
+        "jasmine-tools-riq": "~0.1.0",
+        "jquery": "^2.1.0",
+        "karma": "~0.13.14",
+        "karma-browserify": "~4.4.0",
+        "karma-chrome-launcher": "~0.2.1",
+        "karma-jasmine": "~0.3.6",
+        "karma-jasmine-jquery": "~0.1.1",
+        "karma-phantomjs-launcher": "~0.2.1",
+        "node-sass": "~3.4.1",
+        "phantomjs": "~1.9.18",
+        "polyfill-function-prototype-bind": "0.0.1",
+        "tiny-lr": "~0.2.1",
+        "watchify": "~3.6.0",
+        "yargs": "^1.2.2"
+    },
+    "peerDependencies": {
+        "aliasify": "^1.5.0"
+    },
+    "browserify": {
+        "transform": [
+            "aliasify"
+        ]
+    },
+    "aliasify": {
+        "aliases": {
+            "@grid": "./src/modules"
+        }
+    },
+    "browserify-shim": {},
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/relateiq/grid.git"
+    },
+    "keywords": [
+        "grid",
+        "spreadsheet",
+        "virtual",
+        "scroll"
+    ],
+    "author": "Sterling Camden",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/relateiq/grid/issues"
+    },
+    "homepage": "https://github.com/relateiq/grid"
 }
