@@ -82,7 +82,7 @@ START_TIME=$(node -e "console.log(+new Date())")
 set -e
 case $command in
     # npm lifecycle commands
-    "test")
+    "test"|"karma")
         if [ "$FEAT_APP" = "true" ]; then
             $KARMA_CMD start --single-run --no-auto-watch karma.conf.js 
         else
