@@ -74,6 +74,7 @@ angular.module('gridApp', [])
                 grid.colModel.get(2).builder = builder;
 
                 var headerRow = grid.rowModel.get(0);
+                headerRow.isBuiltActionable = false;
                 headerRow.builder = grid.rowModel.createBuilder(function() {
                     return $compile('<div><div>{{line1}}</div><div style="color:hotpink;">{{line2}}</div></div>')($scope.$new())[0];
                 }, function(elem, ctx) {

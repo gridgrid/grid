@@ -15,7 +15,6 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
     var builderDirtyClean = makeDirtyClean(grid);
     var selected = [];
 
-
     function setDescriptorsDirty(eventOptional) {
         var event = eventOptional || {};
         event.type = 'grid-' + name + '-change';
@@ -48,6 +47,25 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
         if (change) {
             fireSelectionChange();
         }
+    }
+
+    function addDragReadyClass(descriptor, index) {
+        if (!descriptor || !(index >= 0)) {
+            return;
+        }
+        var top = name === 'row' ? index : -1;
+        var left = name === 'row' ? -1 : index;
+        var dragReadyClass = grid.cellClasses.create(top, left, 'grid-col-drag-ready');
+        grid.cellClasses.add(dragReadyClass);
+        descriptor.dragReadyClass = dragReadyClass;
+    }
+
+    function removeDragReadyClass(descriptor) {
+        if (!descriptor || !descriptor.dragReadyClass) {
+            return;
+        }
+        grid.cellClasses.remove(descriptor.dragReadyClass);
+        descriptor.dragReadyClass = undefined;
     }
 
     var api = {
@@ -210,6 +228,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
             }).map(function(idx) {
                 var descriptor = api[name](idx);
                 if (!descriptor.selected && descriptor.selectable !== false) {
+                    addDragReadyClass(descriptor, idx);
                     descriptor.selected = true;
                     selected.push(idx);
                     return idx;
@@ -231,6 +250,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                 return hasDescriptor;
             }).map(function(idx) {
                 var descriptor = api[name](idx);
+                removeDragReadyClass(descriptor);
                 if (descriptor.selected) {
                     descriptor.selected = false;
                     selected.splice(selected.indexOf(idx), 1);
@@ -273,6 +293,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
             });
             var expanded = false;
             var expandedClass;
+
             Object.defineProperty(descriptor, 'expanded', {
                 get: function() {
                     return expanded;
@@ -311,6 +332,8 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                     }
                 }
             });
+
+            descriptor.isBuiltActionable = true;
 
             addDirtyProps(descriptor, ['builder'], [builderDirtyClean]);
             descriptor.builder = builder;

@@ -79,5 +79,6 @@
   "bugs": {
     "url": "https://github.com/relateiq/grid/issues"
   },
-  "homepage": "https://github.com/relateiq/grid"
+  "homepage": "https://github.com/relateiq/grid",
+  "browserify-shim": {}
 }
