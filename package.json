@@ -1,6 +1,6 @@
 {
   "name": "grid",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "A highly scalable grid component written in javscript",
   "main": "src/modules/grid-entry.js",
   "publishConfig": {
@@ -79,6 +79,5 @@
   "bugs": {
     "url": "https://github.com/relateiq/grid/issues"
   },
-  "homepage": "https://github.com/relateiq/grid",
-  "browserify-shim": {}
+  "homepage": "https://github.com/relateiq/grid"
 }
