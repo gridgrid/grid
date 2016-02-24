@@ -211,8 +211,9 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
             }).map(function(idx) {
                 var descriptor = api[name](idx);
                 if (!descriptor.selected && descriptor.selectable !== false) {
-
-                    var dragReadyClass = grid.cellClasses.create(-1, idx, 'grid-col-drag-ready');
+                    var top = name === 'row' ? idx : -1;
+                    var left = name === 'row' ? -1 : idx;
+                    var dragReadyClass = grid.cellClasses.create(top, left, 'grid-col-drag-ready');
                     grid.cellClasses.add(dragReadyClass);
                     dragReadyClasses.push(dragReadyClass);
 

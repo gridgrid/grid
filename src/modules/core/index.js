@@ -30,12 +30,12 @@ module.exports = function(opts) {
     grid.viewLayer = require('../view-layer')(grid);
 
     // things with logic that also register decorators (slightly less core than the other models)
-    grid.navigationModel = require('../navigation-model')(grid);
-    grid.pixelScrollModel = require('../pixel-scroll-model')(grid);
-    grid.colResize = require('../col-resize')(grid);
     if (!(opts && opts.col && opts.col.disableReorder)) {
         grid.colReorder = require('../col-reorder')(grid);
     }
+    grid.navigationModel = require('../navigation-model')(grid);
+    grid.pixelScrollModel = require('../pixel-scroll-model')(grid);
+    grid.colResize = require('../col-resize')(grid);
     grid.showHiddenCols = require('../show-hidden-cols')(grid);
     grid.copyPaste = require('../copy-paste')(grid);
 

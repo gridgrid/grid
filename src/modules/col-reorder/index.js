@@ -6,7 +6,7 @@ var key = require('key');
 module.exports = function(_grid) {
     var grid = _grid;
     var api = {};
-    var wasSelectedAtMousedown = false;
+    var wasSelectedAtMousedown
 
     function isTargetingColHeader(e) {
         return e && (e.row < 0 || e.col < 0);
@@ -17,7 +17,7 @@ module.exports = function(_grid) {
             return;
         }
 
-        wasSelectedAtMousedown = grid.data.col.get(e.col).selected;
+        wasSelectedAtMousedown = !!grid.data.col.get(e.col).selected;
         if (wasSelectedAtMousedown && !ctrlOrCmd(e)) {
             grid.eventLoop.stopBubbling(e);
         }
@@ -100,7 +100,11 @@ module.exports = function(_grid) {
     };
 
     grid.eventLoop.bind('grid-drag-start', api._onDragStart);
-    grid.eventLoop.bind('mousedown', api._onMousedown);
+    grid.eventLoop.addInterceptor(function(e) {
+        if (e.type === 'mousedown') {
+            api._onMousedown(e);
+        }
+    });
 
     return api;
 };

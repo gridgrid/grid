@@ -1,47 +1,47 @@
 {
-    "frameworks": [
-        "browserify",
-        "jasmine"
-    ],
-    "basePath": "",
-    "files": [
-        "node_modules/polyfill-function-prototype-bind/bind.js",
-        "node_modules/angular/angular.js",
-        "node_modules/angular-mocks/angular-mocks.js",
-        "src/modules/grid-spec-helper/matchers.js",
-        "src/**/*.spec.js"
-    ],
-    "browserify": {
-        "debug": true
-    },
-    "preprocessors": {
-        "src/**/*.spec.js": "browserify",
-        "src/modules/grid-spec-helper/matchers.js": "browserify"
-    },
-    "autoWatch": true,
-    "reporters": [
-        "progress",
-        "coverage"
-    ],
-    "browsers": ["Chrome"],
-    "customLaunchers": {
-        "PhantomJS_custom": {
-            "base": "PhantomJS",
-            "options": {
-                "viewportSize": {
-                    "width": 400,
-                    "height": 500
-                }
-            }
-        }
-    },
-    "junitReporter": {
-        "outputFile": "test_out/unit.xml",
-        "suite": "unit"
-    },
-    "notifyReporter": {
-        "reportSuccess": false
-    },
-    "browserNoActivityTimeout": 3000000,
-    "reportSlowerThan": 250
+  "frameworks": [
+    "browserify",
+    "jasmine"
+  ],
+  "basePath": "",
+  "files": [
+    "node_modules/polyfill-function-prototype-bind/bind.js",
+    "node_modules/angular/angular.js",
+    "node_modules/angular-mocks/angular-mocks.js",
+    "src/modules/grid-spec-helper/matchers.js",
+    "src/**/*.spec.js"
+  ],
+  "browserify": {
+    "debug": true
+  },
+  "preprocessors": {
+    "src/**/*.spec.js": "browserify",
+    "src/modules/grid-spec-helper/matchers.js": "browserify"
+  },
+  "autoWatch": true,
+  "reporters": [
+    "progress",
+    "coverage"
+  ],
+  "browsers": ["PhantomJS_custom"],
+  "customLaunchers": {
+      "PhantomJS_custom": {
+          "base": "PhantomJS",
+          "options": {
+              "viewportSize": {
+                  "width": 400,
+                  "height": 500
+              }
+          }
+      }
+  },
+  "junitReporter": {
+    "outputFile": "test_out/unit.xml",
+    "suite": "unit"
+  },
+  "notifyReporter": {
+    "reportSuccess": false
+  },
+  "browserNoActivityTimeout": 3000000,
+  "reportSlowerThan": 250
 }

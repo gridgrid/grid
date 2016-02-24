@@ -437,16 +437,21 @@ describe('navigation-model', function() {
             expect(grid.rowModel.getSelected()).toEqual([2, 3, 4]);
         });
 
-        it('should set a cell class for a selected row', function(cb) {
+        it('should set a cell classes for a selected row', function(cb) {
             var spy = spyOn(grid.cellClasses, 'add');
             grid.rowModel.select(0);
             setTimeout(function() {
                 expect(spy).toHaveBeenCalled();
-                var cellClass = spy.calls.argsFor(0)[0];
-                expect(cellClass).unitsToBe('cell');
-                expect(cellClass).spaceToBe('virtual');
-                expect(cellClass).rangeToBe(1, 0, 1, 1);
-                expect(cellClass).classToBe('selected');
+                var cellClass1 = spy.calls.argsFor(0)[0];
+                var cellClass2 = spy.calls.argsFor(1)[0];
+                expect(cellClass1).unitsToBe('cell');
+                expect(cellClass2).unitsToBe('cell');
+                expect(cellClass1).spaceToBe('data');
+                expect(cellClass2).spaceToBe('virtual');
+                expect(cellClass1).rangeToBe(0, -1, 1, 1);
+                expect(cellClass2).rangeToBe(1, 0, 1, 1);
+                expect(cellClass1).classToBe('grid-col-drag-ready');
+                expect(cellClass2).classToBe('selected');
                 cb();
             }, 2);
 
@@ -457,7 +462,7 @@ describe('navigation-model', function() {
             var spy = spyOn(grid.cellClasses, 'add');
             grid.rowModel.select(1);
             setTimeout(function() {
-                expect(spy.calls.count()).toBe(2);
+                expect(spy.calls.count()).toBe(3);
                 expect(model._rowSelectionClasses.length).toBe(2);
                 cb();
             }, 2);
@@ -468,11 +473,16 @@ describe('navigation-model', function() {
             grid.colModel.select(0);
             setTimeout(function() {
                 expect(spy).toHaveBeenCalled();
-                var decorator = spy.calls.argsFor(0)[0];
-                expect(decorator).unitsToBe('cell');
-                expect(decorator).spaceToBe('virtual');
-                expect(decorator).rangeToBe(0, 1, 1, 1);
-                expect(decorator).classToBe('selected');
+                var cellClass1 = spy.calls.argsFor(0)[0];
+                var cellClass2 = spy.calls.argsFor(1)[0];
+                expect(cellClass1).unitsToBe('cell');
+                expect(cellClass2).unitsToBe('cell');
+                expect(cellClass1).spaceToBe('data');
+                expect(cellClass2).spaceToBe('virtual');
+                expect(cellClass1).rangeToBe(-1, 0, 1, 1);
+                expect(cellClass2).rangeToBe(0, 1, 1, 1);
+                expect(cellClass1).classToBe('grid-col-drag-ready');
+                expect(cellClass2).classToBe('selected');
                 cb();
             }, 2);
 
@@ -483,7 +493,7 @@ describe('navigation-model', function() {
             var spy = spyOn(grid.cellClasses, 'add');
             grid.colModel.select(1);
             setTimeout(function() {
-                expect(spy.calls.count()).toBe(2);
+                expect(spy.calls.count()).toBe(3);
                 expect(model._colSelectionClasses.length).toBe(2);
                 cb();
             }, 2);
