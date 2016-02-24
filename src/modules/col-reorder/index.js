@@ -9,7 +9,7 @@ module.exports = function(_grid) {
     var wasSelectedAtMousedown
 
     function isTargetingColHeader(e) {
-        return e && (e.row < 0 || e.col < 0);
+        return e && e.row < 0;
     }
 
     api._onMousedown = function(e) {
