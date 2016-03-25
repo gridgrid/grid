@@ -101,7 +101,7 @@ module.exports = function(_grid) {
         setTimeout(function() {
             var tempDiv = document.createElement('div');
             if (pasteHtml.match(/<meta name=ProgId content=Excel.Sheet>/)) {
-                pasteHtml = pasteHtml.replace(/[\n\r]/g, '');
+                pasteHtml = pasteHtml.replace(/[\n\r]+  /g, ' ').replace(/[\n\r]+/g, '');
             }
             tempDiv.innerHTML = pasteHtml;
             var table = tempDiv.querySelector('table');
