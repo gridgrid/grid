@@ -21,6 +21,7 @@ module.exports = function(opts) {
     grid.virtualPixelCellModel = require('../virtual-pixel-cell-model')(grid);
     grid.cellScrollModel = require('../cell-scroll-model')(grid);
     grid.cellMouseModel = require('../cell-mouse-model')(grid);
+    grid.cellKeyboardModel = require('../cell-keyboard-model')(grid);
 
     grid.viewPort = require('../view-port')(grid);
 
@@ -32,6 +33,9 @@ module.exports = function(opts) {
     // things with logic that also register decorators (slightly less core than the other models)
     if (!(opts && opts.col && opts.col.disableReorder)) {
         grid.colReorder = require('../col-reorder')(grid);
+    }
+    if (opts && opts.allowEdit) {
+        grid.editModel = require('../edit-model')(grid);
     }
     grid.navigationModel = require('../navigation-model')(grid);
     grid.pixelScrollModel = require('../pixel-scroll-model')(grid);

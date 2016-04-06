@@ -16,7 +16,9 @@ angular.module('gridApp', [])
                 var numRows = 1000;
                 var numCols = 100;
 
-                var grid = makeSimpleGrid(numRows, numCols, [30], [40, 100, 400, 90], 1, 3, undefined, 1, 1);
+                var grid = makeSimpleGrid(numRows, numCols, [30], [40, 100, 400, 90], 1, 3, undefined, 1, 1, {
+                    allowEdit: true
+                });
                 grid.colModel.get(0).width = 60;
                 grid.colModel.get(2).width = 40;
                 grid.build(elem);

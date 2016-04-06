@@ -2,38 +2,13 @@ var mockEvent = require('../custom-event');
 var key = require('key');
 var util = require('../util');
 
-describe('copy-paste', function() {
+fdescribe('copy-paste', function() {
 
     require('../grid-spec-helper')();
     beforeEach(function() {
         this.buildSimpleGrid();
         this.viewBuild(); //to get the textarea
         this.grid.textarea.focus();
-        jasmine.addMatchers({
-            toHaveBeenCalledWithAllPointsInRange: function() {
-                return {
-                    compare: function(spy, range) {
-                        var allArgs = spy.calls.allArgs();
-                        var fails = [];
-                        for (var r = range.top; r < range.top + range.height; r++) {
-                            for (var c = range.left; c < range.left + range.width; c++) {
-                                var hadArgs = allArgs.some(function(args) {
-                                    return args[0] === r && args[1] === c;
-                                });
-                                if (!hadArgs) {
-                                    fails.push(r + ',' + c);
-                                }
-                            }
-                        }
-                        var pass = !fails.length;
-                        return {
-                            pass: pass,
-                            message: 'Expected ' + spy.and.identity() + (!pass ? '' : ' not') + ' to have been called with all points in range ' + JSON.stringify(range) + ' but ' + JSON.stringify(fails) + ' were missing'
-                        };
-                    }
-                };
-            }
-        });
         this.tableString = '<table><tbody><tr><td grid-data="[1,2]">r1 c2</td><td grid-data="[1,3]">r1 c3</td></tr><tr><td grid-data="[2,2]">r2 c2</td><td grid-data="[2,3]">r2 c3</td></tr></tbody></table>';
     });
 
