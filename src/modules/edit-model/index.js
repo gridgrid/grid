@@ -11,9 +11,7 @@ module.exports = function(grid) {
         element.style.zIndex = 1;
         element.style.position = 'relative';
         grid.eventLoop.bindOnce('grid-draw', function() {
-            if (editModel._defaultDecorator.isTyping) {
-                element.value = grid.textarea.value;
-            }
+            element.value = editModel._defaultDecorator.startingText();
             element.focus();
         });
         return element;
@@ -158,7 +156,9 @@ module.exports = function(grid) {
         }
         editModel.currentEditor = editor;
         if (editor.decorator) {
-            editor.decorator.isTyping = !!isTyping;
+            editor.decorator.startingText = function() {
+                return isTyping ? grid.textarea.value : '';
+            };
             editor.decorator.top = r;
             editor.decorator.left = c;
             grid.decorators.add(editor.decorator);

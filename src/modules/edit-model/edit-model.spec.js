@@ -265,16 +265,13 @@ fdescribe('edit-model', function() {
                 expect(elem.tagName).toEqual('TEXTAREA');
             });
 
-            it('should render with textarea value if from typing', function() {
-                this.grid.editModel._defaultDecorator.isTyping = true;
-                var value = 'blahhhh';
-                this.grid.textarea = {
-                    value: value
-                };
+            it('should render with startingText', function() {
+                this.grid.editModel.editCell(1, 1, true);
                 var elem = this.grid.editModel._defaultDecorator.render();
                 expect(elem.tagName).toEqual('TEXTAREA');
+                spyOn(this.grid.editModel._defaultDecorator, 'startingText').and.returnValue('mike');
                 this.grid.eventLoop.fire('grid-draw');
-                expect(elem.value).toEqual(value);
+                expect(elem.value).toEqual('mike');
             });
         });
 
@@ -291,9 +288,23 @@ fdescribe('edit-model', function() {
                 expect(this.grid.editModel.currentEditor.decorator.space).toBe('data');
             });
 
-            it('flag the decorator as isTyping if it is', function() {
+            it('should have a starting text function that returns text on typing', function() {
                 this.grid.editModel.editCell(1, 1, true);
-                expect(this.grid.editModel.currentEditor.decorator.isTyping).toBe(true);
+                var value = 'blahhhh';
+                this.grid.textarea = {
+                    value: value
+                };
+                expect(this.grid.editModel.currentEditor.decorator.startingText()).toBe(value);
+            });
+
+
+            it('should have a starting text function that returns empty for not typing', function() {
+                this.grid.editModel.editCell(1, 1, false);
+                var value = 'blahhhh';
+                this.grid.textarea = {
+                    value: value
+                };
+                expect(this.grid.editModel.currentEditor.decorator.startingText()).toBe('');
             });
         });
     });
