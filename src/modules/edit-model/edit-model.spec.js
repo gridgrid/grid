@@ -264,6 +264,18 @@ fdescribe('edit-model', function() {
                 var elem = this.grid.editModel._defaultDecorator.render();
                 expect(elem.tagName).toEqual('TEXTAREA');
             });
+
+            it('should render with textarea value if from typing', function() {
+                this.grid.editModel._defaultDecorator.isTyping = true;
+                var value = 'blahhhh';
+                this.grid.textarea = {
+                    value: value
+                };
+                var elem = this.grid.editModel._defaultDecorator.render();
+                expect(elem.tagName).toEqual('TEXTAREA');
+                this.grid.eventLoop.fire('grid-draw');
+                expect(elem.value).toEqual(value);
+            });
         });
 
         describe('decorator', function() {
@@ -277,6 +289,11 @@ fdescribe('edit-model', function() {
                 expect(this.grid.editModel.currentEditor.decorator).rangeToBe(1, 1, 1, 1);
                 expect(this.grid.editModel.currentEditor.decorator.units).toBe('cell');
                 expect(this.grid.editModel.currentEditor.decorator.space).toBe('data');
+            });
+
+            it('flag the decorator as isTyping if it is', function() {
+                this.grid.editModel.editCell(1, 1, true);
+                expect(this.grid.editModel.currentEditor.decorator.isTyping).toBe(true);
             });
         });
     });

@@ -11,6 +11,9 @@ module.exports = function(grid) {
         element.style.zIndex = 1;
         element.style.position = 'relative';
         grid.eventLoop.bindOnce('grid-draw', function() {
+            if (editModel._defaultDecorator.isTyping) {
+                element.value = grid.textarea.value;
+            }
             element.focus();
         });
         return element;
@@ -114,7 +117,7 @@ module.exports = function(grid) {
                     break;
                 case 'keypress':
                     if (optsHasTrigger(opts, 'typing') && e.which >= 32 && e.which <= 122) {
-                        editModel.editCell(row, col);
+                        editModel.editCell(row, col, true);
                     }
                     break;
             }
@@ -138,7 +141,7 @@ module.exports = function(grid) {
         grid.dataModel.set(dataChanges);
     };
 
-    editModel.editCell = function(r, c) {
+    editModel.editCell = function(r, c, isTyping) {
         var opts = getOptsForCol(c);
         if (!opts) {
             return;
@@ -155,6 +158,7 @@ module.exports = function(grid) {
         }
         editModel.currentEditor = editor;
         if (editor.decorator) {
+            editor.decorator.isTyping = !!isTyping;
             editor.decorator.top = r;
             editor.decorator.left = c;
             grid.decorators.add(editor.decorator);
