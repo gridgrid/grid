@@ -86,9 +86,9 @@ describe('col-resize', function() {
                 expect(dragCtx.decorator).leftToBe(gridX);
             });
 
-            it('should min out at decorator left + 10', function(done) {
+            it('should min out at decorator left + 22', function(done) {
                 $(this.container).css({
-                    'margin-left': '10px'
+                    'margin-left': '22px'
                 });
                 this.viewBuild();
                 this.onDraw(function() {
@@ -98,7 +98,7 @@ describe('col-resize', function() {
                     drag.gridX = gridX;
                     grid.eventLoop.fire(drag);
                     expect(dragCtx.decorator)
-                        .leftToBe(decoratorLeft + 10);
+                        .leftToBe(decoratorLeft + 22);
                     done();
                 });
 

@@ -27,7 +27,7 @@ module.exports = function(_grid) {
             grid.decorators.add(headerDecorator._dragLine);
 
             headerDecorator._unbindDrag = grid.eventLoop.bind('grid-drag', function(e) {
-                var minX = headerDecorator.getDecoratorLeft() + 10;
+                var minX = headerDecorator.getDecoratorLeft() + 22;
                 headerDecorator._dragLine.left = Math.max(e.gridX, minX);
             });
 
