@@ -144,6 +144,9 @@ module.exports = function(grid) {
         if (!opts) {
             return;
         }
+        if ((r < 0 || c < 0) && !opts.headers) {
+            return;
+        }
         editModel.editing = true;
         var editor = opts.getEditor();
         if (editor.decorator === undefined) {

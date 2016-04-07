@@ -259,6 +259,26 @@ fdescribe('edit-model', function() {
             });
         });
 
+        describe('on headers', function() {
+            it('should trigger if headers : true', function() {
+                var col = this.grid.data.col.get(0);
+                col.editOptions = {
+                    headers: true
+                };
+                this.grid.editModel.editCell(-1, 0);
+                expect(this.grid.editModel.editing).toBe(true);
+            });
+
+            it('should not trigger if headers : false', function() {
+                var col = this.grid.data.col.get(0);
+                col.editOptions = {
+                    headers: false
+                };
+                this.grid.editModel.editCell(-1, 0);
+                expect(this.grid.editModel.editing).toBe(false);
+            });
+        });
+
         describe('default decorator', function() {
             it('should render to a text area', function() {
                 var elem = this.grid.editModel._defaultDecorator.render();
