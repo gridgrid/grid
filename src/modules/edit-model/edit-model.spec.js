@@ -205,7 +205,79 @@ fdescribe('edit-model', function() {
         });
     });
 
-    describe('edit decorator', function() {
+    describe('edit cell', function() {
+        describe('default setup', function() {
+            function makeOptsForEditor(editor) {
+                return {
+                    getEditor: function() {
+                        return editor;
+                    }
+                }
+            }
 
+            afterEach(function() {
+                var col = this.grid.data.col.get(1);
+                col.editOptions = this.opts;
+                this.grid.editModel.editCell(1, 1);
+                expect(this.grid.editModel.currentEditor).toBeDefined();
+                expect(this.grid.editModel.currentEditor.decorator).toEqual(this.decorator);
+                if (this.saveDefined) {
+                    expect(this.grid.editModel.currentEditor.save).toBeDefined();
+                }
+            });
+            it('should be populated on editor if undefined', function() {
+                this.opts = makeOptsForEditor({});
+                this.decorator = this.grid.editModel._defaultDecorator;
+            });
+
+            it('should populate a save promise if decorator is undefined and save is undefined', function() {
+                this.opts = makeOptsForEditor({});
+                this.decorator = this.grid.editModel._defaultDecorator;
+                this.saveDefined = true;
+            });
+
+            it('should not populate a save promise if decorator is undefined and save is defined', function() {
+                this.opts = makeOptsForEditor({
+                    save: new Promise(require('../no-op'), require('../no-op'))
+                });
+                this.decorator = this.grid.editModel._defaultDecorator;
+            });
+
+            it('should not be populated on editor if false', function() {
+                this.opts = makeOptsForEditor({
+                    decorator: false
+                });
+                this.decorator = false;
+            });
+
+            it('should not be populated on editor if decorator is defined', function() {
+                var decorator = {};
+                this.opts = makeOptsForEditor({
+                    decorator: decorator // yes yes this is not really a decorator
+                });
+                this.decorator = decorator;
+            });
+        });
+
+        describe('default decorator', function() {
+            it('should render to a text area', function() {
+                var elem = this.grid.editModel._defaultDecorator.render();
+                expect(elem.tagName).toEqual('TEXTAREA');
+            });
+        });
+
+        describe('decorator', function() {
+            it('should be added on edit', function() {
+                this.grid.editModel.editCell(1, 1);
+                expect(this.grid.decorators.getAlive()).toContain(this.grid.editModel.currentEditor.decorator);
+            });
+
+            it('should be positioned at the editing cell', function() {
+                this.grid.editModel.editCell(1, 1);
+                expect(this.grid.editModel.currentEditor.decorator).rangeToBe(1, 1, 1, 1);
+                expect(this.grid.editModel.currentEditor.decorator.units).toBe('cell');
+                expect(this.grid.editModel.currentEditor.decorator.space).toBe('data');
+            });
+        });
     });
 });

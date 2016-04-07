@@ -2,7 +2,18 @@ var key = require('key');
 
 module.exports = function(grid) {
     var editModel = {
-        editing: false
+        editing: false,
+        _defaultDecorator: grid.decorators.create(-1, -1, 1, 1)
+    };
+    editModel._defaultDecorator.render = function() {
+        var element = document.createElement('textarea');
+        element.style.pointerEvents = 'all';
+        element.style.zIndex = 1;
+        element.style.position = 'relative';
+        grid.eventLoop.bindOnce('grid-draw', function() {
+            element.focus();
+        });
+        return element;
     };
     editModel._hydrateOpts = function(opts) {
         opts = opts || {
@@ -44,6 +55,10 @@ module.exports = function(grid) {
                     closePromise: opts.action()
                 };
             };
+        } else if (!opts.getEditor) {
+            opts.getEditor = function() {
+                return {};
+            };
         }
 
         opts.headers = !!opts.headers; // be explicit, and default to false
@@ -54,15 +69,21 @@ module.exports = function(grid) {
         return opts && opts.editTriggers && opts.editTriggers.indexOf(trigger) !== -1;
     }
 
-    editModel._interceptor = function(e) {
-        var col = e.col;
-        var row = e.row;
+    function getOptsForCol(col) {
         var colDescriptor = grid.data.col.get(col);
         if (!colDescriptor) {
             return;
         }
+        return editModel._hydrateOpts(colDescriptor.editOptions);
+    }
 
-        var opts = editModel._hydrateOpts(colDescriptor.editOptions);
+    editModel._interceptor = function(e) {
+        var col = e.col;
+        var row = e.row;
+        var opts = getOptsForCol(col);
+        if (!opts) {
+            return;
+        }
         if (!editModel.editing) {
             // check editTriggers if not editing
             switch (e.type) {
@@ -118,9 +139,29 @@ module.exports = function(grid) {
     };
 
     editModel.editCell = function(r, c) {
+        var opts = getOptsForCol(c);
+        if (!opts) {
+            return;
+        }
         editModel.editing = true;
+        var editor = opts.getEditor();
+        if (editor.decorator === undefined) {
+            editor.decorator = editModel._defaultDecorator;
+            if (editor.save === undefined) {
+                editor.save = function() {
+
+                };
+            }
+        }
+        editModel.currentEditor = editor;
+        if (editor.decorator) {
+            editor.decorator.top = r;
+            editor.decorator.left = c;
+            grid.decorators.add(editor.decorator);
+        }
     };
 
+    grid.eventLoop.addInterceptor(editModel._interceptor);
 
     return editModel;
 };
