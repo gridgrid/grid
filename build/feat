@@ -30,7 +30,7 @@ cat << EOF > app/index.html
     <html>
         <head>
             <title>$module_name</title>
-            <link rel="stylesheet" type="text/css" href="$module_name.scss" />
+            <link rel="stylesheet" type="text/css" href="$module_name.css" />
         </head>
         <body>
             <h1>It Works!</h1>
@@ -51,6 +51,42 @@ console.log('$module_name initialized: ', $module_name);
 EOF
     fi
 
+}
+
+function write-tsproj() {
+    if [ ! -f ts/tsconfig.json ]; then
+cat << EOF > ts/tsconfig.json
+{
+  "compilerOptions": {
+    "declaration": true,
+    "module": "commonjs",
+    "sourceMap": true,
+    "target": "ES5",
+    "outDir": "../release"
+  }
+}
+EOF
+    fi
+
+    if [ ! -f tsd.json ]; then
+cat << EOF > tsd.json
+{
+  "version": "v4",
+  "repo": "borisyankov/DefinitelyTyped",
+  "ref": "master",
+  "path": "typings",
+  "bundle": "typings/tsd.d.ts"
+}
+EOF
+    fi
+
+    if [ ! -f ts/index.ts ]; then
+cat << EOF > ts/index.ts
+///<reference path="../typings/tsd.d.ts" />
+
+export = {};
+EOF
+    fi
 }
 
 if [ -z "$featname" ]; then
@@ -144,6 +180,25 @@ case $featname in
         esac
     ;;
 
+    'typescript')
+        case $featcmd in
+            'enable')
+                npm install --save-dev typescript
+                mkdir -p ts/
+                write-tsproj
+                [ ! -f tsd.json ] && tsd init
+                ;;
+            'disable')
+                npm uninstall --save-dev typescript
+                ;;
+            *)
+                print-usage "feat: unknown command $featcmd"
+                exit 1;
+                ;;
+        esac
+    ;;
+
+    'templates') ;;
 
     *)
         echo "Unknown feature $featname";
