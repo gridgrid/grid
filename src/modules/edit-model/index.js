@@ -141,6 +141,7 @@ module.exports = function(grid) {
                         editModel.saveEdit().then(function() {
                             grid.navigationModel.handleTabEvent(e);
                         });
+                        e.preventDefault();
                     }
 
                     if (optsHasSaveTrigger(opts, 'enter') && key.is(key.code.special.enter, e.which)) {
@@ -193,7 +194,7 @@ module.exports = function(grid) {
         editModel.currentEditor = editor;
         if (editor.decorator) {
             editor.decorator.typedText = function() {
-                return isTyping ? grid.textarea.value : '';
+                return isTyping ? grid.textarea.value && grid.textarea.value.trim() : '';
             };
             editor.decorator.top = r;
             editor.decorator.left = c;
