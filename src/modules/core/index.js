@@ -4,12 +4,25 @@ var util = require('../util');
 var rangeUtil = require('../range-util');
 var passThrough = require('../pass-through');
 var capitalize = require('capitalize');
+var escapeStack = require('escape-stack');
 
 module.exports = function(opts) {
     function GridMarker() {
 
     }
     var grid = new GridMarker();
+    var userSuppliedEscapeStack;
+    Object.defineProperty(grid, 'escapeStack', {
+        get: function() {
+            return userSuppliedEscapeStack || escapeStack(true);
+        },
+        set: function(v) {
+            userSuppliedEscapeStack = {
+                // support old method for now
+                add: v.addEscapeHandler || v.add
+            };
+        }
+    });
 
     // the order here matters because some of these depend on each other
     grid.eventLoop = require('../event-loop')(grid);

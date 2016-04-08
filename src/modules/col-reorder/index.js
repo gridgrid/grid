@@ -64,7 +64,7 @@ module.exports = function(_grid) {
 
         grid.decorators.add(api._dragRects);
 
-        api._unbindKeyDown = grid.escapeStack && grid.escapeStack.addEscapeHandler(removeDecoratorsAndUnbind);
+        api._unbindKeyDown = grid.escapeStack.add(removeDecoratorsAndUnbind);
 
         api._unbindDrag = grid.eventLoop.bind('grid-drag', function(e) {
             api._dragRects.forEach(function(dragRect) {

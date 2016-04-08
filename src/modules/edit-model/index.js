@@ -1,4 +1,5 @@
 var key = require('key');
+var clickOff = require('click-off');
 
 module.exports = function(grid) {
     var editModel = {
@@ -11,9 +12,10 @@ module.exports = function(grid) {
         element.style.zIndex = 1;
         element.style.position = 'relative';
         grid.eventLoop.bindOnce('grid-draw', function() {
-            element.value = editModel._defaultDecorator.startingText();
+            element.value = editModel._defaultDecorator.typedText() || grid.dataModel.get(editModel._defaultDecorator.top, editModel._defaultDecorator.left).formatted;
             element.focus();
         });
+        editModel._defaultDecorator.renderedElem = element;
         return element;
     };
     editModel._hydrateOpts = function(opts) {
@@ -66,8 +68,20 @@ module.exports = function(grid) {
         return opts;
     };
 
-    function optsHasTrigger(opts, trigger) {
-        return opts && opts.editTriggers && opts.editTriggers.indexOf(trigger) !== -1;
+    function optsHasTrigger(opts, trigger, triggerField) {
+        return opts && opts[triggerField] && opts[triggerField].indexOf(trigger) !== -1;
+    }
+
+    function optsHasEditTrigger(opts, trigger) {
+        return optsHasTrigger(opts, trigger, 'editTriggers');
+    }
+
+    function optsHasCancelTrigger(opts, trigger) {
+        return optsHasTrigger(opts, trigger, 'cancelTriggers');
+    }
+
+    function optsHasSaveTrigger(opts, trigger) {
+        return optsHasTrigger(opts, trigger, 'saveTriggers');
     }
 
     function getOptsForCol(col) {
@@ -89,21 +103,21 @@ module.exports = function(grid) {
             // check editTriggers if not editing
             switch (e.type) {
                 case 'click':
-                    if (optsHasTrigger(opts, 'click')) {
+                    if (optsHasEditTrigger(opts, 'click')) {
                         editModel.editCell(row, col);
                     }
                     break;
                 case 'dblclick':
-                    if (optsHasTrigger(opts, 'dblclick')) {
+                    if (optsHasEditTrigger(opts, 'dblclick')) {
                         editModel.editCell(row, col);
                     }
                     break;
                 case 'keydown':
-                    if (optsHasTrigger(opts, 'space') && key.is(key.code.special.space, e.which)) {
+                    if (optsHasEditTrigger(opts, 'space') && key.is(key.code.special.space, e.which)) {
                         editModel.editCell(row, col);
                     }
 
-                    if (optsHasTrigger(opts, 'enter') && key.is(key.code.special.enter, e.which)) {
+                    if (optsHasEditTrigger(opts, 'enter') && key.is(key.code.special.enter, e.which)) {
                         editModel.editCell(row, col);
                     }
 
@@ -114,13 +128,28 @@ module.exports = function(grid) {
                     }
                     break;
                 case 'keypress':
-                    if (optsHasTrigger(opts, 'typing') && e.which >= 32 && e.which <= 122) {
+                    if (optsHasEditTrigger(opts, 'typing') && e.which >= 32 && e.which <= 122) {
                         editModel.editCell(row, col, true);
                     }
                     break;
             }
         } else {
-            // check save and cancel triggers if editing
+            // check save triggers if editing
+            switch (e.type) {
+                case 'keydown':
+                    if (optsHasSaveTrigger(opts, 'tab') && key.is(key.code.special.tab, e.which)) {
+                        editModel.saveEdit().then(function() {
+                            grid.navigationModel.handleTabEvent(e);
+                        });
+                    }
+
+                    if (optsHasSaveTrigger(opts, 'enter') && key.is(key.code.special.enter, e.which)) {
+                        editModel.saveEdit().then(function() {
+                            grid.navigationModel.setFocus(grid.data.down(grid.navigationModel.focus.row), grid.navigationModel.focus.col);
+                        });
+                    }
+                    break;
+            }
         }
     };
 
@@ -153,20 +182,83 @@ module.exports = function(grid) {
             editor.decorator = editModel._defaultDecorator;
             if (editor.save === undefined) {
                 editor.save = function() {
-
+                    var text = editor.decorator.renderedElem && editor.decorator.renderedElem.value;
+                    return Promise.resolve({
+                        value: text,
+                        formatted: text
+                    });
                 };
             }
         }
         editModel.currentEditor = editor;
         if (editor.decorator) {
-            editor.decorator.startingText = function() {
+            editor.decorator.typedText = function() {
                 return isTyping ? grid.textarea.value : '';
             };
             editor.decorator.top = r;
             editor.decorator.left = c;
             grid.decorators.add(editor.decorator);
+            editor.removeEscapeStackHandler = grid.escapeStack.add(function() {
+                if (optsHasCancelTrigger(opts, 'escape')) {
+                    editModel.cancelEdit();
+                } else if (optsHasSaveTrigger(opts, 'escape')) {
+                    editModel.saveEdit();
+                }
+            });
+
+            editor.removeClickOffHandler = clickOff.listen(function getClickOffElement() {
+                return editor.decorator && editor.decorator.boundingBox;
+            }, function onClick() {
+                if (optsHasCancelTrigger(opts, 'clickoff')) {
+                    editModel.cancelEdit();
+                } else if (optsHasSaveTrigger(opts, 'clickoff')) {
+                    editModel.saveEdit();
+                }
+            }, {});
         }
     };
+
+    editModel._closeEditor = function() {
+        if (!editModel.editing) {
+            return;
+        }
+        editModel.editing = false;
+        if (editModel.currentEditor.removeEscapeStackHandler) {
+            editModel.currentEditor.removeEscapeStackHandler();
+        }
+        if (editModel.currentEditor.removeClickOffHandler) {
+            editModel.currentEditor.removeClickOffHandler();
+        }
+        if (editModel.currentEditor.decorator) {
+            grid.decorators.remove(editModel.currentEditor.decorator);
+        }
+
+        grid.viewLayer.draw();
+        grid.eventLoop.bindOnce('grid-draw', function() {
+            grid.container.focus();
+        });
+    };
+
+    editModel.cancelEdit = function() {
+        editModel._closeEditor();
+    };
+
+    editModel.saveEdit = function() {
+        var savePromise = editModel.currentEditor.save && editModel.currentEditor.save() || Promise.resolve(null);
+        return savePromise.then(function(dataResult) {
+            if (dataResult) {
+                dataResult.row = editModel.currentEditor.decorator.top;
+                dataResult.col = editModel.currentEditor.decorator.left;
+                grid.dataModel.set([dataResult]);
+            }
+            editModel._closeEditor();
+            return dataResult;
+        });
+    };
+
+    grid.eventLoop.bind('grid-destroy', function() {
+        editModel.cancelEdit();
+    });
 
     grid.eventLoop.addInterceptor(editModel._interceptor);
 

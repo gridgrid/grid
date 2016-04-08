@@ -31,7 +31,7 @@ module.exports = function(_grid) {
                 headerDecorator._dragLine.left = Math.max(e.gridX, minX);
             });
 
-            headerDecorator._unbindKeyDown = grid.escapeStack && grid.escapeStack.addEscapeHandler(removeDecoratorsAndUnbind);
+            headerDecorator._unbindKeyDown = grid.escapeStack.add(removeDecoratorsAndUnbind);
 
             headerDecorator._unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function(e) {
                 var newWidth = headerDecorator._dragLine.left - headerDecorator.getDecoratorLeft();

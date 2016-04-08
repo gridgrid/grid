@@ -19,6 +19,12 @@ fdescribe('edit-model', function() {
         return event;
     }
 
+    function mockKeyUp(code) {
+        var event = mockEventOnDefaultEditableCells('keyup');
+        event.keyCode = event.which = code;
+        return event;
+    }
+
     function mockEventOnDefaultEditableCells(name) {
         var e = mockEvent(name);
         e.row = 1;
@@ -285,13 +291,30 @@ fdescribe('edit-model', function() {
                 expect(elem.tagName).toEqual('TEXTAREA');
             });
 
-            it('should render with startingText', function() {
+            it('should render with typedText', function() {
                 this.grid.editModel.editCell(1, 1, true);
                 var elem = this.grid.editModel._defaultDecorator.render();
-                expect(elem.tagName).toEqual('TEXTAREA');
-                spyOn(this.grid.editModel._defaultDecorator, 'startingText').and.returnValue('mike');
+                spyOn(this.grid.editModel._defaultDecorator, 'typedText').and.returnValue('mike');
                 this.grid.eventLoop.fire('grid-draw');
                 expect(elem.value).toEqual('mike');
+            });
+
+            it('should render with the cell value if not typing', function() {
+                this.grid.editModel.editCell(1, 1);
+                var elem = this.grid.editModel._defaultDecorator.render();
+                this.grid.eventLoop.fire('grid-draw');
+                expect(elem.value).toEqual(this.grid.dataModel.get(1, 1).formatted);
+            });
+
+            it('save method should return promise of text areas value', function(done) {
+                this.grid.editModel.editCell(1, 1);
+                var elem = this.grid.editModel._defaultDecorator.render();
+                elem.value = 'moop';
+                this.grid.editModel.currentEditor.save().then(function(result) {
+                    expect(result.formatted).toEqual('moop');
+                    expect(result.value).toEqual('moop');
+                    done();
+                });
             });
         });
 
@@ -314,7 +337,7 @@ fdescribe('edit-model', function() {
                 this.grid.textarea = {
                     value: value
                 };
-                expect(this.grid.editModel.currentEditor.decorator.startingText()).toBe(value);
+                expect(this.grid.editModel.currentEditor.decorator.typedText()).toBe(value);
             });
 
 
@@ -324,8 +347,269 @@ fdescribe('edit-model', function() {
                 this.grid.textarea = {
                     value: value
                 };
-                expect(this.grid.editModel.currentEditor.decorator.startingText()).toBe('');
+                expect(this.grid.editModel.currentEditor.decorator.typedText()).toBe('');
             });
+        });
+    });
+
+    describe('close edit', function() {
+        it('should not barf if called when not editing', function() {
+            this.grid.editModel._closeEditor();
+        });
+
+        it('should remove previously added decorator', function() {
+            this.grid.editModel.editCell(1, 1);
+            var decorator = this.grid.editModel.currentEditor.decorator;
+            this.grid.editModel._closeEditor();
+            expect(this.grid.decorators.getAlive()).not.toContain(decorator);
+        });
+
+        it('should set editing back to false', function() {
+            this.grid.editModel.editCell(1, 1);
+            expect(this.grid.editModel.editing).toBe(true);
+            this.grid.editModel._closeEditor();
+            expect(this.grid.editModel.editing).toBe(false);
+        });
+
+        it('should ask the grid to draw and then focus it when it does', function() {
+            this.grid.editModel.editCell(1, 1);
+            var spy = spyOn(this.grid.viewLayer, 'draw');
+            this.grid.editModel._closeEditor();
+            expect(spy).toHaveBeenCalled();
+            this.grid.container = {
+                focus: jasmine.createSpy('focus')
+            };
+            this.grid.eventLoop.fire('grid-draw');
+            expect(this.grid.container.focus).toHaveBeenCalled();
+        });
+
+        it('should remove escape handler', function() {
+            this.grid.editModel.editCell(1, 1);
+            var spy = spyOn(this.grid.editModel.currentEditor, 'removeEscapeStackHandler');
+            this.grid.editModel._closeEditor();
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should remove cancel handler', function() {
+            this.grid.editModel.editCell(1, 1);
+
+            var spy = spyOn(this.grid.editModel.currentEditor, 'removeClickOffHandler');
+            this.grid.editModel._closeEditor();
+            expect(spy).toHaveBeenCalled();
+        });
+    });
+
+    describe('cancelEdit', function() {
+        it('should call close editor', function() {
+            this.grid.editModel.editCell(1, 1);
+            var spy = spyOn(this.grid.editModel, '_closeEditor');
+            this.grid.editModel.cancelEdit();
+            expect(spy).toHaveBeenCalled();
+        });
+    });
+
+    describe('save edit', function() {
+        it('should call close editor', function(done) {
+            this.grid.editModel.editCell(1, 1);
+            var spy = spyOn(this.grid.editModel, '_closeEditor');
+            this.grid.editModel.saveEdit();
+            setTimeout(function() {
+                expect(spy).toHaveBeenCalled();
+                done();
+            }, 1);
+
+        });
+
+        it('should call close editor if no save promise', function(done) {
+            var col = this.grid.data.col.get(1);
+            col.editOptions = {
+                getEditor: function() {
+                    return {
+                        decorator: false
+                    }
+                }
+            };
+            this.grid.editModel.editCell(1, 1);
+            var spy = spyOn(this.grid.editModel, '_closeEditor');
+            this.grid.editModel.saveEdit();
+            setTimeout(function() {
+                expect(spy).toHaveBeenCalled();
+                done();
+            }, 1);
+        });
+
+        it('should call set on the data model with the result of the editors save promise', function(done) {
+            var resolve;
+            var col = this.grid.data.col.get(1);
+            col.editOptions = {
+                getEditor: function() {
+                    return {
+                        save: function() {
+                            var promise = new Promise(function(r) {
+                                resolve = r;
+                            });
+                            return promise;
+                        }
+                    };
+                }
+            };
+            this.grid.editModel.editCell(1, 1);
+            this.grid.editModel.saveEdit();
+            var spy = spyOn(this.grid.dataModel, 'set');
+            var saveResult = {
+                value: undefined,
+                formatted: 'resolution'
+            };
+            resolve(saveResult);
+            var dataChange = {
+                row: 1,
+                col: 1
+            };
+            dataChange.formatted = saveResult.formatted;
+            dataChange.value = saveResult.value;
+            setTimeout(function() {
+                expect(spy).toHaveBeenCalledWith([dataChange]);
+                done();
+            }, 2);
+
+        });
+    });
+
+    function fireEscape() {
+        document.body.dispatchEvent(mockKeyDown(27));
+        document.body.dispatchEvent(mockKeyPress(27));
+        document.body.dispatchEvent(mockKeyUp(27));
+    }
+
+    function fireClickOff() {
+        document.body.dispatchEvent(mockEvent('mousedown', true));
+        document.body.dispatchEvent(mockEvent('mouseup', true));
+        document.body.dispatchEvent(mockEvent('click', true));
+    }
+
+    function fireTab() {
+        this.grid.editModel._interceptor(mockKeyDown(key.code.special.tab));
+    }
+
+    function fireEnter() {
+        this.grid.editModel._interceptor(mockKeyDown(key.code.special.enter));
+    }
+
+    function testPostEditTriggers(triggerActionName, triggerToDoTrigger, triggerToPostTriggerExpect) {
+        describe(triggerActionName + 'Triggers', function() {
+            afterEach(function(done) {
+                var spy = spyOn(this.grid.editModel, triggerActionName + 'Edit').and.callThrough();
+                var col = this.grid.data.col.get(1);
+                col.editOptions = {
+                    cancelTriggers: [],
+                    editTriggers: [],
+                    saveTriggers: []
+                };
+                col.editOptions[triggerActionName + 'Triggers'] = this.triggers;
+
+                this.grid.navigationModel.setFocus(1, 1);
+                this.grid.editModel.editCell(1, 1);
+                this.doTrigger();
+                var expectation = expect(spy);
+                if (this.notCancel) {
+                    expectation = expectation.not;
+                }
+                expectation.toHaveBeenCalled();
+                setTimeout(function() {
+                    if (this.extraExpect) {
+                        this.extraExpect.call(this);
+                    }
+                    done();
+                }, 1)
+
+            });
+
+            Object.keys(triggerToDoTrigger).forEach(function(triggerName) {
+                it('should ' + triggerActionName + ' edit if in trigger array for ' + triggerName, function() {
+                    this.triggers = [triggerName];
+                    this.doTrigger = triggerToDoTrigger[triggerName];
+                    this.extraExpect = triggerToPostTriggerExpect && triggerToPostTriggerExpect[triggerName];
+                });
+
+                it('should not ' + triggerActionName + 'edit if not in trigger array for ' + triggerName, function() {
+                    this.triggers = [];
+                    this.notCancel = true;
+                    this.doTrigger = triggerToDoTrigger[triggerName];
+                });
+            });
+        });
+    }
+
+    testPostEditTriggers('cancel', {
+        clickoff: fireClickOff,
+        escape: fireEscape
+    });
+
+
+    testPostEditTriggers('save', {
+        clickoff: fireClickOff,
+        escape: fireEscape,
+        enter: fireEnter,
+        tab: fireTab
+    }, {
+        enter: function() {
+            expect(this.grid.navigationModel.focus.row).toBe(2);
+            expect(this.grid.navigationModel.focus.col).toBe(1);
+        },
+        tab: function() {
+            expect(this.grid.navigationModel.focus.row).toBe(1);
+            expect(this.grid.navigationModel.focus.col).toBe(2);
+        }
+    });
+
+    xdescribe('save triggers', function() {
+        afterEach(function() {
+            var spy = spyOn(this.grid.editModel, 'cancelEdit');
+            var col = this.grid.data.col.get(1);
+            col.editOptions = {
+                cancelTriggers: this.triggers
+            };
+            this.grid.editModel.editCell(1, 1);
+            this.doTrigger();
+            var expectation = expect(spy);
+            if (this.notCancel) {
+                expectation = expectation.not;
+            }
+            expectation.toHaveBeenCalled();
+        });
+
+        function fireEscape() {
+            document.body.dispatchEvent(mockKeyDown(27));
+            document.body.dispatchEvent(mockKeyPress(27));
+            document.body.dispatchEvent(mockKeyUp(27));
+        }
+
+        function fireClickOff() {
+            document.body.dispatchEvent(mockEvent('mousedown', true));
+            document.body.dispatchEvent(mockEvent('mouseup', true));
+            document.body.dispatchEvent(mockEvent('click', true));
+        }
+
+        it('should cancel edit on clickoff if in trigger array', function() {
+            this.triggers = ['clickoff'];
+            this.doTrigger = fireClickOff;
+        });
+
+        it('should not cancel edit on clickoff if not in trigger array', function() {
+            this.triggers = [];
+            this.notCancel = true;
+            this.doTrigger = fireClickOff;
+        });
+
+        it('should cancel edit on escape if in trigger array', function() {
+            this.triggers = ['escape'];
+            this.doTrigger = fireEscape;
+        });
+
+        it('should not cancel edit on escape if not in trigger array', function() {
+            this.triggers = [];
+            this.notCancel = true;
+            this.doTrigger = fireEscape;
         });
     });
 });
