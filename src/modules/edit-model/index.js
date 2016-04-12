@@ -6,6 +6,7 @@ module.exports = function(grid) {
         editing: false,
         _defaultDecorator: grid.decorators.create(-1, -1, 1, 1)
     };
+
     editModel._defaultDecorator.render = function() {
         var element = document.createElement('textarea');
         element.style.pointerEvents = 'all';
@@ -169,6 +170,15 @@ module.exports = function(grid) {
         grid.dataModel.set(dataChanges);
     };
 
+    function setEditing(editing) {
+        var prevEditing = editModel.editing;
+        editModel.editing = editing;
+        if (prevEditing !== editing) {
+            grid.eventLoop.fire('grid-edit');
+        }
+
+    }
+
     editModel.editCell = function(r, c, isTyping) {
         var opts = getOptsForCol(c);
         if (!opts) {
@@ -177,7 +187,7 @@ module.exports = function(grid) {
         if ((r < 0 || c < 0) && !opts.headers) {
             return;
         }
-        editModel.editing = true;
+        setEditing(true);
         var editor = opts.getEditor();
         if (editor.decorator === undefined) {
             editor.decorator = editModel._defaultDecorator;
@@ -223,7 +233,7 @@ module.exports = function(grid) {
         if (!editModel.editing) {
             return;
         }
-        editModel.editing = false;
+        setEditing(false);
         if (editModel.currentEditor.removeEscapeStackHandler) {
             editModel.currentEditor.removeEscapeStackHandler();
         }

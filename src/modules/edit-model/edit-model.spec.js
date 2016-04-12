@@ -263,6 +263,17 @@ fdescribe('edit-model', function() {
                 });
                 this.decorator = decorator;
             });
+
+
+        });
+
+        describe('', function() {
+            it('should fire the grid-edit event', function() {
+                var spy = jasmine.createSpy();
+                this.grid.eventLoop.bind('grid-edit', spy);
+                this.grid.editModel.editCell(1, 1);
+                expect(spy).toHaveBeenCalled();
+            });
         });
 
         describe('on headers', function() {
@@ -394,6 +405,14 @@ fdescribe('edit-model', function() {
             this.grid.editModel.editCell(1, 1);
 
             var spy = spyOn(this.grid.editModel.currentEditor, 'removeClickOffHandler');
+            this.grid.editModel._closeEditor();
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should fire the grid-edit event', function() {
+            var spy = jasmine.createSpy();
+            this.grid.editModel.editCell(1, 1);
+            this.grid.eventLoop.bind('grid-edit', spy);
             this.grid.editModel._closeEditor();
             expect(spy).toHaveBeenCalled();
         });
