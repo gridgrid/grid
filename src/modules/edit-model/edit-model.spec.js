@@ -4,7 +4,7 @@ var util = require('../util');
 var _ = require('lodash');
 var noop = require('../no-op');
 
-fdescribe('edit-model', function() {
+describe('edit-model', function() {
 
     //char code for z === 122
     //space 32

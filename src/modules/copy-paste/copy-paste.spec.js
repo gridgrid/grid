@@ -2,7 +2,7 @@ var mockEvent = require('../custom-event');
 var key = require('key');
 var util = require('../util');
 
-fdescribe('copy-paste', function() {
+describe('copy-paste', function() {
 
     require('../grid-spec-helper')();
     beforeEach(function() {

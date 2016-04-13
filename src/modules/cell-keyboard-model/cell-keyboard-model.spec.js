@@ -1,6 +1,6 @@
 var mockEvent = require('../custom-event');
 
-fdescribe('cell-keyboard-model', function() {
+describe('cell-keyboard-model', function() {
 
     require('../grid-spec-helper')();
     var model;
