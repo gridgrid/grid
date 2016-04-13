@@ -178,11 +178,11 @@ module.exports = function(_grid) {
     });
 
     var maybeSelectText = debounce(function maybeSelectTextInner() {
-        if ((!model.isSelectionDisabled || !model.isSelectionDisabled()) && grid.focused) {
+        if (!(grid.editModel && grid.editModel.editing) && grid.focused) {
             grid.textarea.value = grid.dataModel.get(grid.navigationModel.focus.row, grid.navigationModel.focus.col).formatted || '.';
             grid.textarea.select();
         }
-    }, 1)
+    }, 1);
 
     model._maybeSelectText = maybeSelectText;
 

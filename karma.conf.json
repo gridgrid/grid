@@ -6,6 +6,7 @@
   "basePath": "",
   "files": [
     "node_modules/polyfill-function-prototype-bind/bind.js",
+    "node_modules/es6-promise/dist/es6-promise.js",
     "node_modules/angular/angular.js",
     "node_modules/angular-mocks/angular-mocks.js",
     "src/modules/grid-spec-helper/matchers.js",
@@ -25,15 +26,15 @@
   ],
   "browsers": ["PhantomJS_custom"],
   "customLaunchers": {
-      "PhantomJS_custom": {
-          "base": "PhantomJS",
-          "options": {
-              "viewportSize": {
-                  "width": 400,
-                  "height": 500
-              }
-          }
+    "PhantomJS_custom": {
+      "base": "PhantomJS",
+      "options": {
+        "viewportSize": {
+          "width": 400,
+          "height": 500
+        }
       }
+    }
   },
   "junitReporter": {
     "outputFile": "test_out/unit.xml",

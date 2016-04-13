@@ -19,11 +19,11 @@ module.exports = function () {
         $('body').append(this.container);
 
         var self = this;
-        this.buildSimpleGrid = function (numRows, numCols, varyHeight, varyWidths, fixedRows, fixedCols, headerRows, headerCols) {
+        this.buildSimpleGrid = function (numRows, numCols, varyHeight, varyWidths, fixedRows, fixedCols, headerRows, headerCols, opts) {
             maybeDestroyGrid();
             this.grid = require('../simple-grid')(numRows || 100, numCols || 10, varyHeight, varyWidths, fixedRows, fixedCols, function (grid) {
                 self.resizeSpy = spyOn(grid.viewPort, '_resize');
-            }, headerRows, headerCols);
+            }, headerRows, headerCols, opts);
             this.grid.viewPort.sizeToContainer(this.container);
             this.grid.eventLoop.setContainer(this.container);
             return this.grid;
@@ -72,4 +72,4 @@ module.exports = function () {
     });
 
 };
-        
+

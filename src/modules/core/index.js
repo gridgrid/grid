@@ -4,12 +4,25 @@ var util = require('../util');
 var rangeUtil = require('../range-util');
 var passThrough = require('../pass-through');
 var capitalize = require('capitalize');
+var escapeStack = require('escape-stack');
 
 module.exports = function(opts) {
     function GridMarker() {
 
     }
     var grid = new GridMarker();
+    var userSuppliedEscapeStack;
+    Object.defineProperty(grid, 'escapeStack', {
+        get: function() {
+            return userSuppliedEscapeStack || escapeStack(true);
+        },
+        set: function(v) {
+            userSuppliedEscapeStack = {
+                // support old method for now
+                add: v.addEscapeHandler || v.add
+            };
+        }
+    });
 
     // the order here matters because some of these depend on each other
     grid.eventLoop = require('../event-loop')(grid);
@@ -21,6 +34,7 @@ module.exports = function(opts) {
     grid.virtualPixelCellModel = require('../virtual-pixel-cell-model')(grid);
     grid.cellScrollModel = require('../cell-scroll-model')(grid);
     grid.cellMouseModel = require('../cell-mouse-model')(grid);
+    grid.cellKeyboardModel = require('../cell-keyboard-model')(grid);
 
     grid.viewPort = require('../view-port')(grid);
 
@@ -32,6 +46,9 @@ module.exports = function(opts) {
     // things with logic that also register decorators (slightly less core than the other models)
     if (!(opts && opts.col && opts.col.disableReorder)) {
         grid.colReorder = require('../col-reorder')(grid);
+    }
+    if (opts && opts.allowEdit) {
+        grid.editModel = require('../edit-model')(grid);
     }
     grid.navigationModel = require('../navigation-model')(grid);
     grid.pixelScrollModel = require('../pixel-scroll-model')(grid);
