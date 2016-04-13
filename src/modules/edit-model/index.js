@@ -183,6 +183,7 @@ module.exports = function(grid) {
         if (editModel.editing) {
             editModel.saveEdit();
         }
+        editModel.savePromise = undefined;
 
         if (isNaN(r) || isNaN(c)) {
             return;
@@ -279,16 +280,20 @@ module.exports = function(grid) {
     };
 
     editModel.saveEdit = function() {
-        var savePromise = editModel.currentEditor.save && editModel.currentEditor.save() || Promise.resolve(null);
-        return savePromise.then(function(dataResult) {
-            if (dataResult) {
-                dataResult.row = editModel.currentEditor.decorator.top;
-                dataResult.col = editModel.currentEditor.decorator.left;
-                grid.dataModel.set([dataResult]);
-            }
-            editModel._closeEditor();
-            return dataResult;
-        });
+        if (!editModel.savePromise) {
+            var savePromise = editModel.currentEditor.save && editModel.currentEditor.save() || Promise.resolve(null);
+
+            editModel.savePromise = savePromise.then(function(dataResult) {
+                if (dataResult) {
+                    dataResult.row = editModel.currentEditor.decorator.top;
+                    dataResult.col = editModel.currentEditor.decorator.left;
+                    grid.dataModel.set([dataResult]);
+                }
+                editModel._closeEditor();
+                return dataResult;
+            });
+        }
+        return editModel.savePromise;
     };
 
     grid.eventLoop.bind('grid-destroy', function() {

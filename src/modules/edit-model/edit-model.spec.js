@@ -606,6 +606,26 @@ fdescribe('edit-model', function() {
             }, 1);
         });
 
+        it('should call close editor only once no matter how many saves are called', function(done) {
+            var col = this.grid.data.col.get(1);
+            col.editOptions = {
+                getEditor: function() {
+                    return {
+                        decorator: false,
+                        closePromise: new Promise(noop, noop)
+                    }
+                }
+            };
+            this.grid.editModel.editCell(1, 1);
+            var spy = spyOn(this.grid.editModel, '_closeEditor');
+            this.grid.editModel.saveEdit();
+            this.grid.editModel.saveEdit();
+            setTimeout(function() {
+                expect(spy.calls.count()).toBe(1);
+                done();
+            }, 1);
+        });
+
         it('should call set on the data model with the result of the editors save promise', function(done) {
             var resolve;
             var col = this.grid.data.col.get(1);
