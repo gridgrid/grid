@@ -233,6 +233,9 @@ module.exports = function(grid) {
             editor.removeClickOffHandler = clickOff.listen(function getClickOffElement() {
                 return editor.decorator && editor.decorator.boundingBox;
             }, function onClick() {
+                if (editor.isInMe && editor.isInMe()) {
+                    return;
+                }
                 if (optsHasCancelTrigger(opts, 'clickoff')) {
                     editModel.cancelEdit();
                 } else if (optsHasSaveTrigger(opts, 'clickoff')) {

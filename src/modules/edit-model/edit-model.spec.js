@@ -620,17 +620,18 @@ fdescribe('edit-model', function() {
     function testPostEditTriggers(triggerActionName, triggerToDoTrigger, triggerToPostTriggerExpect) {
         describe(triggerActionName + 'Triggers', function() {
             afterEach(function(done) {
-                var spy = spyOn(this.grid.editModel, triggerActionName + 'Edit').and.callThrough();
+
                 var col = this.grid.data.col.get(1);
-                col.editOptions = {
+                col.editOptions = _.assign(col.editOptions || {}, {
                     cancelTriggers: [],
                     editTriggers: [],
                     saveTriggers: []
-                };
+                });
                 col.editOptions[triggerActionName + 'Triggers'] = this.triggers;
 
                 this.grid.navigationModel.setFocus(1, 1);
                 this.grid.editModel.editCell(1, 1);
+                var spy = spyOn(this.grid.editModel, triggerActionName + 'Edit').and.callThrough();
                 this.doTrigger();
                 var expectation = expect(spy);
                 if (this.notCancel) {
@@ -667,6 +668,18 @@ fdescribe('edit-model', function() {
                     e.shiftKey = true;
                     this.grid.editModel._interceptor(e);
                 };
+                this.notCancel = true;
+            });
+
+            it('should not ' + triggerActionName + ' for clickoff if isInMe returns true from editor', function() {
+                var col = this.grid.data.col.get(1);
+                col.editOptions = makeOptsForEditor({
+                    isInMe: function() {
+                        return true;
+                    }
+                });
+                this.triggers = ['clickoff'];
+                this.doTrigger = fireClickOff;
                 this.notCancel = true;
             });
         });
