@@ -2,6 +2,7 @@ var mockEvent = require('../custom-event');
 var key = require('key');
 var util = require('../util');
 var _ = require('lodash');
+var noop = require('../no-op');
 
 fdescribe('edit-model', function() {
 
@@ -177,8 +178,13 @@ fdescribe('edit-model', function() {
             var event = this.event;
             var col = this.grid.data.col.get(event.col);
             col.editOptions = this.opts;
+            var spy = spyOn(this.grid.editModel, 'editCell');
             this.grid.editModel._interceptor(event);
-            expect(this.grid.editModel.editing).toBe(this.editing);
+            var expectation = expect(spy);
+            if (!this.editing) {
+                expectation = expectation.not;
+            }
+            expectation.toHaveBeenCalled();
         });
 
         Object.keys(editTriggerToEvent).forEach(function(trigger) {
@@ -246,7 +252,26 @@ fdescribe('edit-model', function() {
         });
     });
 
+    function makeOptsForEditor(editor) {
+        return {
+            getEditor: function() {
+                return editor;
+            }
+        }
+    }
+
     describe('edit cell', function() {
+        beforeEach(function() {
+            var col = this.grid.data.col.get(1);
+            col.editOptions = makeOptsForEditor({
+                decorator: undefined,
+                save: undefined,
+                closePromise: new Promise(noop, noop)
+            });
+        });
+
+
+
         it('should fire the grid-edit event', function() {
             var spy = jasmine.createSpy();
             this.grid.eventLoop.bind('grid-edit', spy);
@@ -261,26 +286,39 @@ fdescribe('edit-model', function() {
             expect(spy).toHaveBeenCalled();
         });
 
+        it('should leave editing mode if no editor', function() {
+            var col = this.grid.data.col.get(1);
+            col.editOptions = makeOptsForEditor();
+            this.grid.editModel.editCell(1, 1);
+            expect(this.grid.editModel.editing).toEqual(false);
+        });
+
+        it('should leave editing mode if no closePromise', function() {
+            var col = this.grid.data.col.get(1);
+            col.editOptions = makeOptsForEditor({
+                decorator: false,
+                save: undefined,
+                closePromise: null
+            });
+            this.grid.editModel.editCell(1, 1);
+            expect(this.grid.editModel.editing).toEqual(false);
+        });
+
         describe('default setup', function() {
-            function makeOptsForEditor(editor) {
-                return {
-                    getEditor: function() {
-                        return editor;
-                    }
-                }
-            }
+
 
             afterEach(function() {
                 var col = this.grid.data.col.get(1);
                 col.editOptions = this.opts;
                 this.grid.editModel.editCell(1, 1);
-                expect(this.grid.editModel.currentEditor).toBeDefined();
-                expect(this.grid.editModel.currentEditor.decorator).toEqual(this.decorator);
+                if (this.grid.editModel.currentEditor) {
+                    expect(this.grid.editModel.currentEditor.decorator).toEqual(this.decorator);
+                }
                 if (this.saveDefined) {
                     expect(this.grid.editModel.currentEditor.save).toBeDefined();
                 }
             });
-            it('should be populated on editor if undefined', function() {
+            it('should populate default decorator on editor if undefined', function() {
                 this.opts = makeOptsForEditor({});
                 this.decorator = this.grid.editModel._defaultDecorator;
             });
@@ -298,14 +336,14 @@ fdescribe('edit-model', function() {
                 this.decorator = this.grid.editModel._defaultDecorator;
             });
 
-            it('should not be populated on editor if false', function() {
+            it('should not populate default decorator on editor if false', function() {
                 this.opts = makeOptsForEditor({
                     decorator: false
                 });
                 this.decorator = false;
             });
 
-            it('should not be populated on editor if decorator is defined', function() {
+            it('should not populate default decorator on editor if decorator is defined', function() {
                 var decorator = {};
                 this.opts = makeOptsForEditor({
                     decorator: decorator // yes yes this is not really a decorator
@@ -404,6 +442,14 @@ fdescribe('edit-model', function() {
     });
 
     describe('close edit', function() {
+        beforeEach(function() {
+            var col = this.grid.data.col.get(1);
+            col.editOptions = makeOptsForEditor({
+                decorator: undefined,
+                save: undefined,
+                closePromise: new Promise(noop, noop)
+            });
+        });
         it('should not barf if called when not editing', function() {
             this.grid.editModel._closeEditor();
         });
@@ -459,6 +505,14 @@ fdescribe('edit-model', function() {
     });
 
     describe('cancelEdit', function() {
+        beforeEach(function() {
+            var col = this.grid.data.col.get(1);
+            col.editOptions = makeOptsForEditor({
+                decorator: undefined,
+                save: undefined,
+                closePromise: new Promise(noop, noop)
+            });
+        });
         it('should call close editor', function() {
             this.grid.editModel.editCell(1, 1);
             var spy = spyOn(this.grid.editModel, '_closeEditor');
@@ -468,6 +522,14 @@ fdescribe('edit-model', function() {
     });
 
     describe('save edit', function() {
+        beforeEach(function() {
+            var col = this.grid.data.col.get(1);
+            col.editOptions = makeOptsForEditor({
+                decorator: undefined,
+                save: undefined,
+                closePromise: new Promise(noop, noop)
+            });
+        });
         it('should call close editor', function(done) {
             this.grid.editModel.editCell(1, 1);
             var spy = spyOn(this.grid.editModel, '_closeEditor');
@@ -484,7 +546,8 @@ fdescribe('edit-model', function() {
             col.editOptions = {
                 getEditor: function() {
                     return {
-                        decorator: false
+                        decorator: false,
+                        closePromise: new Promise(noop, noop)
                     }
                 }
             };

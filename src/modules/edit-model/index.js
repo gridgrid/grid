@@ -194,8 +194,14 @@ module.exports = function(grid) {
         if ((r < 0 || c < 0) && !opts.headers) {
             return;
         }
-        setEditing(true);
+
         var editor = opts.getEditor();
+        // if they have no editor or not closePromise,
+        // it's just a simple action and there's no need to wait on them in edit mode
+        if (!editor || (!editor.closePromise && editor.decorator === false)) {
+            return;
+        }
+        setEditing(true);
         if (editor.decorator === undefined) {
             editor.decorator = editModel._defaultDecorator;
             if (editor.save === undefined) {
