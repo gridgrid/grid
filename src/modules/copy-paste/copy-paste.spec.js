@@ -57,7 +57,7 @@ fdescribe('copy-paste', function() {
         });
     }
 
-    ('copy', function() {
+    describe('copy', function() {
         function fireCopy() {
             var e = {
                 type: 'copy'
@@ -169,10 +169,10 @@ fdescribe('copy-paste', function() {
                 expectSelectionAfterTimeout.call(this, cb);
             });
 
-            it('should honor a disabling function', function(cb) {
-                this.grid.copyPaste.isSelectionDisabled = function() {
-                    return true;
-                };
+            it('should not select when grid is editing', function(cb) {
+                this.grid.editModel = {
+                    editing: true
+                }
                 this.grid.eventLoop.fire(mockEvent('keyup'));
                 this.grid.textarea.blur();
                 this.grid.textarea.focus();

@@ -1,6 +1,7 @@
 var mockEvent = require('../custom-event');
 var key = require('key');
 var util = require('../util');
+var _ = require('lodash');
 
 fdescribe('edit-model', function() {
 
@@ -168,46 +169,64 @@ fdescribe('edit-model', function() {
         });
     });
 
-    describe('', function() {
+    describe('editTriggers', function() {
         afterEach(function() {
-            var event = editTriggerToEvent[this.trigger];
+            var event = this.event;
             var col = this.grid.data.col.get(event.col);
             col.editOptions = this.opts;
             this.grid.editModel._interceptor(event);
             expect(this.grid.editModel.editing).toBe(this.editing);
         });
 
-        describe('should start editing if trigger exists in options for', function() {
-
-            beforeEach(function() {
+        Object.keys(editTriggerToEvent).forEach(function(trigger) {
+            it('should start editing if trigger exists in options for' + trigger, function() {
                 this.editing = true;
-            });
-            Object.keys(editTriggerToEvent).forEach(function(trigger) {
-                it(trigger, function() {
-                    this.trigger = trigger;
-                    this.opts = {
-                        editTriggers: [trigger]
-                    };
-                })
-            });
+                this.trigger = trigger;
+                this.event = editTriggerToEvent[trigger];
+                this.opts = {
+                    editTriggers: [trigger]
+                };
+            })
 
+            it('should not start editing if trigger does not exist in options for' + trigger, function() {
+
+                this.trigger = trigger;
+                this.event = editTriggerToEvent[trigger];
+                this.opts = {
+                    editTriggers: []
+                };
+                this.editing = false;
+            });
         });
 
-        describe('should not start editing if trigger does not exist in options for', function() {
-            beforeEach(function() {
-                this.editing = false;
+        it('should not starting editing for typing if meta keys are pressed', function() {
+            this.event = mockKeyPress(32);
+            this.event.metaKey = true;
+            this.editing = false;
+            this.trigger = 'typing';
+            this.opts = {
+                editTriggers: ['typing']
+            };
+        });
 
-            });
+        it('should not starting editing for typing if shift keys are pressed', function() {
+            this.event = mockKeyPress(32);
+            this.event.altKey = true;
+            this.editing = false;
+            this.trigger = 'typing';
+            this.opts = {
+                editTriggers: ['typing']
+            };
+        });
 
-            Object.keys(editTriggerToEvent).forEach(function(trigger) {
-                it(trigger, function() {
-                    this.trigger = trigger;
-                    this.opts = {
-                        editTriggers: []
-                    };
-                })
-            });
-
+        it('should not starting editing for typing if ctrl keys are pressed', function() {
+            this.event = mockKeyPress(32);
+            this.event.ctrlKey = true;
+            this.editing = false;
+            this.trigger = 'typing';
+            this.opts = {
+                editTriggers: ['typing']
+            };
         });
     });
 

@@ -129,7 +129,7 @@ module.exports = function(grid) {
                     }
                     break;
                 case 'keypress':
-                    if (optsHasEditTrigger(opts, 'typing') && e.which >= 32 && e.which <= 122) {
+                    if (optsHasEditTrigger(opts, 'typing') && e.which >= 32 && e.which <= 122 && !e.metaKey && !e.ctrlKey && !e.altKey) {
                         editModel.editCell(row, col, true);
                     }
                     break;

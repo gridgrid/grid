@@ -24,7 +24,7 @@
     "progress",
     "coverage"
   ],
-  "browsers": ["Chrome"],
+  "browsers": ["PhantomJS_custom"],
   "customLaunchers": {
     "PhantomJS_custom": {
       "base": "PhantomJS",
