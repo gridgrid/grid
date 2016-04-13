@@ -56,7 +56,7 @@ module.exports = function(grid) {
                 return {
                     decorator: false,
                     save: undefined,
-                    closePromise: opts.action()
+                    closePromise: opts.action.apply(opts, arguments)
                 };
             };
         } else if (!opts.getEditor) {
@@ -195,7 +195,7 @@ module.exports = function(grid) {
             return;
         }
 
-        var editor = opts.getEditor();
+        var editor = opts.getEditor(r);
         // if they have no editor or not closePromise,
         // it's just a simple action and there's no need to wait on them in edit mode
         if (!editor || (!editor.closePromise && editor.decorator === false)) {
@@ -232,8 +232,8 @@ module.exports = function(grid) {
 
             editor.removeClickOffHandler = clickOff.listen(function getClickOffElement() {
                 return editor.decorator && editor.decorator.boundingBox;
-            }, function onClick() {
-                if (editor.isInMe && editor.isInMe()) {
+            }, function onClick(e) {
+                if (editor.isInMe && editor.isInMe(e)) {
                     return;
                 }
                 if (optsHasCancelTrigger(opts, 'clickoff')) {
@@ -242,6 +242,14 @@ module.exports = function(grid) {
                     editModel.saveEdit();
                 }
             }, {});
+        }
+
+        if (editor.closePromise) {
+            editor.closePromise.then(function resolve() {
+                return editModel.saveEdit();
+            }, function reject() {
+                return editModel.cancelEdit();
+            });
         }
     };
 

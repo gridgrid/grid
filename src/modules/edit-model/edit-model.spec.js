@@ -70,12 +70,14 @@ fdescribe('edit-model', function() {
                         return promise;
                     }
                 };
+                var actionSpy = spyOn(opts, 'action').and.callThrough();
                 opts = this.grid.editModel._hydrateOpts(opts);
                 expect(opts.getEditor).toBeAFunction();
-                var editor = opts.getEditor();
+                var editor = opts.getEditor(23);
                 expect(editor.decorator).toEqual(false);
                 expect(editor.save).toEqual(undefined);
                 expect(editor.closePromise).toBe(promise);
+                expect(actionSpy).toHaveBeenCalledWith(23);
             });
         });
 
@@ -266,11 +268,16 @@ fdescribe('edit-model', function() {
             col.editOptions = makeOptsForEditor({
                 decorator: undefined,
                 save: undefined,
-                closePromise: new Promise(noop, noop)
+                closePromise: new Promise(noop)
             });
         });
 
-
+        it('should call getEditor with the edited row', function() {
+            var col = this.grid.data.col.get(1);
+            var spy = spyOn(col.editOptions, 'getEditor');
+            this.grid.editModel.editCell(1, 1);
+            expect(spy).toHaveBeenCalledWith(1);
+        });
 
         it('should fire the grid-edit event', function() {
             var spy = jasmine.createSpy();
@@ -302,6 +309,45 @@ fdescribe('edit-model', function() {
             });
             this.grid.editModel.editCell(1, 1);
             expect(this.grid.editModel.editing).toEqual(false);
+        });
+
+        it('should call save on closePromise resolve', function(done) {
+            var resolve;
+            var col = this.grid.data.col.get(1);
+            col.editOptions = makeOptsForEditor({
+                decorator: false,
+                save: undefined,
+                closePromise: new Promise(function(r) {
+                    resolve = r;
+                })
+            });
+            this.grid.editModel.editCell(1, 1);
+            var spy = spyOn(this.grid.editModel, 'saveEdit');
+            resolve();
+            setTimeout(function() {
+                expect(spy).toHaveBeenCalled();
+                done();
+            }, 1);
+
+        });
+
+        it('should call cancel on closePromise reject', function(done) {
+            var reject;
+            var col = this.grid.data.col.get(1);
+            col.editOptions = makeOptsForEditor({
+                decorator: false,
+                save: undefined,
+                closePromise: new Promise(function(resolve, r) {
+                    reject = r;
+                })
+            });
+            this.grid.editModel.editCell(1, 1);
+            var spy = spyOn(this.grid.editModel, 'cancelEdit');
+            reject();
+            setTimeout(function() {
+                expect(spy).toHaveBeenCalled();
+                done();
+            }, 1);
         });
 
         describe('default setup', function() {
@@ -674,8 +720,8 @@ fdescribe('edit-model', function() {
             it('should not ' + triggerActionName + ' for clickoff if isInMe returns true from editor', function() {
                 var col = this.grid.data.col.get(1);
                 col.editOptions = makeOptsForEditor({
-                    isInMe: function() {
-                        return true;
+                    isInMe: function(e) {
+                        return !!e;
                     }
                 });
                 this.triggers = ['clickoff'];
