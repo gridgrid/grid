@@ -104,12 +104,12 @@ module.exports = function(grid) {
             // check editTriggers if not editing
             switch (e.type) {
                 case 'click':
-                    if (optsHasEditTrigger(opts, 'click')) {
+                    if (optsHasEditTrigger(opts, 'click') && grid.eventIsOnCells(e)) {
                         editModel.editCell(row, col);
                     }
                     break;
                 case 'dblclick':
-                    if (optsHasEditTrigger(opts, 'dblclick')) {
+                    if (optsHasEditTrigger(opts, 'dblclick') && grid.eventIsOnCells(e)) {
                         editModel.editCell(row, col);
                     }
                     break;

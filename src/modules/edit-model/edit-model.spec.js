@@ -55,6 +55,9 @@ fdescribe('edit-model', function() {
         this.buildSimpleGrid(null, null, null, null, null, null, null, null, {
             allowEdit: true
         });
+        this.grid.eventIsOnCells = function() {
+            return true;
+        }
     });
 
     describe('_hydrateOpts', function() {
@@ -197,6 +200,19 @@ fdescribe('edit-model', function() {
                 };
                 this.editing = false;
             });
+            if (trigger == 'click' || trigger === 'dblclick') {
+                it('should not start editing for if not on cells for ' + trigger, function() {
+                    this.grid.eventIsOnCells = function() {
+                        return false;
+                    }
+                    this.editing = false;
+                    this.trigger = trigger;
+                    this.event = editTriggerToEvent[trigger];
+                    this.opts = {
+                        editTriggers: [trigger]
+                    };
+                });
+            }
         });
 
         it('should not starting editing for typing if meta keys are pressed', function() {
