@@ -231,6 +231,20 @@ fdescribe('edit-model', function() {
     });
 
     describe('edit cell', function() {
+        it('should fire the grid-edit event', function() {
+            var spy = jasmine.createSpy();
+            this.grid.eventLoop.bind('grid-edit', spy);
+            this.grid.editModel.editCell(1, 1);
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it('should save previous edit if already editing', function() {
+            this.grid.editModel.editCell(1, 2);
+            var spy = spyOn(this.grid.editModel, 'saveEdit');
+            this.grid.editModel.editCell(1, 1);
+            expect(spy).toHaveBeenCalled();
+        });
+
         describe('default setup', function() {
             function makeOptsForEditor(editor) {
                 return {
@@ -284,15 +298,6 @@ fdescribe('edit-model', function() {
             });
 
 
-        });
-
-        describe('', function() {
-            it('should fire the grid-edit event', function() {
-                var spy = jasmine.createSpy();
-                this.grid.eventLoop.bind('grid-edit', spy);
-                this.grid.editModel.editCell(1, 1);
-                expect(spy).toHaveBeenCalled();
-            });
         });
 
         describe('on headers', function() {
@@ -574,6 +579,16 @@ fdescribe('edit-model', function() {
                     this.notCancel = true;
                     this.doTrigger = triggerToDoTrigger[triggerName];
                 });
+            });
+
+            it('should not ' + triggerActionName + ' for enter if shift is pressed', function() {
+                this.triggers = ['enter'];
+                this.doTrigger = function() {
+                    var e = mockKeyDown(key.code.special.enter);
+                    e.shiftKey = true;
+                    this.grid.editModel._interceptor(e);
+                };
+                this.notCancel = true;
             });
         });
     }

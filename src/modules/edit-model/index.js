@@ -145,7 +145,7 @@ module.exports = function(grid) {
                         e.preventDefault();
                     }
 
-                    if (optsHasSaveTrigger(opts, 'enter') && key.is(key.code.special.enter, e.which)) {
+                    if (optsHasSaveTrigger(opts, 'enter') && key.is(key.code.special.enter, e.which) && !e.shiftKey) {
                         editModel.saveEdit().then(function() {
                             grid.navigationModel.setFocus(grid.data.down(grid.navigationModel.focus.row), grid.navigationModel.focus.col);
                         });
@@ -180,6 +180,13 @@ module.exports = function(grid) {
     }
 
     editModel.editCell = function(r, c, isTyping) {
+        if (editModel.editing) {
+            editModel.saveEdit();
+        }
+
+        if (isNaN(r) || isNaN(c)) {
+            return;
+        }
         var opts = getOptsForCol(c);
         if (!opts) {
             return;
