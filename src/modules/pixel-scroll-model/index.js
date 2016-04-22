@@ -1,21 +1,26 @@
 var util = require('../util');
 var debounce = require('../debounce');
 var capitalize = require('capitalize');
+var dirtyClean = require('../dirty-clean');
 
-module.exports = function(_grid) {
+module.exports = function (_grid) {
     var grid = _grid;
+    var pixelDirtyClean = dirtyClean(grid);
     var model = {
         top: 0,
         left: 0,
+        offsetTop: 0,
+        offsetLeft: 0,
         maxScroll: {},
         maxIsAllTheWayFor: {
             height: false,
             width: false
-        }
+        },
+        isDirty: pixelDirtyClean.isDirty
     };
     var scrollBarWidth = 10;
 
-    grid.eventLoop.bind('grid-virtual-pixel-cell-change', function() {
+    grid.eventLoop.bind('grid-virtual-pixel-cell-change', function () {
         var scrollHeight = grid.virtualPixelCellModel.totalHeight() - grid.virtualPixelCellModel.fixedHeight();
         var scrollWidth = grid.virtualPixelCellModel.totalWidth() - grid.virtualPixelCellModel.fixedWidth();
         model.setScrollSize(scrollHeight, scrollWidth);
@@ -24,7 +29,7 @@ module.exports = function(_grid) {
     });
 
 
-    grid.eventLoop.bind('grid-viewport-change', function() {
+    grid.eventLoop.bind('grid-viewport-change', function () {
         cacheMaxScroll();
         sizeScrollBars();
     });
@@ -41,12 +46,12 @@ module.exports = function(_grid) {
         }
         var deltaY = e.deltaY;
         var deltaX = e.deltaX;
-        model.scrollTo(model.top - deltaY, model.left - deltaX, true);
+        model.scrollTo(model.top - deltaY, model.left - deltaX, false);
         e.preventDefault();
-        debouncedNotify();
+        // debouncedNotify();
     });
 
-    model.setScrollSize = function(h, w) {
+    model.setScrollSize = function (h, w) {
         model.height = h;
         model.width = w;
     };
@@ -63,14 +68,32 @@ module.exports = function(_grid) {
         var col = grid.virtualPixelCellModel.getCol(scrollLeft + grid.virtualPixelCellModel.fixedWidth()) - grid.colModel.numFixed();
 
         grid.cellScrollModel.scrollTo(row, col, undefined, true);
+        pixelDirtyClean.setDirty();
     }
 
     var debouncedNotify = debounce(notifyListeners, 1);
 
-    model.scrollTo = function(top, left, dontNotify) {
+    function updatePixelOffsets() {
+        var fixedHeight = grid.virtualPixelCellModel.fixedHeight();
+        var fixedWidth = grid.virtualPixelCellModel.fixedWidth();
+        var row = grid.virtualPixelCellModel.getRow(grid.pixelScrollModel.top + fixedHeight) - grid.rowModel.numFixed();
+        var top = grid.virtualPixelCellModel.height(grid.rowModel.numFixed(), row + grid.rowModel.numFixed() - 1);
+        var otherTop = grid.pixelScrollModel.top;
+        var modTopPixels = top - otherTop;
+        var col = grid.virtualPixelCellModel.getCol(grid.pixelScrollModel.left + fixedWidth) - grid.colModel.numFixed();
+        var left = grid.virtualPixelCellModel.width(grid.colModel.numFixed(), col + grid.colModel.numFixed() - 1);
+
+        var modLeftPixels = left - grid.pixelScrollModel.left;
+        model.offsetTop = modTopPixels;
+        model.offsetLeft = modLeftPixels;
+    }
+
+    model.scrollTo = function (top, left, dontNotify) {
         model.top = util.clamp(top, 0, model.maxScroll.height);
         model.left = util.clamp(left, 0, model.maxScroll.width);
         positionScrollBars();
+        updatePixelOffsets();
+
 
         if (!dontNotify) {
             notifyListeners();
@@ -90,6 +113,7 @@ module.exports = function(_grid) {
 
     function makeScrollBarDecorator(isHorz) {
         var decorator = grid.decorators.create();
+        decorator.fixed = true;
         var xOrY = isHorz ? 'X' : 'Y';
         var heightWidth = isHorz ? 'width' : 'height';
         var vertHorz = isHorz ? 'horz' : 'vert';
@@ -97,15 +121,15 @@ module.exports = function(_grid) {
         var layerCoordField = 'layer' + xOrY;
         var viewPortClampFn = grid.viewPort['clamp' + xOrY];
 
-        decorator.postRender = function(scrollBarElem) {
+        decorator.postRender = function (scrollBarElem) {
             scrollBarElem.setAttribute('class', 'grid-scroll-bar');
-            decorator._onDragStart = function(e) {
+            decorator._onDragStart = function (e) {
                 if (e.target !== scrollBarElem) {
                     return;
                 }
                 var scrollBarOffset = e[layerCoordField];
 
-                decorator._unbindDrag = grid.eventLoop.bind('grid-drag', function(e) {
+                decorator._unbindDrag = grid.eventLoop.bind('grid-drag', function (e) {
                     grid.eventLoop.stopBubbling(e);
                     var gridCoord = viewPortClampFn(e[gridCoordField]);
                     var scrollBarRealClickCoord = gridCoord - scrollBarOffset;
@@ -117,7 +141,7 @@ module.exports = function(_grid) {
                     }
                 });
 
-                decorator._unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function() {
+                decorator._unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function () {
                     decorator._unbindDrag();
                     decorator._unbindDragEnd();
                 });
@@ -126,7 +150,7 @@ module.exports = function(_grid) {
             };
 
             grid.eventLoop.bind('grid-drag-start', scrollBarElem, decorator._onDragStart);
-            grid.eventLoop.bind('mousedown', scrollBarElem, function(e) {
+            grid.eventLoop.bind('mousedown', scrollBarElem, function (e) {
                 grid.eventLoop.stopBubbling(e);
             });
 

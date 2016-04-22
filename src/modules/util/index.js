@@ -1,5 +1,5 @@
-module.exports = {
-    clamp: function(num, min, max, returnNaN) {
+var util = {
+    clamp: function (num, min, max, returnNaN) {
         if (num > max) {
             return returnNaN ? NaN : max;
         }
@@ -8,30 +8,37 @@ module.exports = {
         }
         return num;
     },
-    isNumber: function(number) {
+    isNumber: function (number) {
         return typeof number === 'number' && !isNaN(number);
     },
-    isElement: function(node) {
+    isElement: function (node) {
         return !!(node &&
             (node.nodeName || // we are a direct element
                 (node.prop && node.attr && node.find))); // we have an on and find method part of jquery API
     },
-    isArray: function(value) {
+    isArray: function (value) {
         return Object.prototype.toString.call(value) === '[object Array]';
     },
-    position: function(elem, t, l, b, r) {
+    position: function (elem, t, l, b, r, h, w) {
         if (t != null) {
             elem.style.top = t + 'px';
         }
-        if (t != null) {
+        if (l != null) {
             elem.style.left = l + 'px';
         }
-        if (t != null) {
+        if (b != null) {
             elem.style.bottom = b + 'px';
         }
-        if (t != null) {
+        if (r != null) {
             elem.style.right = r + 'px';
+        }
+        if (h != null) {
+            elem.style.height = h + 'px';
+        }
+        if (w != null) {
+            elem.style.width = w + 'px';
         }
         elem.style.position = 'absolute';
     }
 };
+module.exports = util;

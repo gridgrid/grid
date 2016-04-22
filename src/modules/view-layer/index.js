@@ -1,15 +1,17 @@
 var customEvent = require('../custom-event');
-var debounce = require('../debounce');
 var util = require('../util');
 
 
-module.exports = function(_grid) {
+module.exports = function (_grid) {
     var viewLayer = {};
 
     var grid = _grid;
     var container;
     var root;
-    var cellContainer;
+    var cellContainerTL;
+    var cellContainerTR;
+    var cellContainerBL;
+    var cellContainerBR;
     var decoratorContainer;
     var borderWidth;
 
@@ -36,44 +38,84 @@ module.exports = function(_grid) {
     grid.cellClasses.add(fixedColClasses);
 
 
-    grid.eventLoop.bind('grid-col-change', function() {
+    grid.eventLoop.bind('grid-col-change', function () {
         fixedColClasses.left = grid.colModel.numFixed() - 1;
         rowHeaderClasses.width = grid.colModel.numHeaders();
     });
 
-    grid.eventLoop.bind('grid-row-change', function() {
+    grid.eventLoop.bind('grid-row-change', function () {
         fixedRowClasses.top = grid.rowModel.numFixed() - 1;
         colHeaderClasses.height = grid.rowModel.numHeaders();
     });
 
+    function makeCellContainer() {
+        var cellContainer = document.createElement('div');
+        cellContainer.setAttribute('dts', 'grid-cells');
+        cellContainer.setAttribute('class', GRID_CELL_CONTAINER_BASE_CLASS);
+        cellContainer.style.zIndex = '';
+        // cellContainer.style.pointerEvents = 'none';
+        return cellContainer;
+    }
 
-    viewLayer.build = function(elem) {
+    function makeDecoratorContainer() {
+        var decoratorContainer = document.createElement('div');
+        decoratorContainer.setAttribute('dts', 'grid-decorators');
+        util.position(decoratorContainer, 0, 0, 0, 0);
+        decoratorContainer.style.zIndex = '';
+        decoratorContainer.style.pointerEvents = 'none';
+        return decoratorContainer;
+    }
+
+
+    viewLayer.build = function (elem) {
         cleanup();
 
         container = elem;
 
-        cellContainer = document.createElement('div');
-        cellContainer.setAttribute('dts', 'grid-cells');
-        cellContainer.setAttribute('class', GRID_CELL_CONTAINER_BASE_CLASS);
-        util.position(cellContainer, 0, 0, 0, 0);
-        cellContainer.style.zIndex = 0;
+        cellContainerTL = makeCellContainer();
+        cellContainerTL.style.zIndex = 4;
+        cellContainerTR = makeCellContainer();
+        cellContainerTR.style.zIndex = 3;
+        cellContainerBL = makeCellContainer();
+        cellContainerBL.style.zIndex = 3;
+        cellContainerBR = makeCellContainer();
+        cellContainerBR.style.zIndex = 2;
 
-        decoratorContainer = document.createElement('div');
-        decoratorContainer.setAttribute('dts', 'grid-decorators');
-        util.position(decoratorContainer, 0, 0, 0, 0);
-        decoratorContainer.style.zIndex = 0;
-        decoratorContainer.style.pointerEvents = 'none';
+        decoratorContainer = makeDecoratorContainer();
 
         root = document.createElement('div');
         root.setAttribute('class', GRID_VIEW_ROOT_CLASS);
 
-        root.appendChild(cellContainer);
+        root.appendChild(cellContainerTL);
+        root.appendChild(cellContainerTR);
+        root.appendChild(cellContainerBL);
+        root.appendChild(cellContainerBR);
         root.appendChild(decoratorContainer);
 
         container.appendChild(root);
 
     };
 
+    function offsetContainerForPixelScroll(drawingCells) {
+        var modTopPixels = grid.pixelScrollModel.offsetTop;
+        var modLeftPixels = grid.pixelScrollModel.offsetLeft;
+        util.position(cellContainerTL, 0, 0, null, null, grid.virtualPixelCellModel.fixedHeight(), grid.virtualPixelCellModel.fixedWidth());
+        util.position(cellContainerBR, modTopPixels, modLeftPixels, 0, 0);
+        util.position(cellContainerTR, 0, modLeftPixels, null, 0, grid.virtualPixelCellModel.fixedHeight());
+        util.position(cellContainerBL, modTopPixels, 0, 0, null, null, grid.virtualPixelCellModel.fixedWidth());
+        grid.decorators.getAlive().forEach(function (decorator) {
+            if (decorator.fixed) {
+                return;
+            }
+            if (decorator.scrollVert) {
+                decorator.boundingBox.style.marginTop = modTopPixels + 'px';
+            }
+            if (decorator.scrollHorz) {
+                decorator.boundingBox.style.marginLeft = modLeftPixels + 'px';
+            }
+
+        });
+    }
 
     function measureBorderWidth() {
         // read the border width, for the rare case of larger than 1px borders, otherwise the draw will default to 1
@@ -94,11 +136,19 @@ module.exports = function(_grid) {
     }
 
     // only draw once per js turn, may need to create a synchronous version
-    viewLayer.draw = debounce(function() {
-        viewLayer._draw();
-    }, 1);
+    // viewLayer.draw = debounce(function () {
+    //     viewLayer._draw();
+    // }, 1);
+    var drawRequested = false;
+    viewLayer.draw = function () {
+        if (!drawRequested) {
+            requestAnimationFrame(viewLayer._draw);
+            drawRequested = true;
+        }
+    };
 
-    viewLayer._draw = function() {
+    viewLayer._draw = function () {
+        drawRequested = false;
         // return if we haven't built yet
         if (!container) {
             return;
@@ -106,7 +156,7 @@ module.exports = function(_grid) {
 
         var rebuilt = grid.viewPort.isDirty();
         if (rebuilt) {
-            viewLayer._buildCells(cellContainer);
+            viewLayer._buildCells();
         }
 
         var builtColsDirty = grid.colModel.areBuildersDirty();
@@ -125,12 +175,18 @@ module.exports = function(_grid) {
             viewLayer._drawCellClasses();
         }
 
-        if (rebuilt || cellsPositionOrSizeChanged || builtColsDirty || builtRowsDirty || grid.dataModel.isDirty()) {
+        var drawingCells = rebuilt || cellsPositionOrSizeChanged || builtColsDirty || builtRowsDirty || grid.dataModel.isDirty();
+        if (drawingCells) {
             viewLayer._drawCells();
         }
 
-        if (grid.decorators.isDirty() || rebuilt || cellsPositionOrSizeChanged) {
+        var drawingDecorators = grid.decorators.isDirty() || rebuilt || cellsPositionOrSizeChanged;
+        if (drawingDecorators) {
             viewLayer._drawDecorators(cellsPositionOrSizeChanged);
+        }
+
+        if (grid.pixelScrollModel.isDirty() || drawingDecorators) {
+            offsetContainerForPixelScroll(drawingCells);
         }
 
         grid.eventLoop.fire('grid-draw');
@@ -141,7 +197,7 @@ module.exports = function(_grid) {
         return borderWidth || 1;
     }
 
-    viewLayer._drawCells = function() {
+    viewLayer._drawCells = function () {
         measureBorderWidth();
         var bWidth = getBorderWidth();
         var headerRows = grid.rowModel.numHeaders();
@@ -153,6 +209,20 @@ module.exports = function(_grid) {
         var widths = [];
         var lefts = [];
         var virtualCols = [];
+
+        function positionRow(row, height, top, virtualRow) {
+            if (!row) {
+                return;
+            }
+            // seeing the same virtual row twice means we've been clamped and it's time to hide the row
+            if (height === 0 || lastVirtualRow === virtualRow) {
+                row.style.display = 'none';
+                return;
+            }
+            row.style.display = '';
+            row.style.height = height + bWidth + 'px';
+            row.style.top = top + 'px';
+        }
 
         grid.viewPort.iterateCells(function drawCell(r, c) {
             var cell = cells[r][c];
@@ -224,54 +294,92 @@ module.exports = function(_grid) {
             }
         }, function drawRow(r) {
             var height = grid.viewPort.getRowHeight(r);
-            var row = rows[r];
             var virtualRow = grid.view.row.toVirtual(r);
-            // seeing the same virtual row twice means we've been clamped and it's time to hide the row
-            if (height === 0 || lastVirtualRow === virtualRow) {
-                row.style.display = 'none';
-                return;
-            }
-            lastVirtualRow = virtualRow;
-            row.style.display = '';
-            row.style.height = height + bWidth + 'px';
             var top = grid.viewPort.getRowTop(r);
-            row.style.top = top + 'px';
+            positionRow(rows.fixed[r], height, top, virtualRow);
+            positionRow(rows.nonFixed[r], height, top, virtualRow);
+            lastVirtualRow = virtualRow;
         });
 
-        rows.forEach(function(row) {
+        rows.nonFixed.forEach(function (row) {
             row.style.width = totalVisibleCellWidth + 'px';
+        });
+        rows.fixed.forEach(function (row) {
+            row.style.width = grid.virtualPixelCellModel.fixedWidth() + 'px';
         });
 
         if (grid.cellScrollModel.row % 2) {
-            cellContainer.className = GRID_CELL_CONTAINER_BASE_CLASS + ' odds';
+            doToAllCellContainers(function (cellContainer) {
+                cellContainer.className = GRID_CELL_CONTAINER_BASE_CLASS + ' odds';
+            });
+
         } else {
-            cellContainer.className = GRID_CELL_CONTAINER_BASE_CLASS;
+            doToAllCellContainers(function (cellContainer) {
+                cellContainer.className = GRID_CELL_CONTAINER_BASE_CLASS;
+            });
+
         }
     };
 
-
-    viewLayer._buildCells = function buildCells(cellContainer) {
+    function clearCellContainer(cellContainer) {
         while (cellContainer.firstChild) {
             cellContainer.removeChild(cellContainer.firstChild);
         }
+    }
 
+    function doToAllCellContainers(fn) {
+        fn(cellContainerTL);
+        fn(cellContainerTR);
+        fn(cellContainerBL);
+        fn(cellContainerBR);
+    }
+
+    function getCellContainer(r, c) {
+        var fixedRow = r < grid.rowModel.numFixed();
+        var fixedCol = c < grid.colModel.numFixed();
+        if (fixedRow && fixedCol) {
+            return cellContainerTL;
+        } else if (fixedRow) {
+            return cellContainerTR;
+        } else if (fixedCol) {
+            return cellContainerBL
+        }
+        return cellContainerBR;
+    }
+
+    function buildRow(r) {
+        var row = document.createElement('div');
+        row.setAttribute('class', 'grid-row');
+        row.setAttribute('dts', 'grid-row');
+        row.style.position = 'absolute';
+        row.style.left = 0;
+        if (r < grid.rowModel.numHeaders()) {
+            row.classList.add('grid-is-header');
+        }
+        return row;
+    }
+
+    viewLayer._buildCells = function buildCells() {
+
+        doToAllCellContainers(clearCellContainer);
 
         cells = [];
-        rows = [];
+        rows = {
+            fixed: [],
+            nonFixed: []
+        };
         var row;
-        grid.viewPort.iterateCells(function(r, c) {
+        grid.viewPort.iterateCells(function (r, c) {
+            if (c === 0) {
+                cells[r] = [];
+                row = rows.fixed[r] = buildRow(r);
+            } else if (c === grid.colModel.numFixed()) {
+                row = rows.nonFixed[r] = buildRow(r);
+            }
             var cell = buildDivCell();
             cells[r][c] = cell;
             row.appendChild(cell);
-        }, function(r) {
-            cells[r] = [];
-            row = document.createElement('div');
-            row.setAttribute('class', 'grid-row');
-            row.setAttribute('dts', 'grid-row');
-            row.style.position = 'absolute';
-            row.style.left = 0;
-            rows[r] = row;
-            cellContainer.appendChild(row);
+            getCellContainer(r, c).appendChild(row);
         });
     };
 
@@ -294,7 +402,7 @@ module.exports = function(_grid) {
         if (!oldElems) {
             return;
         }
-        oldElems.forEach(function(oldElem) {
+        oldElems.forEach(function (oldElem) {
             if (!oldElem) {
                 return;
             }
@@ -303,7 +411,7 @@ module.exports = function(_grid) {
         });
     }
 
-    viewLayer._buildCols = function() {
+    viewLayer._buildCols = function () {
         var previouslyBuiltCols = builtCols;
         builtCols = {};
         for (var c = 0; c < grid.colModel.length(true); c++) {
@@ -328,7 +436,7 @@ module.exports = function(_grid) {
      *  for now we only build headers
      * */
 
-    viewLayer._buildRows = function() {
+    viewLayer._buildRows = function () {
         var previouslyBuiltRows = builtRows;
         builtRows = {};
         for (var r = 0; r < grid.rowModel.numHeaders(); r++) {
@@ -387,9 +495,9 @@ module.exports = function(_grid) {
         return range;
     }
 
-    viewLayer._drawDecorators = function(cellsPositionOrSizeChanged) {
+    viewLayer._drawDecorators = function (cellsPositionOrSizeChanged) {
         var aliveDecorators = grid.decorators.getAlive();
-        aliveDecorators.forEach(function(decorator) {
+        aliveDecorators.forEach(function (decorator) {
 
             var boundingBox = decorator.boundingBox;
             var hasBeenRendered = !!boundingBox;
@@ -405,7 +513,12 @@ module.exports = function(_grid) {
             }
 
             if (decorator.isDirty() || cellsPositionOrSizeChanged || !hasBeenRendered) {
+
+                var vCol = decorator.left;
+                var vRow = decorator.top;
                 if (decorator.space === 'real') {
+                    vCol = grid.view.col.toVirtual(vCol);
+                    vRow = grid.view.row.toVirtual(vRow);
                     switch (decorator.units) {
                         case 'px':
                             positionDecorator(boundingBox, decorator.top, decorator.left, decorator.height, decorator.width);
@@ -415,6 +528,10 @@ module.exports = function(_grid) {
                             break;
                     }
                 } else if (decorator.space === 'virtual' || decorator.space === 'data') {
+                    if (decorator.space === 'data') {
+                        vCol = grid.data.col.toVirtual(vCol);
+                        vRow = grid.data.row.toVirtual(vRow);
+                    }
                     switch (decorator.units) {
                         case 'px':
                             break;
@@ -431,7 +548,25 @@ module.exports = function(_grid) {
                             break;
                             /* jshint +W086 */
                     }
-
+                }
+                var fixedRow = vRow < grid.rowModel.numFixed();
+                var fixedCol = vCol < grid.colModel.numFixed();
+                if (fixedRow && fixedCol) {
+                    decorator.scrollHorz = false;
+                    decorator.scrollVert = false;
+                    decorator.boundingBox.style.zIndex = 4;
+                } else if (fixedRow) {
+                    decorator.scrollHorz = true;
+                    decorator.scrollVert = false;
+                    decorator.boundingBox.style.zIndex = 3;
+                } else if (fixedCol) {
+                    decorator.scrollHorz = false;
+                    decorator.scrollVert = true;
+                    decorator.boundingBox.style.zIndex = 3;
+                } else {
+                    decorator.scrollHorz = true;
+                    decorator.scrollVert = true;
+                    decorator.boundingBox.style.zIndex = 2;
                 }
             }
         });
@@ -440,7 +575,7 @@ module.exports = function(_grid) {
     };
 
     function removeDecorators(decorators) {
-        decorators.forEach(function(decorator) {
+        decorators.forEach(function (decorator) {
             var boundingBox = decorator.boundingBox;
             if (boundingBox) {
                 // if they rendered an element previously we attached it to the bounding box as the only child
@@ -450,7 +585,10 @@ module.exports = function(_grid) {
                     var destroyEvent = customEvent('decorator-destroy', true);
                     renderedElement.dispatchEvent(destroyEvent);
                 }
-                decoratorContainer.removeChild(boundingBox);
+                var parent = boundingBox.parentElement;
+                if (parent) {
+                    parent.removeChild(boundingBox);
+                }
                 decorator.boundingBox = undefined;
             }
         });
@@ -459,8 +597,8 @@ module.exports = function(_grid) {
     /* END DECORATOR LOGIC */
 
     /* CELL CLASSES LOGIC */
-    viewLayer._drawCellClasses = function() {
-        grid.viewPort.iterateCells(function(r, c) {
+    viewLayer._drawCellClasses = function () {
+        grid.viewPort.iterateCells(function (r, c) {
             var classes = grid.cellClasses.getCachedClasses(grid.view.row.toVirtual(r), grid.view.col.toVirtual(c));
             cells[r][c].className = classes.join(' ');
         });
@@ -468,7 +606,7 @@ module.exports = function(_grid) {
 
     /* END CELL CLASSES LOGIC*/
 
-    viewLayer.eventIsOnCells = function(e) {
+    viewLayer.eventIsOnCells = function (e) {
         var target = e.target;
 
         if (!target) {
@@ -493,7 +631,7 @@ module.exports = function(_grid) {
         return false;
     }
 
-    viewLayer.setTextContent = function(elem, text) {
+    viewLayer.setTextContent = function (elem, text) {
         if (elem.firstChild && elem.firstChild.nodeType === 3) {
             elem.firstChild.nodeValue = text;
         } else {
@@ -505,7 +643,7 @@ module.exports = function(_grid) {
         if (!built) {
             return;
         }
-        Object.keys(built).forEach(function(key) {
+        Object.keys(built).forEach(function (key) {
             destroyRenderedElems(built[key]);
         });
     }
@@ -535,7 +673,7 @@ module.exports = function(_grid) {
         return false;
     }
 
-    grid.eventLoop.bind('grid-destroy', function() {
+    grid.eventLoop.bind('grid-destroy', function () {
         cleanup();
         clearTimeout(viewLayer.draw.timeout);
         viewLayer.draw = require('../no-op');

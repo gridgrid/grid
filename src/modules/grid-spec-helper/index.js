@@ -1,4 +1,7 @@
 module.exports = function () {
+    window.requestAnimationFrame = function (fn) {
+        return setTimeout(fn, 1);
+    };
     var $ = require('jquery');
     beforeEach(function () {
 
@@ -45,7 +48,12 @@ module.exports = function () {
             this.grid.eventLoop.fire('grid-draw');
         };
         this.makeFakeRange = function (t, l, h, w) {
-            return {top: t, left: l, height: h, width: w};
+            return {
+                top: t,
+                left: l,
+                height: h,
+                width: w
+            };
         };
         this.spyOnUnbind = function () {
             var unbind = jasmine.createSpy();
@@ -72,4 +80,3 @@ module.exports = function () {
     });
 
 };
-
