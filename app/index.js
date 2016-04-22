@@ -18,12 +18,13 @@ angular.module('gridApp', [])
 
                 var grid = makeSimpleGrid(numRows, numCols, [30], [40, 100, 400, 90], 1, 3, undefined, 1, 1, {
                     allowEdit: true,
-                    snapToCell: true
+                    snapToCell: false
                 });
                 grid.colModel.get(0).width = 60;
                 grid.colModel.get(2).width = 40;
                 grid.build(elem);
                 grid.navigationModel.minRow = 1;
+                grid.pixelScrollModel.maxIsAllTheWayFor.height = true;
 
                 //hide columsn for testing
                 for (var c = 0; c < grid.colModel.length(); c++) {
