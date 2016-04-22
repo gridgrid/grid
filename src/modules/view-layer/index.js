@@ -22,7 +22,10 @@ module.exports = function (_grid) {
     var CELL_CLASS = 'grid-cell';
 
     var cells; // matrix of rendered cell elements;
-    var rows; // array of all rendered rows
+    var rows = {
+        fixed: [],
+        nonFixed: []
+    }; // array of all rendered rows
     var builtCols; // map from col index to an array of built elements for the column to update on scroll
     var builtRows; // map from row index to an array of built elements for the row to update on scroll
 
@@ -384,10 +387,8 @@ module.exports = function (_grid) {
         doToAllCellContainers(clearCellContainer);
 
         cells = [];
-        rows = {
-            fixed: [],
-            nonFixed: []
-        };
+        rows.fixed = [];
+        rows.nonFixed = [];
         var row;
         grid.viewPort.iterateCells(function (r, c) {
             if (c === 0) {
