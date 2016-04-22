@@ -19,6 +19,7 @@ module.exports = function (_grid) {
         isDirty: pixelDirtyClean.isDirty
     };
     var scrollBarWidth = 10;
+    var intentionAngle = 30;
 
     grid.eventLoop.bind('grid-virtual-pixel-cell-change', function () {
         var scrollHeight = grid.virtualPixelCellModel.totalHeight() - grid.virtualPixelCellModel.fixedHeight();
@@ -39,16 +40,27 @@ module.exports = function (_grid) {
         model.maxScroll.width = getMaxScroll('width');
     }
 
+    function checkAngle(side1, side2) {
+        var angle = Math.abs(Math.atan(side1 / side2) * 57.29);
+        return angle < intentionAngle;
+    }
+
     // assumes a standardized wheel event that we create through the mousewheel package
     grid.eventLoop.bind('mousewheel', function handleMouseWheel(e) {
         if (getScrollElementFromTarget(e.target, grid.container) !== grid.container) {
             return;
         }
+
         var deltaY = e.deltaY;
         var deltaX = e.deltaX;
+        if (checkAngle(deltaY, deltaX)) {
+            deltaY = 0;
+        } else if (checkAngle(deltaX, deltaY)) {
+            deltaX = 0;
+        }
+
         model.scrollTo(model.top - deltaY, model.left - deltaX, false);
         e.preventDefault();
-        // debouncedNotify();
     });
 
     model.setScrollSize = function (h, w) {
@@ -57,10 +69,10 @@ module.exports = function (_grid) {
     };
 
     function notifyListeners() {
-        //TODO: possibly keep track of delta since last update and send it along. for now, no
+        // TODO: possibly keep track of delta since last update and send it along. for now, no
         grid.eventLoop.fire('grid-pixel-scroll');
 
-        //update the cell scroll
+        // update the cell scroll
         var scrollTop = model.top;
         var row = grid.virtualPixelCellModel.getRow(scrollTop + grid.virtualPixelCellModel.fixedHeight()) - grid.rowModel.numFixed();
 
@@ -70,8 +82,6 @@ module.exports = function (_grid) {
         grid.cellScrollModel.scrollTo(row, col, undefined, true);
         pixelDirtyClean.setDirty();
     }
-
-    var debouncedNotify = debounce(notifyListeners, 1);
 
     function updatePixelOffsets() {
         var fixedHeight = grid.virtualPixelCellModel.fixedHeight();
