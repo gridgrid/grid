@@ -332,10 +332,8 @@ module.exports = function (_grid) {
         });
 
         if (grid.cellScrollModel.row % 2) {
-            doToAllCellContainers(function (cellContainer) {
-                cellContainer.className = GRID_CELL_CONTAINER_BASE_CLASS + ' odds';
-            });
-
+            cellContainerBR.className = GRID_CELL_CONTAINER_BASE_CLASS + ' odds';
+            cellContainerBL.className = GRID_CELL_CONTAINER_BASE_CLASS + ' odds';
         } else {
             doToAllCellContainers(function (cellContainer) {
                 cellContainer.className = GRID_CELL_CONTAINER_BASE_CLASS;
@@ -393,9 +391,11 @@ module.exports = function (_grid) {
         grid.viewPort.iterateCells(function (r, c) {
             if (c === 0) {
                 cells[r] = [];
-                row = rows.fixed[r] = buildRow(r);
-            } else if (c === grid.colModel.numFixed()) {
+            }
+            if (c === grid.colModel.numFixed()) {
                 row = rows.nonFixed[r] = buildRow(r);
+            } else if (c === 0) {
+                row = rows.fixed[r] = buildRow(r);
             }
             var cell = buildDivCell();
             cells[r][c] = cell;
