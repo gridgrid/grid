@@ -14,6 +14,8 @@ module.exports = function (_grid) {
     var cellContainerBR;
     var decoratorContainer;
     var borderWidth;
+    var hoveredFixedRow;
+    var hoveredRow;
 
     var GRID_CELL_CONTAINER_BASE_CLASS = 'grid-cells';
     var GRID_VIEW_ROOT_CLASS = 'js-grid-view-root';
@@ -46,6 +48,24 @@ module.exports = function (_grid) {
     grid.eventLoop.bind('grid-row-change', function () {
         fixedRowClasses.top = grid.rowModel.numFixed() - 1;
         colHeaderClasses.height = grid.rowModel.numHeaders();
+    });
+
+    grid.eventLoop.bind('grid-cell-mouse-move', function (e) {
+        var row = rows.fixed[e.realRow];
+        if (!row) {
+            return;
+        }
+        row.classList.add('hover');
+        if (hoveredFixedRow && hoveredFixedRow !== row) {
+            hoveredFixedRow.classList.remove('hover');
+        }
+        hoveredFixedRow = row;
+        row = rows.nonFixed[e.realRow];
+        row.classList.add('hover');
+        if (hoveredRow && hoveredRow !== row) {
+            hoveredRow.classList.remove('hover');
+        }
+        hoveredRow = row;
     });
 
     function makeCellContainer() {

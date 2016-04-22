@@ -26,16 +26,16 @@ a {
 
 .odds {
   .grid-row:nth-of-type(odd) {
-    .grid-cell:not(.grid-last-fixed-row) {
+
       background: #f7f7f7;
     }
-  }
+
 
   .grid-row:nth-of-type(even) {
-    .grid-cell:not(.grid-last-fixed-row) {
+
       background: white;
     }
-  }
+
 }
 
 .grid-cell {
@@ -56,8 +56,8 @@ a {
 }
 
 .grid-row {
-  &:hover .grid-cell {
-    //background-color: transparentize(green, .8) !important;
+  &.hover {
+    background-color: lighten(green, 50) !important;
   }
 
   //header row
