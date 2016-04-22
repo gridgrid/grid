@@ -102,7 +102,9 @@ module.exports = function (_grid) {
         model.top = util.clamp(top, 0, model.maxScroll.height);
         model.left = util.clamp(left, 0, model.maxScroll.width);
         positionScrollBars();
-        updatePixelOffsets();
+        if (!grid.opts.snapToCell) {
+            updatePixelOffsets();
+        }
 
 
         if (!dontNotify) {

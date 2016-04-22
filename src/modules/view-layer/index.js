@@ -205,7 +205,7 @@ module.exports = function (_grid) {
             viewLayer._drawDecorators(cellsPositionOrSizeChanged);
         }
 
-        if (grid.pixelScrollModel.isDirty() || drawingDecorators) {
+        if ((!grid.opts.snapToCell || rebuilt) && (grid.pixelScrollModel.isDirty() || drawingDecorators)) {
             offsetContainerForPixelScroll(drawingCells);
         }
 
