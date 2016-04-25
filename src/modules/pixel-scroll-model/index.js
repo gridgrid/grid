@@ -6,6 +6,7 @@ var dirtyClean = require('../dirty-clean');
 module.exports = function (_grid) {
     var grid = _grid;
     var pixelDirtyClean = dirtyClean(grid);
+    var offsetDirtyClean = dirtyClean(grid);
     var model = {
         top: 0,
         left: 0,
@@ -16,7 +17,8 @@ module.exports = function (_grid) {
             height: false,
             width: false
         },
-        isDirty: pixelDirtyClean.isDirty
+        isDirty: pixelDirtyClean.isDirty,
+        isOffsetDirty: offsetDirtyClean.isDirty
     };
     var scrollBarWidth = 10;
     var intentionAngle = 30;
@@ -84,16 +86,23 @@ module.exports = function (_grid) {
     }
 
     function updatePixelOffsets() {
-        var fixedHeight = grid.virtualPixelCellModel.fixedHeight();
-        var fixedWidth = grid.virtualPixelCellModel.fixedWidth();
-        var row = grid.virtualPixelCellModel.getRow(grid.pixelScrollModel.top + fixedHeight) - grid.rowModel.numFixed();
-        var top = grid.virtualPixelCellModel.height(grid.rowModel.numFixed(), row + grid.rowModel.numFixed() - 1);
-        var otherTop = grid.pixelScrollModel.top;
-        var modTopPixels = top - otherTop;
-        var col = grid.virtualPixelCellModel.getCol(grid.pixelScrollModel.left + fixedWidth) - grid.colModel.numFixed();
-        var left = grid.virtualPixelCellModel.width(grid.colModel.numFixed(), col + grid.colModel.numFixed() - 1);
+        var modTopPixels = 0;
+        var modLeftPixels = 0;
+        if (!grid.opts.snapToCell) {
+            var fixedHeight = grid.virtualPixelCellModel.fixedHeight();
+            var fixedWidth = grid.virtualPixelCellModel.fixedWidth();
+            var row = grid.virtualPixelCellModel.getRow(grid.pixelScrollModel.top + fixedHeight) - grid.rowModel.numFixed();
+            var top = grid.virtualPixelCellModel.height(grid.rowModel.numFixed(), row + grid.rowModel.numFixed() - 1);
+            var otherTop = grid.pixelScrollModel.top;
+            modTopPixels = top - otherTop;
+            var col = grid.virtualPixelCellModel.getCol(grid.pixelScrollModel.left + fixedWidth) - grid.colModel.numFixed();
+            var left = grid.virtualPixelCellModel.width(grid.colModel.numFixed(), col + grid.colModel.numFixed() - 1);
 
-        var modLeftPixels = left - grid.pixelScrollModel.left;
+            modLeftPixels = left - grid.pixelScrollModel.left;
+        }
+        if (model.offsetTop !== modTopPixels || model.offsetLeft !== modLeftPixels) {
+            offsetDirtyClean.setDirty();
+        }
         model.offsetTop = modTopPixels;
         model.offsetLeft = modLeftPixels;
     }
@@ -102,9 +111,7 @@ module.exports = function (_grid) {
         model.top = util.clamp(top, 0, model.maxScroll.height);
         model.left = util.clamp(left, 0, model.maxScroll.width);
         positionScrollBars();
-        if (!grid.opts.snapToCell) {
-            updatePixelOffsets();
-        }
+        updatePixelOffsets();
 
 
         if (!dontNotify) {

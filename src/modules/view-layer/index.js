@@ -119,7 +119,7 @@ module.exports = function (_grid) {
 
     };
 
-    function offsetContainerForPixelScroll(drawingCells) {
+    function offsetContainerForPixelScroll() {
         var modTopPixels = grid.pixelScrollModel.offsetTop;
         var modLeftPixels = grid.pixelScrollModel.offsetLeft;
         util.position(cellContainerTL, 0, 0, null, null, grid.virtualPixelCellModel.fixedHeight(), grid.virtualPixelCellModel.fixedWidth());
@@ -177,6 +177,11 @@ module.exports = function (_grid) {
             return;
         }
 
+
+        if (!grid.opts.snapToCell && grid.fps.slowCount > 10) {
+            grid.opts.snapToCell = true;
+        }
+
         var rebuilt = grid.viewPort.isDirty();
         if (rebuilt) {
             viewLayer._buildCells();
@@ -208,8 +213,8 @@ module.exports = function (_grid) {
             viewLayer._drawDecorators(cellsPositionOrSizeChanged);
         }
 
-        if ((!grid.opts.snapToCell || rebuilt) && (grid.pixelScrollModel.isDirty() || drawingDecorators)) {
-            offsetContainerForPixelScroll(drawingCells);
+        if (grid.pixelScrollModel.isOffsetDirty() || drawingDecorators) {
+            offsetContainerForPixelScroll();
         }
 
         grid.eventLoop.fire('grid-draw');

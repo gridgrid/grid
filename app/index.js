@@ -25,6 +25,7 @@ angular.module('gridApp', [])
                 grid.build(elem);
                 grid.navigationModel.minRow = 1;
                 grid.pixelScrollModel.maxIsAllTheWayFor.height = true;
+                grid.fps.logging = true;
 
                 //hide columsn for testing
                 for (var c = 0; c < grid.colModel.length(); c++) {

@@ -27,6 +27,7 @@ describe('grid-core', function() {
         expect(grid).toHaveField('colReorder');
         expect(grid).toHaveField('showHiddenCols');
         expect(grid).toHaveField('copyPaste');
+        expect(grid).toHaveField('fps');
     });
 
     it('should have a main build function', function() {

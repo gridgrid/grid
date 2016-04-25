@@ -36,6 +36,7 @@ module.exports = function (opts) {
     grid.cellScrollModel = require('../cell-scroll-model')(grid);
     grid.cellMouseModel = require('../cell-mouse-model')(grid);
     grid.cellKeyboardModel = require('../cell-keyboard-model')(grid);
+    grid.fps = require('../fps')(grid);
 
     grid.viewPort = require('../view-port')(grid);
 
