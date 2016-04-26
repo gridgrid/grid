@@ -2,6 +2,10 @@ module.exports = function () {
     window.requestAnimationFrame = function (fn) {
         return setTimeout(fn, 1);
     };
+
+    window.cancelAnimationFrame = function (id) {
+        return clearTimeout(id);
+    };
     var $ = require('jquery');
     beforeEach(function () {
 
