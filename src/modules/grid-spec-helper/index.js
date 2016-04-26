@@ -41,7 +41,7 @@ module.exports = function () {
         };
         this.onDraw = function (fn) {
             var self = this;
-            var unbind = this.grid.eventLoop.bind('grid-draw', function () {
+            var unbind = this.grid.eventLoop.bindOnce('grid-draw', function () {
                 setTimeout(function () {
                     fn.call(self);
                 }, 1);

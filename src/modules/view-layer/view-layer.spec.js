@@ -1,4 +1,4 @@
-fdescribe('view-layer', function () {
+describe('view-layer', function () {
 
     require('../grid-spec-helper')();
     var viewRows = 10;

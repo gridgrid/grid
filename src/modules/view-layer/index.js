@@ -690,9 +690,6 @@ module.exports = function (_grid) {
             var root = querySelectorAll[i];
             container.removeChild(root);
         }
-        if (drawRequestedId) {
-            cancelAnimationFrame(drawRequestedId);
-        }
     }
 
     function isTargetInElem(target, elem) {
@@ -708,7 +705,9 @@ module.exports = function (_grid) {
 
     grid.eventLoop.bind('grid-destroy', function () {
         cleanup();
-        clearTimeout(viewLayer.draw.timeout);
+        if (drawRequestedId) {
+            cancelAnimationFrame(drawRequestedId);
+        }
         viewLayer.draw = require('../no-op');
     });
 
