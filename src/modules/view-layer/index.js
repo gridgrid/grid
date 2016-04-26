@@ -130,7 +130,7 @@ module.exports = function(_grid) {
         }
 
         if (grid.decorators.isDirty() || rebuilt || cellsPositionOrSizeChanged) {
-            viewLayer._drawDecorators(cellsPositionOrSizeChanged);
+            viewLayer._drawDecorators(cellsPositionOrSizeChanged || rebuilt);
         }
 
         grid.eventLoop.fire('grid-draw');
