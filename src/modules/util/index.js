@@ -39,6 +39,17 @@ var util = {
             elem.style.width = w + 'px';
         }
         elem.style.position = 'absolute';
+    },
+    position3D: function (elem, t, l) {
+        var x = '0';
+        var y = '0';
+        if (l != null) {
+            x = l + 'px';
+        }
+        if (t != null) {
+            y = t + 'px';
+        }
+        elem.style.transform = 'translate3d(' + x + ',' + y + ',0)';
     }
 };
 module.exports = util;

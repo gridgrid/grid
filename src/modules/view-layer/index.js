@@ -122,10 +122,14 @@ module.exports = function (_grid) {
     function offsetContainerForPixelScroll() {
         var modTopPixels = grid.pixelScrollModel.offsetTop;
         var modLeftPixels = grid.pixelScrollModel.offsetLeft;
+
         util.position(cellContainerTL, 0, 0, null, null, grid.virtualPixelCellModel.fixedHeight(), grid.virtualPixelCellModel.fixedWidth());
-        util.position(cellContainerBR, modTopPixels, modLeftPixels, 0, 0);
-        util.position(cellContainerTR, 0, modLeftPixels, null, 0, grid.virtualPixelCellModel.fixedHeight());
-        util.position(cellContainerBL, modTopPixels, 0, 0, null, null, grid.virtualPixelCellModel.fixedWidth());
+        util.position(cellContainerBR, 0, 0, 0, 0);
+        util.position3D(cellContainerBR, modTopPixels, modLeftPixels);
+        util.position(cellContainerTR, 0, 0, null, 0, grid.virtualPixelCellModel.fixedHeight());
+        util.position3D(cellContainerTR, 0, modLeftPixels);
+        util.position(cellContainerBL, 0, 0, 0, null, null, grid.virtualPixelCellModel.fixedWidth());
+        util.position3D(cellContainerBL, modTopPixels, 0);
         grid.decorators.getAlive().forEach(function (decorator) {
             if (decorator.fixed) {
                 return;
@@ -328,6 +332,7 @@ module.exports = function (_grid) {
             positionRow(rows.nonFixed[r], height, top, virtualRow);
             lastVirtualRow = virtualRow;
         });
+
 
         rows.nonFixed.forEach(function (row) {
             row.style.width = totalVisibleCellWidth + 'px';

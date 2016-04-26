@@ -49,7 +49,7 @@ module.exports = function (_grid) {
 
     // assumes a standardized wheel event that we create through the mousewheel package
     grid.eventLoop.bind('mousewheel', function handleMouseWheel(e) {
-        if (getScrollElementFromTarget(e.target, grid.container) !== grid.container) {
+        if (e.target !== grid.container && getScrollElementFromTarget(e.target, grid.container) !== grid.container) {
             return;
         }
 
