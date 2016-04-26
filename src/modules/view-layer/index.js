@@ -493,7 +493,7 @@ module.exports = function (_grid) {
         var style = boundingBox.style;
         if (height <= 0 || width <= 0) {
             style.display = 'none';
-            return;
+            return false;
         }
         style.display = ''
         style.top = top + 'px';
@@ -504,12 +504,12 @@ module.exports = function (_grid) {
     }
 
     function positionDecorator(bounding, t, l, h, w) {
-        setPosition(bounding, t, l, util.clamp(h, 0, grid.viewPort.height), util.clamp(w, 0, grid.viewPort.width));
+        return setPosition(bounding, t, l, util.clamp(h, 0, grid.viewPort.height), util.clamp(w, 0, grid.viewPort.width));
     }
 
     function positionCellDecoratorFromViewCellRange(realCellRange, boundingBox) {
         var realPxRange = grid.viewPort.toPx(realCellRange);
-        positionDecorator(boundingBox, realPxRange.top, realPxRange.left, realPxRange.height && realPxRange.height + getBorderWidth(), realPxRange.width && realPxRange.width + getBorderWidth());
+        return positionDecorator(boundingBox, realPxRange.top, realPxRange.left, realPxRange.height && realPxRange.height + getBorderWidth(), realPxRange.width && realPxRange.width + getBorderWidth());
     }
 
     function createRangeForDescriptor(descriptor) {
