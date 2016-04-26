@@ -15,29 +15,27 @@ a {
 }
 
 .grid-row:nth-of-type(odd) {
-  .grid-cell {
-    background: transparent;
-  }
+    background: white;
 }
 
 .grid-row:nth-of-type(even) {
-  .grid-cell {
+
     background: #f7f7f7;
-  }
+
 }
 
 .odds {
   .grid-row:nth-of-type(odd) {
-    .grid-cell:not(.grid-last-fixed-row) {
+
       background: #f7f7f7;
     }
-  }
+
 
   .grid-row:nth-of-type(even) {
-    .grid-cell:not(.grid-last-fixed-row) {
-      background: transparent;
+
+      background: white;
     }
-  }
+
 }
 
 .grid-cell {
@@ -58,13 +56,13 @@ a {
 }
 
 .grid-row {
-  &:hover .grid-cell {
-    background-color: transparentize(green, .8) !important;
+  &.hover {
+    background-color: lighten(green, 50) !important;
   }
 
   //header row
-  &:nth-of-type(1) {
-    box-shadow: 3px 0px 10px rgba(0, 0, 0, 0.6);
+  &.grid-is-header {
+    box-shadow: -10px 0px 10px rgba(0, 0, 0, 0.6);
     z-index: 2;
     margin-top: -1px;
 

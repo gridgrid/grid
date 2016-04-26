@@ -101,7 +101,7 @@ module.exports = function(_grid) {
         setTimeout(function() {
             var tempDiv = document.createElement('div');
             if (pasteHtml.match(/<meta name=ProgId content=Excel.Sheet>/)) {
-                pasteHtml = pasteHtml.replace(/[\n\r]/g, '');
+                pasteHtml = pasteHtml.replace(/[\n\r]+  /g, ' ').replace(/[\n\r]+/g, '');
             }
             tempDiv.innerHTML = pasteHtml;
             var table = tempDiv.querySelector('table');
@@ -178,11 +178,11 @@ module.exports = function(_grid) {
     });
 
     var maybeSelectText = debounce(function maybeSelectTextInner() {
-        if ((!model.isSelectionDisabled || !model.isSelectionDisabled()) && grid.focused) {
+        if (!(grid.editModel && grid.editModel.editing) && grid.focused) {
             grid.textarea.value = grid.dataModel.get(grid.navigationModel.focus.row, grid.navigationModel.focus.col).formatted || '.';
             grid.textarea.select();
         }
-    }, 1)
+    }, 1);
 
     model._maybeSelectText = maybeSelectText;
 

@@ -50,9 +50,13 @@ module.exports = function(_grid) {
             var dataRow = cellData[rowDescriptor.dataRow];
             var datum = dataRow && dataRow[grid.colModel.col(c).dataCol];
             var value = datum && datum.value;
+            var formatted = value;
+            if (Array.isArray(value)) {
+                formatted = (rowDescriptor.dataLayer ? ' s' + rowDescriptor.dataLayer + ' ' : '') + 'r' + value[0] + ' c' + value[1];
+            }
             return {
                 value: value,
-                formatted: (value && (rowDescriptor.dataLayer ? ' s' + rowDescriptor.dataLayer + ' ' : '') + 'r' + value[0] + ' c' + value[1]) || ''
+                formatted: formatted || ''
             };
         },
         getCopyData: function(r, c) {

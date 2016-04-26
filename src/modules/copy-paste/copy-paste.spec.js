@@ -9,31 +9,6 @@ describe('copy-paste', function() {
         this.buildSimpleGrid();
         this.viewBuild(); //to get the textarea
         this.grid.textarea.focus();
-        jasmine.addMatchers({
-            toHaveBeenCalledWithAllPointsInRange: function() {
-                return {
-                    compare: function(spy, range) {
-                        var allArgs = spy.calls.allArgs();
-                        var fails = [];
-                        for (var r = range.top; r < range.top + range.height; r++) {
-                            for (var c = range.left; c < range.left + range.width; c++) {
-                                var hadArgs = allArgs.some(function(args) {
-                                    return args[0] === r && args[1] === c;
-                                });
-                                if (!hadArgs) {
-                                    fails.push(r + ',' + c);
-                                }
-                            }
-                        }
-                        var pass = !fails.length;
-                        return {
-                            pass: pass,
-                            message: 'Expected ' + spy.and.identity() + (!pass ? '' : ' not') + ' to have been called with all points in range ' + JSON.stringify(range) + ' but ' + JSON.stringify(fails) + ' were missing'
-                        };
-                    }
-                };
-            }
-        });
         this.tableString = '<table><tbody><tr><td grid-data="[1,2]">r1 c2</td><td grid-data="[1,3]">r1 c3</td></tr><tr><td grid-data="[2,2]">r2 c2</td><td grid-data="[2,3]">r2 c3</td></tr></tbody></table>';
     });
 
@@ -82,7 +57,7 @@ describe('copy-paste', function() {
         });
     }
 
-    ('copy', function() {
+    describe('copy', function() {
         function fireCopy() {
             var e = {
                 type: 'copy'
@@ -194,10 +169,10 @@ describe('copy-paste', function() {
                 expectSelectionAfterTimeout.call(this, cb);
             });
 
-            it('should honor a disabling function', function(cb) {
-                this.grid.copyPaste.isSelectionDisabled = function() {
-                    return true;
-                };
+            it('should not select when grid is editing', function(cb) {
+                this.grid.editModel = {
+                    editing: true
+                }
                 this.grid.eventLoop.fire(mockEvent('keyup'));
                 this.grid.textarea.blur();
                 this.grid.textarea.focus();
