@@ -166,18 +166,17 @@ module.exports = function (_grid) {
     // viewLayer.draw = debounce(function () {
     //     viewLayer._draw();
     // }, 1);
-    var drawRequested = false;
+    var drawRequestedId = false;
     viewLayer.draw = function () {
-        if (!drawRequested) {
-            requestAnimationFrame(viewLayer._draw);
-            drawRequested = true;
+        if (!drawRequestedId) {
+            drawRequestedId = requestAnimationFrame(viewLayer._draw);
         }
     };
 
     viewLayer._draw = function () {
-        drawRequested = false;
+        drawRequestedId = undefined;
         // return if we haven't built yet
-        if (!container) {
+        if (!container || grid.destroyed) {
             return;
         }
 
@@ -690,6 +689,9 @@ module.exports = function (_grid) {
         for (var i = 0; i < querySelectorAll.length; ++i) {
             var root = querySelectorAll[i];
             container.removeChild(root);
+        }
+        if (drawRequestedId) {
+            cancelAnimationFrame(drawRequestedId);
         }
     }
 
