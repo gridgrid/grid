@@ -3,7 +3,7 @@ var customEvent = require('../custom-event');
 var PROPS_TO_COPY_FROM_MOUSE_EVENTS = ['clientX', 'clientY', 'gridX', 'gridY', 'layerX', 'layerY', 'row', 'col', 'realRow', 'realCol', 'virtualRow', 'virtualCol'];
 
 
-module.exports = function(_grid) {
+module.exports = function (_grid) {
     var grid = _grid;
 
     var model = {};
@@ -24,7 +24,7 @@ module.exports = function(_grid) {
         /*eslint-enable no-fallthrough*/
     };
 
-    model._annotateEventFromViewCoords = function(e, viewRow, viewCol) {
+    model._annotateEventFromViewCoords = function (e, viewRow, viewCol) {
         e.realRow = viewRow;
         e.realCol = viewCol;
         e.virtualRow = grid.view.row.toVirtual(e.realRow);
@@ -34,7 +34,7 @@ module.exports = function(_grid) {
         return e;
     };
 
-    model._annotateEventInternal = function(e) {
+    model._annotateEventInternal = function (e) {
         var y = grid.viewPort.toGridY(e.clientY);
         var x = grid.viewPort.toGridX(e.clientX);
         var viewRow = grid.viewPort.getRowByTop(y);
@@ -46,7 +46,7 @@ module.exports = function(_grid) {
 
     var lastMoveRow;
     var lastMoveCol;
-    grid.eventLoop.addInterceptor(function(e) {
+    grid.eventLoop.addInterceptor(function (e) {
         model._annotateEvent(e);
         if (e.type === 'mousedown') {
             if (e.currentTarget === grid.container) {
@@ -88,7 +88,7 @@ module.exports = function(_grid) {
         var unbindAutoScrollDrag;
         var lastX = downEvent.clientX;
         var lastY = downEvent.clientY;
-        var unbindMove = grid.eventLoop.bind('mousemove', window, function(e) {
+        var unbindMove = grid.eventLoop.bind('mousemove', window, function (e) {
 
 
             if (dragStarted && !e.which) {
@@ -105,11 +105,11 @@ module.exports = function(_grid) {
                 createAndFireCustomMouseEvent('grid-drag-start', downEvent, function annotateDragStart(dragStart) {
                     var onlyFixedRows = !calculateRowScrollDiff(e);
                     var onlyFixedCols = !calculateColScrollDiff(e);
-                    dragStart.enableAutoScroll = function() {
+                    dragStart.enableAutoScroll = function () {
                         if (unbindAutoScrollDrag) {
                             unbindAutoScrollDrag();
                         }
-                        unbindAutoScrollDrag = grid.eventLoop.bind('grid-drag', function(e) {
+                        unbindAutoScrollDrag = grid.eventLoop.bind('grid-drag', function (e) {
                             // if it gets here then we will try to auto scroll
                             var newRowDiff = calculateRowScrollDiff(e);
                             onlyFixedRows = !newRowDiff;
@@ -122,7 +122,7 @@ module.exports = function(_grid) {
 
                             clearInterval(scrollInterval);
                             if (rowDiff || colDiff) {
-                                scrollInterval = grid.interval(function() {
+                                scrollInterval = grid.interval(function () {
                                     grid.cellScrollModel.scrollTo(grid.cellScrollModel.row + rowDiff, grid.cellScrollModel.col + colDiff);
                                 }, 100);
                             }
@@ -153,6 +153,7 @@ module.exports = function(_grid) {
             if (unbindAutoScrollDrag) {
                 unbindAutoScrollDrag();
             }
+            clearInterval(scrollInterval);
 
             var dragEnd = createCustomEventFromMouseEvent('grid-drag-end', e);
 
@@ -163,7 +164,7 @@ module.exports = function(_grid) {
 
     function createCustomEventFromMouseEvent(type, e) {
         var event = customEvent(type, true, true);
-        PROPS_TO_COPY_FROM_MOUSE_EVENTS.forEach(function(prop) {
+        PROPS_TO_COPY_FROM_MOUSE_EVENTS.forEach(function (prop) {
             event[prop] = e[prop];
         });
         event.originalEvent = e;

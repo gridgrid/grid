@@ -1,4 +1,4 @@
-module.exports = function(_grid) {
+module.exports = function (_grid) {
     var grid = _grid;
 
     var api = {
@@ -20,7 +20,7 @@ module.exports = function(_grid) {
     function createDecorator(col, right) {
         var headerDecorator = grid.decorators.create(0, col, 1, 1, 'cell', 'virtual');
 
-        headerDecorator.postRender = function(div) {
+        headerDecorator.postRender = function (div) {
 
             if (right) {
                 div.style.transform = 'translate(50%, -50%)';
@@ -36,7 +36,7 @@ module.exports = function(_grid) {
             div.setAttribute('class', 'show-hidden-cols');
             div.setAttribute('dts', 'grid_column_unhide_btn');
 
-            grid.eventLoop.bind('click', div, function() {
+            grid.eventLoop.bind('click', div, function () {
                 doWhileHidden(col, setColShowing);
             });
         };
@@ -51,9 +51,9 @@ module.exports = function(_grid) {
         }
     }
 
-    grid.eventLoop.bind('grid-col-change', function(e) {
+    grid.eventLoop.bind('grid-col-change', function (e) {
         if (e.action === 'hide' || e.action === 'add') {
-            e.descriptors.forEach(function(descriptor) {
+            e.descriptors.forEach(function (descriptor) {
                 var col = descriptor.index;
                 if (!col && col !== 0) {
                     return;

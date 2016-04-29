@@ -54,8 +54,8 @@ module.exports = function (opts) {
     }
     grid.navigationModel = require('../navigation-model')(grid);
     grid.pixelScrollModel = require('../pixel-scroll-model')(grid);
-    grid.colResize = require('../col-resize')(grid);
     grid.showHiddenCols = require('../show-hidden-cols')(grid);
+    grid.colResize = require('../col-resize')(grid);
     grid.copyPaste = require('../copy-paste')(grid);
 
     var drawRequested = false;
