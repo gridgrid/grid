@@ -84,7 +84,7 @@ module.exports = function (_grid) {
         var decoratorContainer = document.createElement('div');
         decoratorContainer.setAttribute('dts', 'grid-decorators');
         util.position(decoratorContainer, 0, 0, 0, 0);
-        decoratorContainer.style.zIndex = '';
+        decoratorContainer.style.zIndex = '3';
         decoratorContainer.style.pointerEvents = 'none';
         return decoratorContainer;
     }
