@@ -153,7 +153,6 @@ module.exports = function (_grid) {
             if (unbindAutoScrollDrag) {
                 unbindAutoScrollDrag();
             }
-            clearInterval(scrollInterval);
 
             var dragEnd = createCustomEventFromMouseEvent('grid-drag-end', e);
 
