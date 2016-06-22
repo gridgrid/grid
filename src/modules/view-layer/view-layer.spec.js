@@ -402,7 +402,7 @@ describe('view-layer', function () {
 
             it('should have a container after the cell container', function () {
                 var decoratorContainer = $(container).find('[dts="grid-decorators"]');
-                expect(decoratorContainer.length).toBe(1);
+                expect(decoratorContainer.length).toBe(4);
                 expect(decoratorContainer.prevAll('[dts=grid-cells]').length).toBeGreaterThan(0);
             });
 

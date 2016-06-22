@@ -9,10 +9,13 @@ module.exports = function (_grid) {
         grid.colModel.get(col).hidden = false;
     }
 
-    function doWhileHidden(col, fn) {
-        while (grid.colModel.get(col - 1).hidden) {
-            col--;
-            fn && fn(col);
+    function doWhileHidden(col, fn, inc) {
+        var colDescriptor;
+        while ((colDescriptor = grid.colModel.get(col)) !== undefined && colDescriptor.hidden) {
+            if (fn) {
+                fn(col);
+            }
+            col = col + inc;
         }
         return col;
     }
@@ -37,7 +40,8 @@ module.exports = function (_grid) {
             div.setAttribute('dts', 'grid_column_unhide_btn');
 
             grid.eventLoop.bind('click', div, function () {
-                doWhileHidden(col, setColShowing);
+                var inc = right ? 1 : -1;
+                doWhileHidden(col + inc, setColShowing, inc);
             });
         };
         return headerDecorator;
@@ -59,14 +63,14 @@ module.exports = function (_grid) {
                     return;
                 }
                 if (descriptor.hidden) {
-                    var decCol = col + 1;
-                    var rightSide = col === grid.colModel.length(true) - 1;
-                    if (rightSide) {
-                        //if we're last we actually have to backtrack to the last showing column
-                        var lastHiddenCol = doWhileHidden(col);
-                        decCol = lastHiddenCol - 1;
-
+                    var decCol = col;
+                    var showingCol = doWhileHidden(col, undefined, -1);
+                    var rightSide = showingCol !== -1;
+                    if (!rightSide) {
+                        // we actually have to backtrack to the last showing column
+                        showingCol = doWhileHidden(col, undefined, 1);
                     }
+                    decCol = showingCol;
                     maybeRemoveDecorator(col);
                     var decorator = createDecorator(decCol, rightSide);
                     grid.decorators.add(decorator);

@@ -13,6 +13,10 @@ module.exports = function (_grid) {
     var cellContainerBL;
     var cellContainerBR;
     var decoratorContainer;
+    var decoratorContainerTL;
+    var decoratorContainerTR;
+    var decoratorContainerBL;
+    var decoratorContainerBR;
     var borderWidth;
     var hoveredFixedRow;
     var hoveredRow;
@@ -104,7 +108,14 @@ module.exports = function (_grid) {
         cellContainerBR = makeCellContainer();
         cellContainerBR.style.zIndex = 2;
 
-        decoratorContainer = makeDecoratorContainer();
+        decoratorContainerTL = makeDecoratorContainer();
+        decoratorContainerTL.style.zIndex = 4;
+        decoratorContainerTR = makeDecoratorContainer();
+        decoratorContainerTR.style.zIndex = 3;
+        decoratorContainerBL = makeDecoratorContainer();
+        decoratorContainerBL.style.zIndex = 3;
+        decoratorContainerBR = makeDecoratorContainer();
+        decoratorContainerBR.style.zIndex = 2;
 
         root = document.createElement('div');
         root.setAttribute('class', GRID_VIEW_ROOT_CLASS);
@@ -113,7 +124,11 @@ module.exports = function (_grid) {
         root.appendChild(cellContainerTR);
         root.appendChild(cellContainerBL);
         root.appendChild(cellContainerBR);
-        root.appendChild(decoratorContainer);
+
+        root.appendChild(decoratorContainerTL);
+        root.appendChild(decoratorContainerTR);
+        root.appendChild(decoratorContainerBL);
+        root.appendChild(decoratorContainerBR);
 
         container.appendChild(root);
 
@@ -130,15 +145,23 @@ module.exports = function (_grid) {
         util.position3D(cellContainerTR, 0, modLeftPixels);
         util.position(cellContainerBL, 0, 0, 0, null, null, grid.virtualPixelCellModel.fixedWidth());
         util.position3D(cellContainerBL, modTopPixels, 0);
+
+        util.position(decoratorContainerTL, 0, 0, null, null, grid.virtualPixelCellModel.fixedHeight(), grid.virtualPixelCellModel.fixedWidth());
+        util.position(decoratorContainerBR, 0, 0, 0, 0);
+        util.position3D(decoratorContainerBR, modTopPixels, modLeftPixels);
+        util.position(decoratorContainerTR, 0, 0, null, 0, grid.virtualPixelCellModel.fixedHeight());
+        util.position3D(decoratorContainerTR, 0, modLeftPixels);
+        util.position(decoratorContainerBL, 0, 0, 0, null, null, grid.virtualPixelCellModel.fixedWidth());
+        util.position3D(decoratorContainerBL, modTopPixels, 0);
         grid.decorators.getAlive().forEach(function (decorator) {
-            if (decorator.fixed) {
+            if (!decorator.fixed) {
                 return;
             }
             if (decorator.scrollVert) {
-                decorator.boundingBox.style.marginTop = modTopPixels + 'px';
+                decorator.boundingBox.style.marginTop = -1 * modTopPixels + 'px';
             }
             if (decorator.scrollHorz) {
-                decorator.boundingBox.style.marginLeft = modLeftPixels + 'px';
+                decorator.boundingBox.style.marginLeft = -1 * modLeftPixels + 'px';
             }
 
         });
@@ -372,7 +395,7 @@ module.exports = function (_grid) {
         } else if (fixedRow) {
             return cellContainerTR;
         } else if (fixedCol) {
-            return cellContainerBL
+            return cellContainerBL;
         }
         return cellContainerBR;
     }
@@ -538,7 +561,6 @@ module.exports = function (_grid) {
                 var decElement = decorator.render();
                 if (decElement) {
                     boundingBox.appendChild(decElement);
-                    decoratorContainer.appendChild(boundingBox);
                 }
             }
 
@@ -579,24 +601,29 @@ module.exports = function (_grid) {
                             /* jshint +W086 */
                     }
                 }
+
+                var parent = boundingBox.parentElement;
+                if (parent) {
+                    parent.removeChild(boundingBox);
+                }
                 var fixedRow = vRow < grid.rowModel.numFixed();
                 var fixedCol = vCol < grid.colModel.numFixed();
                 if (fixedRow && fixedCol) {
                     decorator.scrollHorz = false;
                     decorator.scrollVert = false;
-                    decorator.boundingBox.style.zIndex = 4;
+                    decoratorContainerTL.appendChild(boundingBox);
                 } else if (fixedRow) {
                     decorator.scrollHorz = true;
                     decorator.scrollVert = false;
-                    decorator.boundingBox.style.zIndex = 3;
+                    decoratorContainerTR.appendChild(boundingBox);
                 } else if (fixedCol) {
                     decorator.scrollHorz = false;
                     decorator.scrollVert = true;
-                    decorator.boundingBox.style.zIndex = 3;
+                    decoratorContainerBL.appendChild(boundingBox);
                 } else {
                     decorator.scrollHorz = true;
                     decorator.scrollVert = true;
-                    decorator.boundingBox.style.zIndex = 2;
+                    decoratorContainerBR.appendChild(boundingBox);
                 }
             }
         });
