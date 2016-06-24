@@ -1,7 +1,7 @@
 Grid
 ===
 
-A highly scalable grid component written in javscript
+A highly scalable grid component written in javscript [DEMO](http://relateiq.github.io/grid/ "Grid Demo")
 
 Note: while Grid is fully functional it is still in beta. Use at your own risk and please file any issues on GitHub. 
 
