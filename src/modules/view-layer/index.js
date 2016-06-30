@@ -164,8 +164,6 @@ module.exports = function (_grid) {
                 decoratorTopOffset = fixedHeight - modTopPixels;
             } else if (decorator.scrollHorz && !decorator.scrollVert) {
                 decoratorLeftOffset = fixedWidth - modLeftPixels;
-            } else {
-                var x = 'what.';
             }
 
             if (decorator.fixed) {
