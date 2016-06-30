@@ -112,8 +112,10 @@ module.exports = function (_grid) {
         decoratorContainerTL.style.zIndex = 4;
         decoratorContainerTR = makeDecoratorContainer();
         decoratorContainerTR.style.zIndex = 3;
+        decoratorContainerTR.style.overflow = 'hidden';
         decoratorContainerBL = makeDecoratorContainer();
         decoratorContainerBL.style.zIndex = 3;
+        decoratorContainerBL.style.overflow = 'hidden';
         decoratorContainerBR = makeDecoratorContainer();
         decoratorContainerBR.style.zIndex = 2;
 
@@ -138,30 +140,45 @@ module.exports = function (_grid) {
         var modTopPixels = grid.pixelScrollModel.offsetTop;
         var modLeftPixels = grid.pixelScrollModel.offsetLeft;
 
-        util.position(cellContainerTL, 0, 0, null, null, grid.virtualPixelCellModel.fixedHeight(), grid.virtualPixelCellModel.fixedWidth());
+        var fixedHeight = grid.virtualPixelCellModel.fixedHeight();
+        var fixedWidth = grid.virtualPixelCellModel.fixedWidth();
+        util.position(cellContainerTL, 0, 0, null, null, fixedHeight, fixedWidth);
         util.position(cellContainerBR, 0, 0, 0, 0);
         util.position3D(cellContainerBR, modTopPixels, modLeftPixels);
-        util.position(cellContainerTR, 0, 0, null, 0, grid.virtualPixelCellModel.fixedHeight());
+        util.position(cellContainerTR, 0, 0, null, 0, fixedHeight);
         util.position3D(cellContainerTR, 0, modLeftPixels);
-        util.position(cellContainerBL, 0, 0, 0, null, null, grid.virtualPixelCellModel.fixedWidth());
+        util.position(cellContainerBL, 0, 0, 0, null, null, fixedWidth);
         util.position3D(cellContainerBL, modTopPixels, 0);
 
-        util.position(decoratorContainerTL, 0, 0, null, null, grid.virtualPixelCellModel.fixedHeight(), grid.virtualPixelCellModel.fixedWidth());
+        util.position(decoratorContainerTL, 0, 0, null, null, fixedHeight, fixedWidth);
         util.position(decoratorContainerBR, 0, 0, 0, 0);
         util.position3D(decoratorContainerBR, modTopPixels, modLeftPixels);
-        util.position(decoratorContainerTR, 0, 0, null, 0, grid.virtualPixelCellModel.fixedHeight());
-        util.position3D(decoratorContainerTR, 0, modLeftPixels);
-        util.position(decoratorContainerBL, 0, 0, 0, null, null, grid.virtualPixelCellModel.fixedWidth());
-        util.position3D(decoratorContainerBL, modTopPixels, 0);
+        util.position(decoratorContainerTR, 0, fixedWidth, null, 0, null, null);
+        util.position3D(decoratorContainerTR, 0, 0);
+        util.position(decoratorContainerBL, fixedHeight, 0, 0, null, null, null);
+        util.position3D(decoratorContainerBL, 0, 0);
         grid.decorators.getAlive().forEach(function (decorator) {
-            if (!decorator.fixed) {
-                return;
+            var decoratorTopOffset = 0;
+            var decoratorLeftOffset = 0;
+            if (decorator.scrollVert && !decorator.scrollHorz) {
+                decoratorTopOffset = fixedHeight - modTopPixels;
+            } else if (decorator.scrollHorz && !decorator.scrollVert) {
+                decoratorLeftOffset = fixedWidth - modLeftPixels;
+            } else {
+                var x = 'what.';
             }
-            if (decorator.scrollVert) {
-                decorator.boundingBox.style.marginTop = -1 * modTopPixels + 'px';
+
+            if (decorator.fixed) {
+                if (decorator.scrollVert) {
+                    decoratorTopOffset += modTopPixels;
+                }
+                if (decorator.scrollHorz) {
+                    decoratorLeftOffset += modLeftPixels;
+                }
             }
-            if (decorator.scrollHorz) {
-                decorator.boundingBox.style.marginLeft = -1 * modLeftPixels + 'px';
+            if (decorator.boundingBox) {
+                decorator.boundingBox.style.marginTop = -1 * decoratorTopOffset + 'px';
+                decorator.boundingBox.style.marginLeft = -1 * decoratorLeftOffset + 'px';
             }
 
         });

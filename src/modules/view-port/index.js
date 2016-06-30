@@ -217,7 +217,8 @@ module.exports = function (_grid) {
         var viewMax = viewPort[rowOrCol + 's'];
         var toVirtual = viewPort['toVirtual' + rowOrColCap];
         var lengthFn = grid.virtualPixelCellModel[heightOrWidth];
-        var summedLength = grid.pixelScrollModel['offset' + capitalize(topOrLeft)];
+        var fixed = grid.virtualPixelCellModel['fixed' + capitalize(heightOrWidth)]();
+        var summedLength = pos <= fixed ? 0 : grid.pixelScrollModel['offset' + capitalize(topOrLeft)];
         for (var i = 0; i < viewMax; i++) {
             var virtual = toVirtual(i);
             var length = lengthFn(virtual);
