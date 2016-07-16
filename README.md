@@ -1,5 +1,5 @@
 [![npm][npm-badge]][npm-badge-url]
-[npm-badge]: https://img.shields.io/npm/v/npm.svg
+[npm-badge]: https://img.shields.io/npm/v/grid.svg
 [npm-badge-url]: https://www.npmjs.com/package/grid
 
 Grid
