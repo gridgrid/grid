@@ -1,4 +1,6 @@
 [![npm][npm-badge]][npm-badge-url]
+[npm-badge]: https://img.shields.io/npm/v/npm.svg
+[npm-badge-url]: https://www.npmjs.com/package/grid
 
 Grid
 ===
@@ -255,5 +257,3 @@ The GridBuilderSrvc handles destroying the scope and properly removing the eleme
 
 Note: it's important for the update function of a builder to be extremely fast. Call `scope.$digest` not `scope.$apply`, and  use `grid.viewLayer.setTextContent` not `elem.innerHTML` where possible
 
-[npm-badge]: https://img.shields.io/npm/v/angular-cli.svg
-[npm-badge-url]: https://www.npmjs.com/package/grid
