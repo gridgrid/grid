@@ -17,7 +17,8 @@ module.exports = function (_grid) {
             return;
         }
 
-        wasSelectedAtMousedown = !!grid.data.col.get(e.col).selected;
+        var colDescriptor = grid.data.col.get(e.col);
+        wasSelectedAtMousedown = colDescriptor && !!colDescriptor.selected;
         if (wasSelectedAtMousedown && !ctrlOrCmd(e)) {
             grid.eventLoop.stopBubbling(e);
         }

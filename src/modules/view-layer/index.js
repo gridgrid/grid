@@ -68,7 +68,9 @@ module.exports = function (_grid) {
         }
         hoveredFixedRow = row;
         row = rows.nonFixed[e.realRow];
-        row.classList.add('hover');
+        if (row) {
+            row.classList.add('hover');
+        }
         if (hoveredRow && hoveredRow !== row) {
             hoveredRow.classList.remove('hover');
         }
@@ -265,6 +267,8 @@ module.exports = function (_grid) {
     function getBorderWidth() {
         return borderWidth || 1;
     }
+
+    viewLayer.getBorderWidth = getBorderWidth;
 
     viewLayer._drawCells = function () {
         measureBorderWidth();
@@ -648,6 +652,9 @@ module.exports = function (_grid) {
 
     function removeDecorators(decorators) {
         decorators.forEach(function (decorator) {
+            if (!decorator) {
+                return;
+            }
             var boundingBox = decorator.boundingBox;
             if (boundingBox) {
                 // if they rendered an element previously we attached it to the bounding box as the only child
