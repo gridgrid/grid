@@ -29,12 +29,14 @@ module.exports = function (_grid) {
         model.setScrollSize(scrollHeight, scrollWidth);
         cacheMaxScroll();
         sizeScrollBars();
+        updatePixelOffsets();
     });
 
 
     grid.eventLoop.bind('grid-viewport-change', function () {
         cacheMaxScroll();
         sizeScrollBars();
+        updatePixelOffsets();
     });
 
     function cacheMaxScroll() {
@@ -190,7 +192,7 @@ module.exports = function (_grid) {
     function getMaxScroll(heightWidth) {
         var rowOrCol = heightWidth === 'height' ? 'row' : 'col';
         if (model.maxIsAllTheWayFor[heightWidth]) {
-            return model[heightWidth] - grid.virtualPixelCellModel[heightWidth](grid[rowOrCol + 'Model'].length(true) - 1);
+            return Math.max(0, model[heightWidth] - grid.virtualPixelCellModel[heightWidth](grid[rowOrCol + 'Model'].length(true) - 1));
         }
 
         var scrollLength = model[heightWidth];
