@@ -55,9 +55,6 @@
     "watchify": "~3.6.0",
     "yargs": "^1.2.2"
   },
-  "peerDependencies": {
-    "aliasify": "^1.5.0"
-  },
   "browserify": {
     "transform": [
       "aliasify"
