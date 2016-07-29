@@ -77,7 +77,7 @@ The grid determines what to render for a given cell by calling the supplied data
 
 The datamodel can be a simple object that the user sets on the grid instance `dataModel` field and needs to implement at a minimum
 
-`get`, `getHeader`, `getCopyData`, and `isDirty`, 
+`get`, `getHeader`, and `isDirty`, 
 
 if you support user data entry and want paste to work you should also implement `set`
 
@@ -90,7 +90,7 @@ var dataDirtyClean = grid.makeDirtyClean();
 
 grid.dataModel = {
 
-    get: function(dataRowIndex, dataColIndex) {
+    get: function(dataRowIndex, dataColIndex, isCopy) {
         var rawValue = [dataRowIndex, dataColIndex];
         return {
             value: rawValue,
@@ -104,12 +104,6 @@ grid.dataModel = {
             value: rawValue,
             formatted: 'hr' + rawValue[0] + ', hc' + rawValue[1]
         };
-    },
-    
-    // copy data is the same as normal data but it expects the result to only be a string 
-    // (and gives the client a chance to return more interesting data for the copy)
-    getCopyData: function(dataRowIndex, dataColIndex) {
-        return grid.dataModel.get(dataRowIndex, dataColIndex).formatted;
     },
     
     isDirty: dataDirtyClean.isDirty
