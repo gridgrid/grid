@@ -59,7 +59,7 @@ module.exports = function (_grid) {
 
     grid.eventLoop.bind('grid-cell-mouse-move', function (e) {
         var row = rows.fixed[e.realRow];
-        if (!row) {
+        if (!row || !viewLayer.eventIsOnCells(e)) {
             return;
         }
         row.classList.add('hover');
