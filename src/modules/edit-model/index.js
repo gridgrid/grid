@@ -1,27 +1,27 @@
 var key = require('key');
 var clickOff = require('click-off');
 
-module.exports = function(grid) {
+module.exports = function (grid) {
     var editModel = {
         editing: false,
         _defaultDecorator: grid.decorators.create(-1, -1, 1, 1)
     };
 
-    editModel._defaultDecorator.render = function() {
+    editModel._defaultDecorator.render = function () {
         var element = document.createElement('textarea');
         element.style.pointerEvents = 'all';
         element.style.zIndex = 1;
         element.style.position = 'relative';
-        grid.eventLoop.bindOnce('grid-draw', function() {
+        grid.eventLoop.bindOnce('grid-draw', function () {
             element.value = editModel._defaultDecorator.typedText() || grid.dataModel.get(editModel._defaultDecorator.top, editModel._defaultDecorator.left).formatted;
             element.focus();
         });
         editModel._defaultDecorator.renderedElem = element;
         return element;
     };
-    editModel._hydrateOpts = function(opts) {
+    editModel._hydrateOpts = function (opts) {
         opts = opts || {
-            getEditor: function() {
+            getEditor: function () {
                 return {};
             }
         };
@@ -52,7 +52,7 @@ module.exports = function(grid) {
         }
 
         if (isActionMode) {
-            opts.getEditor = function() {
+            opts.getEditor = function () {
                 return {
                     decorator: false,
                     save: undefined,
@@ -60,7 +60,7 @@ module.exports = function(grid) {
                 };
             };
         } else if (!opts.getEditor) {
-            opts.getEditor = function() {
+            opts.getEditor = function () {
                 return {};
             };
         }
@@ -93,7 +93,7 @@ module.exports = function(grid) {
         return editModel._hydrateOpts(colDescriptor.editOptions);
     }
 
-    editModel._interceptor = function(e) {
+    editModel._interceptor = function (e) {
         var col = e.col;
         var row = e.row;
         var opts = getOptsForCol(col);
@@ -105,21 +105,21 @@ module.exports = function(grid) {
             switch (e.type) {
                 case 'click':
                     if (optsHasEditTrigger(opts, 'click') && grid.eventIsOnCells(e)) {
-                        editModel.editCell(row, col);
+                        editModel.editCell(row, col, false, e);
                     }
                     break;
                 case 'dblclick':
                     if (optsHasEditTrigger(opts, 'dblclick') && grid.eventIsOnCells(e)) {
-                        editModel.editCell(row, col);
+                        editModel.editCell(row, col, false, e);
                     }
                     break;
                 case 'keydown':
                     if (optsHasEditTrigger(opts, 'space') && key.is(key.code.special.space, e.which)) {
-                        editModel.editCell(row, col);
+                        editModel.editCell(row, col, false, e);
                     }
 
                     if (optsHasEditTrigger(opts, 'enter') && key.is(key.code.special.enter, e.which)) {
-                        editModel.editCell(row, col);
+                        editModel.editCell(row, col, false, e);
                     }
 
                     // delete trigger can also happen only when not editing
@@ -130,7 +130,7 @@ module.exports = function(grid) {
                     break;
                 case 'keypress':
                     if (optsHasEditTrigger(opts, 'typing') && e.which >= 32 && e.which <= 122 && !e.metaKey && !e.ctrlKey && !e.altKey) {
-                        editModel.editCell(row, col, true);
+                        editModel.editCell(row, col, true, e);
                     }
                     break;
             }
@@ -139,14 +139,14 @@ module.exports = function(grid) {
             switch (e.type) {
                 case 'keydown':
                     if (optsHasSaveTrigger(opts, 'tab') && key.is(key.code.special.tab, e.which)) {
-                        editModel.saveEdit().then(function() {
+                        editModel.saveEdit().then(function () {
                             grid.navigationModel.handleTabEvent(e);
                         });
                         e.preventDefault();
                     }
 
                     if (optsHasSaveTrigger(opts, 'enter') && key.is(key.code.special.enter, e.which) && !e.shiftKey) {
-                        editModel.saveEdit().then(function() {
+                        editModel.saveEdit().then(function () {
                             grid.navigationModel.setFocus(grid.data.down(grid.navigationModel.focus.row), grid.navigationModel.focus.col);
                         });
                     }
@@ -155,11 +155,11 @@ module.exports = function(grid) {
         }
     };
 
-    editModel.deleteSelection = function() {
+    editModel.deleteSelection = function () {
         var ranges = grid.navigationModel.getAllSelectedRanges();
         var dataChanges = [];
-        ranges.forEach(function(range) {
-            grid.data.iterate(range, function(r, c) {
+        ranges.forEach(function (range) {
+            grid.data.iterate(range, function (r, c) {
                 dataChanges.push({
                     row: r,
                     col: c,
@@ -179,7 +179,7 @@ module.exports = function(grid) {
 
     }
 
-    editModel.editCell = function(r, c, isTyping) {
+    editModel.editCell = function (r, c, isTyping, originalEvent) {
         if (editModel.editing) {
             editModel.saveEdit();
         }
@@ -196,7 +196,7 @@ module.exports = function(grid) {
             return;
         }
 
-        var editor = opts.getEditor(r);
+        var editor = opts.getEditor(r, originalEvent);
         // if they have no editor or not closePromise,
         // it's just a simple action and there's no need to wait on them in edit mode
         if (!editor || (!editor.closePromise && editor.decorator === false)) {
@@ -206,7 +206,7 @@ module.exports = function(grid) {
         if (editor.decorator === undefined) {
             editor.decorator = editModel._defaultDecorator;
             if (editor.save === undefined) {
-                editor.save = function() {
+                editor.save = function () {
                     var text = editor.decorator.renderedElem && editor.decorator.renderedElem.value;
                     return Promise.resolve({
                         value: text,
@@ -217,13 +217,13 @@ module.exports = function(grid) {
         }
         editModel.currentEditor = editor;
         if (editor.decorator) {
-            editor.decorator.typedText = function() {
+            editor.decorator.typedText = function () {
                 return isTyping ? grid.textarea.value && grid.textarea.value.trim() : '';
             };
             editor.decorator.top = r;
             editor.decorator.left = c;
             grid.decorators.add(editor.decorator);
-            editor.removeEscapeStackHandler = grid.escapeStack.add(function() {
+            editor.removeEscapeStackHandler = grid.escapeStack.add(function () {
                 if (optsHasCancelTrigger(opts, 'escape')) {
                     editModel.cancelEdit();
                 } else if (optsHasSaveTrigger(opts, 'escape')) {
@@ -254,7 +254,7 @@ module.exports = function(grid) {
         }
     };
 
-    editModel._closeEditor = function() {
+    editModel._closeEditor = function () {
         if (!editModel.editing) {
             return;
         }
@@ -270,20 +270,20 @@ module.exports = function(grid) {
         }
 
         grid.viewLayer.draw();
-        grid.eventLoop.bindOnce('grid-draw', function() {
+        grid.eventLoop.bindOnce('grid-draw', function () {
             grid.container.focus();
         });
     };
 
-    editModel.cancelEdit = function() {
+    editModel.cancelEdit = function () {
         editModel._closeEditor();
     };
 
-    editModel.saveEdit = function() {
+    editModel.saveEdit = function () {
         if (!editModel.savePromise) {
             var savePromise = editModel.currentEditor.save && editModel.currentEditor.save() || Promise.resolve(null);
 
-            editModel.savePromise = savePromise.then(function(dataResult) {
+            editModel.savePromise = savePromise.then(function (dataResult) {
                 if (dataResult) {
                     dataResult.row = editModel.currentEditor.decorator.top;
                     dataResult.col = editModel.currentEditor.decorator.left;
@@ -296,7 +296,7 @@ module.exports = function(grid) {
         return editModel.savePromise;
     };
 
-    grid.eventLoop.bind('grid-destroy', function() {
+    grid.eventLoop.bind('grid-destroy', function () {
         editModel.cancelEdit();
     });
 
