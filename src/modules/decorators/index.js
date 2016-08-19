@@ -29,6 +29,9 @@ module.exports = function (_grid) {
                 if (index !== -1) {
                     aliveDecorators.splice(index, 1);
                     deadDecorators.push(decorator);
+                    if (decorator._decoratorDirtyClean) {
+                        decorator._decoratorDirtyClean.destroy();
+                    }
                     dirtyClean.setDirty();
                 }
             });
@@ -43,8 +46,10 @@ module.exports = function (_grid) {
         },
         isDirty: dirtyClean.isDirty,
         create: function (t, l, h, w, u, s) {
-            var decorator = {};
             var thisDirtyClean = makeDirtyClean(grid);
+            var decorator = {
+                _decoratorDirtyClean: thisDirtyClean
+            };
 
             //mixin the position range functionality
             positionRange(decorator, thisDirtyClean, dirtyClean);

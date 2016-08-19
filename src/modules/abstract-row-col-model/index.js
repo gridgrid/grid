@@ -4,7 +4,7 @@ var noop = require('../no-op');
 var passThrough = require('../pass-through');
 var debounce = require('../debounce');
 
-module.exports = function(_grid, name, lengthName, defaultSize) {
+module.exports = function (_grid, name, lengthName, defaultSize) {
     var grid = _grid;
 
     var descriptors = [];
@@ -23,14 +23,14 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
         builderDirtyClean.setDirty();
     }
 
-    var fireSelectionChange = debounce(function() {
+    var fireSelectionChange = debounce(function () {
         grid.eventLoop.fire('grid-' + name + '-selection-change');
     }, 1);
 
     function updateDescriptorIndices() {
         var oldSelected = selected;
         selected = [];
-        descriptors.forEach(function(descriptor, i) {
+        descriptors.forEach(function (descriptor, i) {
             descriptor.index = i;
             if (descriptor.selected) {
                 selected.push(i);
@@ -38,10 +38,11 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
         });
         if (selected.length !== oldSelected.length) {
             fireSelectionChange();
+            return;
         }
         selected.sort();
         oldSelected.sort();
-        var change = oldSelected.some(function(idx, i) {
+        var change = oldSelected.some(function (idx, i) {
             return idx !== selected[i];
         });
         if (change) {
@@ -72,7 +73,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
         areBuildersDirty: builderDirtyClean.isDirty,
         isDirty: dirtyClean.isDirty,
         defaultSize: defaultSize,
-        add: function(toAdd) {
+        add: function (toAdd) {
             if (!toAdd) {
                 return;
             }
@@ -80,7 +81,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
             if (!util.isArray(toAdd)) {
                 toAdd = [toAdd];
             }
-            toAdd.forEach(function(descriptor) {
+            toAdd.forEach(function (descriptor) {
                 if (descriptor.header) {
                     descriptors.splice(numHeaders, 0, descriptor);
                     numFixed++;
@@ -103,7 +104,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                 descriptors: toAdd
             });
         },
-        addHeaders: function(toAdd) {
+        addHeaders: function (toAdd) {
             if (!toAdd) {
                 return;
             }
@@ -111,22 +112,22 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
             if (!util.isArray(toAdd)) {
                 toAdd = [toAdd];
             }
-            toAdd.forEach(function(header) {
+            toAdd.forEach(function (header) {
                 header.header = true;
             });
             api.add(toAdd);
         },
-        header: function(index) {
+        header: function (index) {
             return descriptors[index];
         },
-        get: function(index) {
+        get: function (index) {
             return descriptors[index];
         },
-        length: function(includeHeaders) {
+        length: function (includeHeaders) {
             var subtract = includeHeaders ? 0 : numHeaders;
             return descriptors.length - subtract;
         },
-        remove: function(descriptor, dontUpdateIndex) {
+        remove: function (descriptor, dontUpdateIndex) {
             var index = descriptors.indexOf(descriptor);
             if (index !== -1) {
                 descriptors.splice(index, 1);
@@ -145,7 +146,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                 });
             }
         },
-        clear: function(includeHeaders) {
+        clear: function (includeHeaders) {
             var removed;
             if (includeHeaders) {
                 removed = descriptors;
@@ -165,7 +166,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                 });
             }
         },
-        move: function(fromIndexes, target, after) {
+        move: function (fromIndexes, target, after) {
             if (!util.isArray(fromIndexes)) {
                 fromIndexes = [fromIndexes];
             }
@@ -187,7 +188,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                 var toValue = descriptors[target];
                 var removed = fromIndexes.sort(function compareNumbers(a, b) {
                     return b - a;
-                }).map(function(fromIndex) {
+                }).map(function (fromIndex) {
                     var removedDescriptors = descriptors.splice(fromIndex, 1);
                     return removedDescriptors[0];
 
@@ -202,30 +203,30 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                 });
             }
         },
-        numHeaders: function() {
+        numHeaders: function () {
             return numHeaders;
         },
-        numFixed: function(excludeHeaders) {
+        numFixed: function (excludeHeaders) {
             return numFixed - (excludeHeaders ? numHeaders : 0);
         },
-        toVirtual: function(dataIndex) {
+        toVirtual: function (dataIndex) {
             return dataIndex + api.numHeaders();
         },
-        toData: function(virtualIndex) {
+        toData: function (virtualIndex) {
             return virtualIndex - api.numHeaders();
         },
 
-        select: function(indexes, dontFire) {
+        select: function (indexes, dontFire) {
             if (!util.isArray(indexes)) {
                 indexes = [indexes];
             }
-            var changes = indexes.filter(function(idx) {
+            var changes = indexes.filter(function (idx) {
                 var hasDescriptor = !!api[name](idx);
                 if (!hasDescriptor) {
                     console.warn('Tried to select index that had no descriptor', idx);
                 }
                 return hasDescriptor;
-            }).map(function(idx) {
+            }).map(function (idx) {
                 var descriptor = api[name](idx);
                 if (!descriptor.selected && descriptor.selectable !== false) {
                     addDragReadyClass(descriptor, idx);
@@ -238,30 +239,41 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                 fireSelectionChange();
             }
         },
-        deselect: function(indexes, dontFire) {
+        deselect: function (indexes, dontFire) {
             if (!util.isArray(indexes)) {
                 indexes = [indexes];
             }
-            var changes = indexes.filter(function(idx) {
+            var selectedMap = selected.reduce(function (map, selectedIndex) {
+                map[selectedIndex] = true;
+                return map;
+            }, {});
+            var changes = indexes.filter(function (idx) {
                 var hasDescriptor = !!api[name](idx);
                 if (!hasDescriptor) {
                     console.warn('Tried to deselect index that had no descriptor', idx);
                 }
                 return hasDescriptor;
-            }).map(function(idx) {
+            }).map(function (idx) {
                 var descriptor = api[name](idx);
                 removeDragReadyClass(descriptor);
                 if (descriptor.selected) {
                     descriptor.selected = false;
-                    selected.splice(selected.indexOf(idx), 1);
+                    selectedMap[idx] = false;
                     return idx;
                 }
             });
+            selected = Object.keys(selectedMap)
+                .filter(function (idxStr) {
+                    return selectedMap[idxStr];
+                }).map(function (idxStr) {
+                    return parseInt(idxStr, 10);
+                });
+
             if (changes.length && !dontFire) {
                 fireSelectionChange();
             }
         },
-        toggleSelect: function(index) {
+        toggleSelect: function (index) {
             var descriptor = api[name](index);
             if (descriptor.selected) {
                 api.deselect(index);
@@ -269,25 +281,25 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                 api.select(index);
             }
         },
-        clearSelected: function() {
+        clearSelected: function () {
             // have to make a copy or we are iterating the same array we're removing from yikes.
             return api.deselect(api.getSelected().slice(0));
         },
-        getSelected: function() {
+        getSelected: function () {
             return selected;
         },
-        allSelected: function() {
+        allSelected: function () {
             return api.getSelected().length === api.length();
         },
-        create: function(builder) {
+        create: function (builder) {
             var descriptor = {};
             var fixed = false;
             Object.defineProperty(descriptor, 'fixed', {
                 enumerable: true,
-                get: function() {
+                get: function () {
                     return descriptor.header || fixed;
                 },
-                set: function(_fixed) {
+                set: function (_fixed) {
                     fixed = _fixed;
                 }
             });
@@ -295,10 +307,10 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
             var expandedClass;
 
             Object.defineProperty(descriptor, 'expanded', {
-                get: function() {
+                get: function () {
                     return expanded;
                 },
-                set: function(exp) {
+                set: function (exp) {
                     if (!descriptor.children) {
                         return;
                     }
@@ -340,7 +352,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
 
             return addDirtyProps(descriptor, [{
                 name: lengthName,
-                onDirty: function() {
+                onDirty: function () {
                     setDescriptorsDirty({
                         action: 'size',
                         descriptors: [descriptor]
@@ -348,7 +360,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                 }
             }, {
                 name: 'hidden',
-                onDirty: function() {
+                onDirty: function () {
                     setDescriptorsDirty({
                         action: 'hide',
                         descriptors: [descriptor]
@@ -356,7 +368,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
                 }
             }], [dirtyClean]);
         },
-        createBuilder: function(render, update) {
+        createBuilder: function (render, update) {
             return {
                 render: render || noop,
                 update: update || passThrough
@@ -366,7 +378,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
     };
 
     // basically height or width
-    api[lengthName] = function(index) {
+    api[lengthName] = function (index) {
         var descriptor = descriptors[index];
         if (!descriptor) {
             return NaN;
@@ -381,7 +393,7 @@ module.exports = function(_grid, name, lengthName, defaultSize) {
     };
 
     // row or col get
-    api[name] = function(index) {
+    api[name] = function (index) {
         return descriptors[index + numHeaders];
     };
 

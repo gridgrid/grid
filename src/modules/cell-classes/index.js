@@ -2,7 +2,7 @@ var positionRange = require('../position-range');
 var makeDirtyClean = require('../dirty-clean');
 var addDirtyProps = require('../add-dirty-props');
 
-module.exports = function(_grid) {
+module.exports = function (_grid) {
     var grid = _grid;
 
     var dirtyClean = makeDirtyClean(grid);
@@ -10,28 +10,33 @@ module.exports = function(_grid) {
     var cachedClassMatrix = [];
 
     var api = {
-        add: function(descriptor) {
+        add: function (descriptor) {
             descriptors.push(descriptor);
             addOrRemoveCachedClass(descriptor);
             dirtyClean.setDirty();
         },
-        remove: function(descriptor) {
+        remove: function (descriptor) {
             var index = descriptors.indexOf(descriptor);
             if (index !== -1) {
                 descriptors.splice(index, 1);
                 addOrRemoveCachedClass(descriptor, true);
+                if (descriptor._cellClassDirtyClean) {
+                    descriptor._cellClassDirtyClean.destroy();
+                }
                 dirtyClean.setDirty();
             }
         },
-        getAll: function() {
+        getAll: function () {
             return descriptors.slice(0);
         },
-        getCachedClasses: function(vRow, vCol) {
+        getCachedClasses: function (vRow, vCol) {
             return cachedClassMatrix[vRow] && cachedClassMatrix[vRow][vCol] || [];
         },
-        create: function(top, left, className, height, width, space) {
+        create: function (top, left, className, height, width, space) {
             var thisDirtyClean = makeDirtyClean(grid);
-            var descriptor = {};
+            var descriptor = {
+                _cellClassDirtyClean: thisDirtyClean
+            };
             // mixins
 
             function classPreDirty() {
@@ -67,7 +72,7 @@ module.exports = function(_grid) {
 
     function regnerateCache() {
         cachedClassMatrix = [];
-        api.getAll().forEach(function(descriptor) {
+        api.getAll().forEach(function (descriptor) {
             addOrRemoveCachedClass(descriptor);
         })
     }

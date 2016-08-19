@@ -1,4 +1,5 @@
 var mousewheel = require('../mousewheel');
+var debounce = require('../debounce');
 var util = require('../util');
 var listeners = require('../listeners');
 
@@ -6,8 +7,7 @@ var EVENTS = ['click', 'mousedown', 'mouseup', 'mousemove', 'dblclick', 'keydown
 
 var GRID_EVENTS = ['grid-drag-start', 'grid-drag', 'grid-cell-drag', 'grid-drag-end', 'grid-cell-mouse-move'];
 
-var eventLoop = function(_grid) {
-    var grid = _grid;
+var eventLoop = function () {
     var eloop = {
         isRunning: false
     };
@@ -17,26 +17,26 @@ var eventLoop = function(_grid) {
 
     var unbindAll;
 
-    eloop.setContainer = function(container) {
+    eloop.setContainer = function (container) {
         var unbindMouseWheelFn = mousewheel.bind(container, mainLoop);
 
-        EVENTS.forEach(function(name) {
+        EVENTS.forEach(function (name) {
             bindToDomElement(container, name, mainLoop);
         });
 
-        GRID_EVENTS.forEach(function(name) {
+        GRID_EVENTS.forEach(function (name) {
             bindToDomElement(window, name, mainLoop);
         });
 
-        unbindAll = function() {
+        unbindAll = function () {
             unbindMouseWheelFn();
 
             // have to copy the array since the unbind will actually remove itself from the array which modifies it mid iteration
-            domUnbindFns.slice(0).forEach(function(unbind) {
+            domUnbindFns.slice(0).forEach(function (unbind) {
                 unbind();
             });
 
-            Object.keys(handlersByName).forEach(function(key) {
+            Object.keys(handlersByName).forEach(function (key) {
                 handlersByName[key] = [];
             });
         };
@@ -52,7 +52,7 @@ var eventLoop = function(_grid) {
 
     function bindToDomElement(elem, name, listener) {
         elem.addEventListener(name, listener);
-        var unbindFn = function() {
+        var unbindFn = function () {
             elem.removeEventListener(name, listener);
             domUnbindFns.splice(domUnbindFns.indexOf(unbindFn), 1);
         };
@@ -61,15 +61,15 @@ var eventLoop = function(_grid) {
     }
 
     function getHandlerFromArgs(args) {
-        var handler = args.filter(function(arg) {
+        var handler = args.filter(function (arg) {
             return typeof arg === 'function';
         })[0];
         return handler;
     }
 
-    eloop.bind = function() {
+    eloop.bind = function () {
         var args = Array.prototype.slice.call(arguments, 0);
-        var name = args.filter(function(arg) {
+        var name = args.filter(function (arg) {
             return typeof arg === 'string';
         })[0];
         var handler = getHandlerFromArgs(args);
@@ -78,15 +78,18 @@ var eventLoop = function(_grid) {
         }
 
 
-        var elem = args.filter(function(arg) {
+        var elem = args.filter(function (arg) {
             return util.isElement(arg) || arg === window || arg === document;
         })[0];
 
         if (!elem) {
-            getHandlers(name).push(handler);
-            return function() {
+
+            handler._eventLoopIdx = getHandlers(name).push(handler) - 1;
+            return function () {
                 var handlers = getHandlers(name);
-                handlers.splice(handlers.indexOf(handler), 1);
+                handlers[handler._eventLoopIdx] = null;
+                // release the memory but do the expensive work later all at once
+                scheduleHandlerCleanUp();
             };
         } else {
             var listener = loopWith(handler);
@@ -98,7 +101,7 @@ var eventLoop = function(_grid) {
         }
     };
 
-    eloop.bindOnce = function() {
+    eloop.bindOnce = function () {
         var args = Array.prototype.slice.call(arguments, 0);
         var handler = getHandlerFromArgs(args);
         args.splice(args.indexOf(handler), 1, function bindOnceHandler(e) {
@@ -107,9 +110,9 @@ var eventLoop = function(_grid) {
         });
         var unbind = eloop.bind.apply(this, args);
         return unbind;
-    }
+    };
 
-    eloop.fire = function(event) {
+    eloop.fire = function (event) {
         event = typeof event === 'string' ? {
             type: event
         } : event;
@@ -123,15 +126,31 @@ var eventLoop = function(_grid) {
     eloop.addExitListener = exitListeners.addListener;
 
     function loopWith(fn) {
-        return function(e) {
+        return function (e) {
             loop(e, fn);
         };
     }
 
-    var mainLoop = loopWith(function(e) {
+    var scheduleHandlerCleanUp = debounce(function () {
+        Object.keys(handlersByName).forEach(function (type) {
+            var i = 0;
+            handlersByName[type] = handlersByName[type].filter(function (handler) {
+                if (!!handler) {
+                    handler._eventLoopIdx = i;
+                    i++;
+                }
+                return !!handler;
+            });
+        });
+    }, 1);
+
+    var mainLoop = loopWith(function (e) {
         // have to copy the array because handlers can unbind themselves which modifies the array
         // we use some so that we can break out of the loop if need be
-        getHandlers(e.type).slice(0).some(function(handler) {
+        getHandlers(e.type).slice(0).some(function (handler) {
+            if (!handler) {
+                return;
+            }
             handler(e);
             if (e.gridStopBubbling) {
                 return true;
@@ -156,12 +175,12 @@ var eventLoop = function(_grid) {
         }
     }
 
-    eloop.bind('grid-destroy', function() {
+    eloop.bind('grid-destroy', function () {
         unbindAll();
         eloop.destroyed = true;
     });
 
-    eloop.stopBubbling = function(e) {
+    eloop.stopBubbling = function (e) {
         e.gridStopBubbling = true;
         return e;
     };
