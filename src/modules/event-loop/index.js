@@ -85,7 +85,12 @@ var eventLoop = function () {
         if (!elem) {
 
             handler._eventLoopIdx = getHandlers(name).push(handler) - 1;
+            handler._eventLoopUnbound = false;
             return function () {
+                if (handler._eventLoopUnbound) {
+                    return;
+                }
+                handler._eventLoopUnbound = true;
                 var handlers = getHandlers(name);
                 handlers[handler._eventLoopIdx] = null;
                 // release the memory but do the expensive work later all at once

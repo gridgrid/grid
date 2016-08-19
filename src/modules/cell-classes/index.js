@@ -13,6 +13,9 @@ module.exports = function (_grid) {
         add: function (descriptor) {
             descriptors.push(descriptor);
             addOrRemoveCachedClass(descriptor);
+            if (descriptor._cellClassDirtyClean) {
+                descriptor._cellClassDirtyClean.enable();
+            }
             dirtyClean.setDirty();
         },
         remove: function (descriptor) {
@@ -21,7 +24,7 @@ module.exports = function (_grid) {
                 descriptors.splice(index, 1);
                 addOrRemoveCachedClass(descriptor, true);
                 if (descriptor._cellClassDirtyClean) {
-                    descriptor._cellClassDirtyClean.destroy();
+                    descriptor._cellClassDirtyClean.disable();
                 }
                 dirtyClean.setDirty();
             }

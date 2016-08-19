@@ -244,7 +244,7 @@ module.exports = function (_grid, name, lengthName, defaultSize) {
                 indexes = [indexes];
             }
             var selectedMap = selected.reduce(function (map, selectedIndex) {
-                map[selectedIndex] = true;
+                map[selectedIndex] = selectedIndex;
                 return map;
             }, {});
             var changes = indexes.filter(function (idx) {
@@ -263,11 +263,13 @@ module.exports = function (_grid, name, lengthName, defaultSize) {
                 }
             });
             selected = Object.keys(selectedMap)
-                .filter(function (idxStr) {
-                    return selectedMap[idxStr];
-                }).map(function (idxStr) {
-                    return parseInt(idxStr, 10);
-                });
+                .reduce(function (array, selectedKey) {
+                    var idx = selectedMap[selectedKey];
+                    if (idx !== false) {
+                        array.push(idx)
+                    }
+                    return array;
+                }, []);
 
             if (changes.length && !dontFire) {
                 fireSelectionChange();

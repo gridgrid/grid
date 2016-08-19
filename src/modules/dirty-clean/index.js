@@ -2,9 +2,15 @@ module.exports = function (_grid) {
     var grid = _grid;
     var dirty = true;
 
-    var unbindDrawHandler = grid.eventLoop.bind('grid-draw', function () {
-        api.setClean();
-    });
+    var unbindDrawHandler;
+
+    function listenForDraw() {
+        if (!unbindDrawHandler) {
+            unbindDrawHandler = grid.eventLoop.bind('grid-draw', function () {
+                api.setClean();
+            });
+        }
+    }
 
 
     var api = {
@@ -25,9 +31,18 @@ module.exports = function (_grid) {
         setClean: function () {
             dirty = false;
         },
-        destroy: function () {
-            unbindDrawHandler();
+        disable: function () {
+            if (unbindDrawHandler) {
+                unbindDrawHandler();
+                unbindDrawHandler = null;
+            }
+        },
+        enable: function () {
+            listenForDraw();
         }
     };
+
+    api.enable();
+
     return api;
 };

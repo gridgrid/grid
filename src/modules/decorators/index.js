@@ -17,6 +17,9 @@ module.exports = function (_grid) {
             }
             decorators.forEach(function (decorator) {
                 aliveDecorators.push(decorator);
+                if (decorator._decoratorDirtyClean) {
+                    decorator._decoratorDirtyClean.enable();
+                }
             });
             dirtyClean.setDirty();
         },
@@ -30,7 +33,7 @@ module.exports = function (_grid) {
                     aliveDecorators.splice(index, 1);
                     deadDecorators.push(decorator);
                     if (decorator._decoratorDirtyClean) {
-                        decorator._decoratorDirtyClean.destroy();
+                        decorator._decoratorDirtyClean.disable();
                     }
                     dirtyClean.setDirty();
                 }
