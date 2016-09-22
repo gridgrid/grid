@@ -53,11 +53,18 @@ module.exports = function (_grid) {
 
     viewPort.sizeToContainer = function (elem) {
         container = elem;
+        var oldWidth = viewPort.width;
+        var oldHeight = viewPort.height;
         viewPort.width = elem.offsetWidth;
         viewPort.height = elem.offsetHeight;
         viewPort.rows = calculateMaxLengths(viewPort.height, grid.rowModel);
         viewPort.cols = calculateMaxLengths(viewPort.width, grid.colModel);
-        grid.eventLoop.fire('grid-viewport-change');
+        var event = {};
+        event.type = 'grid-viewport-change';
+        event.isWidthChange = oldWidth !== viewPort.width;
+        event.isHeightChange = oldHeight !== viewPort.height;
+        event.isSizeChange = event.isWidthChange || event.isHeightChange;
+        grid.eventLoop.fire(event);
     };
 
     viewPort._onResize = debounce(function () {
