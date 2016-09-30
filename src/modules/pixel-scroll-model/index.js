@@ -198,7 +198,7 @@ module.exports = function (_grid) {
         var scrollLength = model[heightWidth];
         var viewScrollHeightOrWidth = getViewScrollHeightOrWidth(heightWidth);
         var firstScrollableCell = grid[rowOrCol + 'Model'].numFixed();
-        while (scrollLength > viewScrollHeightOrWidth - 10) {
+        while (scrollLength > viewScrollHeightOrWidth - 10 && firstScrollableCell < grid.virtual.col.count()) {
             scrollLength -= grid.virtualPixelCellModel[heightWidth](firstScrollableCell);
             firstScrollableCell++;
         }
