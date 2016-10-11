@@ -4,7 +4,7 @@ var util = require('../util');
 var rangeUtil = require('../range-util');
 var ctrlOrCmd = require('../ctrl-or-cmd');
 
-module.exports = function(_grid) {
+module.exports = function (_grid) {
     var grid = _grid;
 
     var model = {
@@ -22,7 +22,7 @@ module.exports = function(_grid) {
 
     model.focusDecorator = grid.decorators.create(0, 0, 1, 1);
     var focusDefaultRender = model.focusDecorator.render;
-    model.focusDecorator.render = function() {
+    model.focusDecorator.render = function () {
         var div = focusDefaultRender();
         div.setAttribute('class', 'grid-focus-decorator');
         return div;
@@ -81,23 +81,23 @@ module.exports = function(_grid) {
         var isSeek = ctrlOrCmd(e);
         var isLeftwardEdge, isRightwardEdge, isUpwardEdge, isDownwardEdge, cellHasValue, startedDefined;
         if (isSeek) {
-            cellHasValue = function(r, c) {
+            cellHasValue = function (r, c) {
                 if (r === undefined || c === undefined) {
                     return false;
                 }
 
                 return !!grid.dataModel.get(r, c).formatted;
             };
-            isLeftwardEdge = function(c) {
+            isLeftwardEdge = function (c) {
                 return cellHasValue(newRow, c) && !cellHasValue(newRow, grid.data.left(c));
             };
-            isRightwardEdge = function(c) {
+            isRightwardEdge = function (c) {
                 return cellHasValue(newRow, c) && !cellHasValue(newRow, grid.data.right(c));
             };
-            isUpwardEdge = function(r) {
+            isUpwardEdge = function (r) {
                 return cellHasValue(r, newCol) && !cellHasValue(grid.data.up(r), newCol);
             };
-            isDownwardEdge = function(r) {
+            isDownwardEdge = function (r) {
                 return cellHasValue(r, newCol) && !cellHasValue(grid.data.down(r), newCol);
             };
             startedDefined = cellHasValue(newRow, newCol);
@@ -146,7 +146,7 @@ module.exports = function(_grid) {
 
     model._navFrom = navFrom;
 
-    model.handleTabEvent = function(e) {
+    model.handleTabEvent = function (e) {
         var newCol = model.focus.col;
         var newRow = model.focus.row;
         if (!e || !e.shiftKey) {
@@ -168,7 +168,7 @@ module.exports = function(_grid) {
         e.preventDefault();
     }
 
-    grid.eventLoop.bind('keydown', function(e) {
+    grid.eventLoop.bind('keydown', function (e) {
         if (!grid.focused) {
             return;
         }
@@ -235,7 +235,7 @@ module.exports = function(_grid) {
         return model.checkboxModeFor.rows && col < 0 || (row < 0 && colSelectable(col)) && model.checkboxModeFor.cols
     }
 
-    grid.eventLoop.bind('mousedown', function(e) {
+    grid.eventLoop.bind('mousedown', function (e) {
         if (!isNavableMouseEvent(e)) {
             return;
         }
@@ -243,7 +243,7 @@ module.exports = function(_grid) {
         var row = e.row;
         var col = e.col;
 
-        // if we're in checkbox mode pretend the user held command for header mousedowns only 
+        // if we're in checkbox mode pretend the user held command for header mousedowns only
         var isCheckboxMode = isCheckboxModeForRowCol(row, col);
         var ctrlOrCmdPressed = isCheckboxMode || ctrlOrCmd(e);
 
@@ -286,7 +286,7 @@ module.exports = function(_grid) {
                 var prevSelections = findFullRowOrColSelections(headerSelectionRange);
                 if (prevSelections.length && isCheckboxMode) {
                     var selectAll = headerSelectionRange.width === Infinity && headerSelectionRange.height === Infinity && !(grid.rowModel.allSelected() || grid.colModel.allSelected());
-                    prevSelections.forEach(function(prevSelection) {
+                    prevSelections.forEach(function (prevSelection) {
                         removeFullRowOrColFromSelection(prevSelection, headerSelectionRange);
                     });
                     if (selectAll) {
@@ -321,7 +321,7 @@ module.exports = function(_grid) {
             var range = rangeUtil.createFromPoints(fromRow, fromCol, toRow, toCol);
             var prevSelections = findFullRowOrColSelections(range);
             if (prevSelections.length) {
-                prevSelections.forEach(function(prevSelection) {
+                prevSelections.forEach(function (prevSelection) {
                     removeFullRowOrColFromSelection(prevSelection, range);
                 });
             }
@@ -348,7 +348,7 @@ module.exports = function(_grid) {
     }
 
     function findSelectionByRange(range) {
-        return model.getAllSelections().filter(function(selection) {
+        return model.getAllSelections().filter(function (selection) {
             return rangeUtil.equal(selection, range);
         })[0];
     }
@@ -396,7 +396,7 @@ module.exports = function(_grid) {
     }
 
     function findFullRowOrColSelections(range) {
-        return model.getAllSelections().filter(function(selection) {
+        return model.getAllSelections().filter(function (selection) {
             return (selection.height === Infinity && selection.top === 0 && rangeUtil.intersect([selection.left, selection.width], [range.left, range.width])) ||
                 (selection.width === Infinity && selection.left === 0 && rangeUtil.intersect([selection.top, selection.height], [range.top, range.height]));
         });
@@ -411,7 +411,7 @@ module.exports = function(_grid) {
     // row col selection
     function handleRowColSelectionChange(rowOrCol) {
         var decoratorsField = ('_' + rowOrCol + 'SelectionClasses');
-        model[decoratorsField].forEach(function(selectionDecorator) {
+        model[decoratorsField].forEach(function (selectionDecorator) {
             grid.cellClasses.remove(selectionDecorator);
         });
         model[decoratorsField] = [];
@@ -423,7 +423,7 @@ module.exports = function(_grid) {
             grid.cellClasses.add(decorator);
             model[decoratorsField].push(decorator);
         } else {
-            grid[rowOrCol + 'Model'].getSelected().forEach(function(index) {
+            grid[rowOrCol + 'Model'].getSelected().forEach(function (index) {
                 var virtualIndex = grid[rowOrCol + 'Model'].toVirtual(index);
                 var top = rowOrCol === 'row' ? virtualIndex : 0;
                 var left = rowOrCol === 'col' ? virtualIndex : 0;
@@ -434,18 +434,18 @@ module.exports = function(_grid) {
         }
     }
 
-    grid.eventLoop.bind('grid-row-selection-change', function() {
+    grid.eventLoop.bind('grid-row-selection-change', function () {
         handleRowColSelectionChange('row');
     });
 
-    grid.eventLoop.bind('grid-col-selection-change', function() {
+    grid.eventLoop.bind('grid-col-selection-change', function () {
         handleRowColSelectionChange('col');
     });
 
     function createAndAddSelectionDecorator() {
         var selection = grid.decorators.create.apply(this, arguments);
         var defaultRender = selection.render;
-        selection.render = function() {
+        selection.render = function () {
             var div = defaultRender();
             div.setAttribute('class', 'grid-selection');
             return div;
@@ -459,14 +459,14 @@ module.exports = function(_grid) {
     function syncSelectionToHeaders() {
         grid.colModel.clearSelected(true);
         grid.rowModel.clearSelected(true);
-        model.getAllSelections().forEach(function(selection) {
+        model.getAllSelections().forEach(function (selection) {
             if (selection) {
                 maybeSelectHeaderFromSelection(selection);
             }
         });
     }
 
-    model.getAllSelections = function() {
+    model.getAllSelections = function () {
         var selections = [];
         if (model.selection) {
             selections.push(model.selection);
@@ -476,7 +476,7 @@ module.exports = function(_grid) {
 
     function maybeSelectHeaderFromSelection(range, deselect) {
         var indexes;
-        if (range.height === Infinity) {
+        if (range.top === 0 && range.height === Infinity) {
             indexes = grid.data.col.indexes({
                 from: range.left,
                 length: range.width
@@ -487,7 +487,7 @@ module.exports = function(_grid) {
                 grid.colModel.select(indexes);
             }
         }
-        if (range.width === Infinity) {
+        if (range.left === 0 && range.width === Infinity) {
             indexes = grid.data.row.indexes({
                 from: range.top,
                 length: range.height
@@ -564,7 +564,7 @@ module.exports = function(_grid) {
         model.setSelection(newSelection);
     }
 
-    selection._onDragStart = function(e) {
+    selection._onDragStart = function (e) {
         if (!isNavableMouseEvent(e)) {
             return;
         }
@@ -590,7 +590,7 @@ module.exports = function(_grid) {
             fromCol = 0;
             toCol = Infinity;
         }
-        var unbindDrag = grid.eventLoop.bind('grid-cell-drag', function(e) {
+        var unbindDrag = grid.eventLoop.bind('grid-cell-drag', function (e) {
             toRow = toRow !== Infinity ? e.row : toRow;
             toCol = toCol !== Infinity ? e.col : toCol;
             if (toCol !== Infinity && !colSelectable(toCol)) {
@@ -612,7 +612,7 @@ module.exports = function(_grid) {
             }
             selectFromFocusToCell(fromRow, fromCol, toRow, toCol, true, wasSelected); // always pass true because if it was to be cleared mousedown should have handled that
         });
-        var unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function() {
+        var unbindDragEnd = grid.eventLoop.bind('grid-drag-end', function () {
             unbindDrag();
             unbindDragEnd();
         });
@@ -623,7 +623,7 @@ module.exports = function(_grid) {
     model._selectionDecorator = selection;
 
     Object.defineProperty(model, 'selection', {
-        get: function() {
+        get: function () {
             if (selection.height === -1) { // cleared selection default to focus
                 return {
                     top: model.focus.row,
@@ -636,7 +636,7 @@ module.exports = function(_grid) {
         }
     });
 
-    model.getAllSelectedRanges = function() {
+    model.getAllSelectedRanges = function () {
         var selectionRange = grid.navigationModel.selection;
         // valid selection range cannot go to -1
         if (selectionRange.top === -1) {
@@ -650,7 +650,7 @@ module.exports = function(_grid) {
         return [selectionRange].concat(model.otherSelections);
     };
 
-    model.clearSelection = function() {
+    model.clearSelection = function () {
         clearOtherSelections();
         setSelectionToFocus();
     }
