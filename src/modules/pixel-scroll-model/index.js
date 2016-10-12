@@ -197,13 +197,17 @@ module.exports = function (_grid) {
 
         var scrollLength = model[heightWidth];
         var viewScrollHeightOrWidth = getViewScrollHeightOrWidth(heightWidth);
+
+        if (scrollLength <= viewScrollHeightOrWidth) {
+            return 0;
+        }
+
         var firstScrollableCell = grid[rowOrCol + 'Model'].numFixed();
-        while (scrollLength > viewScrollHeightOrWidth - 10 && firstScrollableCell < grid.virtual.col.count()) {
+        while (scrollLength > viewScrollHeightOrWidth - 10 && firstScrollableCell < grid.virtual[rowOrCol].count()) {
             scrollLength -= grid.virtualPixelCellModel[heightWidth](firstScrollableCell);
             firstScrollableCell++;
         }
         return model[heightWidth] - scrollLength;
-
     }
 
     model._getMaxScroll = getMaxScroll;
