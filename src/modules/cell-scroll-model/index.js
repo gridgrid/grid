@@ -70,16 +70,12 @@ module.exports = function(_grid) {
         if (targetScroll < currentScroll) {
             scrollTo = targetScroll;
         } else if (targetScroll > currentScroll) {
-
             var lengthToCell = grid.virtualPixelCellModel[heightWidth](0, virtualCoord);
             var numFixed = grid[rowOrCol + 'Model'].numFixed();
             scrollTo = 0;
-            for (var i = numFixed; i < virtualCoord; i++) {
+            for (var i = numFixed; i < virtualCoord && lengthToCell > grid.viewPort[heightWidth]; i++) {
                 lengthToCell -= grid.virtualPixelCellModel[heightWidth](i);
                 scrollTo = i - (numFixed - 1);
-                if (lengthToCell <= grid.viewPort[heightWidth]) {
-                    break;
-                }
             }
         }
 
