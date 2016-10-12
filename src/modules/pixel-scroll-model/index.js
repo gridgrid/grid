@@ -198,7 +198,7 @@ module.exports = function (_grid) {
         var scrollLength = model[heightWidth];
         var viewScrollHeightOrWidth = getViewScrollHeightOrWidth(heightWidth);
 
-        if (grid.opts.noScrollBuffer && scrollLength <= viewScrollHeightOrWidth) {
+        if (scrollLength <= viewScrollHeightOrWidth) {
             return 0;
         }
 
