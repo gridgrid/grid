@@ -1,6 +1,6 @@
 {
   "name": "grid",
-  "version": "3.3.5",
+  "version": "0.0.0-semantic-release",
   "description": "A highly scalable grid component written in javscript",
   "main": "src/modules/grid-entry.js",
   "publishConfig": {
@@ -15,7 +15,8 @@
   "scripts": {
     "test": "bin/iqb test",
     "start": "bin/iqb start",
-    "preversion": "bin/iqb test"
+    "preversion": "bin/iqb test",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "dependencies": {
     "angular": "~1.4.7",
@@ -34,6 +35,7 @@
     "browserify": "~12.0.1",
     "browserify-istanbul": "~0.2.1",
     "chokidar-cli": "~1.1.1",
+    "condition-circle": "~1.5.0",
     "connect-livereload": "~0.5.3",
     "es6-promise": "~3.1.2",
     "exorcist": "~0.4.0",
@@ -51,6 +53,7 @@
     "node-sass": "~3.4.1",
     "phantomjs": "~1.9.18",
     "polyfill-function-prototype-bind": "0.0.1",
+    "semantic-release": "^4.3.5",
     "tiny-lr": "~0.2.1",
     "watchify": "~3.6.0",
     "yargs": "^1.2.2"
@@ -81,5 +84,13 @@
   "bugs": {
     "url": "https://github.com/relateiq/grid/issues"
   },
-  "homepage": "https://github.com/relateiq/grid"
+  "homepage": "https://github.com/relateiq/grid",
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "release": {
+    "verifyConditions": "condition-circle"
+  }
 }
