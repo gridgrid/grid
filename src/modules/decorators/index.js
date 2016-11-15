@@ -12,19 +12,19 @@ module.exports = function (_grid) {
 
     var decorators = {
         add: function (decorators) {
-            if (!util.isArray(decorators)) {
+            if (decorators && !util.isArray(decorators)) {
                 decorators = [decorators];
             }
             decorators.forEach(function (decorator) {
                 aliveDecorators.push(decorator);
-                if (decorator && decorator._decoratorDirtyClean) {
+                if (decorator._decoratorDirtyClean) {
                     decorator._decoratorDirtyClean.enable();
                 }
             });
             dirtyClean.setDirty();
         },
         remove: function (decorators) {
-            if (!util.isArray(decorators)) {
+            if (decorators && !util.isArray(decorators)) {
                 decorators = [decorators];
             }
             decorators.forEach(function (decorator) {
@@ -32,7 +32,7 @@ module.exports = function (_grid) {
                 if (index !== -1) {
                     aliveDecorators.splice(index, 1);
                     deadDecorators.push(decorator);
-                    if (decorator && decorator._decoratorDirtyClean) {
+                    if (decorator._decoratorDirtyClean) {
                         decorator._decoratorDirtyClean.disable();
                     }
                     dirtyClean.setDirty();
