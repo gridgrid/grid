@@ -12,6 +12,9 @@ module.exports = function (_grid) {
 
     var decorators = {
         add: function (decorators) {
+            if (!decorators) {
+                return ;
+            }
             if (!util.isArray(decorators)) {
                 decorators = [decorators];
             }
@@ -24,6 +27,9 @@ module.exports = function (_grid) {
             dirtyClean.setDirty();
         },
         remove: function (decorators) {
+            if (!decorators) {
+                return ;
+            }
             if (!util.isArray(decorators)) {
                 decorators = [decorators];
             }
