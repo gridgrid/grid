@@ -54,7 +54,7 @@ module.exports = function(_grid) {
             if (data.value) {
                 td.setAttribute('grid-data', JSON.stringify(data.value));
             }
-            td.innerHTML = data.formatted.replace(/\n/g, '<br>') || ' ';
+            td.innerHTML = data.formatted.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>') || ' ';
             rowResult.row.appendChild(td);
             rowResult.array.push(data.formatted);
         });
