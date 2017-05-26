@@ -1,3 +1,6 @@
-test:
-  post:
-    - npm run semantic-release || true
+deployment:
+  master:
+    branch: master
+    commands:
+      - npm run semantic-release || true  
+    

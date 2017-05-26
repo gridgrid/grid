@@ -91,6 +91,20 @@ describe('copy-paste', function() {
             expect(e.clipboardData.setData).toHaveBeenCalledWith('text/html', this.tableString);
         });
 
+        it('should escape html in copied html', function() {
+            this.grid.dataModel.set(1, 2, ['<img src="xx" onerror="alert(\'xss attack\')" />', '2']);
+            var selectionRange = {
+                top: 1,
+                left: 2,
+                width: 2,
+                height: 2
+            };
+            this.grid.navigationModel.setSelection(selectionRange);
+            var e = fireCopy.call(this);
+            expect(e.clipboardData.setData).toHaveBeenCalledWith('text/plain', '"r<img src=""xx"" onerror=""alert(\'xss attack\')"" /> c2"\tr1 c3\nr2 c2\tr2 c3');
+            expect(e.clipboardData.setData).toHaveBeenCalledWith('text/html', '<table><tbody><tr><td grid-data="[&quot;&lt;img src=\\&quot;xx\\&quot; onerror=\\&quot;alert(\'xss attack\')\\&quot; /&gt;&quot;,&quot;2&quot;]">r&lt;img src="xx" onerror="alert(\'xss attack\')" /&gt; c2</td><td grid-data="[1,3]">r1 c3</td></tr><tr><td grid-data="[2,2]">r2 c2</td><td grid-data="[2,3]">r2 c3</td></tr></tbody></table>');
+        });
+
         it('should replace \n with <br> in copied html', function() {
             this.grid.dataModel.set(1, 2, ['something\nwith lines', '2']);
             var selectionRange = {
