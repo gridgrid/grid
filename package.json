@@ -13,6 +13,7 @@
     "app": true
   },
   "scripts": {
+    "commitmsg": "validate-commit-msg",
     "test": "bin/iqb test",
     "start": "bin/iqb start",
     "preversion": "bin/iqb test",
@@ -40,6 +41,7 @@
     "es6-promise": "~3.1.2",
     "exorcist": "~0.4.0",
     "express": "~4.13.3",
+    "husky": "~0.13.3",
     "jasmine": "~2.3.2",
     "jasmine-tools-riq": "~0.3.0",
     "jquery": "^2.1.0",
@@ -55,6 +57,7 @@
     "polyfill-function-prototype-bind": "0.0.1",
     "semantic-release": "^4.3.5",
     "tiny-lr": "~0.2.1",
+    "validate-commit-msg": "~2.12.1",
     "watchify": "~3.6.0",
     "yargs": "^1.2.2"
   },
