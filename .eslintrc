@@ -154,7 +154,6 @@
 
     // additional predefined global variables
     "globals": {
-        "angular":         false,
         "module":          true,
         "numeral":         false
     }

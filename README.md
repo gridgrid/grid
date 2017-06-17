@@ -14,21 +14,6 @@ Installation
 ===
 `npm install --save grid`
 
-if using angular the wrapping module can simply be accessed:
-
-
-`angular.module('myGridApp', [require('grid')])`
-
-
-the three srvcs currently exposed can be injected
-
-`function(GridSrvc, GridBuilderSrvc, GridDecoratorSrvc){}`
-
-
-if not using angular 
-
-`var core = require('grid/src/modules/core')`
-
 
 Example / Quick-Start
 ===
@@ -36,7 +21,8 @@ Example / Quick-Start
 To run the sample app locally, run `npm start` and hit http://localhost:8082
 
 ##### Create a Grid Instance
-`var grid = core();` or in angular `var grid = GridSrvc.core();`
+`var core = require('grid')`
+`var grid = core();`
 
 The grid handles most complexity for you. There are only three user supplied requirements to a get a grid up and running
 
@@ -171,7 +157,7 @@ Decorators are great for adding a piece of one-off ui that doesn't relate direct
 
 Puts a link over the cell at row 1 col 2 that doesn’t move with the scroll (why you would do this is questionable but it's just an example).
 
-You can do more complicated things like render 
+You can do more complicated things like render directives: (requires grid-angular-adapter)
 
 **angular directive decorator**
 ``` javascript
@@ -223,29 +209,6 @@ var colDescriptor = grid.colModel.create(builder);
 ```
 
 have `<a>` tags in your cells for all the rows in that column
-
-**angular cell builder**
-
-``` javascript
-angular.module('myCoolGrid', [require('grid')])
-
-.controller('MyGridCtrl', function($scope, GridSrvc, GridBuilderSrvc) {
-    var grid = GridSrvc.core();
-
-    // do row col and datamodel setup...
-
-    grid.colModel.create(grid.colModel.createBuilder(function render(ctx) {
-        return GridBuilderSrvc.render($scope, '<my-directive data="interestingData"></my-directive>');
-    }, function update(elem, ctx) {
-        var scope = angular.element(elem).scope();
-        scope.interestingData = ctx.data.formatted;
-        scope.$digest();
-        return elem;
-    }));
-});
-```
-
-The GridBuilderSrvc handles destroying the scope and properly removing the elements to prevent memory leaks.
 
 Note: it's important for the update function of a builder to be extremely fast. Call `scope.$digest` not `scope.$apply`, and  use `grid.viewLayer.setTextContent` not `elem.innerHTML` where possible
 

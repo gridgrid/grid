@@ -46,7 +46,6 @@ export DEFAULT_NAME=$(jq -r .name package.json);
 
 # configuration settings
 export FEAT_APP=$(jq -r '.iqproj.app //empty' package.json)
-export FEAT_TEMPLATES=$(jq -r '.iqproj.templates //empty' package.json)
 export FEAT_TS=$(jq -r '.iqproj.typescript //empty' package.json)
 
 #################################################################################
@@ -108,28 +107,6 @@ case $command in
         fi
         ;;
 
-    "templates")
-        # this task is gross. don't use it. we needed it for back-compat
-        mkdir -p tmp
-        outfile=$(pwd)/tmp/templates.js
-
-        echo 'module.exports = angular.module("templates", []).run(function($templateCache) {' > $outfile
-        find src app ts \
-            | grep '.html' \
-            | xargs -P 6 -n 1 -I{} bash -c 'echo "$(basename {}) {}"' \
-            | xargs -P 6 -n 2 node -e "console.log( \
-                '    \$templateCache.put(\"' + process.argv[1] + '\", ', \
-                JSON.stringify(require('fs').readFileSync(process.argv[2]).toString()), \
-                ');' \
-              );" \
-            >> $outfile
-        echo '});' >> $outfile
-        ;;
-
-    "watch:templates")
-        $WATCH_CMD --silent src/**/*.html app/**/*.html ts/**/*.html -c "$self templates"
-        ;;
-
     # testing
     "watch:test")
         if [ "$FEAT_APP" = "true" ]; then
@@ -173,11 +150,6 @@ case $command in
     "start"|"watch")
         features=("$self assets" "$self watch:test")
 
-        if [ "$FEAT_TEMPLATES" = "true" ]; then
-            $self "templates"
-            features+=("$self watch:templates")
-        fi
-
         if [ "$FEAT_TS" = "true" ]; then
             $self "build:ts"
             features+=("$self watch:ts")
@@ -197,9 +169,6 @@ case $command in
         ;;
 
     "build")
-        if [ "$FEAT_TEMPLATES" = "true" ]; then
-            $self "templates"
-        fi
 
         if [ "$FEAT_TS" = "true" ]; then
             "$self build:ts"

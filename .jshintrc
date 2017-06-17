@@ -129,7 +129,6 @@
   // Yahoo User Interface
 
   "globals": {
-    "angular": false,
     "describe": false,
     "it": false,
     "afterEach": false,

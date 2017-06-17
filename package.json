@@ -20,9 +20,6 @@
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "dependencies": {
-    "angular": "~1.4.7",
-    "angular-mocks": "~1.4.7",
-    "angular-route": "~1.4.7",
     "capitalize": "^0.5.0",
     "click-off": "~0.2.1",
     "element-class": "^0.1.1",
@@ -43,7 +40,7 @@
     "express": "~4.13.3",
     "husky": "~0.13.3",
     "jasmine": "~2.3.2",
-    "jasmine-tools-riq": "~0.3.0",
+    "jasmine-tools-riq": "~0.3.1",
     "jquery": "^2.1.0",
     "karma": "~0.13.14",
     "karma-browserify": "~4.4.0",
