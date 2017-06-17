@@ -2,7 +2,7 @@
   "name": "grid",
   "version": "0.0.0-semantic-release",
   "description": "A highly scalable grid component written in javscript",
-  "main": "src/modules/grid-entry.js",
+  "main": "src/modules/core/index.js",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
@@ -50,10 +50,10 @@
     "karma-chrome-launcher": "~0.2.1",
     "karma-jasmine": "~0.3.6",
     "karma-jasmine-jquery": "~0.1.1",
-    "karma-phantomjs-launcher": "~0.2.1",
+    "karma-phantomjs-launcher": "~1.0.4",
     "lodash": "~4.11.0",
     "node-sass": "~3.4.1",
-    "phantomjs": "~1.9.18",
+    "phantomjs-prebuilt": "~2.1.14",
     "polyfill-function-prototype-bind": "0.0.1",
     "semantic-release": "^4.3.5",
     "tiny-lr": "~0.2.1",
