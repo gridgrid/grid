@@ -61,6 +61,10 @@ function normalizeWheelEvent(e) {
         },
         currentTarget: {
             value: e.currentTarget
+        },
+        defaultPrevented : {
+            value : false,
+            writable : true
         }
     });
 

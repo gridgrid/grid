@@ -1,7 +1,8 @@
 'use strict';
 
-var makeSimpleGrid = require('../src/modules/simple-grid');
-var debounce = require('../src/modules/debounce');
+var makeSimpleGrid = require('../modules/simple-grid');
+var debounce = require('../modules/debounce');
+require('../scss/grid.scss');
 
 
 var elem = document.getElementsByClassName('grid-app-container')[0];
