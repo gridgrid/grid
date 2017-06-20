@@ -1,6 +1,5 @@
 {
   "frameworks": [
-    "browserify",
     "jasmine"
   ],
   "basePath": "",
@@ -10,12 +9,9 @@
     "src/modules/grid-spec-helper/matchers.js",
     "src/**/*.spec.js"
   ],
-  "browserify": {
-    "debug": true
-  },
   "preprocessors": {
-    "src/**/*.spec.js": "browserify",
-    "src/modules/grid-spec-helper/matchers.js": "browserify"
+    "src/**/*.spec.js": ["webpack", "sourcemap"],
+    "src/modules/grid-spec-helper/matchers.js": ["webpack", "sourcemap"]
   },
   "autoWatch": true,
   "reporters": [
