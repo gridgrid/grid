@@ -3,4 +3,3 @@ describe('abstract-row-col-model', function () {
     var abstractRowCol = require('../abstract-row-col-model');
     require('./test-body')(abstractRowCol, 'colish', 'widthy', 100);
 });
-

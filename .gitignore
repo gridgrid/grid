@@ -9,4 +9,5 @@ tmp
 test-assets
 /coverage
 release
+dist
 release/bundle*.css

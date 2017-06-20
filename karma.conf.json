@@ -7,10 +7,10 @@
     "node_modules/polyfill-function-prototype-bind/bind.js",
     "node_modules/es6-promise/dist/es6-promise.js",
     "src/modules/grid-spec-helper/matchers.js",
-    "src/**/*.spec.js"
+    "webpack/test-entry.js"
   ],
   "preprocessors": {
-    "src/**/*.spec.js": ["webpack", "sourcemap"],
+    "webpack/test-entry.js": ["webpack", "sourcemap"],
     "src/modules/grid-spec-helper/matchers.js": ["webpack", "sourcemap"]
   },
   "autoWatch": true,

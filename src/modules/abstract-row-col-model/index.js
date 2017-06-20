@@ -1,6 +1,6 @@
 var addDirtyProps = require('../add-dirty-props');
 var util = require('../util');
-var noop = require('../no-op');
+var noop = require('../no-op').default;
 var passThrough = require('../pass-through');
 var debounce = require('../debounce');
 

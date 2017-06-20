@@ -2,7 +2,7 @@ describe('cell-classes', function () {
     require('../grid-spec-helper')();
     var classes;
     beforeEach(function () {
-        var grid =this.buildSimpleGrid();
+        var grid = this.buildSimpleGrid();
         classes = grid.cellClasses;
         spyOn(grid, 'requestDraw'); //mock the draw;
     });
@@ -54,7 +54,7 @@ describe('cell-classes', function () {
 
     it('should be able to add descriptors and be dirty', function () {
         var descriptor = classes.create();
-       this.resetAllDirties();
+        this.resetAllDirties();
         classes.add(descriptor);
         expect(classes.getAll()).toContain(descriptor);
         expect(classes).toBeDirty();
@@ -63,7 +63,7 @@ describe('cell-classes', function () {
     it('should be able to remove descriptors and be dirty', function () {
         var descriptor = classes.create();
         classes.add(descriptor);
-       this.resetAllDirties();
+        this.resetAllDirties();
         classes.remove(descriptor);
         expect(classes.getAll()).not.toContain(descriptor);
         expect(classes).toBeDirty();
