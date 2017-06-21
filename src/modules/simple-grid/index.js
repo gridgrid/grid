@@ -2,7 +2,7 @@ var util = require('../util');
 
 module.exports = function(numRows, numCols, varyHeights, varyWidths, fixedRows, fixedCols, preSetupFn, headerRows, headerCols, opts) {
 
-    var grid = require('../core')(opts);
+    var grid = require('../core').default(opts);
 
     if (preSetupFn) {
         preSetupFn(grid);

@@ -84,7 +84,6 @@ describe('show-hidden-cols', function () {
       style.innerHTML = '.show-hidden-cols{width : 6px; height: 6px;}';
       document.body.appendChild(style);
       this.onDraw(function () {
-        debugger;
         ctx.decorator = this.showHiddenCols._decorators[0];
         var $rendered = $(ctx.decorator.boundingBox.firstChild);
         var $box = $(ctx.decorator.boundingBox);

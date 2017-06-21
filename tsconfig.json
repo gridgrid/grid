@@ -17,7 +17,8 @@
     "baseUrl": ".",
     "paths": {
       "@grid": ["./src/modules/*"]
-    }
+    },
+    "lib": ["es2017", "dom"]
   },
   "compileOnSave": false,
   "include": [

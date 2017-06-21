@@ -26,6 +26,7 @@
     "jsdoc-format": false,
     "jsx-no-multiline-js": false, // maybe turn this on when we have more time to fix it
     "label-position": true,
+    "max-classes-per-file": [false],
     "max-line-length": [
       true,
       140

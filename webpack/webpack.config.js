@@ -47,6 +47,7 @@ module.exports = function(isProd, isTests) {
         debug: true,
         devtool: isTests ? 'inline-source-map' : 'source-map', // more info:https://webpack.github.io/docs/build-performance.html#sourcemaps and https://webpack.github.io/docs/configuration.html#devtool
         noInfo: true, // set to false to see a list of every file being bundled.
+        quiet: true,
         entry: [
             // './src/webpack-public-path',
             // 'webpack-hot-middleware/client?reload=true',

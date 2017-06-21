@@ -2,6 +2,6 @@
 {
     "editor.detectIndentation": true,
     "editor.formatOnSave": true,
-    "javascript.format.insertSpaceBeforeFunctionParenthesis": false,
-    "javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false
+    "javascript.format.insertSpaceBeforeFunctionParenthesis": true,
+    "javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": true
 }

@@ -10,4 +10,5 @@ test-assets
 /coverage
 release
 dist
+.awcache
 release/bundle*.css

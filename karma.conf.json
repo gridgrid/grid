@@ -13,6 +13,9 @@
     "webpack/test-entry.js": ["webpack", "sourcemap"],
     "src/modules/grid-spec-helper/matchers.js": ["webpack", "sourcemap"]
   },
+  "webpackMiddleware": {
+    "noInfo": true
+  },
   "autoWatch": true,
   "reporters": [
     "progress"
