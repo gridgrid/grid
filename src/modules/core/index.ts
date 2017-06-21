@@ -69,7 +69,7 @@ export interface IGridModels {
 
 export type Grid = IGridCore & IGridModels;
 
-export default function (opts: IGridOpts = {}) {
+export function create(opts: IGridOpts = {}) {
     const lazyGetterMap: { [key: string]: any } = {};
 
     const lazyGetter = <T>(idx: string, getFn: () => T) => {

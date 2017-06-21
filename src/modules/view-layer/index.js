@@ -757,7 +757,7 @@ module.exports = function (_grid) {
         if (drawRequestedId) {
             cancelAnimationFrame(drawRequestedId);
         }
-        viewLayer.draw = require('../no-op').default;
+        viewLayer.draw = function () {};
     });
 
     return viewLayer;

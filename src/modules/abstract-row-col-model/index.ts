@@ -71,7 +71,7 @@ export interface IRowColEvent extends IRowColEventBody {
     type: string;
 }
 
-export default function (
+export function create(
     grid: Grid,
     name: string,
     lengthName: string,
