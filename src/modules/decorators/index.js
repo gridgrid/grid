@@ -1,4 +1,4 @@
-var util = require('../util');
+var util = require('@grid/util');
 var makeDirtyClean = require('../dirty-clean');
 var positionRange = require('../position-range');
 
@@ -12,7 +12,7 @@ module.exports = function (_grid) {
 
     var decorators = {
         add: function (decorators) {
-            if (!util.isArray(decorators)) {
+            if (!Array.isArray(decorators)) {
                 decorators = [decorators];
             }
             decorators.forEach(function (decorator) {
@@ -24,7 +24,7 @@ module.exports = function (_grid) {
             dirtyClean.setDirty();
         },
         remove: function (decorators) {
-            if (!util.isArray(decorators)) {
+            if (!Array.isArray(decorators)) {
                 decorators = [decorators];
             }
             decorators.forEach(function (decorator) {

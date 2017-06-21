@@ -1,6 +1,6 @@
-var util = require('../util');
+var util = require('@grid/util');
 
-module.exports = function(numRows, numCols, varyHeights, varyWidths, fixedRows, fixedCols, preSetupFn, headerRows, headerCols, opts) {
+module.exports = function (numRows, numCols, varyHeights, varyWidths, fixedRows, fixedCols, preSetupFn, headerRows, headerCols, opts) {
 
     var grid = require('../core').default(opts);
 
@@ -24,7 +24,7 @@ module.exports = function(numRows, numCols, varyHeights, varyWidths, fixedRows, 
             } else if (r < fixedRows + headerRows) { // returns false for undefined luckily
                 row.fixed = true;
             }
-            if (util.isArray(varyHeights)) {
+            if (Array.isArray(varyHeights)) {
                 row.height = varyHeights[r % varyHeights.length];
             }
             rows.push(row);
@@ -41,7 +41,7 @@ module.exports = function(numRows, numCols, varyHeights, varyWidths, fixedRows, 
                             col.fixed = true;
                         }
                         if (varyWidths) {
-                            if (util.isArray(varyWidths)) {
+                            if (Array.isArray(varyWidths)) {
                                 col.width = varyWidths[c % varyWidths.length];
                             } else {
                                 col.width = Math.random() * 10 + 101;

@@ -1,6 +1,6 @@
 var key = require('key');
 var arrow = key.code.arrow;
-var util = require('../util');
+var util = require('@grid/util');
 var rangeUtil = require('../range-util');
 var ctrlOrCmd = require('../ctrl-or-cmd');
 

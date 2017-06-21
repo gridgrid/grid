@@ -10,7 +10,7 @@ var transformTsConfigPaths = require('../transformTSPaths');
 
 const aliases = transformTsConfigPaths();
 
-module.exports = function(isProd, isTests) {
+module.exports = function (isProd, isTests) {
     const plugins = [
         failPlugin,
         // new BundleAnalyzerPlugin(),

@@ -1,6 +1,6 @@
-var util = require('../util');
+var util = require('@grid/util');
 
-module.exports = function(_grid) {
+module.exports = function (_grid) {
     var grid = _grid;
     var dirtyClean = require('../dirty-clean')(grid);
 
@@ -11,10 +11,10 @@ module.exports = function(_grid) {
     };
     Object.defineProperty(model, 'row', {
         enumerable: true,
-        get: function() {
+        get: function () {
             return row;
         },
-        set: function(r) {
+        set: function (r) {
             row = r;
         }
     });
@@ -22,7 +22,7 @@ module.exports = function(_grid) {
 
     model.isDirty = dirtyClean.isDirty;
 
-    grid.eventLoop.bind('grid-row-change', function(e) {
+    grid.eventLoop.bind('grid-row-change', function (e) {
         switch (e.action) {
             case 'remove':
                 model.scrollTo(0, model.col);
@@ -30,7 +30,7 @@ module.exports = function(_grid) {
         }
     });
 
-    model.scrollTo = function(r, c, dontFire, fromPixelModel) {
+    model.scrollTo = function (r, c, dontFire, fromPixelModel) {
         if (isNaN(r) || isNaN(c)) {
             return;
         }
@@ -83,7 +83,7 @@ module.exports = function(_grid) {
     }
 
     //for now assumes data space
-    model.scrollIntoView = function(dataRow, dataCol) {
+    model.scrollIntoView = function (dataRow, dataCol) {
         dataRow = grid.virtual.row.clamp(grid.data.row.toVirtual(dataRow));
         dataCol = grid.virtual.col.clamp(grid.data.col.toVirtual(dataCol));
         var newRow = getScrollToRowOrCol(dataRow, 'row', 'height');

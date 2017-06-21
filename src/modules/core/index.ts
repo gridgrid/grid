@@ -1,6 +1,8 @@
+require('es6-object-assign').polyfill();
+
 const elementClass = require('element-class');
 const dirtyClean = require('../dirty-clean');
-const util = require('../util');
+const util = require('@grid/util');
 
 const escapeStack = require('escape-stack');
 

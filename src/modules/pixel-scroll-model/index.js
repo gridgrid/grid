@@ -1,4 +1,4 @@
-var util = require('../util');
+var util = require('@grid/util');
 var debounce = require('../debounce');
 var capitalize = require('capitalize');
 var dirtyClean = require('../dirty-clean');

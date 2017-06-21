@@ -1,4 +1,4 @@
-var util = require('../util');
+var util = require('@grid/util');
 var rangeUtil = require('../range-util');
 var capitalize = require('capitalize');
 var addDirtyProps = require('../add-dirty-props');

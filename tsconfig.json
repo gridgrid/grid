@@ -16,7 +16,7 @@
     "jsx": "react",
     "baseUrl": ".",
     "paths": {
-      "@grid": ["./src/modules/*"]
+      "@grid/*": ["./src/modules/*"]
     },
     "lib": ["es2017", "dom"]
   },

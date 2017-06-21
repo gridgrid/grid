@@ -1,5 +1,5 @@
 var elementClass = require('element-class');
-var util = require('../util');
+var util = require('@grid/util');
 var ctrlOrCmd = require('../ctrl-or-cmd');
 var key = require('key');
 

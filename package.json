@@ -28,6 +28,7 @@
     "capitalize": "^0.5.0",
     "click-off": "~0.2.1",
     "element-class": "^0.1.1",
+    "es6-object-assign": "~1.1.0",
     "escape-stack": "~0.1.2",
     "inner-text-shim": "~1.0.1",
     "key": "^0.1.11",

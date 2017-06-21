@@ -1,15 +1,9 @@
-import { Grid } from '../core';
+import { IAbstractRowColModel } from '@grid/abstract-row-col-model';
+import { Grid } from '@grid/core';
 
-const util = require('../util');
+const util = require('@grid/util');
 
 export type DimensionalSpaceCoordConverter = (spaceCoord: number) => number;
-
-export interface IAbstractRowColModel {
-  get: (i: number) => any;
-  toVirtual: (i: number) => number;
-  toData: (i: number) => number;
-  length: (includeHeaders?: boolean) => number;
-}
 
 export interface IIndexOpts {
   from?: number;
