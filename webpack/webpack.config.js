@@ -8,10 +8,10 @@ var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlug
 var failPlugin = require('webpack-fail-plugin');
 var transformTsConfigPaths = require('../transformTSPaths');
 
-const aliases = transformTsConfigPaths();
+var aliases = transformTsConfigPaths();
 
 module.exports = function (isProd, isTests) {
-    const plugins = [
+    var plugins = [
         failPlugin,
         // new BundleAnalyzerPlugin(),
         new CoreJsPlugin({
@@ -25,7 +25,7 @@ module.exports = function (isProd, isTests) {
         new CheckerPlugin()
     ];
     if (!isTests) {
-        plugins = plugins.concact([
+        plugins = plugins.concat([
             new ExtractTextPlugin('grid.css', {
                 allChunks: false
             }),
@@ -39,7 +39,8 @@ module.exports = function (isProd, isTests) {
             })
         ])
     }
-    const config = {
+
+    var config = {
         resolve: {
             extensions: ['', '.js', '.ts'],
             alias: aliases
@@ -48,10 +49,9 @@ module.exports = function (isProd, isTests) {
         devtool: isTests ? 'inline-source-map' : 'source-map', // more info:https://webpack.github.io/docs/build-performance.html#sourcemaps and https://webpack.github.io/docs/configuration.html#devtool
         noInfo: true, // set to false to see a list of every file being bundled.
         quiet: true,
-        entry: [
-            // './src/webpack-public-path',
+        entry: isTests ? [] : ['./src/webpack-public-path',
             // 'webpack-hot-middleware/client?reload=true',
-            // './src/app/index'
+            './src/app/index'
         ],
         target: 'web', // necessary per https://webpack.github.io/docs/testing.html#compile-and-test
         output: {

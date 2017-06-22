@@ -3,5 +3,13 @@
     "editor.detectIndentation": true,
     "editor.formatOnSave": true,
     "javascript.format.insertSpaceBeforeFunctionParenthesis": true,
-    "javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": true
+    "javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": true,
+    "search.exclude": {
+        "**/.git": true,
+        "**/.awcache": true,
+        "**/node_modules": true,
+        "**/tmp": true,
+        "**/dist": true,
+        "**/typings": true
+    }
 }

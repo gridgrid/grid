@@ -6,10 +6,12 @@ const util = require('@grid/util');
 
 const escapeStack = require('escape-stack');
 
-import { AbstractSpaceConverter } from '../space/converter';
-import { DataSpaceConverter } from '../space/data-space-converter';
-import { ViewSpaceConverter } from '../space/view-space-converter';
-import { VirtualSpaceConverter } from '../space/virtual-space-converter';
+import createColModel from '@grid/col-model';
+import createRowModel from '@grid/row-model';
+import { AbstractSpaceConverter } from '@grid/space/converter';
+import { DataSpaceConverter } from '@grid/space/data-space-converter';
+import { ViewSpaceConverter } from '@grid/space/view-space-converter';
+import { VirtualSpaceConverter } from '@grid/space/virtual-space-converter';
 
 export interface IGridOpts {
     allowEdit?: boolean;
@@ -157,8 +159,8 @@ export function create(opts: IGridOpts = {}) {
     grid.eventLoop = require('../event-loop')(grid);
     grid.decorators = require('../decorators')(grid);
     grid.cellClasses = require('../cell-classes')(grid);
-    grid.rowModel = require('../row-model')(grid);
-    grid.colModel = require('../col-model')(grid);
+    grid.rowModel = createRowModel(grid);
+    grid.colModel = createColModel(grid);
     grid.dataModel = require('../simple-data-model')(grid);
     grid.virtualPixelCellModel = require('../virtual-pixel-cell-model')(grid);
     grid.cellScrollModel = require('../cell-scroll-model')(grid);
@@ -275,3 +277,5 @@ export function create(opts: IGridOpts = {}) {
 
     return grid;
 }
+
+export default create;

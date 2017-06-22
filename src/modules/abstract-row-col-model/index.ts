@@ -71,380 +71,345 @@ export interface IRowColEvent extends IRowColEventBody {
     type: string;
 }
 
-export function create(
-    grid: Grid,
-    name: string,
-    lengthName: string,
-    defaultSize: number
-): IAbstractRowColModel {
+const makeDirtyClean = require('../dirty-clean');
 
-    let descriptors: IRowColDescriptor[] = [];
-    let numFixed = 0;
-    let numHeaders = 0;
-    const makeDirtyClean = require('../dirty-clean');
-    const dirtyClean = makeDirtyClean(grid);
-    const builderDirtyClean = makeDirtyClean(grid);
-    let selected: number[] = [];
-    const ROW_COL_EVENT_TYPE = 'grid-' + name + '-change';
-
-    function setDescriptorsDirty(eventBody: IRowColEventBody) {
-        // tslint:disable-next-line:prefer-object-spread
-        const event: IRowColEvent = Object.assign(eventBody, {
-            type: ROW_COL_EVENT_TYPE
-        });
-        grid.eventLoop.fire(event);
-        dirtyClean.setDirty();
-        builderDirtyClean.setDirty();
+export class AbstractRowColModel {
+    grid: Grid;
+    defaultSize: number;
+    areBuildersDirty: () => boolean;
+    isDirty: () => boolean;
+    private name: string;
+    private descriptors: IRowColDescriptor[] = [];
+    private _numFixed: number = 0;
+    private _numHeaders: number = 0;
+    private dirtyClean: any;
+    private builderDirtyClean: any;
+    private _selected: number[] = [];
+    private ROW_COL_EVENT_TYPE: string;
+    private lengthName: string;
+    private fireSelectionChange: () => void;
+    constructor(
+        grid: Grid,
+        name: string,
+        lengthName: string,
+        defaultSize: number
+    ) {
+        this.grid = grid;
+        this.name = name;
+        this.dirtyClean = makeDirtyClean(grid);
+        this.builderDirtyClean = makeDirtyClean(grid);
+        this.areBuildersDirty = this.builderDirtyClean.isDirty;
+        this.isDirty = this.dirtyClean.isDirty;
+        this.ROW_COL_EVENT_TYPE = 'grid-' + name + '-change';
+        this.defaultSize = defaultSize;
+        this.lengthName = lengthName;
+        this.fireSelectionChange = debounce(() => {
+            grid.eventLoop.fire('grid-' + name + '-selection-change');
+        }, 1);
     }
 
-    const fireSelectionChange = debounce(() => {
-        grid.eventLoop.fire('grid-' + name + '-selection-change');
-    }, 1);
-
-    function updateDescriptorIndices() {
-        const oldSelected = selected;
-        selected = [];
-        descriptors.forEach((descriptor, i) => {
-            descriptor.index = i;
-            if (descriptor.selected) {
-                selected.push(i);
-            }
-        });
-        if (selected.length !== oldSelected.length) {
-            fireSelectionChange();
+    add(_toAdd?: IRowColDescriptor | IRowColDescriptor[]) {
+        if (!_toAdd) {
             return;
         }
-        selected.sort();
-        oldSelected.sort();
-        const change = oldSelected.some((idx, i) => {
-            return idx !== selected[i];
-        });
-        if (change) {
-            fireSelectionChange();
-        }
-    }
-
-    function addDragReadyClass(descriptor: IRowColDescriptor, index: number) {
-        if (!descriptor || !(index >= 0)) {
-            return;
-        }
-        const top = name === 'row' ? index : -1;
-        const left = name === 'row' ? -1 : index;
-        const dragReadyClass = grid.cellClasses.create(top, left, 'grid-col-drag-ready');
-        grid.cellClasses.add(dragReadyClass);
-        descriptor.dragReadyClass = dragReadyClass;
-    }
-
-    function removeDragReadyClass(descriptor: IRowColDescriptor) {
-        if (!descriptor || !descriptor.dragReadyClass) {
-            return;
-        }
-        grid.cellClasses.remove(descriptor.dragReadyClass);
-        descriptor.dragReadyClass = undefined;
-    }
-
-    const api: IAbstractRowColModel = {
-        areBuildersDirty: builderDirtyClean.isDirty,
-        isDirty: dirtyClean.isDirty,
-        defaultSize,
-        add(_toAdd?: IRowColDescriptor | IRowColDescriptor[]) {
-            if (!_toAdd) {
-                return;
-            }
-            const toAdd = util.toArray(_toAdd);
-            toAdd.forEach((descriptor) => {
-                if (descriptor.header) {
-                    descriptors.splice(numHeaders, 0, descriptor);
-                    numFixed++;
-                    numHeaders++;
-                } else {
-                    // if the column is fixed and the last one added is fixed (we only allow fixed at the beginning for now)
-                    if (descriptor.fixed) {
-                        if (!descriptors.length || descriptors[descriptors.length - 1].fixed) {
-                            numFixed++;
-                        } else {
-                            throw new Error('Cannot add a fixed column after an unfixed one');
-                        }
+        const toAdd = util.toArray(_toAdd);
+        toAdd.forEach((descriptor) => {
+            if (descriptor.header) {
+                this.descriptors.splice(this._numHeaders, 0, descriptor);
+                this._numFixed++;
+                this._numHeaders++;
+            } else {
+                // if the column is fixed and the last one added is fixed (we only allow fixed at the beginning for now)
+                if (descriptor.fixed) {
+                    if (!this.descriptors.length || this.descriptors[this.descriptors.length - 1].fixed) {
+                        this._numFixed++;
+                    } else {
+                        throw new Error('Cannot add a fixed column after an unfixed one');
                     }
-                    descriptors.push(descriptor);
                 }
+                this.descriptors.push(descriptor);
+            }
+        });
+        this.updateDescriptorIndices();
+        this.setDescriptorsDirty({
+            action: 'add',
+            descriptors: toAdd
+        });
+    }
+    addHeaders(_toAdd?: IRowColDescriptor | IRowColDescriptor[]) {
+        if (!_toAdd) {
+            return;
+        }
+        const toAdd = util.toArray(_toAdd);
+        toAdd.forEach((headerDescriptor) => {
+            headerDescriptor.header = true;
+        });
+        this.add(toAdd);
+    }
+    header(index: number) {
+        return this.descriptors[index];
+    }
+    get(index: number, dataSpace?: boolean) {
+        if (dataSpace) {
+            index += this._numHeaders;
+        }
+        return this.descriptors[index];
+    }
+    length(includeHeaders?: boolean) {
+        const subtract = includeHeaders ? 0 : this._numHeaders;
+        return this.descriptors.length - subtract;
+    }
+    remove(descriptor: IRowColDescriptor, dontUpdateIndex?: boolean) {
+        const index = this.descriptors.indexOf(descriptor);
+        if (index !== -1) {
+            this.descriptors.splice(index, 1);
+            if (descriptor.header) {
+                this._numFixed--;
+                this._numHeaders--;
+            } else if (descriptor.fixed) {
+                this._numFixed--;
+            }
+        }
+        if (!dontUpdateIndex) {
+            this.updateDescriptorIndices();
+            this.setDescriptorsDirty({
+                action: 'remove',
+                descriptors: [descriptor]
             });
-            updateDescriptorIndices();
-            setDescriptorsDirty({
-                action: 'add',
-                descriptors: toAdd
+        }
+    }
+    clear(includeHeaders?: boolean) {
+        let removed;
+        if (includeHeaders) {
+            removed = this.descriptors;
+            this.descriptors = [];
+            this._numFixed = 0;
+            this._numHeaders = 0;
+        } else {
+            removed = this.descriptors.slice(this._numHeaders);
+            this.descriptors = this.descriptors.slice(0, this._numHeaders);
+            this._numFixed = this._numHeaders;
+        }
+        this.updateDescriptorIndices();
+        if (removed && removed.length) {
+            this.setDescriptorsDirty({
+                action: 'remove',
+                descriptors: removed
             });
-        },
-        addHeaders(_toAdd?: IRowColDescriptor | IRowColDescriptor[]) {
-            if (!_toAdd) {
+        }
+    }
+    move(_fromIndexes: number | number[], target: number, after?: boolean) {
+        const fromIndexes = util.toArray(_fromIndexes);
+
+        if (fromIndexes.length === 1) {
+            // the single move case is easier and doesn't require the after hint
+            const from = fromIndexes[0];
+            this.descriptors.splice(target, 0, this.descriptors.splice(from, 1)[0]);
+            this.setDescriptorsDirty({
+                action: 'move',
+                descriptors: [this.get(from), this.get(target)]
+            });
+        } else {
+            while (fromIndexes.indexOf(target) !== -1 && target !== -1) {
+                target--;
+                after = true;
+            }
+
+            const toValue = this.descriptors[target];
+            const removed = fromIndexes
+                .sort((a, b) => b - a)
+                .map((fromIndex) => {
+                    const removedDescriptors = this.descriptors.splice(fromIndex, 1);
+                    return removedDescriptors[0];
+
+                });
+            removed.reverse();
+            this.descriptors.splice(this.descriptors.indexOf(toValue) + (after ? 1 : 0), 0, ...removed);
+            this.updateDescriptorIndices();
+            this.setDescriptorsDirty({
+                action: 'move',
+                descriptors: removed.concat(toValue)
+            });
+        }
+    }
+    numHeaders() {
+        return this._numHeaders;
+    }
+    numFixed(excludeHeaders?: boolean) {
+        return this._numFixed - (excludeHeaders ? this._numHeaders : 0);
+    }
+    toVirtual(dataIndex: number) {
+        return dataIndex + this.numHeaders();
+    }
+    toData(virtualIndex: number) {
+        return virtualIndex - this.numHeaders();
+    }
+
+    select(_indexes: number | number[], dontFire?: boolean) {
+        const indexes = util.toArray(_indexes);
+        const changes = indexes
+            .filter((idx) => {
+                const hasDescriptor = !!this.get(idx, true);
+                if (!hasDescriptor) {
+                    console.warn('Tried to select index that had no descriptor', idx);
+                }
+                return hasDescriptor;
+            })
+            .map((idx) => {
+                const descriptor = this.get(idx, true);
+                if (!descriptor.selected && descriptor.selectable !== false) {
+                    this.addDragReadyClass(descriptor, idx);
+                    descriptor.selected = true;
+                    this._selected.push(idx);
+                    return idx;
+                }
+                return undefined;
+            })
+            .filter((c) => c != undefined) as number[];
+        if (changes.length && !dontFire) {
+            this.fireSelectionChange();
+        }
+    }
+    deselect(_indexes: number | number[], dontFire?: boolean) {
+        const indexes = util.toArray(_indexes);
+        const selectedMap = this._selected.reduce<{ [key: string]: number | false }>((map, selectedIndex) => {
+            map[selectedIndex] = selectedIndex;
+            return map;
+        }, {});
+        const changes = indexes
+            .filter((idx) => {
+                const hasDescriptor = !!this.get(idx, true);
+                if (!hasDescriptor) {
+                    console.warn('Tried to deselect index that had no descriptor', idx);
+                }
+                return hasDescriptor;
+            })
+            .map((idx) => {
+                const descriptor = this.get(idx, true);
+                this.removeDragReadyClass(descriptor);
+                if (descriptor.selected) {
+                    descriptor.selected = false;
+                    selectedMap[idx] = false;
+                    return idx;
+                }
+                return undefined;
+            })
+            .filter((c) => c != undefined) as number[];
+
+        this._selected =
+            Object.keys(selectedMap)
+                .reduce<number[]>((array, selectedKey) => {
+                    const idx = selectedMap[selectedKey];
+                    if (idx !== false) {
+                        array.push(idx);
+                    }
+                    return array;
+                }, []);
+
+        if (changes.length && !dontFire) {
+            this.fireSelectionChange();
+        }
+    }
+    toggleSelect(index: number) {
+        const descriptor = this.get(index, true);
+        if (descriptor.selected) {
+            this.deselect(index);
+        } else {
+            this.select(index);
+        }
+    }
+    clearSelected() {
+        // have to make a copy or we are iterating the same array we're removing from yikes.
+        return this.deselect(this.getSelected().slice(0));
+    }
+    getSelected() {
+        return this._selected;
+    }
+    allSelected() {
+        return this.getSelected().length === this.length();
+    }
+    create(builder?: IRowColBuilder) {
+        let fixed: boolean | undefined = false;
+        let expanded = false;
+        let expandedClass: any; // TODO: cell class descriptor type
+        const setExpanded = (exp: boolean) => {
+            if (!descriptor.children || descriptor.index == undefined) {
                 return;
             }
-            const toAdd = util.toArray(_toAdd);
-            toAdd.forEach((headerDescriptor) => {
-                headerDescriptor.header = true;
-            });
-            api.add(toAdd);
-        },
-        header(index: number) {
-            return descriptors[index];
-        },
-        get(index: number) {
-            return descriptors[index];
-        },
-        length(includeHeaders?: boolean) {
-            const subtract = includeHeaders ? 0 : numHeaders;
-            return descriptors.length - subtract;
-        },
-        remove(descriptor: IRowColDescriptor, dontUpdateIndex?: boolean) {
-            const index = descriptors.indexOf(descriptor);
-            if (index !== -1) {
-                descriptors.splice(index, 1);
-                if (descriptor.header) {
-                    numFixed--;
-                    numHeaders--;
-                } else if (descriptor.fixed) {
-                    numFixed--;
+            expanded = exp;
+            // we never look for changes to the children, if you need to change it, remove and add the row again
+            if (expanded) {
+                this.descriptors.splice(descriptor.index + 1, 0, ...descriptor.children);
+                this.updateDescriptorIndices();
+                this.setDescriptorsDirty({
+                    action: 'add',
+                    descriptors: descriptor.children
+                });
+                const top = this.name === 'row' ? descriptor.index : 0;
+                const left = this.name === 'col' ? descriptor.index : 0;
+                const height = this.name === 'row' ? 1 : Infinity;
+                const width = this.name === 'col' ? 1 : Infinity;
+                expandedClass = this.grid.cellClasses.create(top, left, 'grid-expanded', height, width, 'virtual');
+                this.grid.cellClasses.add(expandedClass);
+
+            } else {
+                this.descriptors.splice(descriptor.index + 1, descriptor.children.length);
+                this.updateDescriptorIndices();
+                this.setDescriptorsDirty({
+                    action: 'remove',
+                    descriptors: [...descriptor.children]
+                });
+                if (expandedClass) {
+                    this.grid.cellClasses.remove(expandedClass);
                 }
             }
-            if (!dontUpdateIndex) {
-                updateDescriptorIndices();
-                setDescriptorsDirty({
-                    action: 'remove',
+        };
+        const descriptor: IRowColDescriptor = {
+            isBuiltActionable: true,
+            get fixed() {
+                return descriptor.header || !!fixed;
+            },
+            set fixed(_fixed: boolean | undefined) {
+                fixed = _fixed;
+            },
+            get expanded() {
+                return expanded;
+            },
+            set expanded(exp: boolean) {
+                setExpanded(exp);
+            }
+        };
+
+        addDirtyProps(descriptor, ['builder'], [this.builderDirtyClean]);
+        descriptor.builder = builder;
+
+        return addDirtyProps(descriptor, [{
+            name: this.lengthName,
+            onDirty: () => {
+                this.setDescriptorsDirty({
+                    action: 'size',
                     descriptors: [descriptor]
                 });
             }
-        },
-        clear(includeHeaders?: boolean) {
-            let removed;
-            if (includeHeaders) {
-                removed = descriptors;
-                descriptors = [];
-                numFixed = 0;
-                numHeaders = 0;
-            } else {
-                removed = descriptors.slice(numHeaders);
-                descriptors = descriptors.slice(0, numHeaders);
-                numFixed = numHeaders;
-            }
-            updateDescriptorIndices();
-            if (removed && removed.length) {
-                setDescriptorsDirty({
-                    action: 'remove',
-                    descriptors: removed
+        }, {
+            name: 'hidden',
+            onDirty: () => {
+                this.setDescriptorsDirty({
+                    action: 'hide',
+                    descriptors: [descriptor]
                 });
             }
-        },
-        move(_fromIndexes: number | number[], target: number, after?: boolean) {
-            const fromIndexes = util.toArray(_fromIndexes);
+        }], [this.dirtyClean]);
+    }
+    createBuilder(render: BuilderRenderer, update: BuilderUpdater = passThrough) {
+        return {
+            render,
+            update
+        };
+    }
 
-            if (fromIndexes.length === 1) {
-                // the single move case is easier and doesn't require the after hint
-                const from = fromIndexes[0];
-                descriptors.splice(target, 0, descriptors.splice(from, 1)[0]);
-                setDescriptorsDirty({
-                    action: 'move',
-                    descriptors: [api.get(from), api.get(target)]
-                });
-            } else {
-                while (fromIndexes.indexOf(target) !== -1 && target !== -1) {
-                    target--;
-                    after = true;
-                }
-
-                const toValue = descriptors[target];
-                const removed = fromIndexes
-                    .sort((a, b) => b - a)
-                    .map((fromIndex) => {
-                        const removedDescriptors = descriptors.splice(fromIndex, 1);
-                        return removedDescriptors[0];
-
-                    });
-                removed.reverse();
-                descriptors.splice(descriptors.indexOf(toValue) + (after ? 1 : 0), 0, ...removed);
-                updateDescriptorIndices();
-                setDescriptorsDirty({
-                    action: 'move',
-                    descriptors: removed.concat(toValue)
-                });
-            }
-        },
-        numHeaders() {
-            return numHeaders;
-        },
-        numFixed(excludeHeaders?: boolean) {
-            return numFixed - (excludeHeaders ? numHeaders : 0);
-        },
-        toVirtual(dataIndex: number) {
-            return dataIndex + api.numHeaders();
-        },
-        toData(virtualIndex: number) {
-            return virtualIndex - api.numHeaders();
-        },
-
-        select(_indexes: number | number[], dontFire?: boolean) {
-            const indexes = util.toArray(_indexes);
-            const changes = indexes
-                .filter((idx) => {
-                    const hasDescriptor = !!rowOrCol(idx);
-                    if (!hasDescriptor) {
-                        console.warn('Tried to select index that had no descriptor', idx);
-                    }
-                    return hasDescriptor;
-                })
-                .map((idx) => {
-                    const descriptor = rowOrCol(idx);
-                    if (!descriptor.selected && descriptor.selectable !== false) {
-                        addDragReadyClass(descriptor, idx);
-                        descriptor.selected = true;
-                        selected.push(idx);
-                        return idx;
-                    }
-                    return undefined;
-                })
-                .filter((c) => c != undefined) as number[];
-            if (changes.length && !dontFire) {
-                fireSelectionChange();
-            }
-        },
-        deselect(_indexes: number | number[], dontFire?: boolean) {
-            const indexes = util.toArray(_indexes);
-            const selectedMap = selected.reduce<{ [key: string]: number | false }>((map, selectedIndex) => {
-                map[selectedIndex] = selectedIndex;
-                return map;
-            }, {});
-            const changes = indexes
-                .filter((idx) => {
-                    const hasDescriptor = !!rowOrCol(idx);
-                    if (!hasDescriptor) {
-                        console.warn('Tried to deselect index that had no descriptor', idx);
-                    }
-                    return hasDescriptor;
-                })
-                .map((idx) => {
-                    const descriptor = rowOrCol(idx);
-                    removeDragReadyClass(descriptor);
-                    if (descriptor.selected) {
-                        descriptor.selected = false;
-                        selectedMap[idx] = false;
-                        return idx;
-                    }
-                    return undefined;
-                })
-                .filter((c) => c != undefined) as number[];
-
-            selected =
-                Object.keys(selectedMap)
-                    .reduce<number[]>((array, selectedKey) => {
-                        const idx = selectedMap[selectedKey];
-                        if (idx !== false) {
-                            array.push(idx);
-                        }
-                        return array;
-                    }, []);
-
-            if (changes.length && !dontFire) {
-                fireSelectionChange();
-            }
-        },
-        toggleSelect(index: number) {
-            const descriptor = rowOrCol(index);
-            if (descriptor.selected) {
-                api.deselect(index);
-            } else {
-                api.select(index);
-            }
-        },
-        clearSelected() {
-            // have to make a copy or we are iterating the same array we're removing from yikes.
-            return api.deselect(api.getSelected().slice(0));
-        },
-        getSelected() {
-            return selected;
-        },
-        allSelected() {
-            return api.getSelected().length === api.length();
-        },
-        create(builder?: IRowColBuilder) {
-            let fixed: boolean | undefined = false;
-            let expanded = false;
-            let expandedClass: any; // TODO: cell class descriptor type
-            const descriptor: IRowColDescriptor = {
-                isBuiltActionable: true,
-                get fixed() {
-                    return descriptor.header || !!fixed;
-                },
-                set fixed(_fixed: boolean | undefined) {
-                    fixed = _fixed;
-                },
-                get expanded() {
-                    return expanded;
-                },
-                set expanded(exp: boolean) {
-                    if (!descriptor.children || descriptor.index == undefined) {
-                        return;
-                    }
-                    expanded = exp;
-                    // we never look for changes to the children, if you need to change it, remove and add the row again
-                    if (expanded) {
-                        descriptors.splice(descriptor.index + 1, 0, ...descriptor.children);
-                        updateDescriptorIndices();
-                        setDescriptorsDirty({
-                            action: 'add',
-                            descriptors: descriptor.children
-                        });
-                        const top = name === 'row' ? descriptor.index : 0;
-                        const left = name === 'col' ? descriptor.index : 0;
-                        const height = name === 'row' ? 1 : Infinity;
-                        const width = name === 'col' ? 1 : Infinity;
-                        expandedClass = grid.cellClasses.create(top, left, 'grid-expanded', height, width, 'virtual');
-                        grid.cellClasses.add(expandedClass);
-
-                    } else {
-                        descriptors.splice(descriptor.index + 1, descriptor.children.length);
-                        updateDescriptorIndices();
-                        setDescriptorsDirty({
-                            action: 'remove',
-                            descriptors: [...descriptor.children]
-                        });
-                        if (expandedClass) {
-                            grid.cellClasses.remove(expandedClass);
-                        }
-                    }
-                }
-            };
-
-            addDirtyProps(descriptor, ['builder'], [builderDirtyClean]);
-            descriptor.builder = builder;
-
-            return addDirtyProps(descriptor, [{
-                name: lengthName,
-                onDirty() {
-                    setDescriptorsDirty({
-                        action: 'size',
-                        descriptors: [descriptor]
-                    });
-                }
-            }, {
-                name: 'hidden',
-                onDirty() {
-                    setDescriptorsDirty({
-                        action: 'hide',
-                        descriptors: [descriptor]
-                    });
-                }
-            }], [dirtyClean]);
-        },
-        createBuilder(render: BuilderRenderer, update: BuilderUpdater = passThrough) {
-            return {
-                render,
-                update
-            };
-        }
-
-    };
-
-    function heightOrWidth(index: number) {
-        const descriptor = descriptors[index];
+    protected sizeOf(index: number) {
+        const descriptor = this.get(index);
         if (!descriptor) {
             return NaN;
         }
@@ -453,19 +418,70 @@ export function create(
             return 0;
         }
 
-        const size: number | undefined = (descriptor as any)[lengthName];
-        return size || api.defaultSize;
+        const size: number | undefined = (descriptor as any)[this.lengthName];
+        return size || this.defaultSize;
     }
 
-    function rowOrCol(index: number) {
-        return descriptors[index + numHeaders];
+    private setDescriptorsDirty(eventBody: IRowColEventBody) {
+        // tslint:disable-next-line:prefer-object-spread
+        const event: IRowColEvent = Object.assign(eventBody, {
+            type: this.ROW_COL_EVENT_TYPE
+        });
+        this.grid.eventLoop.fire(event);
+        this.dirtyClean.setDirty();
+        this.builderDirtyClean.setDirty();
     }
 
-    // basically height or width
-    (api as any)[lengthName] = heightOrWidth;
+    private updateDescriptorIndices() {
+        const oldSelected = this._selected;
+        this._selected = [];
+        this.descriptors.forEach((descriptor, i) => {
+            descriptor.index = i;
+            if (descriptor.selected) {
+                this._selected.push(i);
+            }
+        });
+        if (this._selected.length !== oldSelected.length) {
+            this.fireSelectionChange();
+            return;
+        }
+        this._selected.sort();
+        oldSelected.sort();
+        const change = oldSelected.some((idx, i) => {
+            return idx !== this._selected[i];
+        });
+        if (change) {
+            this.fireSelectionChange();
+        }
+    }
 
-    // row or col get
-    (api as any)[name] = rowOrCol;
+    private addDragReadyClass(descriptor: IRowColDescriptor, index: number) {
+        if (!descriptor || !(index >= 0)) {
+            return;
+        }
+        const top = this.name === 'row' ? index : -1;
+        const left = this.name === 'row' ? -1 : index;
+        const dragReadyClass = this.grid.cellClasses.create(top, left, 'grid-col-drag-ready');
+        this.grid.cellClasses.add(dragReadyClass);
+        descriptor.dragReadyClass = dragReadyClass;
+    }
 
-    return api;
+    private removeDragReadyClass(descriptor: IRowColDescriptor) {
+        if (!descriptor || !descriptor.dragReadyClass) {
+            return;
+        }
+        this.grid.cellClasses.remove(descriptor.dragReadyClass);
+        descriptor.dragReadyClass = undefined;
+    }
 }
+
+export function create(
+    grid: Grid,
+    name: string,
+    lengthName: string,
+    defaultSize: number
+): IAbstractRowColModel {
+    return new AbstractRowColModel(grid, name, lengthName, defaultSize);
+}
+
+export default create;

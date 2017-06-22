@@ -31,13 +31,13 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
 
     it('should be able to tell you a default ' + name + ' ' + lengthName, function () {
         model.add({});
-        expect(model[lengthName](0)).toBeANumber();
+        expect(model.sizeOf(0)).toBeANumber();
     });
 
     it('should have a settable default', function () {
         model.add({});
         model.defaultSize = 20;
-        expect(model[lengthName](0)).toBe(20);
+        expect(model.sizeOf(0)).toBe(20);
     });
 
     it('should be able to clear', function () {
@@ -88,13 +88,13 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
         var descriptor = {};
         descriptor[lengthName] = weirdLength;
         model.add(descriptor);
-        expect(model[lengthName](0)).toEqual(weirdLength);
+        expect(model.sizeOf(0)).toEqual(weirdLength);
 
         var weirdLength2 = 105;
         var descriptor2 = {};
         descriptor2[lengthName] = weirdLength2;
         model.add(descriptor2);
-        expect(model[lengthName](1)).toBe(weirdLength2);
+        expect(model.sizeOf(1)).toBe(weirdLength2);
     });
 
     it('should notify listeners if ' + name + 's are added', function () {
@@ -129,9 +129,9 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
     });
 
     it('should handle weird queries', function () {
-        expect(model[lengthName](-1)).toBeNaN();
-        expect(model[lengthName](10000)).toBeNaN();
-        expect(model[lengthName](undefined)).toBeNaN();
+        expect(model.sizeOf(-1)).toBeNaN();
+        expect(model.sizeOf(10000)).toBeNaN();
+        expect(model.sizeOf(undefined)).toBeNaN();
     });
 
 
@@ -332,7 +332,7 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
             model.addHeaders(model.create());
             var descriptor = model.create();
             model.add(descriptor);
-            expect(model[name](0)).toBe(descriptor);
+            expect(model.get(0, true)).toBe(descriptor);
         });
 
         it('should select disregarding headers', function () {
@@ -522,7 +522,7 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
             var descriptor = model.create();
             model.add(descriptor);
             descriptor.hidden = true;
-            expect(model[lengthName](0)).toBe(0);
+            expect(model.sizeOf(0)).toBe(0);
         });
 
         it('should be dirty on change', function () {
