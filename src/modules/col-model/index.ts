@@ -2,7 +2,7 @@
 import { AbstractRowColModel, IColDescriptor } from '@grid/abstract-row-col-model';
 import { Grid } from '@grid/core';
 
-class ColModel extends AbstractRowColModel {
+export class ColModel extends AbstractRowColModel {
     width = (idx: number) => {
         return this.sizeOf(idx);
     }

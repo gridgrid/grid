@@ -12,6 +12,10 @@ export function isNumber(num: any): num is number {
     return typeof num === 'number' && !isNaN(num);
 }
 
+export function isElementWithStyle(node?: any): node is HTMLElement {
+    return !!node.style;
+}
+
 export function isElement(node?: any): node is HTMLElement {
     return !!(node &&
         node.nodeName); // we are a direct element

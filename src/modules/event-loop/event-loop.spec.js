@@ -1,5 +1,6 @@
 var mockEvent = require('../custom-event');
-var eventLoopFn = require('../event-loop');
+var eventLoop = require('../event-loop');
+var eventLoopFn = eventLoop.create;
 
 describe('event-loop', function () {
     require('../grid-spec-helper')();
@@ -11,7 +12,7 @@ describe('event-loop', function () {
     });
 
     function spyAndFireAllNormalEvents(not) {
-        var events = eventLoopFn.EVENTS;
+        var events = eventLoop.EVENTS;
         //include mousewheel for tests because it's not bound the normal way
         events.push('mousewheel');
         var self = this;
@@ -33,7 +34,7 @@ describe('event-loop', function () {
     });
 
     function spyAndFireAllGridEvents(not) {
-        eventLoopFn.GRID_EVENTS.forEach(function (type) {
+        eventLoop.GRID_EVENTS.forEach(function (type) {
             var spy = jasmine.createSpy(type);
             //use interceptor in case something else tries to stop propagation
             grid.eventLoop.addInterceptor(spy);

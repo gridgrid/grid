@@ -1,17 +1,18 @@
 require('es6-object-assign').polyfill();
 
-const elementClass = require('element-class');
-const dirtyClean = require('../dirty-clean');
-const util = require('@grid/util');
-
 const escapeStack = require('escape-stack');
 
-import createColModel from '@grid/col-model';
-import createRowModel from '@grid/row-model';
+import createColModel, { ColModel } from '@grid/col-model';
+import createEventLoop, { EventLoop } from '@grid/event-loop';
+import createRowModel, { RowModel } from '@grid/row-model';
 import { AbstractSpaceConverter } from '@grid/space/converter';
 import { DataSpaceConverter } from '@grid/space/data-space-converter';
 import { ViewSpaceConverter } from '@grid/space/view-space-converter';
 import { VirtualSpaceConverter } from '@grid/space/virtual-space-converter';
+
+const elementClass = require('element-class');
+const dirtyClean = require('@grid/dirty-clean');
+const util = require('@grid/util');
 
 export interface IGridOpts {
     allowEdit?: boolean;
@@ -47,11 +48,11 @@ export interface IGridCore {
 }
 
 export interface IGridModels {
-    eventLoop: any;
+    eventLoop: EventLoop;
     decorators: any;
     cellClasses: any;
-    rowModel: any;
-    colModel: any;
+    rowModel: RowModel;
+    colModel: ColModel;
     dataModel: any;
     virtualPixelCellModel: any;
     cellScrollModel: any;
@@ -156,7 +157,7 @@ export function create(opts: IGridOpts = {}) {
 
     const grid: Grid = gridCore as any;
 
-    grid.eventLoop = require('../event-loop')(grid);
+    grid.eventLoop = createEventLoop();
     grid.decorators = require('../decorators')(grid);
     grid.cellClasses = require('../cell-classes')(grid);
     grid.rowModel = createRowModel(grid);
