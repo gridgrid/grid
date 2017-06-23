@@ -3,6 +3,8 @@ require('es6-object-assign').polyfill();
 const escapeStack = require('escape-stack');
 
 import createColModel, { ColModel } from '@grid/col-model';
+import createDecorators, { } from '@grid/decorators';
+import makeDirtyClean from '@grid/dirty-clean';
 import createEventLoop, { EventLoop } from '@grid/event-loop';
 import createRowModel, { RowModel } from '@grid/row-model';
 import { AbstractSpaceConverter } from '@grid/space/converter';
@@ -11,7 +13,6 @@ import { ViewSpaceConverter } from '@grid/space/view-space-converter';
 import { VirtualSpaceConverter } from '@grid/space/virtual-space-converter';
 
 const elementClass = require('element-class');
-const dirtyClean = require('@grid/dirty-clean');
 const util = require('@grid/util');
 
 export interface IGridOpts {
@@ -145,7 +146,7 @@ export function create(opts: IGridOpts = {}) {
             });
         },
         makeDirtyClean() {
-            return dirtyClean(grid);
+            return makeDirtyClean(grid);
         },
         eventIsOnCells(e: UIEvent) {
             return grid.viewLayer.eventIsOnCells(e);
@@ -158,7 +159,7 @@ export function create(opts: IGridOpts = {}) {
     const grid: Grid = gridCore as any;
 
     grid.eventLoop = createEventLoop();
-    grid.decorators = require('../decorators')(grid);
+    grid.decorators = createDecorators(grid);
     grid.cellClasses = require('../cell-classes')(grid);
     grid.rowModel = createRowModel(grid);
     grid.colModel = createColModel(grid);

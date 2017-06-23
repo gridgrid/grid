@@ -1,7 +1,8 @@
 import { Grid } from '@grid/core';
+import makeDirtyClean, { IDirtyClean } from '@grid/dirty-clean';
+import addDirtyProps from '@grid/dirty-props';
 import * as util from '@grid/util';
 
-const addDirtyProps = require('../add-dirty-props');
 const passThrough = require('../pass-through');
 const debounce = require('../debounce');
 
@@ -71,8 +72,6 @@ export interface IRowColEvent extends IRowColEventBody {
     type: string;
 }
 
-const makeDirtyClean = require('../dirty-clean');
-
 export class AbstractRowColModel {
     grid: Grid;
     defaultSize: number;
@@ -82,8 +81,8 @@ export class AbstractRowColModel {
     private descriptors: IRowColDescriptor[] = [];
     private _numFixed: number = 0;
     private _numHeaders: number = 0;
-    private dirtyClean: any;
-    private builderDirtyClean: any;
+    private dirtyClean: IDirtyClean;
+    private builderDirtyClean: IDirtyClean;
     private _selected: number[] = [];
     private ROW_COL_EVENT_TYPE: string;
     private lengthName: string;

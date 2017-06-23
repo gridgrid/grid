@@ -5,7 +5,7 @@ describe('dirty-clean', function () {
     beforeEach(function () {
         grid = this.buildSimpleGrid();
         this.viewBuild();
-        dirtyClean = require('../dirty-clean')(grid);
+        dirtyClean = require('../dirty-clean').create(grid);
     });
 
     it('should start dirty', function () {

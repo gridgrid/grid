@@ -24,7 +24,7 @@ describe('cell-classes', function () {
 
         describe('satisfy', function () {
             addDirtyCtx.props = ['class'];
-            require('../add-dirty-props/test-body')(addDirtyCtx);
+            require('../dirty-props/test-body')(addDirtyCtx);
         });
 
         describe('satisfy', function () {

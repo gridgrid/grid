@@ -8,7 +8,7 @@ module.exports = function (context) {
         props = context.props;
     });
 
-    describe('add-dirty-props', function () {
+    describe('dirty-props.add', function () {
         function setPropAndCheckDirty(prop, val) {
             this.resetAllDirties();
             dirtyObjs.forEach(function (dirtyObj) {

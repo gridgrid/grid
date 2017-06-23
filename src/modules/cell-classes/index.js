@@ -1,6 +1,6 @@
-var positionRange = require('../position-range');
-var makeDirtyClean = require('../dirty-clean');
-var addDirtyProps = require('../add-dirty-props');
+var positionRange = require('../position-range').mixin;
+var makeDirtyClean = require('../dirty-clean').create;
+var addDirtyProps = require('../dirty-props').add;
 
 module.exports = function (_grid) {
     var grid = _grid;

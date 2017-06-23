@@ -1,7 +1,7 @@
 var util = require('@grid/util');
 var debounce = require('../debounce');
 var capitalize = require('capitalize');
-var dirtyClean = require('../dirty-clean');
+var dirtyClean = require('../dirty-clean').create;
 
 module.exports = function (_grid) {
     var grid = _grid;

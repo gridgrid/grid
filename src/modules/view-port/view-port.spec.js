@@ -86,7 +86,7 @@ describe('view port', function () {
             ctx.props = ['rows', 'cols', 'width', 'height'];
             ctx.dirtyObjs = [viewPort];
         });
-        require('../add-dirty-props/test-body')(ctx);
+        require('../dirty-props/test-body')(ctx);
     });
 
     describe('cell coordinate conversion', function () {

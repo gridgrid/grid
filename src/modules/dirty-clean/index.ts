@@ -1,26 +1,35 @@
-module.exports = function (_grid) {
-    var grid = _grid;
-    var dirty = true;
+import { Grid } from '@grid/core';
 
-    var unbindDrawHandler;
+export interface IDirtyClean {
+    isDirty(): boolean;
+    isClean(): boolean;
+    setDirty(): void;
+    setClean(): void;
+    disable(): void;
+    enable(): void;
+}
+
+export function create(grid: Grid) {
+    let dirty = true;
+
+    let unbindDrawHandler: (() => void) | null = null;
 
     function listenForDraw() {
         if (!unbindDrawHandler) {
-            unbindDrawHandler = grid.eventLoop.bind('grid-draw', function () {
-                api.setClean();
+            unbindDrawHandler = grid.eventLoop.bind('grid-draw', () => {
+                dirtyCleanInstance.setClean();
             });
         }
     }
 
-
-    var api = {
-        isDirty: function () {
+    const dirtyCleanInstance: IDirtyClean = {
+        isDirty() {
             return dirty;
         },
-        isClean: function () {
+        isClean() {
             return !dirty;
         },
-        setDirty: function () {
+        setDirty() {
             dirty = true;
             // when things are initalizing sometimes this doesn't exist yet
             // we have to hope that at the end of initialization the grid will call request draw itself
@@ -28,21 +37,23 @@ module.exports = function (_grid) {
                 grid.requestDraw();
             }
         },
-        setClean: function () {
+        setClean() {
             dirty = false;
         },
-        disable: function () {
+        disable() {
             if (unbindDrawHandler) {
                 unbindDrawHandler();
                 unbindDrawHandler = null;
             }
         },
-        enable: function () {
+        enable() {
             listenForDraw();
         }
     };
 
-    api.enable();
+    dirtyCleanInstance.enable();
 
-    return api;
-};
+    return dirtyCleanInstance;
+}
+
+export default create;

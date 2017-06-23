@@ -368,7 +368,7 @@ function testAbstractModel(modelCreatorFn, name, lengthName, defaultLength) {
                 ctx.props = [lengthName];
             });
 
-            require('../add-dirty-props/test-body')(ctx);
+            require('../dirty-props/test-body')(ctx);
         });
 
         it('should fire change on ' + lengthName + ' set', function () {
