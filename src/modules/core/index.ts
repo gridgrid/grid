@@ -3,6 +3,7 @@ require('es6-object-assign').polyfill();
 const escapeStack = require('escape-stack');
 
 import { IAbstractRowColModel } from '@grid/abstract-row-col-model';
+import createCellKeyboardModel, { ICellKeyboardModel } from '@grid/cell-keyboard-model';
 import cellMouseModel, { ICellMouseModel, IEventDimensionInfoGetter } from '@grid/cell-mouse-model';
 import createColModel, { ColModel } from '@grid/col-model';
 import createDecorators, { IDecoratorModel } from '@grid/decorators';
@@ -81,7 +82,7 @@ export interface IGridModels {
     virtualPixelCellModel: IVirtualPixelCellModel;
     cellScrollModel: any;
     cellMouseModel: ICellMouseModel;
-    cellKeyboardModel: any;
+    cellKeyboardModel: ICellKeyboardModel;
     fps: any;
     viewPort: IViewPort;
     viewLayer: any;
@@ -246,7 +247,7 @@ export function create(opts: IGridOpts = {}) {
     grid.virtualPixelCellModel = createVirtualPixelCellModel(grid);
     grid.cellScrollModel = require('../cell-scroll-model')(grid);
     grid.cellMouseModel = cellMouseModel(grid);
-    grid.cellKeyboardModel = require('../cell-keyboard-model')(grid);
+    grid.cellKeyboardModel = createCellKeyboardModel(grid);
     grid.fps = require('../fps')(grid);
     grid.viewPort = createViewPort(grid);
     grid.viewLayer = require('../view-layer')(grid);

@@ -99,7 +99,7 @@ type AnnotatedDocumentMouseEventMap = {
 
 type AnnotatedDocumentEventMap = AnnotatedDocumentKeyEventMap & AnnotatedDocumentMouseEventMap;
 
-type AllEventMap = AnnotatedHTMLElementEventMap & HTMLElementEventMap & WindowEventMap & DocumentEventMap;
+type AllEventMap = AnnotatedHTMLElementEventMap & HTMLElementEventMap & WindowEventMap & DocumentEventMap & GridCustomEventMap;
 export type EventUnion = AllEventMap[keyof AllEventMap] | ILoopEvent;
 
 type WindowEventHandler<K extends keyof WindowEventMap> = (ev: WindowEventMap[K]) => any;
@@ -110,6 +110,7 @@ type AnnotatedDocumentEventHandler<K extends keyof AnnotatedDocumentEventMap> = 
 type AnnotatedHTMLElementEventHandler<K extends keyof AnnotatedHTMLElementEventMap> = (ev: AnnotatedHTMLElementEventMap[K]) => any;
 type GridCustomEventHandler<K extends keyof GridCustomEventMap> = (ev: GridCustomEventMap[K]) => any;
 type LoopEventHandler = (ev: ILoopEvent) => any;
+type EventUnionHandler = (ev: EventUnion) => any;
 
 export interface ILoopEvent {
     type: string;
@@ -188,8 +189,8 @@ interface IEventLoop extends IBind {
     logTargets?: boolean;
     setContainer(c: HTMLElement): void;
     fire(event: string | ILoopEvent): void;
-    addInterceptor(h: IEventHandler): () => EventHandlerUnbinder;
-    addExitListener(h: IEventHandler): () => EventHandlerUnbinder;
+    addInterceptor(h: EventUnionHandler): () => EventHandlerUnbinder;
+    addExitListener(h: EventUnionHandler): () => EventHandlerUnbinder;
     stopBubbling(e: ILoopEvent): ILoopEvent;
 }
 export type EventLoop = IEventLoop & BindOnce<IBind>;
