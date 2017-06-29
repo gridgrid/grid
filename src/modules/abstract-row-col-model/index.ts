@@ -1,10 +1,10 @@
 import { Grid } from '@grid/core';
+import debounce from '@grid/debounce';
 import makeDirtyClean, { IDirtyClean } from '@grid/dirty-clean';
 import addDirtyProps from '@grid/dirty-props';
 import * as util from '@grid/util';
 
 const passThrough = require('../pass-through');
-const debounce = require('../debounce');
 
 export interface IAbstractRowColModel {
     defaultSize: number;
@@ -22,6 +22,7 @@ export interface IAbstractRowColModel {
     move(fromIndexes: number | number[], target: number, after?: boolean): void;
     numHeaders(): number;
     numFixed(excludeHeaders?: boolean): number;
+    sizeOf(index: number): number;
     select(indexes: number | number[], dontFire?: boolean): void;
     deselect(indexes: number | number[], dontFire?: boolean): void;
     toggleSelect(index: number): void;
@@ -407,7 +408,7 @@ export class AbstractRowColModel {
         };
     }
 
-    protected sizeOf(index: number) {
+    sizeOf(index: number) {
         const descriptor = this.get(index);
         if (!descriptor) {
             return NaN;

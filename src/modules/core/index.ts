@@ -2,20 +2,27 @@ require('es6-object-assign').polyfill();
 
 const escapeStack = require('escape-stack');
 
+import { IAbstractRowColModel } from '@grid/abstract-row-col-model';
+import cellMouseModel, { ICellMouseModel, IEventDimensionInfoGetter } from '@grid/cell-mouse-model';
 import createColModel, { ColModel } from '@grid/col-model';
-import createDecorators, { } from '@grid/decorators';
+import createDecorators, { IDecoratorModel } from '@grid/decorators';
 import makeDirtyClean from '@grid/dirty-clean';
 import createEventLoop, { EventLoop } from '@grid/event-loop';
+import createPixelScrollModel, { IPixelScrollDimensionInfo, IPixelScrollModel } from '@grid/pixel-scroll-model';
+import { colPositionRangeDimension, IPositionRangeDimension, rowPositionRangeDimension } from '@grid/position-range';
 import createRowModel, { RowModel } from '@grid/row-model';
 import { AbstractSpaceConverter } from '@grid/space/converter';
 import { DataSpaceConverter } from '@grid/space/data-space-converter';
 import { ViewSpaceConverter } from '@grid/space/view-space-converter';
 import { VirtualSpaceConverter } from '@grid/space/virtual-space-converter';
+import createViewPort, { IViewPort, IViewPortDimensionInfo } from '@grid/view-port';
+import createVirtualPixelCellModel, { IVirtualPixelCellDimensionInfo, IVirtualPixelCellModel } from '@grid/virtual-pixel-cell-model';
 
 const elementClass = require('element-class');
 const util = require('@grid/util');
 
 export interface IGridOpts {
+    snapToCell?: boolean;
     allowEdit?: boolean;
     col?: {
         disableReorder?: boolean;
@@ -27,6 +34,20 @@ export type EscapeStackRemover = () => void;
 
 export interface IEscapeStack {
     add: (handler: EscapeStackHandler) => EscapeStackRemover;
+}
+
+export interface IGridDimension {
+    rowColModel: IAbstractRowColModel;
+    viewPort: IViewPortDimensionInfo;
+    pixelScroll: IPixelScrollDimensionInfo;
+    cellScroll: ICellScrollDimensionInfo;
+    positionRange: IPositionRangeDimension;
+    cellMouse: IEventDimensionInfoGetter;
+    virtualPixelCell: IVirtualPixelCellDimensionInfo;
+}
+
+export interface ICellScrollDimensionInfo {
+    position: number;
 }
 
 export interface IGridCore {
@@ -46,26 +67,28 @@ export interface IGridCore {
     makeDirtyClean: () => any;
     destroy: () => void;
     eventIsOnCells: (e: UIEvent) => boolean;
+    rows: IGridDimension;
+    cols: IGridDimension;
 }
 
 export interface IGridModels {
     eventLoop: EventLoop;
-    decorators: any;
+    decorators: IDecoratorModel;
     cellClasses: any;
     rowModel: RowModel;
     colModel: ColModel;
     dataModel: any;
-    virtualPixelCellModel: any;
+    virtualPixelCellModel: IVirtualPixelCellModel;
     cellScrollModel: any;
-    cellMouseModel: any;
+    cellMouseModel: ICellMouseModel;
     cellKeyboardModel: any;
     fps: any;
-    viewPort: any;
+    viewPort: IViewPort;
     viewLayer: any;
     colReorder: any;
     editModel: any;
     navigationModel: any;
-    pixelScrollModel: any;
+    pixelScrollModel: IPixelScrollModel;
     showHiddenCols: any;
     colResize: any;
     copyPaste: any;
@@ -86,6 +109,16 @@ export function create(opts: IGridOpts = {}) {
     let drawRequested = false;
     const timeouts: number[] = [];
     const intervals: number[] = [];
+    const cellScrollRowDimension = {
+        get position() {
+            return grid.cellScrollModel.row;
+        }
+    };
+    const cellScrollColDimension = {
+        get position() {
+            return grid.cellScrollModel.col;
+        }
+    };
     const gridCore: IGridCore = {
         opts,
         focused: false,
@@ -153,6 +186,52 @@ export function create(opts: IGridOpts = {}) {
         },
         destroy() {
             grid.eventLoop.fire('grid-destroy');
+        },
+        rows: {
+            get rowColModel() {
+                return grid.rowModel;
+            },
+            get viewPort() {
+                return grid.viewPort.rowInfo;
+            },
+            get cellScroll() {
+                return cellScrollRowDimension;
+            },
+            get pixelScroll() {
+                return grid.pixelScrollModel.y;
+            },
+            get positionRange() {
+                return rowPositionRangeDimension;
+            },
+            get cellMouse() {
+                return grid.cellMouseModel.rowInfo;
+            },
+            get virtualPixelCell() {
+                return grid.virtualPixelCellModel.rows;
+            }
+        },
+        cols: {
+            get rowColModel() {
+                return grid.colModel;
+            },
+            get viewPort() {
+                return grid.viewPort.colInfo;
+            },
+            get cellScroll() {
+                return cellScrollColDimension;
+            },
+            get pixelScroll() {
+                return grid.pixelScrollModel.x;
+            },
+            get positionRange() {
+                return colPositionRangeDimension;
+            },
+            get cellMouse() {
+                return grid.cellMouseModel.colInfo;
+            },
+            get virtualPixelCell() {
+                return grid.virtualPixelCellModel.cols;
+            }
         }
     };
 
@@ -164,12 +243,12 @@ export function create(opts: IGridOpts = {}) {
     grid.rowModel = createRowModel(grid);
     grid.colModel = createColModel(grid);
     grid.dataModel = require('../simple-data-model')(grid);
-    grid.virtualPixelCellModel = require('../virtual-pixel-cell-model')(grid);
+    grid.virtualPixelCellModel = createVirtualPixelCellModel(grid);
     grid.cellScrollModel = require('../cell-scroll-model')(grid);
-    grid.cellMouseModel = require('../cell-mouse-model')(grid);
+    grid.cellMouseModel = cellMouseModel(grid);
     grid.cellKeyboardModel = require('../cell-keyboard-model')(grid);
     grid.fps = require('../fps')(grid);
-    grid.viewPort = require('../view-port')(grid);
+    grid.viewPort = createViewPort(grid);
     grid.viewLayer = require('../view-layer')(grid);
 
     if (!(opts && opts.col && opts.col.disableReorder)) {
@@ -182,7 +261,7 @@ export function create(opts: IGridOpts = {}) {
 
     grid.navigationModel = require('../navigation-model')(grid);
 
-    grid.pixelScrollModel = require('../pixel-scroll-model')(grid);
+    grid.pixelScrollModel = createPixelScrollModel(grid);
     grid.showHiddenCols = require('../show-hidden-cols')(grid);
     grid.colResize = require('../col-resize')(grid);
     grid.copyPaste = require('../copy-paste')(grid);

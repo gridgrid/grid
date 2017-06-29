@@ -1,7 +1,7 @@
 import * as util from '@grid/util';
 
 const mousewheel = require('../mousewheel');
-const debounce = require('../debounce');
+const debounce = require('../debounce').debounce;
 const listeners = require('../listeners');
 
 export const EVENTS: Array<keyof HTMLElementEventMap> =
@@ -9,12 +9,109 @@ export const EVENTS: Array<keyof HTMLElementEventMap> =
 
 export const GRID_EVENTS = ['grid-drag-start', 'grid-drag', 'grid-cell-drag', 'grid-drag-end', 'grid-cell-mouse-move'];
 
-type WindowEventHandler<K extends keyof WindowEventMap> = (this: Window, ev: WindowEventMap[K]) => any;
-type DocumentEventHandler<K extends keyof DocumentEventMap> = (this: Document, ev: DocumentEventMap[K]) => any;
-type HTMLElementEventHandler<K extends keyof HTMLElementEventMap> = (this: HTMLElement, ev: HTMLElementEventMap[K]) => any;
-type LoopEventHandler = (this: void, ev: ILoopEvent) => any;
+export interface IAnnotatedEvent {
+    realRow: number;
+    realCol: number;
+    virtualRow: number;
+    virtualCol: number;
+    row: number;
+    col: number;
+}
 
-interface ILoopEvent {
+export interface IAnnotatedMouseEvent extends IAnnotatedEvent {
+    gridX: number;
+    gridY: number;
+}
+
+export interface IGridCustomMouseEvent extends CustomEvent, IAnnotatedMouseEvent {
+    clientX: number;
+    clientY: number;
+    layerX: number;
+    layerY: number;
+    originalEvent: AnnotatedMouseEventUnion;
+}
+
+export interface IGridDragStartEvent extends IGridCustomMouseEvent {
+    enableAutoScroll(): void;
+}
+
+// tslint:disable-next-line:interface-over-type-literal
+type GridCustomEventMap = {
+    'grid-drag': IGridCustomMouseEvent,
+    'grid-cell-drag': IGridCustomMouseEvent,
+    'grid-drag-start': IGridDragStartEvent,
+    'grid-drag-end': IGridCustomMouseEvent,
+    'grid-cell-mouse-move': IGridCustomMouseEvent,
+};
+
+const ANNOTATED_MOUSE_EVENTS = {
+    click: true,
+    dblclick: true,
+    mousedown: true,
+    mousemove: true,
+    mouseup: true,
+};
+export const ANNOTATED_MOUSE_EVENTS_MAP: { readonly [key: string]: boolean | undefined; } = ANNOTATED_MOUSE_EVENTS;
+export const isAnnotatedMouseEvent = (e: EventUnion): e is AnnotatedMouseEventUnion => !!ANNOTATED_MOUSE_EVENTS_MAP[e.type];
+export const isAnnotatedMouseEventOfType =
+    <T extends keyof typeof ANNOTATED_MOUSE_EVENTS>(e: EventUnion, type: T): e is AnnotatedHTMLElementMouseEventMap[T] =>
+        type === e.type;
+
+const ANNOTATED_KEY_EVENTS = {
+    keydown: true,
+    keypress: true,
+    keyup: true,
+};
+export const ANNOTATED_KEY_EVENTS_MAP: { readonly [key: string]: boolean | undefined; } = ANNOTATED_KEY_EVENTS;
+export const isAnnotatedKeyEvent = (e: EventUnion): e is AnnotatedKeyEventUnion => !!ANNOTATED_KEY_EVENTS_MAP[e.type];
+
+export const isAnnotatedEvent = (e: EventUnion) => isAnnotatedKeyEvent(e) || isAnnotatedMouseEvent(e);
+
+type AnnotatedHTMLElementKeyEventMap = {
+    [K in keyof typeof ANNOTATED_KEY_EVENTS]: IAnnotatedEvent & HTMLElementEventMap[K];
+};
+
+type AnnotatedHTMLElementMouseEventMap = {
+    [K in keyof typeof ANNOTATED_MOUSE_EVENTS]: IAnnotatedMouseEvent & HTMLElementEventMap[K];
+};
+
+type AnnotatedHTMLElementEventMap = AnnotatedHTMLElementKeyEventMap & AnnotatedHTMLElementMouseEventMap;
+export type AnnotatedMouseEventUnion = AnnotatedHTMLElementMouseEventMap[keyof AnnotatedHTMLElementMouseEventMap];
+export type AnnotatedKeyEventUnion = AnnotatedHTMLElementKeyEventMap[keyof AnnotatedHTMLElementKeyEventMap];
+
+type AnnotatedWindowKeyEventMap = {
+    [K in keyof typeof ANNOTATED_KEY_EVENTS]: IAnnotatedEvent & WindowEventMap[K];
+};
+
+type AnnotatedWindowMouseEventMap = {
+    [K in keyof typeof ANNOTATED_MOUSE_EVENTS]: IAnnotatedMouseEvent & WindowEventMap[K];
+};
+
+type AnnotatedWindowEventMap = AnnotatedWindowKeyEventMap & AnnotatedWindowMouseEventMap;
+
+type AnnotatedDocumentKeyEventMap = {
+    [K in keyof typeof ANNOTATED_KEY_EVENTS]: IAnnotatedEvent & DocumentEventMap[K];
+};
+
+type AnnotatedDocumentMouseEventMap = {
+    [K in keyof typeof ANNOTATED_MOUSE_EVENTS]: IAnnotatedMouseEvent & DocumentEventMap[K];
+};
+
+type AnnotatedDocumentEventMap = AnnotatedDocumentKeyEventMap & AnnotatedDocumentMouseEventMap;
+
+type AllEventMap = AnnotatedHTMLElementEventMap & HTMLElementEventMap & WindowEventMap & DocumentEventMap;
+export type EventUnion = AllEventMap[keyof AllEventMap] | ILoopEvent;
+
+type WindowEventHandler<K extends keyof WindowEventMap> = (ev: WindowEventMap[K]) => any;
+type DocumentEventHandler<K extends keyof DocumentEventMap> = (ev: DocumentEventMap[K]) => any;
+type HTMLElementEventHandler<K extends keyof HTMLElementEventMap> = (ev: HTMLElementEventMap[K]) => any;
+type AnnotatedWindowEventHandler<K extends keyof AnnotatedWindowEventMap> = (ev: AnnotatedWindowEventMap[K]) => any;
+type AnnotatedDocumentEventHandler<K extends keyof AnnotatedDocumentEventMap> = (ev: AnnotatedDocumentEventMap[K]) => any;
+type AnnotatedHTMLElementEventHandler<K extends keyof AnnotatedHTMLElementEventMap> = (ev: AnnotatedHTMLElementEventMap[K]) => any;
+type GridCustomEventHandler<K extends keyof GridCustomEventMap> = (ev: GridCustomEventMap[K]) => any;
+type LoopEventHandler = (ev: ILoopEvent) => any;
+
+export interface ILoopEvent {
     type: string;
     gridStopBubbling?: boolean;
 }
@@ -28,7 +125,36 @@ type EventHandlerUnbinder = () => void;
 type BindTarget = HTMLElement | Window | Document;
 
 interface IBind {
-    bind(name: string, handler: IEventHandler): EventHandlerUnbinder;
+    bind<K extends keyof AnnotatedWindowEventMap>(
+        elem: Window,
+        name: K,
+        handler: AnnotatedWindowEventHandler<K>
+    ): EventHandlerUnbinder;
+    bind<K extends keyof AnnotatedDocumentEventMap>(
+        elem: Document,
+        name: K,
+        handler: AnnotatedDocumentEventHandler<K>
+    ): EventHandlerUnbinder;
+    bind<K extends keyof AnnotatedHTMLElementEventMap>(
+        elem: HTMLElement,
+        name: K,
+        handler: AnnotatedHTMLElementEventHandler<K>
+    ): EventHandlerUnbinder;
+    bind<K extends keyof AnnotatedHTMLElementEventMap>(
+        name: K,
+        handler: AnnotatedHTMLElementEventHandler<K>
+    ): EventHandlerUnbinder;
+
+    bind<K extends keyof GridCustomEventMap>(
+        elem: BindTarget,
+        name: K,
+        handler: GridCustomEventHandler<K>
+    ): EventHandlerUnbinder;
+    bind<K extends keyof GridCustomEventMap>(
+        name: K,
+        handler: GridCustomEventHandler<K>
+    ): EventHandlerUnbinder;
+
     bind<K extends keyof WindowEventMap>(
         elem: Window,
         name: K,
@@ -44,13 +170,18 @@ interface IBind {
         name: K,
         handler: HTMLElementEventHandler<K>
     ): EventHandlerUnbinder;
-    bind(elem: BindTarget, name: string, handler: IEventHandler): EventHandlerUnbinder;
+    bind<K extends keyof HTMLElementEventMap>(
+        name: K,
+        handler: HTMLElementEventHandler<K>
+    ): EventHandlerUnbinder;
+    bind(name: string, handler: IEventHandler): EventHandlerUnbinder;
 }
 
 // tslint:disable-next-line:interface-over-type-literal
 type BindOnce<T> = {
     bindOnce: T[keyof T];
 };
+
 interface IEventLoop extends IBind {
     isRunning: boolean;
     destroyed: boolean;

@@ -240,7 +240,7 @@ describe('pixel-scroll-model', function () {
         it('should bind a drag event on render', function () {
             var spy = spyOn(grid.eventLoop, 'bind');
             var scrollBar = model.vertScrollBar.render();
-            expect(spy).toHaveBeenBoundWith('grid-drag-start', scrollBar);
+            expect(spy).toHaveBeenBoundWith(scrollBar, 'grid-drag-start');
         });
 
         function renderBar(barDecorator) {

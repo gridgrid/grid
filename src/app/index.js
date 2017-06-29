@@ -1,7 +1,7 @@
 'use strict';
 
 var makeSimpleGrid = require('../modules/simple-grid');
-var debounce = require('../modules/debounce');
+var debounce = require('../modules/debounce').debounce;
 require('../scss/grid.scss');
 
 

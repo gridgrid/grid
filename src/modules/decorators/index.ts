@@ -5,6 +5,7 @@ import * as util from '@grid/util';
 
 export interface IDecorator extends IPositionRange {
     _decoratorDirtyClean?: IDirtyClean;
+    fixed?: boolean;
     postRender?(elem: HTMLElement): void;
 }
 

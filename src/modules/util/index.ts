@@ -1,3 +1,5 @@
+export type RowCol = 'row' | 'col';
+
 export function clamp(num: number, min: number, max: number, returnNaN?: boolean) {
     if (num > max) {
         return returnNaN ? NaN : max;
@@ -6,6 +8,14 @@ export function clamp(num: number, min: number, max: number, returnNaN?: boolean
         return returnNaN ? NaN : min;
     }
     return num;
+}
+
+export function isRow(rowCol: RowCol) {
+    return rowCol === 'row';
+}
+
+export function isCol(rowCol: RowCol) {
+    return rowCol === 'col';
 }
 
 export function isNumber(num: any): num is number {

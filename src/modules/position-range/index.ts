@@ -7,15 +7,86 @@ const WATCHED_PROP_NAMES = ['top', 'left', 'height', 'width', 'units', 'space'];
 export type IPositionUnit = 'cell' | 'px';
 export type IPositionSpace = 'data' | 'virtual' | 'real';
 
-export interface IPositionRange {
-    top?: number;
-    left?: number;
-    height?: number;
-    width?: number;
+export interface IRawPositionRange {
+    top: number;
+    left: number;
+    height: number;
+    width: number;
+}
+
+export type RawPositionRange = IRawPositionRange;
+export type PartialRawPositionRange = Partial<IRawPositionRange>;
+export type RawPositionRangeUnion = RawPositionRange | PartialRawPositionRange;
+
+export interface IPositionRange extends PartialRawPositionRange {
     units: IPositionUnit;
     space: IPositionSpace;
     isDirty(): void;
 }
+
+// not the sexiest but we get the position type assuming top / left width / height are the same type
+export type PositionType<T extends RawPositionRangeUnion> = T['top'];
+export type SizeType<T extends RawPositionRangeUnion> = T['height'];
+type PositionGet = <T extends RawPositionRangeUnion>(r: T) => PositionType<T>;
+type PositionSet = <T extends RawPositionRangeUnion>(r: T, p: PositionType<T>) => T;
+type SizeGet = <T extends RawPositionRangeUnion>(r: T) => SizeType<T>;
+type SizeSet = <T extends RawPositionRangeUnion>(r: T, p: SizeType<T>) => T;
+
+export interface IPositionRangeDimension {
+    getPosition: PositionGet;
+    setPosition: PositionSet;
+    getSize: SizeGet;
+    setSize: SizeSet;
+}
+
+const getTop = <T extends RawPositionRangeUnion>(range: T) => {
+    return range.top;
+};
+
+const setTop = <T extends RawPositionRangeUnion>(range: T, p: number) => {
+    range.top = p;
+    return range;
+};
+
+const getHeight = <T extends RawPositionRangeUnion>(range: T) => {
+    return range.height;
+};
+
+const setHeight = <T extends RawPositionRangeUnion>(range: T, s: number) => {
+    range.height = s;
+    return range;
+};
+
+const getLeft = <T extends RawPositionRangeUnion>(range: T) => {
+    return range.left;
+};
+const setLeft = <T extends RawPositionRangeUnion>(range: T, p: number) => {
+    range.left = p;
+    return range;
+};
+
+const getWidth = <T extends RawPositionRangeUnion>(range: T) => {
+    return range.width;
+};
+
+const setWidth = <T extends RawPositionRangeUnion>(range: T, s: number) => {
+    range.width = s;
+    return range;
+};
+
+export const rowPositionRangeDimension: IPositionRangeDimension = {
+    getPosition: getTop,
+    getSize: getHeight,
+    setPosition: setTop,
+    setSize: setHeight,
+};
+
+export const colPositionRangeDimension: IPositionRangeDimension = {
+    getPosition: getLeft,
+    getSize: getWidth,
+    setPosition: setLeft,
+    setSize: setWidth,
+};
 
 export function mixin<T extends object>(
     range: T,
