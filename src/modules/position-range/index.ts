@@ -4,8 +4,15 @@ import addDirtyProps, { DirtyProp, IDirtyProp } from '@grid/dirty-props';
 export type IDirtyPropOpts = Pick<IDirtyProp, 'preDirty' | 'onDirty'>;
 const WATCHED_PROP_NAMES = ['top', 'left', 'height', 'width', 'units', 'space'];
 
-export type IPositionUnit = 'cell' | 'px';
-export type IPositionSpace = 'data' | 'virtual' | 'real';
+export type PositionUnit = 'cell' | 'px';
+export type PositionSpace = 'data' | 'virtual' | 'real';
+
+export const toStandardSpace = (space: PositionSpace) => {
+    if (space === 'real') {
+        return 'view';
+    }
+    return space;
+};
 
 export interface IRawPositionRange {
     top: number;
@@ -19,8 +26,8 @@ export type PartialRawPositionRange = Partial<IRawPositionRange>;
 export type RawPositionRangeUnion = RawPositionRange | PartialRawPositionRange;
 
 export interface IPositionRange extends PartialRawPositionRange {
-    units: IPositionUnit;
-    space: IPositionSpace;
+    units: PositionUnit;
+    space: PositionSpace;
     isDirty(): void;
 }
 
@@ -96,7 +103,7 @@ export function mixin<T extends object>(
 ) {
     range = range || {}; // allow mixin functionality
     // tslint:disable-next-line:prefer-object-spread
-    const rangeResult: IPositionRange = Object.assign(range, {
+    const rangeResult: IPositionRange & T = Object.assign(range, {
         isDirty: dirtyClean.isDirty,
         // defaults
         units: 'cell' as 'cell',

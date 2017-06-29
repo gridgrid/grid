@@ -1,6 +1,6 @@
 import { Grid } from '@grid/core';
 import makeDirtyClean, { IDirtyClean } from '@grid/dirty-clean';
-import mixinPositionRange, { IPositionRange, IPositionSpace, IPositionUnit } from '@grid/position-range';
+import mixinPositionRange, { IPositionRange, PositionSpace, PositionUnit } from '@grid/position-range';
 import * as util from '@grid/util';
 
 export interface IDecorator extends IPositionRange {
@@ -15,7 +15,7 @@ export interface IDecoratorModel {
     getAlive(): IDecorator[];
     popAllDead(): IDecorator[];
     isDirty(): boolean;
-    create(t?: number, l?: number, h?: number, w?: number, u?: IPositionUnit, s?: IPositionSpace): IDecorator;
+    create(t?: number, l?: number, h?: number, w?: number, u?: PositionUnit, s?: PositionSpace): IDecorator;
 }
 
 export function create(grid: Grid) {
@@ -59,7 +59,7 @@ export function create(grid: Grid) {
             return oldDead;
         },
         isDirty: dirtyClean.isDirty,
-        create(t?: number, l?: number, h?: number, w?: number, u?: IPositionUnit, s?: IPositionSpace) {
+        create(t?: number, l?: number, h?: number, w?: number, u?: PositionUnit, s?: PositionSpace) {
             const thisDirtyClean = makeDirtyClean(grid);
 
             // mixin the position range functionality

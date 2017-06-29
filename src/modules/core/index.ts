@@ -3,6 +3,7 @@ require('es6-object-assign').polyfill();
 const escapeStack = require('escape-stack');
 
 import { IAbstractRowColModel } from '@grid/abstract-row-col-model';
+import creatCellClasses, { ICellClasses } from '@grid/cell-classes';
 import createCellKeyboardModel, { ICellKeyboardModel } from '@grid/cell-keyboard-model';
 import cellMouseModel, { ICellMouseModel, IEventDimensionInfoGetter } from '@grid/cell-mouse-model';
 import createColModel, { ColModel } from '@grid/col-model';
@@ -76,7 +77,7 @@ export interface IGridCore {
 export interface IGridModels {
     eventLoop: EventLoop;
     decorators: IDecoratorModel;
-    cellClasses: any;
+    cellClasses: ICellClasses;
     rowModel: RowModel;
     colModel: ColModel;
     dataModel: any;
@@ -241,7 +242,7 @@ export function create(opts: IGridOpts = {}) {
 
     grid.eventLoop = createEventLoop();
     grid.decorators = createDecorators(grid);
-    grid.cellClasses = require('../cell-classes')(grid);
+    grid.cellClasses = creatCellClasses(grid);
     grid.rowModel = createRowModel(grid);
     grid.colModel = createColModel(grid);
     grid.dataModel = require('../simple-data-model')(grid);
