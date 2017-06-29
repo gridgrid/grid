@@ -6,7 +6,7 @@ export interface ICellKeyboardModel {
     _annotateEvent(e: EventUnion): void;
 }
 
-export default function create(grid: Grid) {
+export function create(grid: Grid) {
 
     const _annotateEventFromDataCoords = (e: AnnotatedKeyEventUnion, dataRow: number, dataCol: number) => {
         e.realRow = grid.data.row.toView(dataRow);
@@ -36,3 +36,5 @@ export default function create(grid: Grid) {
     };
     return model;
 }
+
+export default create;

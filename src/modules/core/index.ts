@@ -9,6 +9,7 @@ import createColModel, { ColModel } from '@grid/col-model';
 import createDecorators, { IDecoratorModel } from '@grid/decorators';
 import makeDirtyClean from '@grid/dirty-clean';
 import createEventLoop, { EventLoop } from '@grid/event-loop';
+import createFps, { IFps } from '@grid/fps';
 import createPixelScrollModel, { IPixelScrollDimensionInfo, IPixelScrollModel } from '@grid/pixel-scroll-model';
 import { colPositionRangeDimension, IPositionRangeDimension, rowPositionRangeDimension } from '@grid/position-range';
 import createRowModel, { RowModel } from '@grid/row-model';
@@ -83,7 +84,7 @@ export interface IGridModels {
     cellScrollModel: any;
     cellMouseModel: ICellMouseModel;
     cellKeyboardModel: ICellKeyboardModel;
-    fps: any;
+    fps: IFps;
     viewPort: IViewPort;
     viewLayer: any;
     colReorder: any;
@@ -248,7 +249,7 @@ export function create(opts: IGridOpts = {}) {
     grid.cellScrollModel = require('../cell-scroll-model')(grid);
     grid.cellMouseModel = cellMouseModel(grid);
     grid.cellKeyboardModel = createCellKeyboardModel(grid);
-    grid.fps = require('../fps')(grid);
+    grid.fps = createFps(grid);
     grid.viewPort = createViewPort(grid);
     grid.viewLayer = require('../view-layer')(grid);
 
