@@ -1,5 +1,4 @@
-import { IAbstractRowColModel } from '@grid/abstract-row-col-model';
-import { Grid } from '@grid/core';
+import { IGridDimension } from '@grid/core';
 
 const util = require('@grid/util');
 
@@ -13,10 +12,9 @@ export interface IIndexOpts {
 }
 
 export abstract class AbstractDimensionalSpaceConverter {
-  grid: Grid;
-  abstract rowColModel: IAbstractRowColModel;
-  constructor(grid: Grid) {
-    this.grid = grid;
+  gridDimension: IGridDimension;
+  constructor(gridDimension: IGridDimension) {
+    this.gridDimension = gridDimension;
   }
   abstract toVirtual(spaceCoord: number): number;
   abstract toView(spaceCoord: number): number;
@@ -32,7 +30,7 @@ export abstract class AbstractDimensionalSpaceConverter {
     return this.iterateWhileHidden(1, coord);
   }
   get(coord: number) {
-    return this.rowColModel.get(this.toVirtual(coord));
+    return this.gridDimension.rowColModel.get(this.toVirtual(coord));
   }
 
   indexes(opts: IIndexOpts = {}) {

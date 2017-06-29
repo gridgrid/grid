@@ -1,7 +1,8 @@
+import { IRowColEvent } from '@grid/abstract-row-col-model';
+import debounce from '@grid/debounce';
 import * as util from '@grid/util';
 
 const mousewheel = require('../mousewheel');
-const debounce = require('../debounce').debounce;
 const listeners = require('../listeners');
 
 export const EVENTS: Array<keyof HTMLElementEventMap> =
@@ -42,6 +43,8 @@ type GridCustomEventMap = {
     'grid-drag-start': IGridDragStartEvent,
     'grid-drag-end': IGridCustomMouseEvent,
     'grid-cell-mouse-move': IGridCustomMouseEvent,
+    'grid-row-change': IRowColEvent,
+    'grid-col-change': IRowColEvent,
 };
 
 const ANNOTATED_MOUSE_EVENTS = {

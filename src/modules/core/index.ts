@@ -6,6 +6,7 @@ import { IAbstractRowColModel } from '@grid/abstract-row-col-model';
 import creatCellClasses, { ICellClasses } from '@grid/cell-classes';
 import createCellKeyboardModel, { ICellKeyboardModel } from '@grid/cell-keyboard-model';
 import cellMouseModel, { ICellMouseModel, IEventDimensionInfoGetter } from '@grid/cell-mouse-model';
+import createCellScrollModel, { ICellScrollModel } from '@grid/cell-scroll-model';
 import createColModel, { ColModel } from '@grid/col-model';
 import createDecorators, { IDecoratorModel } from '@grid/decorators';
 import makeDirtyClean from '@grid/dirty-clean';
@@ -16,6 +17,7 @@ import { colPositionRangeDimension, IPositionRangeDimension, rowPositionRangeDim
 import createRowModel, { RowModel } from '@grid/row-model';
 import { AbstractSpaceConverter } from '@grid/space/converter';
 import { DataSpaceConverter } from '@grid/space/data-space-converter';
+import { AbstractDimensionalSpaceConverter } from '@grid/space/dimensional-converter';
 import { ViewSpaceConverter } from '@grid/space/view-space-converter';
 import { VirtualSpaceConverter } from '@grid/space/virtual-space-converter';
 import createViewPort, { IViewPort, IViewPortDimensionInfo } from '@grid/view-port';
@@ -47,6 +49,11 @@ export interface IGridDimension {
     positionRange: IPositionRangeDimension;
     cellMouse: IEventDimensionInfoGetter;
     virtualPixelCell: IVirtualPixelCellDimensionInfo;
+    converters: {
+        virtual: AbstractDimensionalSpaceConverter;
+        view: AbstractDimensionalSpaceConverter;
+        data: AbstractDimensionalSpaceConverter;
+    };
 }
 
 export interface ICellScrollDimensionInfo {
@@ -82,7 +89,7 @@ export interface IGridModels {
     colModel: ColModel;
     dataModel: any;
     virtualPixelCellModel: IVirtualPixelCellModel;
-    cellScrollModel: any;
+    cellScrollModel: ICellScrollModel;
     cellMouseModel: ICellMouseModel;
     cellKeyboardModel: ICellKeyboardModel;
     fps: IFps;
@@ -112,16 +119,6 @@ export function create(opts: IGridOpts = {}) {
     let drawRequested = false;
     const timeouts: number[] = [];
     const intervals: number[] = [];
-    const cellScrollRowDimension = {
-        get position() {
-            return grid.cellScrollModel.row;
-        }
-    };
-    const cellScrollColDimension = {
-        get position() {
-            return grid.cellScrollModel.col;
-        }
-    };
     const gridCore: IGridCore = {
         opts,
         focused: false,
@@ -198,7 +195,7 @@ export function create(opts: IGridOpts = {}) {
                 return grid.viewPort.rowInfo;
             },
             get cellScroll() {
-                return cellScrollRowDimension;
+                return grid.cellScrollModel.rowInfo;
             },
             get pixelScroll() {
                 return grid.pixelScrollModel.y;
@@ -211,6 +208,17 @@ export function create(opts: IGridOpts = {}) {
             },
             get virtualPixelCell() {
                 return grid.virtualPixelCellModel.rows;
+            },
+            converters: {
+                get virtual() {
+                    return gridCore.virtual.row;
+                },
+                get view() {
+                    return gridCore.view.row;
+                },
+                get data() {
+                    return gridCore.data.row;
+                },
             }
         },
         cols: {
@@ -221,7 +229,7 @@ export function create(opts: IGridOpts = {}) {
                 return grid.viewPort.colInfo;
             },
             get cellScroll() {
-                return cellScrollColDimension;
+                return grid.cellScrollModel.colInfo;
             },
             get pixelScroll() {
                 return grid.pixelScrollModel.x;
@@ -234,6 +242,17 @@ export function create(opts: IGridOpts = {}) {
             },
             get virtualPixelCell() {
                 return grid.virtualPixelCellModel.cols;
+            },
+            converters: {
+                get virtual() {
+                    return gridCore.virtual.col;
+                },
+                get view() {
+                    return gridCore.view.col;
+                },
+                get data() {
+                    return gridCore.data.col;
+                },
             }
         }
     };
@@ -247,7 +266,7 @@ export function create(opts: IGridOpts = {}) {
     grid.colModel = createColModel(grid);
     grid.dataModel = require('../simple-data-model')(grid);
     grid.virtualPixelCellModel = createVirtualPixelCellModel(grid);
-    grid.cellScrollModel = require('../cell-scroll-model')(grid);
+    grid.cellScrollModel = createCellScrollModel(grid);
     grid.cellMouseModel = cellMouseModel(grid);
     grid.cellKeyboardModel = createCellKeyboardModel(grid);
     grid.fps = createFps(grid);

@@ -233,7 +233,7 @@ export function create(grid: Grid) {
                 return gridDimension.virtualPixelCell.sizeOf(viewDimension.toVirtual(viewDimension.clampCell(viewCoord)));
             },
             totalSize() {
-                return viewDimension.size || 0;
+                return viewDimension.size;
             },
             // TODO: based on looking at the code i think range can sometimes be Partial, def worth checking for npes
             intersect(intersection: PartialRawPositionRange, range: RawPositionRange) {
