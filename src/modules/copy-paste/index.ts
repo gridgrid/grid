@@ -1,14 +1,18 @@
-var tsv = require('../tsv');
-var debounce = require('../debounce').debounce;
-var innerText = require('inner-text-shim');
+import { Grid, IGridDataChange, IGridDataResult } from '@grid/core';
+import debounce from '@grid/debounce';
+import { RawPositionRange } from '@grid/position-range';
+import * as tsv from '@grid/tsv';
 
-module.exports = function (_grid) {
-    var grid = _grid;
-    var model = {};
+const innerText = require('inner-text-shim');
 
-    function getCopyPasteRange() {
-        var selectionRange = grid.navigationModel.selection;
-        //valid selection range cannot go to -1
+export interface ICopyPaste {
+    _maybeSelectText(): void;
+}
+
+export function create(grid: Grid): ICopyPaste {
+    function getCopyPasteRange(): RawPositionRange {
+        let selectionRange = grid.navigationModel.selection;
+        // valid selection range cannot go to -1
         if (selectionRange.top === -1) {
             selectionRange = {
                 top: grid.navigationModel.focus.row,
@@ -20,7 +24,7 @@ module.exports = function (_grid) {
         return selectionRange;
     }
 
-    grid.eventLoop.bind('copy', function (e) {
+    grid.eventLoop.bind('copy', (e) => {
         if (!grid.focused) {
             if (e.target === grid.textarea) {
                 e.preventDefault();
@@ -28,49 +32,51 @@ module.exports = function (_grid) {
             return;
         }
         // prepare for copy
-        var copyTable = document.createElement('table');
-        var tableBody = document.createElement('tbody');
+        const copyTable = document.createElement('table');
+        const tableBody = document.createElement('tbody');
         copyTable.appendChild(tableBody);
-        var tsvData = [];
-        var selectionRange = getCopyPasteRange();
-        var gotNull = false;
-        grid.data.iterate(selectionRange, function () {
-            var row = document.createElement('tr');
+        const tsvData: string[][] = [];
+        const selectionRange = getCopyPasteRange();
+        let gotNull = false;
+        grid.data.iterate(selectionRange, () => {
+            const row = document.createElement('tr');
             tableBody.appendChild(row);
-            var array = [];
+            const array: string[] = [];
             tsvData.push(array);
             return {
-                row: row,
-                array: array
+                row,
+                array
             };
-        }, function (r, c, rowResult) {
-            var data = grid.dataModel.get(r, c, true);
+        }, (r: number, c: number, rowResult: { row: HTMLTableRowElement, array: string[] }) => {
+            const data = grid.dataModel.get(r, c, true);
 
             // intentional == checks null or undefined
             if (data == null) {
                 return gotNull = true; // this breaks the col loop
             }
-            var td = document.createElement('td');
+            const td = document.createElement('td');
             if (data.value) {
                 td.setAttribute('grid-data', JSON.stringify(data.value));
             }
-            td.textContent = data.formatted || ' '
+            td.textContent = data.formatted || ' ';
             td.innerHTML = td.innerHTML.replace(/\n/g, '<br>') || ' ';
             rowResult.row.appendChild(td);
             rowResult.array.push(data.formatted);
+            return undefined;
         });
         if (!gotNull) {
             e.clipboardData.setData('text/plain', tsv.stringify(tsvData));
             e.clipboardData.setData('text/html', copyTable.outerHTML);
             e.preventDefault();
-            setTimeout(function () {
+            setTimeout(() => {
                 grid.eventLoop.fire('grid-copy');
             }, 1);
         }
     });
 
-    function makePasteDataChange(r, c, data) {
-        var value, formatted;
+    function makePasteDataChange(r: number, c: number, data: IGridDataResult<any> | string): IGridDataChange<any> {
+        let value;
+        let formatted;
         if (typeof data === 'string') {
             formatted = data;
         } else {
@@ -80,41 +86,49 @@ module.exports = function (_grid) {
         return {
             row: r,
             col: c,
-            value: value,
-            formatted: formatted,
+            value,
+            formatted,
             paste: true
         };
     }
 
-    grid.eventLoop.bind('paste', function (e) {
+    grid.eventLoop.bind('paste', (e) => {
         if (!grid.focused) {
             return;
         }
-        var selectionRange = getCopyPasteRange();
+        const selectionRange = getCopyPasteRange();
         if (!e.clipboardData || !e.clipboardData.getData) {
             console.warn('no clipboard data on paste event');
             return;
         }
-        var pasteData = tsv.parse(e.clipboardData.getData('text/plain'));
-        var pasteHtml = e.clipboardData.getData('text/html');
+        const tsvPasteData = tsv.parse(e.clipboardData.getData('text/plain'));
+        let pasteHtml = e.clipboardData.getData('text/html');
         e.preventDefault();
 
-        setTimeout(function () {
-            var tempDiv = document.createElement('div');
+        setTimeout(() => {
+            const tempDiv = document.createElement('div');
             if (pasteHtml.match(/<meta name=ProgId content=Excel.Sheet>/)) {
                 pasteHtml = pasteHtml.replace(/[\n\r]+  /g, ' ').replace(/[\n\r]+/g, '');
             }
             tempDiv.innerHTML = pasteHtml;
-            var table = tempDiv.querySelector('table');
+            const table = tempDiv.querySelector('table');
+            let pasteData: Array<Array<string | IGridDataResult<any>>> = tsvPasteData;
             if (table) {
+                let tablePasteData: Array<Array<IGridDataResult<any>>>;
                 table.style.whiteSpace = 'pre';
-                pasteData = [];
-                [].forEach.call(tempDiv.querySelectorAll('tr'), function (tr) {
-                    var row = [];
-                    pasteData.push(row);
-                    [].forEach.call(tr.querySelectorAll('td'), function (td) {
-                        var dataResult = {};
-                        var gridData = td.getAttribute('grid-data');
+                tablePasteData = [];
+                const trs = tempDiv.querySelectorAll('tr');
+                [].forEach.call(trs, (tr: typeof trs[0]) => {
+                    const row: Array<IGridDataResult<any>> = [];
+                    tablePasteData.push(row);
+                    const tds = tr.querySelectorAll('td');
+                    [].forEach.call(tds, (td: typeof tds[0]) => {
+                        const text = innerText(td);
+                        const dataResult: IGridDataResult<any> = {
+                            formatted: text && text.trim(),
+                            value: undefined
+                        };
+                        const gridData = td.getAttribute('grid-data');
                         if (gridData) {
                             try {
                                 dataResult.value = JSON.parse(gridData);
@@ -122,39 +136,38 @@ module.exports = function (_grid) {
                                 console.warn('somehow couldn\'t parse grid data');
                             }
                         }
-                        var text = innerText(td);
-                        dataResult.formatted = text && text.trim();
                         row.push(dataResult);
                     });
                 });
+                pasteData = tablePasteData;
             }
-            var dataChanges = [];
-            var singlePasteValue;
+            const dataChanges: Array<IGridDataChange<any>> = [];
+            let singlePasteValue: string | IGridDataResult<any> | undefined;
             if (pasteData.length === 1 && pasteData[0].length === 1) {
                 singlePasteValue = pasteData[0][0];
             }
 
             if (singlePasteValue) {
+                const singlePasteString = singlePasteValue;
                 // this will do nothing if no other selections as it will be an empty array
-                var ranges = [selectionRange];
+                let ranges = [selectionRange];
                 ranges = ranges.concat(grid.navigationModel.otherSelections);
-                ranges.forEach(function (range) {
-                    grid.data.iterate(range, function (r, c) {
-                        dataChanges.push(makePasteDataChange(r, c, singlePasteValue));
+                ranges.forEach((range) => {
+                    grid.data.iterate(range, (r, c) => {
+                        dataChanges.push(makePasteDataChange(r, c, singlePasteString));
                     });
                 });
             } else {
-                var top = selectionRange.top;
-                var left = selectionRange.left;
+                const top = selectionRange.top;
+                const left = selectionRange.left;
 
-
-                pasteData.forEach(function (row, r) {
-                    var dataRow = r + top;
+                pasteData.forEach((row, r) => {
+                    const dataRow = r + top;
                     if (dataRow > grid.data.row.count() - 1) {
                         return;
                     }
-                    row.forEach(function (pasteValue, c) {
-                        var dataCol = c + left;
+                    row.forEach((pasteValue, c) => {
+                        const dataCol = c + left;
                         // intention == to match null and undefined
                         if (pasteValue == undefined || dataCol > grid.data.col.count() - 1) {
                             return;
@@ -162,9 +175,9 @@ module.exports = function (_grid) {
                         dataChanges.push(makePasteDataChange(dataRow, dataCol, pasteValue));
                     });
                 });
-                var newSelection = {
-                    top: top,
-                    left: left,
+                const newSelection = {
+                    top,
+                    left,
                     height: pasteData.length,
                     width: pasteData[0].length
                 };
@@ -173,31 +186,32 @@ module.exports = function (_grid) {
                 grid.navigationModel.setSelection(newSelection);
             }
 
-
             grid.dataModel.set(dataChanges);
         }, 1);
     });
 
-    var maybeSelectText = debounce(function maybeSelectTextInner() {
+    const maybeSelectText = debounce(function maybeSelectTextInner() {
         if (!(grid.editModel && grid.editModel.editing) && grid.focused) {
             grid.textarea.value = grid.dataModel.get(grid.navigationModel.focus.row, grid.navigationModel.focus.col).formatted || '.';
             grid.textarea.select();
         }
     }, 1);
 
-    model._maybeSelectText = maybeSelectText;
-
-    grid.eventLoop.bind('keyup', function (e) {
+    grid.eventLoop.bind('keyup', (_e) => {
         maybeSelectText();
     });
-    grid.eventLoop.bind('grid-focus', function (e) {
+    grid.eventLoop.bind('grid-focus', (_e) => {
         maybeSelectText();
     });
-    grid.eventLoop.bind('mousedown', function (e) {
+    grid.eventLoop.bind('mousedown', (e) => {
         if (e.target !== grid.textarea) {
             return;
         }
         maybeSelectText();
     });
-    return model;
-};
+    return {
+        _maybeSelectText: maybeSelectText
+    };
+}
+
+export default create;

@@ -1,7 +1,8 @@
+import { RawPositionRange } from '@grid/position-range';
+import { CellFn, getArgs, RowFn } from '@grid/range-util';
 import { Grid } from '../core';
 
 import { AbstractDimensionalSpaceConverter } from './dimensional-converter';
-const rangeUtil = require('../range-util');
 
 export abstract class AbstractSpaceConverter {
   abstract row: AbstractDimensionalSpaceConverter;
@@ -19,19 +20,21 @@ export abstract class AbstractSpaceConverter {
     this.right = (i) => this.col.next(i);
   }
 
-  iterate() {
+  iterate(range: RawPositionRange, cellFn: CellFn<undefined>): void;
+  iterate<T>(range: RawPositionRange, rowFn: RowFn<T>, cellFn: CellFn<T>): void;
+  iterate<T>() {
     // expects to be called with the space as its this
-    const args = rangeUtil.getArgs(arguments);
+    const args = getArgs<T>(arguments);
     const range = args.range;
     const rowFn = args.rowFn;
     const cellFn = args.cellFn;
-    let rowResult;
-    rowloop: for (let r = range.top; r < range.top + range.height; r = this.row.next(r)) {
-      rowResult = undefined;
+
+    rowloop: for (let r: number | undefined = range.top; r !== undefined && r < range.top + range.height; r = this.row.next(r)) {
+      let rowResult;
       if (rowFn) {
         rowResult = rowFn(r);
       }
-      colloop: for (let c = range.left; c < range.left + range.width; c = this.col.next(c)) {
+      colloop: for (let c: number | undefined = range.left; c !== undefined && c < range.left + range.width; c = this.col.next(c)) {
         if (cellFn) {
           const result = cellFn(r, c, rowResult);
           if (result === false) {

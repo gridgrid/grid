@@ -8,6 +8,7 @@ import createCellKeyboardModel, { ICellKeyboardModel } from '@grid/cell-keyboard
 import cellMouseModel, { ICellMouseModel, IEventDimensionInfoGetter } from '@grid/cell-mouse-model';
 import createCellScrollModel, { ICellScrollModel } from '@grid/cell-scroll-model';
 import createColModel, { ColModel } from '@grid/col-model';
+import createCopyPaste, { ICopyPaste } from '@grid/copy-paste';
 import createDecorators, { IDecoratorModel } from '@grid/decorators';
 import makeDirtyClean from '@grid/dirty-clean';
 import createEventLoop, { EventLoop } from '@grid/event-loop';
@@ -39,6 +40,17 @@ export type EscapeStackRemover = () => void;
 
 export interface IEscapeStack {
     add: (handler: EscapeStackHandler) => EscapeStackRemover;
+}
+
+export interface IGridDataResult<T> {
+    value: T;
+    formatted: string;
+}
+
+export interface IGridDataChange<T> extends IGridDataResult<T> {
+    row: number;
+    col: number;
+    paste?: boolean;
 }
 
 export interface IGridDimension {
@@ -101,7 +113,7 @@ export interface IGridModels {
     pixelScrollModel: IPixelScrollModel;
     showHiddenCols: any;
     colResize: any;
-    copyPaste: any;
+    copyPaste: ICopyPaste;
 }
 
 export type Grid = IGridCore & IGridModels;
@@ -273,11 +285,11 @@ export function create(opts: IGridOpts = {}) {
     grid.viewPort = createViewPort(grid);
     grid.viewLayer = require('../view-layer')(grid);
 
-    if (!(opts && opts.col && opts.col.disableReorder)) {
+    if (!(opts.col && opts.col.disableReorder)) {
         grid.colReorder = require('../col-reorder')(grid);
     }
 
-    if (opts && opts.allowEdit) {
+    if (opts.allowEdit) {
         grid.editModel = require('../edit-model')(grid);
     }
 
@@ -286,7 +298,7 @@ export function create(opts: IGridOpts = {}) {
     grid.pixelScrollModel = createPixelScrollModel(grid);
     grid.showHiddenCols = require('../show-hidden-cols')(grid);
     grid.colResize = require('../col-resize')(grid);
-    grid.copyPaste = require('../copy-paste')(grid);
+    grid.copyPaste = createCopyPaste(grid);
 
     // the order here matters because some of these depend on each other
 
