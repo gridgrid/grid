@@ -1,13 +1,12 @@
 require('es6-object-assign').polyfill();
 
-const escapeStack = require('escape-stack');
-
 import { IAbstractRowColModel } from '@grid/abstract-row-col-model';
 import creatCellClasses, { ICellClasses } from '@grid/cell-classes';
 import createCellKeyboardModel, { ICellKeyboardModel } from '@grid/cell-keyboard-model';
 import cellMouseModel, { ICellMouseModel, IEventDimensionInfoGetter } from '@grid/cell-mouse-model';
 import createCellScrollModel, { ICellScrollModel } from '@grid/cell-scroll-model';
 import createColModel, { ColModel } from '@grid/col-model';
+import createColReorder, { IColReorder } from '@grid/col-reorder';
 import createCopyPaste, { ICopyPaste } from '@grid/copy-paste';
 import createDecorators, { IDecoratorModel } from '@grid/decorators';
 import makeDirtyClean from '@grid/dirty-clean';
@@ -24,6 +23,7 @@ import { VirtualSpaceConverter } from '@grid/space/virtual-space-converter';
 import createViewPort, { IViewPort, IViewPortDimensionInfo } from '@grid/view-port';
 import createVirtualPixelCellModel, { IVirtualPixelCellDimensionInfo, IVirtualPixelCellModel } from '@grid/virtual-pixel-cell-model';
 
+const escapeStack = require('escape-stack');
 const elementClass = require('element-class');
 const util = require('@grid/util');
 
@@ -107,7 +107,7 @@ export interface IGridModels {
     fps: IFps;
     viewPort: IViewPort;
     viewLayer: any;
-    colReorder: any;
+    colReorder: IColReorder;
     editModel: any;
     navigationModel: any;
     pixelScrollModel: IPixelScrollModel;
@@ -286,7 +286,7 @@ export function create(opts: IGridOpts = {}) {
     grid.viewLayer = require('../view-layer')(grid);
 
     if (!(opts.col && opts.col.disableReorder)) {
-        grid.colReorder = require('../col-reorder')(grid);
+        grid.colReorder = createColReorder(grid);
     }
 
     if (opts.allowEdit) {
