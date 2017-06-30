@@ -1,13 +1,14 @@
 
+import { IColDescriptor, IRowDescriptor } from '@grid/abstract-row-col-model';
 import { AbstractSpaceConverter } from './converter';
 import { AbstractDimensionalSpaceConverter } from './dimensional-converter';
 
 export class VirtualSpaceConverter extends AbstractSpaceConverter {
-  row: AbstractDimensionalSpaceConverter = new DimensionalVirtualSpaceConverter(this.grid.rows);
-  col: AbstractDimensionalSpaceConverter = new DimensionalVirtualSpaceConverter(this.grid.cols);
+  row: AbstractDimensionalSpaceConverter<IRowDescriptor> = new DimensionalVirtualSpaceConverter(this.grid.rows);
+  col: AbstractDimensionalSpaceConverter<IColDescriptor> = new DimensionalVirtualSpaceConverter(this.grid.cols);
 }
 
-class DimensionalVirtualSpaceConverter extends AbstractDimensionalSpaceConverter {
+class DimensionalVirtualSpaceConverter<T extends IRowDescriptor | IColDescriptor> extends AbstractDimensionalSpaceConverter<T> {
   toVirtual(i: number) {
     return i;
   }

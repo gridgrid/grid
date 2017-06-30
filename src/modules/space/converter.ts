@@ -1,3 +1,4 @@
+import { IColDescriptor, IRowDescriptor } from '@grid/abstract-row-col-model';
 import { RawPositionRange } from '@grid/position-range';
 import { CellFn, getArgs, RowFn } from '@grid/range-util';
 import { Grid } from '../core';
@@ -5,8 +6,8 @@ import { Grid } from '../core';
 import { AbstractDimensionalSpaceConverter } from './dimensional-converter';
 
 export abstract class AbstractSpaceConverter {
-  abstract row: AbstractDimensionalSpaceConverter;
-  abstract col: AbstractDimensionalSpaceConverter;
+  abstract row: AbstractDimensionalSpaceConverter<IRowDescriptor>;
+  abstract col: AbstractDimensionalSpaceConverter<IColDescriptor>;
   up: (coord: number) => number | undefined;
   down: (coord: number) => number | undefined;
   left: (coord: number) => number | undefined;

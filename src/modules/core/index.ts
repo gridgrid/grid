@@ -1,12 +1,13 @@
 require('es6-object-assign').polyfill();
 
-import { IAbstractRowColModel } from '@grid/abstract-row-col-model';
+import { IAbstractRowColModel, IColDescriptor, IRowDescriptor } from '@grid/abstract-row-col-model';
 import creatCellClasses, { ICellClasses } from '@grid/cell-classes';
 import createCellKeyboardModel, { ICellKeyboardModel } from '@grid/cell-keyboard-model';
 import cellMouseModel, { ICellMouseModel, IEventDimensionInfoGetter } from '@grid/cell-mouse-model';
 import createCellScrollModel, { ICellScrollModel } from '@grid/cell-scroll-model';
 import createColModel, { ColModel } from '@grid/col-model';
 import createColReorder, { IColReorder } from '@grid/col-reorder';
+import createColResize, { IColResize } from '@grid/col-resize';
 import createCopyPaste, { ICopyPaste } from '@grid/copy-paste';
 import createDecorators, { IDecoratorModel } from '@grid/decorators';
 import makeDirtyClean from '@grid/dirty-clean';
@@ -62,9 +63,9 @@ export interface IGridDimension {
     cellMouse: IEventDimensionInfoGetter;
     virtualPixelCell: IVirtualPixelCellDimensionInfo;
     converters: {
-        virtual: AbstractDimensionalSpaceConverter;
-        view: AbstractDimensionalSpaceConverter;
-        data: AbstractDimensionalSpaceConverter;
+        virtual: AbstractDimensionalSpaceConverter<IRowDescriptor | IColDescriptor>;
+        view: AbstractDimensionalSpaceConverter<IRowDescriptor | IColDescriptor>;
+        data: AbstractDimensionalSpaceConverter<IRowDescriptor | IColDescriptor>;
     };
 }
 
@@ -112,7 +113,7 @@ export interface IGridModels {
     navigationModel: any;
     pixelScrollModel: IPixelScrollModel;
     showHiddenCols: any;
-    colResize: any;
+    colResize: IColResize;
     copyPaste: ICopyPaste;
 }
 
@@ -297,7 +298,7 @@ export function create(opts: IGridOpts = {}) {
 
     grid.pixelScrollModel = createPixelScrollModel(grid);
     grid.showHiddenCols = require('../show-hidden-cols')(grid);
-    grid.colResize = require('../col-resize')(grid);
+    grid.colResize = createColResize(grid);
     grid.copyPaste = createCopyPaste(grid);
 
     // the order here matters because some of these depend on each other
