@@ -16,6 +16,7 @@ import createFps, { IFps } from '@grid/fps';
 import createPixelScrollModel, { IPixelScrollDimensionInfo, IPixelScrollModel } from '@grid/pixel-scroll-model';
 import { colPositionRangeDimension, IPositionRangeDimension, rowPositionRangeDimension } from '@grid/position-range';
 import createRowModel, { RowModel } from '@grid/row-model';
+import createShowHiddenCols, { IShowHiddenCols } from '@grid/show-hidden-cols';
 import { AbstractSpaceConverter } from '@grid/space/converter';
 import { DataSpaceConverter } from '@grid/space/data-space-converter';
 import { AbstractDimensionalSpaceConverter } from '@grid/space/dimensional-converter';
@@ -112,7 +113,7 @@ export interface IGridModels {
     editModel: any;
     navigationModel: any;
     pixelScrollModel: IPixelScrollModel;
-    showHiddenCols: any;
+    showHiddenCols: IShowHiddenCols;
     colResize: IColResize;
     copyPaste: ICopyPaste;
 }
@@ -297,7 +298,7 @@ export function create(opts: IGridOpts = {}) {
     grid.navigationModel = require('../navigation-model')(grid);
 
     grid.pixelScrollModel = createPixelScrollModel(grid);
-    grid.showHiddenCols = require('../show-hidden-cols')(grid);
+    grid.showHiddenCols = createShowHiddenCols(grid);
     grid.colResize = createColResize(grid);
     grid.copyPaste = createCopyPaste(grid);
 

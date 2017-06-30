@@ -12,7 +12,7 @@ interface IHeaderDecoratorCreator {
 }
 
 interface IHeaderDecoratorModel extends IHeaderDecoratorCreator {
-    _decorators: { [key: number]: IHeaderDecorator };
+    _decorators: { [key: number]: IHeaderDecorator | undefined };
     makeDecorator(c: number): IHeaderDecorator;
 }
 
