@@ -68,7 +68,7 @@ const ANNOTATED_KEY_EVENTS = {
 export const ANNOTATED_KEY_EVENTS_MAP: { readonly [key: string]: boolean | undefined; } = ANNOTATED_KEY_EVENTS;
 export const isAnnotatedKeyEvent = (e: EventUnion): e is AnnotatedKeyEventUnion => !!ANNOTATED_KEY_EVENTS_MAP[e.type];
 
-export const isAnnotatedEvent = (e: EventUnion) => isAnnotatedKeyEvent(e) || isAnnotatedMouseEvent(e);
+export const isAnnotatedEvent = (e: EventUnion): e is AnnotatedEventUnion => isAnnotatedKeyEvent(e) || isAnnotatedMouseEvent(e);
 
 type AnnotatedHTMLElementKeyEventMap = {
     [K in keyof typeof ANNOTATED_KEY_EVENTS]: IAnnotatedEvent & HTMLElementEventMap[K];
@@ -81,6 +81,7 @@ type AnnotatedHTMLElementMouseEventMap = {
 type AnnotatedHTMLElementEventMap = AnnotatedHTMLElementKeyEventMap & AnnotatedHTMLElementMouseEventMap;
 export type AnnotatedMouseEventUnion = AnnotatedHTMLElementMouseEventMap[keyof AnnotatedHTMLElementMouseEventMap];
 export type AnnotatedKeyEventUnion = AnnotatedHTMLElementKeyEventMap[keyof AnnotatedHTMLElementKeyEventMap];
+export type AnnotatedEventUnion = AnnotatedMouseEventUnion | AnnotatedKeyEventUnion;
 
 type AnnotatedWindowKeyEventMap = {
     [K in keyof typeof ANNOTATED_KEY_EVENTS]: IAnnotatedEvent & WindowEventMap[K];

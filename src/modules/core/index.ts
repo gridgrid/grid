@@ -11,6 +11,7 @@ import createColResize, { IColResize } from '@grid/col-resize';
 import createCopyPaste, { ICopyPaste } from '@grid/copy-paste';
 import createDecorators, { IDecoratorModel } from '@grid/decorators';
 import makeDirtyClean from '@grid/dirty-clean';
+import createEditModel, { IEditModel } from '@grid/edit-model';
 import createEventLoop, { EventLoop } from '@grid/event-loop';
 import createFps, { IFps } from '@grid/fps';
 import createPixelScrollModel, { IPixelScrollDimensionInfo, IPixelScrollModel } from '@grid/pixel-scroll-model';
@@ -37,7 +38,7 @@ export interface IGridOpts {
     };
 }
 
-export type EscapeStackHandler = () => boolean | undefined;
+export type EscapeStackHandler = () => boolean | void;
 export type EscapeStackRemover = () => void;
 
 export interface IEscapeStack {
@@ -49,7 +50,12 @@ export interface IGridDataResult<T> {
     formatted: string;
 }
 
-export interface IGridDataChange<T> extends IGridDataResult<T> {
+export interface IGridDataChangeBody<T> {
+    value: T;
+    formatted?: string;
+}
+
+export interface IGridDataChange<T> extends IGridDataChangeBody<T> {
     row: number;
     col: number;
     paste?: boolean;
@@ -110,7 +116,7 @@ export interface IGridModels {
     viewPort: IViewPort;
     viewLayer: any;
     colReorder: IColReorder;
-    editModel: any;
+    editModel: IEditModel;
     navigationModel: any;
     pixelScrollModel: IPixelScrollModel;
     showHiddenCols: IShowHiddenCols;
@@ -292,7 +298,7 @@ export function create(opts: IGridOpts = {}) {
     }
 
     if (opts.allowEdit) {
-        grid.editModel = require('../edit-model')(grid);
+        grid.editModel = createEditModel(grid);
     }
 
     grid.navigationModel = require('../navigation-model')(grid);

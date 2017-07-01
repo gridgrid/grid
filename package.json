@@ -75,7 +75,7 @@
     "transform-ts-paths": "^1.0.0",
     "tslint": "^5.4.2",
     "tslint-eslint-rules": "^4.1.1",
-    "typescript": "~2.2.0",
+    "typescript": "~2.4.1",
     "url-loader": "~0.5.7",
     "validate-commit-msg": "~2.12.1",
     "webpack": "~1.14.0",

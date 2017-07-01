@@ -2,6 +2,7 @@ import { Grid } from '@grid/core';
 import debounce from '@grid/debounce';
 import makeDirtyClean, { IDirtyClean } from '@grid/dirty-clean';
 import addDirtyProps from '@grid/dirty-props';
+import { IEditOptions } from '@grid/edit-model';
 import * as util from '@grid/util';
 
 const passThrough = require('../pass-through');
@@ -45,6 +46,7 @@ export interface IRowColDescriptor {
     dragReadyClass?: any; // a class descriptor
     builder?: IRowColBuilder;
     children?: IRowColDescriptor[];
+    editOptions?: IEditOptions;
 }
 
 export interface IRowDescriptor extends IRowColDescriptor {

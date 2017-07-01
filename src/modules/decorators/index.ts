@@ -7,6 +7,7 @@ export interface IDecorator extends IPositionRange {
     _decoratorDirtyClean?: IDirtyClean;
     fixed?: boolean;
     boundingBox?: HTMLElement;
+    render(): HTMLElement;
     postRender?(elem: HTMLElement): void;
 }
 
