@@ -1,4 +1,4 @@
-var mockEvent = require('../custom-event');
+var mockEvent = require('@grid/custom-event').default;
 var key = require('key');
 var util = require('@grid/util');
 var _ = require('lodash');

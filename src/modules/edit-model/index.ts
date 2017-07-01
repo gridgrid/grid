@@ -1,6 +1,6 @@
 import { Grid, IGridDataChange, IGridDataChangeBody } from '@grid/core';
 import { IDecorator } from '@grid/decorators';
-import { AnnotatedEventUnion, EventUnion, isAnnotatedEvent } from '@grid/event-loop';
+import { AnnotatedMouseOrKeyEventUnion, EventUnion, isAnnotatedMouseOrKeyEvent } from '@grid/event-loop';
 import { RawPositionRange } from '@grid/position-range';
 
 const key = require('key');
@@ -34,7 +34,7 @@ export interface IEditOptions {
     saveTriggers: SaveTrigger[];
     cancelTriggers: CancelTrigger[];
     action?(): ClosePromise | undefined;
-    getEditor(r: number, originalEvent: AnnotatedEventUnion): IEditor;
+    getEditor(r: number, originalEvent: AnnotatedMouseOrKeyEventUnion): IEditor;
 }
 
 export enum Trigger {
@@ -63,7 +63,7 @@ export interface IEditModel {
     _interceptor(e: EventUnion): void;
     _closeEditor(): void;
     deleteSelection(): void;
-    editCell(r: number, c: number, isTyping: boolean, originalEvent: AnnotatedEventUnion): void;
+    editCell(r: number, c: number, isTyping: boolean, originalEvent: AnnotatedMouseOrKeyEventUnion): void;
     cancelEdit(): void;
     saveEdit(): SavePromise;
 }
@@ -108,7 +108,7 @@ export function create(grid: Grid) {
             return opts;
         },
         _interceptor(e: EventUnion) {
-            if (!isAnnotatedEvent(e)) {
+            if (!isAnnotatedMouseOrKeyEvent(e)) {
                 return;
             }
             const col = e.col;
@@ -189,7 +189,7 @@ export function create(grid: Grid) {
             });
             grid.dataModel.set(dataChanges);
         },
-        editCell(r: number, c: number, isTyping: boolean, originalEvent: AnnotatedEventUnion) {
+        editCell(r: number, c: number, isTyping: boolean, originalEvent: AnnotatedMouseOrKeyEventUnion) {
             if (editModel.editing) {
                 editModel.saveEdit();
             }

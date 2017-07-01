@@ -1,9 +1,9 @@
 import { Grid } from '@grid/core';
 import makeDirtyClean, { IDirtyClean } from '@grid/dirty-clean';
-import mixinPositionRange, { IPositionRange, PositionSpace, PositionUnit } from '@grid/position-range';
+import mixinPositionRange, { IPartialPositionRange, PositionSpace, PositionUnit } from '@grid/position-range';
 import * as util from '@grid/util';
 
-export interface IDecorator extends IPositionRange {
+export interface IDecorator extends IPartialPositionRange {
     _decoratorDirtyClean?: IDirtyClean;
     fixed?: boolean;
     boundingBox?: HTMLElement;

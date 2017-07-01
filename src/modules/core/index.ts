@@ -25,6 +25,7 @@ import { AbstractDimensionalSpaceConverter } from '@grid/space/dimensional-conve
 import { ViewSpaceConverter } from '@grid/space/view-space-converter';
 import { VirtualSpaceConverter } from '@grid/space/virtual-space-converter';
 import * as util from '@grid/util';
+import createViewLayer, { IViewLayer } from '@grid/view-layer';
 import createViewPort, { IViewPort, IViewPortDimensionInfo } from '@grid/view-port';
 import createVirtualPixelCellModel, { IVirtualPixelCellDimensionInfo, IVirtualPixelCellModel } from '@grid/virtual-pixel-cell-model';
 
@@ -115,7 +116,7 @@ export interface IGridModels {
     cellKeyboardModel: ICellKeyboardModel;
     fps: IFps;
     viewPort: IViewPort;
-    viewLayer: any;
+    viewLayer: IViewLayer;
     colReorder: IColReorder;
     editModel: IEditModel;
     navigationModel: INavigationModel;
@@ -202,7 +203,7 @@ export function create(opts: IGridOpts = {}) {
         makeDirtyClean() {
             return makeDirtyClean(grid);
         },
-        eventIsOnCells(e: UIEvent) {
+        eventIsOnCells(e: EventUnion) {
             return grid.viewLayer.eventIsOnCells(e);
         },
         destroy() {
@@ -292,7 +293,7 @@ export function create(opts: IGridOpts = {}) {
     grid.cellKeyboardModel = createCellKeyboardModel(grid);
     grid.fps = createFps(grid);
     grid.viewPort = createViewPort(grid);
-    grid.viewLayer = require('../view-layer')(grid);
+    grid.viewLayer = createViewLayer(grid);
 
     if (!(opts.col && opts.col.disableReorder)) {
         grid.colReorder = createColReorder(grid);

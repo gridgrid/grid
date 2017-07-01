@@ -3,7 +3,7 @@ import { ICellClassDescriptor } from '@grid/cell-classes';
 import { Grid } from '@grid/core';
 import ctrlOrCmd from '@grid/ctrl-or-cmd';
 import { IDecorator } from '@grid/decorators';
-import { AnnotatedEventUnion, AnnotatedMouseEventUnion, IGridCustomMouseEvent, IGridDragStartEvent } from '@grid/event-loop';
+import { AnnotatedMouseEventUnion, AnnotatedMouseOrKeyEventUnion, IGridCustomMouseEvent, IGridDragStartEvent } from '@grid/event-loop';
 import { RawPositionRange } from '@grid/position-range';
 import * as rangeUtil from '@grid/range-util';
 import * as util from '@grid/util';
@@ -41,8 +41,8 @@ export interface INavigationModel {
     clearSelection(): void;
     setSelection(r: RawPositionRange): void;
     setFocus(row: number | undefined, col: number | undefined, dontClearSelection?: boolean, dontSetSelection?: boolean): void;
-    _navFrom(row: number, col: number, e: AnnotatedEventUnion): IFocus;
-    handleTabEvent(e: AnnotatedEventUnion): void;
+    _navFrom(row: number, col: number, e: AnnotatedMouseOrKeyEventUnion): IFocus;
+    handleTabEvent(e: AnnotatedMouseOrKeyEventUnion): void;
 }
 
 export function create(grid: Grid) {
@@ -102,7 +102,7 @@ export function create(grid: Grid) {
             }
         },
         _navFrom: navFrom,
-        handleTabEvent(e: AnnotatedEventUnion) {
+        handleTabEvent(e: AnnotatedMouseOrKeyEventUnion) {
             let newCol: number | undefined = model.focus.col;
             let newRow: number | undefined = model.focus.row;
             if (!e || !e.shiftKey) {
@@ -185,7 +185,7 @@ export function create(grid: Grid) {
         return newIndex;
     }
 
-    function navFrom(row: number, col: number, e: AnnotatedEventUnion) {
+    function navFrom(row: number, col: number, e: AnnotatedMouseOrKeyEventUnion) {
         // if nothing changes great we'll stay where we are
         let newRow: number | undefined = row;
         let newCol: number | undefined = col;

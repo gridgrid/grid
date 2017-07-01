@@ -17,7 +17,7 @@ export function intersect(range1: number[], range2: number[]) {
     ];
 }
 // takes a point and a length as the ranges in array form
-export function union(range1: number[], range2: number[]) {
+export function union(range1: number[] | null, range2: number[] | null) {
     if (!range1) {
         return range2;
     }

@@ -1,7 +1,9 @@
 import { Grid } from '@grid/core';
+import customEvent from '@grid/custom-event';
 import {
     AnnotatedMouseEventUnion,
     EventUnion,
+    GridCustomMouseEventTypes,
     IAnnotatedEvent,
     IAnnotatedMouseEvent,
     IGridCustomMouseEvent,
@@ -10,8 +12,6 @@ import {
     isAnnotatedMouseEvent,
     isAnnotatedMouseEventOfType
 } from '@grid/event-loop';
-
-const customEvent = require('../custom-event');
 
 const PROPS_TO_COPY_FROM_MOUSE_EVENTS: Array<keyof AnnotatedMouseEventUnion> =
     ['clientX', 'clientY', 'gridX', 'gridY', 'layerX', 'layerY', 'row', 'col', 'realRow', 'realCol', 'virtualRow', 'virtualCol'];
@@ -222,16 +222,20 @@ export function create(grid: Grid) {
         }
     }
 
-    function createCustomEventFromMouseEvent(type: string, e: AnnotatedMouseEventUnion) {
-        const event = customEvent(type, true, true);
+    function createCustomEventFromMouseEvent(type: GridCustomMouseEventTypes, e: AnnotatedMouseEventUnion) {
+        const event = customEvent(type, true, true) as IGridCustomMouseEvent;
         PROPS_TO_COPY_FROM_MOUSE_EVENTS.forEach((prop: keyof AnnotatedMouseEventUnion) => {
-            event[prop] = e[prop];
+            (event as any)[prop] = e[prop];
         });
         event.originalEvent = e;
         return event;
     }
 
-    function createAndFireCustomMouseEvent(type: string, e: AnnotatedMouseEventUnion, annotateEvent?: (e: ILoopEvent) => void) {
+    function createAndFireCustomMouseEvent(
+        type: GridCustomMouseEventTypes,
+        e: AnnotatedMouseEventUnion,
+        annotateEvent?: (e: ILoopEvent) => void
+    ) {
         let drag = createCustomEventFromMouseEvent(type, e);
         if (annotateEvent) {
             drag = annotateEvent(drag) || drag;

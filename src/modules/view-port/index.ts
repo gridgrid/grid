@@ -3,12 +3,10 @@ import debounce, { IDebounceFunction } from '@grid/debounce';
 import makeDirtyClean from '@grid/dirty-clean';
 import addDirtyProps from '@grid/dirty-props';
 import {
-    PartialRawPositionRange,
     RawPositionRange,
 } from '@grid/position-range';
+import * as rangeUtil from '@grid/range-util';
 import * as util from '@grid/util';
-
-const rangeUtil = require('../range-util');
 
 export interface IViewPort {
     rowInfo: IViewPortDimensionInfo;
@@ -21,8 +19,8 @@ export interface IViewPort {
     cols: IViewPortDimensionInfo['count'];
     top: IViewPortDimensionInfo['clientPx']['start'];
     left: IViewPortDimensionInfo['clientPx']['start'];
-    width?: IViewPortDimensionInfo['size'];
-    height?: IViewPortDimensionInfo['size'];
+    width: IViewPortDimensionInfo['size'];
+    height: IViewPortDimensionInfo['size'];
     toGridX: IViewPortDimensionInfo['clientPx']['toGrid'];
     toGridY: IViewPortDimensionInfo['clientPx']['toGrid'];
     toVirtualRow: IViewPortDimensionInfo['toVirtual'];
@@ -49,10 +47,10 @@ export interface IViewPort {
     sizeToContainer(elem: HTMLElement): void;
     _resize(): void;
     toPx(realCellRange: RawPositionRange): RawPositionRange;
-    intersect(range: PartialRawPositionRange): PartialRawPositionRange | null;
+    intersect(range: RawPositionRange): RawPositionRange | null;
     iterateCells(
         cellFn: (r: number, c: number) => void,
-        rowFn: (r: number) => void,
+        rowFn?: (r: number) => void,
         optionalMaxRow?: number,
         optionalMaxCol?: number
     ): void;
@@ -78,7 +76,7 @@ export interface IViewPortDimensionInfo {
     sizeOf(viewCoord: number): number;
     totalSize(): number;
     updateSize(newSize: number): boolean;
-    intersect(intersection: PartialRawPositionRange, range: PartialRawPositionRange): PartialRawPositionRange | null;
+    intersect(intersection: RawPositionRange, range: RawPositionRange): RawPositionRange | null;
 }
 
 export function create(grid: Grid) {
@@ -236,7 +234,7 @@ export function create(grid: Grid) {
                 return viewDimension.size;
             },
             // TODO: based on looking at the code i think range can sometimes be Partial, def worth checking for npes
-            intersect(intersection: PartialRawPositionRange, range: RawPositionRange) {
+            intersect(intersection: RawPositionRange, range: RawPositionRange) {
                 const numFixed = viewDimension._numFixed;
                 const fixedRange = [0, numFixed];
 
@@ -304,9 +302,9 @@ export function create(grid: Grid) {
                 width: viewPort.colInfo._getLengthBetweenCoords(realCellRange.left, realCellRange.left + realCellRange.width - 1, true)
             };
         },
-        intersect(range: PartialRawPositionRange) {
+        intersect(range: RawPositionRange) {
             // assume virtual cells for now
-            const intersection = viewPort.rowInfo.intersect({}, range);
+            const intersection = viewPort.rowInfo.intersect({} as any, range);
             if (!intersection) {
                 return null;
             }

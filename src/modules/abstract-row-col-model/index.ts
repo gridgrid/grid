@@ -1,4 +1,4 @@
-import { Grid } from '@grid/core';
+import { Grid, IGridDataResult } from '@grid/core';
 import debounce from '@grid/debounce';
 import makeDirtyClean, { IDirtyClean } from '@grid/dirty-clean';
 import addDirtyProps from '@grid/dirty-props';
@@ -58,8 +58,19 @@ export interface IColDescriptor extends IRowColDescriptor {
     children?: IColDescriptor[];
 }
 
-export type BuilderRenderer = () => HTMLElement | undefined;
-export type BuilderUpdater = () => HTMLElement | undefined;
+export interface IBuilderUpdateContext {
+    virtualCol: number;
+    virtualRow: number;
+    data: IGridDataResult<any>;
+}
+export interface IBuilderRenderContext {
+    viewRow: number;
+    viewCol: number;
+    previousElement: HTMLElement | undefined;
+}
+
+export type BuilderRenderer = (context: IBuilderRenderContext) => HTMLElement | undefined;
+export type BuilderUpdater = (builtElem: HTMLElement | undefined, context: IBuilderUpdateContext) => HTMLElement | void;
 
 export interface IRowColBuilder {
     render: BuilderRenderer;
@@ -69,6 +80,7 @@ export interface IRowColBuilder {
 interface IRowColEventBody {
     action: 'add' | 'remove' | 'move' | 'hide' | 'size';
     descriptors: IRowColDescriptor[];
+    target?: undefined;
 }
 
 export interface IRowColEvent extends IRowColEventBody {

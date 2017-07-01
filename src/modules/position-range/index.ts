@@ -25,7 +25,7 @@ export type RawPositionRange = IRawPositionRange;
 export type PartialRawPositionRange = Partial<IRawPositionRange>;
 export type RawPositionRangeUnion = RawPositionRange | PartialRawPositionRange;
 
-export interface IPositionRange extends PartialRawPositionRange {
+export interface IPartialPositionRange extends PartialRawPositionRange {
     units: PositionUnit;
     space: PositionSpace;
     isDirty(): void;
@@ -103,7 +103,7 @@ export function mixin<T extends object>(
 ) {
     range = range || {}; // allow mixin functionality
     // tslint:disable-next-line:prefer-object-spread
-    const rangeResult: IPositionRange & T = Object.assign(range, {
+    const rangeResult: IPartialPositionRange & T = Object.assign(range, {
         isDirty: dirtyClean.isDirty,
         // defaults
         units: 'cell' as 'cell',

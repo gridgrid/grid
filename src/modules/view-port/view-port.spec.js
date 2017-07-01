@@ -1,4 +1,4 @@
-var mockEvent = require('../custom-event');
+var mockEvent = require('@grid/custom-event').default;
 
 describe('view port', function () {
 

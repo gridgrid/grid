@@ -37,15 +37,31 @@ export interface IGridDragStartEvent extends IGridCustomMouseEvent {
 }
 
 // tslint:disable-next-line:interface-over-type-literal
-type GridCustomEventMap = {
+type GridCustomMouseEventMap = {
     'grid-drag': IGridCustomMouseEvent,
     'grid-cell-drag': IGridCustomMouseEvent,
     'grid-drag-start': IGridDragStartEvent,
     'grid-drag-end': IGridCustomMouseEvent,
     'grid-cell-mouse-move': IGridCustomMouseEvent,
+};
+
+const GridCustomMouseEvents: { [key: string]: boolean | undefined } = {
+    'grid-drag': true,
+    'grid-cell-drag': true,
+    'grid-drag-start': true,
+    'grid-drag-end': true,
+    'grid-cell-mouse-move': true,
+};
+
+export type GridCustomMouseEventTypes = keyof GridCustomMouseEventMap;
+
+// tslint:disable-next-line:interface-over-type-literal
+type GridCustomEventMap = GridCustomMouseEventMap & {
     'grid-row-change': IRowColEvent,
     'grid-col-change': IRowColEvent,
 };
+
+export const isAnnotatedGridCustomMouseEvent = (e: EventUnion): e is AnnotatedGridCustomMouseEventUnion => !!GridCustomMouseEvents[e.type];
 
 const ANNOTATED_MOUSE_EVENTS = {
     click: true,
@@ -68,7 +84,12 @@ const ANNOTATED_KEY_EVENTS = {
 export const ANNOTATED_KEY_EVENTS_MAP: { readonly [key: string]: boolean | undefined; } = ANNOTATED_KEY_EVENTS;
 export const isAnnotatedKeyEvent = (e: EventUnion): e is AnnotatedKeyEventUnion => !!ANNOTATED_KEY_EVENTS_MAP[e.type];
 
-export const isAnnotatedEvent = (e: EventUnion): e is AnnotatedEventUnion => isAnnotatedKeyEvent(e) || isAnnotatedMouseEvent(e);
+export const isAnnotatedMouseOrKeyEvent = (e: EventUnion): e is AnnotatedMouseOrKeyEventUnion =>
+    isAnnotatedKeyEvent(e) ||
+    isAnnotatedMouseEvent(e);
+export const isAnnotatedEvent = (e: EventUnion): e is AnnotatedEventUnion =>
+    isAnnotatedMouseOrKeyEvent(e) ||
+    isAnnotatedGridCustomMouseEvent(e);
 
 type AnnotatedHTMLElementKeyEventMap = {
     [K in keyof typeof ANNOTATED_KEY_EVENTS]: IAnnotatedEvent & HTMLElementEventMap[K];
@@ -79,9 +100,11 @@ type AnnotatedHTMLElementMouseEventMap = {
 };
 
 type AnnotatedHTMLElementEventMap = AnnotatedHTMLElementKeyEventMap & AnnotatedHTMLElementMouseEventMap;
+export type AnnotatedGridCustomMouseEventUnion = GridCustomMouseEventMap[keyof GridCustomMouseEventMap];
 export type AnnotatedMouseEventUnion = AnnotatedHTMLElementMouseEventMap[keyof AnnotatedHTMLElementMouseEventMap];
 export type AnnotatedKeyEventUnion = AnnotatedHTMLElementKeyEventMap[keyof AnnotatedHTMLElementKeyEventMap];
-export type AnnotatedEventUnion = AnnotatedMouseEventUnion | AnnotatedKeyEventUnion;
+export type AnnotatedMouseOrKeyEventUnion = AnnotatedMouseEventUnion | AnnotatedKeyEventUnion;
+export type AnnotatedEventUnion = AnnotatedMouseOrKeyEventUnion | AnnotatedGridCustomMouseEventUnion;
 
 type AnnotatedWindowKeyEventMap = {
     [K in keyof typeof ANNOTATED_KEY_EVENTS]: IAnnotatedEvent & WindowEventMap[K];
@@ -104,7 +127,7 @@ type AnnotatedDocumentMouseEventMap = {
 type AnnotatedDocumentEventMap = AnnotatedDocumentKeyEventMap & AnnotatedDocumentMouseEventMap;
 
 type AllEventMap = AnnotatedHTMLElementEventMap & HTMLElementEventMap & WindowEventMap & DocumentEventMap & GridCustomEventMap;
-export type EventUnion = AllEventMap[keyof AllEventMap] | ILoopEvent;
+export type EventUnion = AllEventMap[keyof AllEventMap] | (ILoopEvent & { target?: undefined; });
 
 type WindowEventHandler<K extends keyof WindowEventMap> = (ev: WindowEventMap[K]) => any;
 type DocumentEventHandler<K extends keyof DocumentEventMap> = (ev: DocumentEventMap[K]) => any;
