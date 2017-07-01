@@ -1,10 +1,10 @@
 import { Grid } from '@grid/core';
+import ctrlOrCmd from '@grid/ctrl-or-cmd';
 import { IDecorator } from '@grid/decorators';
 import { AnnotatedMouseEventUnion, IAnnotatedEvent, IGridDragStartEvent, isAnnotatedMouseEventOfType } from '@grid/event-loop';
 import * as util from '@grid/util';
 
 const elementClass = require('element-class');
-const ctrlOrCmd = require('@grid/ctrl-or-cmd');
 
 interface ITargetCol extends IDecorator {
     _renderedElem?: HTMLElement;

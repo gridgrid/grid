@@ -12,8 +12,9 @@ import createCopyPaste, { ICopyPaste } from '@grid/copy-paste';
 import createDecorators, { IDecoratorModel } from '@grid/decorators';
 import makeDirtyClean from '@grid/dirty-clean';
 import createEditModel, { IEditModel } from '@grid/edit-model';
-import createEventLoop, { EventLoop } from '@grid/event-loop';
+import createEventLoop, { EventLoop, EventUnion } from '@grid/event-loop';
 import createFps, { IFps } from '@grid/fps';
+import createNavigationModel, { INavigationModel } from '@grid/navigation-model';
 import createPixelScrollModel, { IPixelScrollDimensionInfo, IPixelScrollModel } from '@grid/pixel-scroll-model';
 import { colPositionRangeDimension, IPositionRangeDimension, rowPositionRangeDimension } from '@grid/position-range';
 import createRowModel, { RowModel } from '@grid/row-model';
@@ -23,12 +24,12 @@ import { DataSpaceConverter } from '@grid/space/data-space-converter';
 import { AbstractDimensionalSpaceConverter } from '@grid/space/dimensional-converter';
 import { ViewSpaceConverter } from '@grid/space/view-space-converter';
 import { VirtualSpaceConverter } from '@grid/space/virtual-space-converter';
+import * as util from '@grid/util';
 import createViewPort, { IViewPort, IViewPortDimensionInfo } from '@grid/view-port';
 import createVirtualPixelCellModel, { IVirtualPixelCellDimensionInfo, IVirtualPixelCellModel } from '@grid/virtual-pixel-cell-model';
 
 const escapeStack = require('escape-stack');
 const elementClass = require('element-class');
-const util = require('@grid/util');
 
 export interface IGridOpts {
     snapToCell?: boolean;
@@ -96,7 +97,7 @@ export interface IGridCore {
     build: (container: HTMLElement) => void;
     makeDirtyClean: () => any;
     destroy: () => void;
-    eventIsOnCells: (e: UIEvent) => boolean;
+    eventIsOnCells: (e: EventUnion) => boolean;
     rows: IGridDimension;
     cols: IGridDimension;
 }
@@ -117,7 +118,7 @@ export interface IGridModels {
     viewLayer: any;
     colReorder: IColReorder;
     editModel: IEditModel;
-    navigationModel: any;
+    navigationModel: INavigationModel;
     pixelScrollModel: IPixelScrollModel;
     showHiddenCols: IShowHiddenCols;
     colResize: IColResize;
@@ -301,7 +302,7 @@ export function create(opts: IGridOpts = {}) {
         grid.editModel = createEditModel(grid);
     }
 
-    grid.navigationModel = require('../navigation-model')(grid);
+    grid.navigationModel = createNavigationModel(grid);
 
     grid.pixelScrollModel = createPixelScrollModel(grid);
     grid.showHiddenCols = createShowHiddenCols(grid);
