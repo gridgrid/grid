@@ -4,9 +4,8 @@ import debounce from '@grid/debounce';
 import makeDirtyClean, { IDirtyClean } from '@grid/dirty-clean';
 import addDirtyProps from '@grid/dirty-props';
 import { IEditOptions } from '@grid/edit-model';
+import passThrough from '@grid/pass-through';
 import * as util from '@grid/util';
-
-const passThrough = require('../pass-through');
 
 export interface IAbstractRowColModel {
     defaultSize: number;

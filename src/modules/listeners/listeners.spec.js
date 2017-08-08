@@ -1,7 +1,7 @@
 describe('listeners', function () {
     var listeners;
     beforeEach(function () {
-        listeners = require('../listeners')();
+        listeners = require('../listeners').create();
     });
 
     it('should allow me to add and remove a listener', function () {
@@ -29,8 +29,7 @@ describe('listeners', function () {
 
     it('should let me add multiple listeners and unbind out of order', function () {
         var spy = jasmine.createSpy();
-        var unbind = listeners.addListener(function () {
-        });
+        var unbind = listeners.addListener(function () {});
         var unbind2 = listeners.addListener(spy);
         unbind();
         unbind2();
