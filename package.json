@@ -17,7 +17,7 @@
     "preversion": "npm run build",
     "open:src": "babel-node tools/srcServer.js",
     "dev": "npm-run-all --parallel open:src",
-    "clean": "rimraf ./dist && mkdir dist",
+    "clean": "rm -rf ./dist && mkdir dist",
     "prebuild": "npm run clean && npm run test",
     "build": "node tools/build.js",
     "test": "node_modules/karma/bin/karma start --single-run --no-auto-watch karma.conf.js",
