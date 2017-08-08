@@ -1,6 +1,6 @@
 'use strict';
 
-var makeSimpleGrid = require('../modules/simple-grid');
+var makeSimpleGrid = require('../modules/simple-grid').create;
 var debounce = require('../modules/debounce').debounce;
 require('../scss/grid.scss');
 
@@ -21,7 +21,7 @@ grid.navigationModel.minRow = 1;
 grid.pixelScrollModel.maxIsAllTheWayFor.height = true;
 grid.fps.logging = true;
 
-//hide columsn for testing
+//hide column for testing
 for (var c = 0; c < grid.colModel.length(); c++) {
   if (c > 4 && c % 5 === 0) {
     grid.colModel.get(c).hidden = true;

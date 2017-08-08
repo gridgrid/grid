@@ -1,4 +1,5 @@
-import { Grid, IGridDataResult } from '@grid/core';
+import { Grid } from '@grid/core';
+import { IGridDataChangeBody, IGridDataResult } from '@grid/data-model';
 import debounce from '@grid/debounce';
 import makeDirtyClean, { IDirtyClean } from '@grid/dirty-clean';
 import addDirtyProps from '@grid/dirty-props';
@@ -47,6 +48,7 @@ export interface IRowColDescriptor {
     builder?: IRowColBuilder;
     children?: IRowColDescriptor[];
     editOptions?: IEditOptions;
+    data?: Array<IGridDataChangeBody<any>>;
 }
 
 export interface IRowDescriptor extends IRowColDescriptor {

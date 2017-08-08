@@ -9,6 +9,8 @@ import createColModel, { ColModel } from '@grid/col-model';
 import createColReorder, { IColReorder } from '@grid/col-reorder';
 import createColResize, { IColResize } from '@grid/col-resize';
 import createCopyPaste, { ICopyPaste } from '@grid/copy-paste';
+import createDataModel from '@grid/data-model';
+import { IDataModel } from '@grid/data-model';
 import createDecorators, { IDecoratorModel } from '@grid/decorators';
 import makeDirtyClean from '@grid/dirty-clean';
 import createEditModel, { IEditModel } from '@grid/edit-model';
@@ -45,22 +47,6 @@ export type EscapeStackRemover = () => void;
 
 export interface IEscapeStack {
     add: (handler: EscapeStackHandler) => EscapeStackRemover;
-}
-
-export interface IGridDataResult<T> {
-    value: T;
-    formatted: string;
-}
-
-export interface IGridDataChangeBody<T> {
-    value: T;
-    formatted?: string;
-}
-
-export interface IGridDataChange<T> extends IGridDataChangeBody<T> {
-    row: number;
-    col: number;
-    paste?: boolean;
 }
 
 export interface IGridDimension {
@@ -109,7 +95,7 @@ export interface IGridModels {
     cellClasses: ICellClasses;
     rowModel: RowModel;
     colModel: ColModel;
-    dataModel: any;
+    dataModel: IDataModel;
     virtualPixelCellModel: IVirtualPixelCellModel;
     cellScrollModel: ICellScrollModel;
     cellMouseModel: ICellMouseModel;
@@ -127,8 +113,7 @@ export interface IGridModels {
 }
 
 export type Grid = IGridCore & IGridModels;
-
-export function create(opts: IGridOpts = {}) {
+export function create(opts: IGridOpts = {}): Grid {
     const lazyGetterMap: { [key: string]: any } = {};
 
     const lazyGetter = <T>(idx: string, getFn: () => T) => {
@@ -286,7 +271,7 @@ export function create(opts: IGridOpts = {}) {
     grid.cellClasses = creatCellClasses(grid);
     grid.rowModel = createRowModel(grid);
     grid.colModel = createColModel(grid);
-    grid.dataModel = require('../simple-data-model')(grid);
+    grid.dataModel = createDataModel(grid);
     grid.virtualPixelCellModel = createVirtualPixelCellModel(grid);
     grid.cellScrollModel = createCellScrollModel(grid);
     grid.cellMouseModel = cellMouseModel(grid);

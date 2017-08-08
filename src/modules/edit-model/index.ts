@@ -1,4 +1,5 @@
-import { Grid, IGridDataChange, IGridDataChangeBody } from '@grid/core';
+import { Grid } from '@grid/core';
+import { IGridDataChange, IGridDataChangeBody } from '@grid/data-model';
 import { IDecorator } from '@grid/decorators';
 import { AnnotatedMouseOrKeyEventUnion, EventUnion, isAnnotatedMouseOrKeyEvent } from '@grid/event-loop';
 import { RawPositionRange } from '@grid/position-range';
@@ -325,8 +326,11 @@ export function create(grid: Grid) {
         element.style.zIndex = '1';
         element.style.position = 'relative';
         grid.eventLoop.bindOnce('grid-draw', () => {
+            const top = editModel._defaultDecorator.top;
+            const left = editModel._defaultDecorator.left;
             element.value = editModel._defaultDecorator.typedText && editModel._defaultDecorator.typedText() ||
-                grid.dataModel.get(editModel._defaultDecorator.top, editModel._defaultDecorator.left).formatted;
+                (top != undefined && left != undefined && grid.dataModel.get(top, left).formatted) ||
+                '';
             element.focus();
         });
         editModel._defaultDecorator.renderedElem = element;

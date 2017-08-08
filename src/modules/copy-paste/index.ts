@@ -1,4 +1,5 @@
-import { Grid, IGridDataChange, IGridDataResult } from '@grid/core';
+import { Grid } from '@grid/core';
+import { IGridDataChange, IGridDataResult } from '@grid/data-model';
 import debounce from '@grid/debounce';
 import { RawPositionRange } from '@grid/position-range';
 import * as tsv from '@grid/tsv';

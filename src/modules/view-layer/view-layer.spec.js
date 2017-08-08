@@ -203,7 +203,7 @@ describe('view-layer', function () {
 
             it('should redraw cells if data model is dirty', function (done) {
                 expectRedraw.call(this, ['_drawCells'], function () {
-                    grid.dataModel.toggleSort();
+                    grid.dataModel.set(1, 2, 'something something');
                 }, done);
             });
         });
