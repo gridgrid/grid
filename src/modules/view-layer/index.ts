@@ -18,7 +18,7 @@ export interface IViewLayer {
     build(elem: HTMLElement): void;
     draw(): void;
     eventIsOnCells(e: EventUnion): boolean;
-    setTextContent(elem: Node, text: string): void;
+    setTextContent(elem: Node | undefined, text: string): void;
     getBorderWidth(): number;
     _drawCells(): void;
     _buildCells(): void;
@@ -139,7 +139,10 @@ export function create(grid: Grid) {
 
             return false;
         },
-        setTextContent(elem: Node, text: string) {
+        setTextContent(elem: Node | undefined, text: string) {
+            if (!elem) {
+                return;
+            }
             if (elem.firstChild && elem.firstChild.nodeType === 3) {
                 elem.firstChild.nodeValue = text;
             } else {
