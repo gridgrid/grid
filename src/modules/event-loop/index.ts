@@ -1,9 +1,9 @@
 import { IRowColEvent } from '@grid/abstract-row-col-model';
 import debounce from '@grid/debounce';
 import listeners from '@grid/listeners';
+import mousewheel from '@grid/mousewheel';
 import * as util from '@grid/util';
 
-const mousewheel = require('../mousewheel');
 
 export const EVENTS: Array<keyof HTMLElementEventMap> =
     ['click', 'mousedown', 'mouseup', 'mousemove', 'dblclick', 'keydown', 'keypress', 'keyup', 'copy', 'paste'];

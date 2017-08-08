@@ -79,7 +79,7 @@ describe('pixel-scroll-model', function () {
         var event = require('@grid/custom-event').default('mousewheel');
         event.deltaY = y;
         event.deltaX = x;
-        event = require('../mousewheel').normalize(event);
+        event = require('../mousewheel').default.normalize(event);
         grid.eventLoop.fire(event);
         return event;
     }

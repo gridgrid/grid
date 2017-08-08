@@ -8,7 +8,7 @@ describe('mousewheel', function () {
 
 
     beforeEach(function () {
-        mousewheel = require('../mousewheel');
+        mousewheel = require('../mousewheel').default;
         div = document.createElement('div');
     });
 
