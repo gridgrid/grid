@@ -1,4 +1,4 @@
-var mockEvent = require('../custom-event');
+var mockEvent = require('@grid/custom-event').default;
 var key = require('key');
 
 describe('navigation-model', function () {
@@ -64,7 +64,7 @@ describe('navigation-model', function () {
 
         it('should register a cell class for focus', function () {
             var spy = spyOn(grid.cellClasses, 'add');
-            require('../navigation-model')(grid);
+            require('../navigation-model').create(grid);
             expect(spy).toHaveBeenCalled();
             var descriptor = spy.calls.argsFor(0)[0];
             expect(descriptor).unitsToBe('cell');
@@ -102,7 +102,7 @@ describe('navigation-model', function () {
 
         it('should move the cell class on navigation', function () {
             var spy = spyOn(grid.cellClasses, 'add');
-            var model = require('../navigation-model')(grid);
+            var model = require('../navigation-model').create(grid);
             expect(spy).toHaveBeenCalled();
             var descriptor = spy.calls.argsFor(0)[0];
             model.setFocus(2, 3);

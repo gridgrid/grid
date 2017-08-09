@@ -1,4 +1,4 @@
-var mockEvent = require('../custom-event');
+var mockEvent = require('@grid/custom-event').default;
 
 describe('pixel-scroll-model', function () {
     var $ = require('jquery');
@@ -76,10 +76,10 @@ describe('pixel-scroll-model', function () {
     });
 
     function sendMouseWheelToModel(y, x) {
-        var event = require('../custom-event')('mousewheel');
+        var event = require('@grid/custom-event').default('mousewheel');
         event.deltaY = y;
         event.deltaX = x;
-        event = require('../mousewheel').normalize(event);
+        event = require('../mousewheel').default.normalize(event);
         grid.eventLoop.fire(event);
         return event;
     }
@@ -240,7 +240,7 @@ describe('pixel-scroll-model', function () {
         it('should bind a drag event on render', function () {
             var spy = spyOn(grid.eventLoop, 'bind');
             var scrollBar = model.vertScrollBar.render();
-            expect(spy).toHaveBeenBoundWith('grid-drag-start', scrollBar);
+            expect(spy).toHaveBeenBoundWith(scrollBar, 'grid-drag-start');
         });
 
         function renderBar(barDecorator) {

@@ -1,3 +1,8 @@
+
+.extra{
+    color: black; // extract text plugin fails on the the first css rule.........
+}
+
 $grid-teal: #39CCCC;
 body {
   font-family: 'Open Sans', sans-serif;

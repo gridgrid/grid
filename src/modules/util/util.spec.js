@@ -2,7 +2,7 @@ describe('util', function () {
 
     var util;
     beforeEach(function () {
-        util = require('../util');
+        util = require('@grid/util');
     });
 
     describe('clamp', function () {

@@ -2,7 +2,7 @@ describe('tsv', function () {
 
 
     beforeEach(function () {
-        this.tsv = require('./index.js');
+        this.tsv = require('./index');
     });
 
     function cases() {

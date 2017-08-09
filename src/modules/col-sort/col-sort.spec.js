@@ -1,12 +1,12 @@
 (function () {
-    var mockEvent = require('../custom-event');
+    var mockEvent = require('@grid/custom-event').default;
     xdescribe('col-sort', function () {
 
 
         require('../grid-spec-helper')();
         var grid;
         beforeEach(function () {
-            grid =this.buildSimpleGrid();
+            grid = this.buildSimpleGrid();
         });
 
         it('should call data model toggle sort on click without drag', function () {

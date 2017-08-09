@@ -1,4 +1,4 @@
-var mockEvent = require('../custom-event');
+var mockEvent = require('@grid/custom-event').default;
 
 describe('view port', function () {
 
@@ -86,7 +86,7 @@ describe('view port', function () {
             ctx.props = ['rows', 'cols', 'width', 'height'];
             ctx.dirtyObjs = [viewPort];
         });
-        require('../add-dirty-props/test-body')(ctx);
+        require('../dirty-props/test-body')(ctx);
     });
 
     describe('cell coordinate conversion', function () {
@@ -222,6 +222,7 @@ describe('view port', function () {
     });
 
     it('should let me get a real row or col from a virtual one', function () {
+        debugger;
         grid.cellScrollModel.scrollTo(1, 1);
         expect(viewPort.toRealRow(1)).toBe(0);
         expect(viewPort.toRealCol(1)).toBe(0);
@@ -386,6 +387,7 @@ describe('view port', function () {
     it('should have top and left values for the client offset of the grid container', function () {
         this.container.style.marginTop = '10px';
         this.container.style.marginLeft = '5px';
+        debugger;
         expect(viewPort.top).toBe(10);
         expect(viewPort.left).toBe(5);
     });

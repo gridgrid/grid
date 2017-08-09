@@ -1,8 +1,8 @@
-var mockEvent = require('../custom-event');
+var mockEvent = require('@grid/custom-event').default;
 var key = require('key');
-var util = require('../util');
+var util = require('@grid/util');
 var _ = require('lodash');
-var noop = require('../no-op');
+var noop = function () {};
 
 describe('edit-model', function () {
 
@@ -385,7 +385,7 @@ describe('edit-model', function () {
 
             it('should not populate a save promise if decorator is undefined and save is defined', function () {
                 this.opts = makeOptsForEditor({
-                    save: new Promise(require('../no-op'), require('../no-op'))
+                    save: new Promise(function () {}, function () {})
                 });
                 this.decorator = this.grid.editModel._defaultDecorator;
             });
