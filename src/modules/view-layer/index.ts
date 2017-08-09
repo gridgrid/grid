@@ -1,4 +1,5 @@
-import { Grid } from '@grid/core';
+import { IBuilderRenderContext } from '@grid/abstract-row-col-model';
+import { Grid, IGridDimension } from '@grid/core';
 import customEvent from '@grid/custom-event';
 import { IDecorator } from '@grid/decorators';
 import { EventUnion, isAnnotatedEvent } from '@grid/event-loop';
@@ -397,11 +398,14 @@ export function create(grid: Grid) {
                 grid.dataModel.get(grid.rowModel.toData(virtualRow), grid.colModel.toData(virtualCol));
 
             // artificially only get builders for row headers for now
-            let builder = virtualRow < headerRows && grid.rowModel.get(virtualRow).builder || undefined;
+            let builder = grid.rowModel.get(virtualRow).builder;
             let hasRowBuilder = true;
-            if (!builder) {
+            if (!builder || (virtualCol < headerCols && !builder.includeHeaders)) {
                 hasRowBuilder = false;
                 builder = grid.colModel.get(virtualCol).builder;
+                if (builder && virtualRow < headerRows && !builder.includeHeaders) {
+                    builder = undefined;
+                }
             }
 
             let cellChild;
@@ -416,6 +420,7 @@ export function create(grid: Grid) {
                     data
                 });
             }
+
             // if we didn't get a child from the builder use a regular text node
             if (!cellChild) {
                 viewLayer.setTextContent(cell, data.formatted);
@@ -547,24 +552,11 @@ export function create(grid: Grid) {
     }
 
     function buildCols() {
-        const previouslyBuiltCols = builtCols;
-        builtCols = {};
-        for (let c = 0; c < grid.colModel.length(true); c++) {
-            const builder = grid.colModel.get(c).builder;
-            const oldElems = previouslyBuiltCols && previouslyBuiltCols[c];
-
-            if (builder) {
-                builtCols[c] = [];
-                destroyRenderedElems(oldElems);
-                for (let realRow = 0; realRow < grid.viewPort.rows; realRow++) {
-                    builtCols[c][realRow] = builder.render({
-                        viewRow: realRow,
-                        viewCol: grid.cols.converters.virtual.toView(c),
-                        previousElement: oldElems && oldElems[realRow]
-                    });
-                }
-            }
-        }
+        builtCols = buildDimension(grid.cols, grid.rows, builtCols, (viewCol, viewRow, previousElement) => ({
+            viewRow,
+            viewCol,
+            previousElement
+        }));
     }
     /* END COL BUILDER LOGIC */
 
@@ -573,24 +565,35 @@ export function create(grid: Grid) {
      * */
 
     function buildRows() {
-        const previouslyBuiltRows = builtRows;
-        builtRows = {};
-        for (let r = 0; r < grid.rowModel.numHeaders(); r++) {
-            const builder = grid.rowModel.get(r).builder;
-            const oldElems = previouslyBuiltRows && previouslyBuiltRows[r];
+        builtRows = buildDimension(grid.rows, grid.cols, builtRows, (viewRow, viewCol, previousElement) => ({
+            viewRow,
+            viewCol,
+            previousElement
+        }));
+    }
+
+    function buildDimension(
+        dimension: IGridDimension,
+        crossDimension: IGridDimension,
+        previouslyBuiltElems: IBuiltElementMap | undefined,
+        getRenderContext: (dimPos: number, crossDimPos: number, elem: HTMLElement | undefined) => IBuilderRenderContext,
+    ) {
+        const builtElems: IBuiltElementMap = {};
+        for (let i = 0; i < dimension.rowColModel.length(true); i++) {
+            const builder = dimension.rowColModel.get(i).builder;
+            const oldElems = previouslyBuiltElems && previouslyBuiltElems[i];
 
             if (builder) {
-                builtRows[r] = [];
+                builtElems[i] = [];
                 destroyRenderedElems(oldElems);
-                for (let realCol = 0; realCol < grid.viewPort.cols; realCol++) {
-                    builtRows[r][realCol] = builder.render({
-                        viewCol: realCol,
-                        viewRow: grid.rows.converters.virtual.toView(r),
-                        previousElement: oldElems && oldElems[realCol]
-                    });
+                for (let realI = 0; realI < crossDimension.viewPort.count; realI++) {
+                    builtElems[i][realI] = builder.render(
+                        getRenderContext(dimension.converters.virtual.toView(i), realI, oldElems && oldElems[realI])
+                    );
                 }
             }
         }
+        return builtElems;
     }
     /* END ROW BUILDER LOGIC*/
 

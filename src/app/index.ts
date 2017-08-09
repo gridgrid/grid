@@ -79,6 +79,6 @@ headerRow.builder = grid.rowModel.createBuilder(() => {
     builtElem.children[1].textContent = 'header' + ctx.virtualCol;
   }
   return builtElem;
-});
+}, true);
 
 headerRow.height = 40;

@@ -76,6 +76,7 @@ export type BuilderUpdater = (builtElem: HTMLElement | undefined, context: IBuil
 export interface IRowColBuilder {
     render: BuilderRenderer;
     update: BuilderUpdater;
+    includeHeaders: boolean;
 }
 
 interface IRowColEventBody {
@@ -416,10 +417,11 @@ export class AbstractRowColModel {
             }
         }], [this.dirtyClean]);
     }
-    createBuilder(render: BuilderRenderer, update: BuilderUpdater = passThrough) {
+    createBuilder(render: BuilderRenderer, update: BuilderUpdater = passThrough, includeHeaders: boolean = false) {
         return {
             render,
-            update
+            update,
+            includeHeaders
         };
     }
 
