@@ -109,6 +109,9 @@
   },
   "release": {
     "verifyConditions": "condition-circle",
-    "branch": "next"
+    "branch": "next",
+    "fallbackTags": {
+      "next": "latest"
+    }
   }
 }

@@ -5,5 +5,5 @@ deployment:
   master:
     branch: [master, next]
     commands:
-      - npm run semantic-release || true  
+      - npm run semantic-release
     
