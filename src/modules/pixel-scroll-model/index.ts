@@ -124,6 +124,9 @@ export function create(grid: Grid) {
 
             decorator.postRender = (scrollBarElem: HTMLElement) => {
                 scrollBarElem.setAttribute('class', 'grid-scroll-bar');
+                scrollBarElem.setAttribute('style', `${scrollBarElem.getAttribute('style')} border-radius: 6px;
+                background: rgba(0, 0, 0, .5);
+                z-index: 10;`);
                 decorator._onDragStart = (e) => {
                     if (e.target !== scrollBarElem) {
                         return;
