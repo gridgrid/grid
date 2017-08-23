@@ -108,6 +108,7 @@
     }
   },
   "release": {
-    "verifyConditions": "condition-circle"
+    "verifyConditions": "condition-circle",
+    "branch": "next"
   }
 }
