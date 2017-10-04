@@ -1,3 +1,8 @@
+// tslint:disable-next-line:no-reference
+///<reference path="../../global.d.ts"/>
+// there's a bug in ATL that requires this to be there in karma tests right now
+// remove if they fix this one : https://github.com/s-panferov/awesome-typescript-loader/issues/468
+
 require('es6-object-assign').polyfill();
 
 import { IAbstractRowColModel, IColDescriptor, IRowDescriptor } from '@grid/abstract-row-col-model';

@@ -34,10 +34,10 @@ export interface IPartialPositionRange extends PartialRawPositionRange {
 // not the sexiest but we get the position type assuming top / left width / height are the same type
 export type PositionType<T extends RawPositionRangeUnion> = T['top'];
 export type SizeType<T extends RawPositionRangeUnion> = T['height'];
-type PositionGet = <T extends RawPositionRangeUnion>(r: T) => PositionType<T>;
-type PositionSet = <T extends RawPositionRangeUnion>(r: T, p: PositionType<T>) => T;
-type SizeGet = <T extends RawPositionRangeUnion>(r: T) => SizeType<T>;
-type SizeSet = <T extends RawPositionRangeUnion>(r: T, p: SizeType<T>) => T;
+export type PositionGet = <T extends RawPositionRangeUnion>(r: T) => PositionType<T>;
+export type PositionSet = <T extends RawPositionRangeUnion>(r: T, p: PositionType<T>) => T;
+export type SizeGet = <T extends RawPositionRangeUnion>(r: T) => SizeType<T>;
+export type SizeSet = <T extends RawPositionRangeUnion>(r: T, p: SizeType<T>) => T;
 
 export interface IPositionRangeDimension {
     getPosition: PositionGet;

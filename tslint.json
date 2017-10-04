@@ -54,6 +54,7 @@
     "no-construct": true,
     "no-constructor-vars": false,
     "no-debugger": true,
+    "no-duplicate-imports": false,
     "no-duplicate-variable": true,
     "no-empty": true,
     "no-empty-interface": false,

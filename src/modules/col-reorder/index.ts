@@ -6,12 +6,12 @@ import * as util from '@grid/util';
 
 const elementClass = require('element-class');
 
-interface ITargetCol extends IDecorator {
+export interface ITargetCol extends IDecorator {
     _renderedElem?: HTMLElement;
     moveAfter?: boolean;
 }
 
-interface IDragRect extends IDecorator {
+export interface IDragRect extends IDecorator {
     colOffset: number;
 }
 

@@ -15,8 +15,8 @@ export interface IDefaultEditDecorator extends IEditDecorator {
     renderedElem?: HTMLTextAreaElement;
 }
 
-type ClosePromise = Promise<void>;
-type SavePromise = Promise<IGridDataChangeBody<any> | undefined>;
+export type ClosePromise = Promise<void>;
+export type SavePromise = Promise<IGridDataChangeBody<any> | undefined>;
 
 export interface IEditor {
     closePromise?: ClosePromise;

@@ -10,21 +10,21 @@ export interface ISimpleGrid extends Grid {
     colModel: ISimpleColModel;
 }
 
-interface ISimpleGridRow extends IRowDescriptor {
+export interface ISimpleGridRow extends IRowDescriptor {
     dataRow: number;
     dataLayer?: number;
 }
-interface ISimpleGridCol extends IColDescriptor {
+export interface ISimpleGridCol extends IColDescriptor {
     dataCol: number;
 }
 
-interface ISimpleRowModel extends RowModel {
+export interface ISimpleRowModel extends RowModel {
     row: (idx: number) => ISimpleGridRow;
     get(idx: number): ISimpleGridRow;
     create(): ISimpleGridRow;
 }
 
-interface ISimpleColModel extends ColModel {
+export interface ISimpleColModel extends ColModel {
     col: (idx: number) => ISimpleGridCol;
     get(idx: number): ISimpleGridCol;
     create(): ISimpleGridCol;

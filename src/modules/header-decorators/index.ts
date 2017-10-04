@@ -5,13 +5,13 @@ export interface IHeaderDecorator extends IDecorator {
     getDecoratorLeft(): number;
 }
 
-interface IHeaderDecoratorCreator {
+export interface IHeaderDecoratorCreator {
     makeDecorator?(c: number): IHeaderDecorator;
     annotateDecorator?(h: IHeaderDecorator): void;
     isNeeded?(c: number): boolean;
 }
 
-interface IHeaderDecoratorModel extends IHeaderDecoratorCreator {
+export interface IHeaderDecoratorModel extends IHeaderDecoratorCreator {
     _decorators: { [key: number]: IHeaderDecorator | undefined };
     makeDecorator(c: number): IHeaderDecorator;
 }
