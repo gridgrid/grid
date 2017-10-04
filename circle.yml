@@ -1,6 +1,6 @@
 dependencies:
   pre:
-    - npm install -g npm@3.x.x
+    - npm install -g npm@5.x.x
 deployment:
   master:
     branch: [master, next]
