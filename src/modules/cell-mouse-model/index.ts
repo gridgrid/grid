@@ -1,5 +1,5 @@
-import { Grid } from '@grid/core';
-import customEvent from '@grid/custom-event';
+import { Grid } from '../core';
+import customEvent from '../custom-event';
 import {
     AnnotatedMouseEventUnion,
     EventUnion,
@@ -11,7 +11,7 @@ import {
     ILoopEvent,
     isAnnotatedMouseEvent,
     isAnnotatedMouseEventOfType
-} from '@grid/event-loop';
+} from '../event-loop';
 
 const PROPS_TO_COPY_FROM_MOUSE_EVENTS: Array<keyof AnnotatedMouseEventUnion> =
     ['clientX', 'clientY', 'gridX', 'gridY', 'layerX', 'layerY', 'row', 'col', 'realRow', 'realCol', 'virtualRow', 'virtualCol'];

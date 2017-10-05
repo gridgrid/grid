@@ -1,12 +1,12 @@
-import { IRowColEvent } from '@grid/abstract-row-col-model';
-import { ICellClassDescriptor } from '@grid/cell-classes';
-import { Grid } from '@grid/core';
-import ctrlOrCmd from '@grid/ctrl-or-cmd';
-import { IDecorator } from '@grid/decorators';
-import { AnnotatedMouseEventUnion, AnnotatedMouseOrKeyEventUnion, IGridCustomMouseEvent, IGridDragStartEvent } from '@grid/event-loop';
-import { RawPositionRange } from '@grid/position-range';
-import * as rangeUtil from '@grid/range-util';
-import * as util from '@grid/util';
+import { IRowColEvent } from '../abstract-row-col-model';
+import { ICellClassDescriptor } from '../cell-classes';
+import { Grid } from '../core';
+import ctrlOrCmd from '../ctrl-or-cmd';
+import { IDecorator } from '../decorators';
+import { AnnotatedMouseEventUnion, AnnotatedMouseOrKeyEventUnion, IGridCustomMouseEvent, IGridDragStartEvent } from '../event-loop';
+import { RawPositionRange } from '../position-range';
+import * as rangeUtil from '../range-util';
+import * as util from '../util';
 
 const key = require('key');
 const arrow = key.code.arrow;

@@ -1,4 +1,4 @@
-var mockEvent = require('@grid/custom-event').default;
+var mockEvent = require('../custom-event').default;
 
 describe('pixel-scroll-model', function () {
     var $ = require('jquery');
@@ -76,7 +76,7 @@ describe('pixel-scroll-model', function () {
     });
 
     function sendMouseWheelToModel(y, x) {
-        var event = require('@grid/custom-event').default('mousewheel');
+        var event = require('../custom-event').default('mousewheel');
         event.deltaY = y;
         event.deltaX = x;
         event = require('../mousewheel').default.normalize(event);

@@ -1,6 +1,6 @@
 'use strict';
 
-import makeSimpleGrid from '@grid/simple-grid';
+import makeSimpleGrid from '../modules/simple-grid';
 require('../scss/grid.scss');
 
 const container = document.getElementsByClassName('grid-app-container')[0] as HTMLElement;

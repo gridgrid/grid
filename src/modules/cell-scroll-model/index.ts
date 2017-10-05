@@ -1,6 +1,6 @@
-import { Grid, IGridDimension } from '@grid/core';
-import makeDirtyClean from '@grid/dirty-clean';
-import * as util from '@grid/util';
+import { Grid, IGridDimension } from '../core';
+import makeDirtyClean from '../dirty-clean';
+import * as util from '../util';
 
 export interface ICellScrollDimension {
     position: number;

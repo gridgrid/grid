@@ -1,4 +1,4 @@
-var mockEvent = require('@grid/custom-event').default;
+var mockEvent = require('../custom-event').default;
 var eventLoop = require('../event-loop');
 var eventLoopFn = eventLoop.create;
 

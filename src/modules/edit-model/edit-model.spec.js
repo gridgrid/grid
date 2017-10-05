@@ -1,6 +1,6 @@
-var mockEvent = require('@grid/custom-event').default;
+var mockEvent = require('../custom-event').default;
 var key = require('key');
-var util = require('@grid/util');
+var util = require('../util');
 var _ = require('lodash');
 var noop = function () {};
 

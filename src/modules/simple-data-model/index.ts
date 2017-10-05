@@ -1,7 +1,7 @@
-import { Grid } from '@grid/core';
-import { IDataModel, IGridDataChange, IGridDataResult } from '@grid/data-model';
-import makeDirtyClean from '@grid/dirty-clean';
-import { ISimpleGrid } from '@grid/simple-grid';
+import { Grid } from '../core';
+import { IDataModel, IGridDataChange, IGridDataResult } from '../data-model';
+import makeDirtyClean from '../dirty-clean';
+import { ISimpleGrid } from '../simple-grid';
 
 export interface ISimpleDataModel extends IDataModel {
     setHeader(virtualRow: number, virtualCol: number, datum: string[]): void;

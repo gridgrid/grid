@@ -1,4 +1,4 @@
-import { Grid } from '@grid/core';
+import { Grid } from '../core';
 
 const timeNow = require('time-now');
 

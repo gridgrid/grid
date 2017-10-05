@@ -1,7 +1,7 @@
-import { Grid } from '@grid/core';
-import makeDirtyClean, { IDirtyClean } from '@grid/dirty-clean';
-import addDirtyProps from '@grid/dirty-props';
-import mixinPositionRange, { IPartialPositionRange, PositionSpace, toStandardSpace } from '@grid/position-range';
+import { Grid } from '../core';
+import makeDirtyClean, { IDirtyClean } from '../dirty-clean';
+import addDirtyProps from '../dirty-props';
+import mixinPositionRange, { IPartialPositionRange, PositionSpace, toStandardSpace } from '../position-range';
 
 export interface ICellClassDescriptor extends IPartialPositionRange {
     _cellClassDirtyClean: IDirtyClean;

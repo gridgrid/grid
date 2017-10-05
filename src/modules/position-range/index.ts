@@ -1,5 +1,5 @@
-import { IDirtyClean } from '@grid/dirty-clean';
-import addDirtyProps, { DirtyProp, IDirtyProp } from '@grid/dirty-props';
+import { IDirtyClean } from '../dirty-clean';
+import addDirtyProps, { DirtyProp, IDirtyProp } from '../dirty-props';
 
 export type IDirtyPropOpts = Pick<IDirtyProp, 'preDirty' | 'onDirty'>;
 const WATCHED_PROP_NAMES = ['top', 'left', 'height', 'width', 'units', 'space'];

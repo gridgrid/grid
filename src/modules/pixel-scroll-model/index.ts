@@ -1,8 +1,8 @@
-import { Grid, IGridDimension } from '@grid/core';
-import { IDecorator } from '@grid/decorators';
-import makeDirtyClean from '@grid/dirty-clean';
-import { IGridCustomMouseEvent } from '@grid/event-loop';
-import * as util from '@grid/util';
+import { Grid, IGridDimension } from '../core';
+import { IDecorator } from '../decorators';
+import makeDirtyClean from '../dirty-clean';
+import { IGridCustomMouseEvent } from '../event-loop';
+import * as util from '../util';
 
 export interface IPixelScrollModel {
     x: IPixelScrollDimensionInfo;

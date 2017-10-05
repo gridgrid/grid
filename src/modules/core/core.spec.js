@@ -1,4 +1,4 @@
-var mockEvent = require('@grid/custom-event').default;
+var mockEvent = require('../custom-event').default;
 
 describe('grid-core', function () {
     require('../grid-spec-helper')();

@@ -1,5 +1,5 @@
-import { Grid, IGridDimension } from '@grid/core';
-import * as  util from '@grid/util';
+import { Grid, IGridDimension } from '../core';
+import * as  util from '../util';
 
 // all pixels are assumed to be in the virtual world, no real world pixels are dealt with here :)
 export interface IVirtualPixelCellDimensionInfo {

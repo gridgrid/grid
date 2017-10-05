@@ -1,7 +1,7 @@
-import { Grid } from '@grid/core';
-import makeDirtyClean, { IDirtyClean } from '@grid/dirty-clean';
-import mixinPositionRange, { IPartialPositionRange, PositionSpace, PositionUnit } from '@grid/position-range';
-import * as util from '@grid/util';
+import { Grid } from '../core';
+import makeDirtyClean, { IDirtyClean } from '../dirty-clean';
+import mixinPositionRange, { IPartialPositionRange, PositionSpace, PositionUnit } from '../position-range';
+import * as util from '../util';
 
 export interface IDecorator extends IPartialPositionRange {
     _decoratorDirtyClean?: IDirtyClean;

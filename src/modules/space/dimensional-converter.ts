@@ -1,6 +1,6 @@
-import { IColDescriptor, IRowDescriptor } from '@grid/abstract-row-col-model';
-import { IGridDimension } from '@grid/core';
-import * as  util from '@grid/util';
+import { IColDescriptor, IRowDescriptor } from '../abstract-row-col-model';
+import { IGridDimension } from '../core';
+import * as  util from '../util';
 
 export type DimensionalSpaceCoordConverter = (spaceCoord: number) => number;
 

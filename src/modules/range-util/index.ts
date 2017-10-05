@@ -1,4 +1,4 @@
-import { IRawPositionRange } from '@grid/position-range';
+import { IRawPositionRange } from '../position-range';
 
 // takes a point and a length as the ranges in array form
 export function intersect(range1: number[], range2: number[]) {

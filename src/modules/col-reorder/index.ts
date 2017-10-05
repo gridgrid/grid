@@ -1,8 +1,8 @@
-import { Grid } from '@grid/core';
-import ctrlOrCmd from '@grid/ctrl-or-cmd';
-import { IDecorator } from '@grid/decorators';
-import { AnnotatedMouseEventUnion, IAnnotatedEvent, IGridDragStartEvent, isAnnotatedMouseEventOfType } from '@grid/event-loop';
-import * as util from '@grid/util';
+import { Grid } from '../core';
+import ctrlOrCmd from '../ctrl-or-cmd';
+import { IDecorator } from '../decorators';
+import { AnnotatedMouseEventUnion, IAnnotatedEvent, IGridDragStartEvent, isAnnotatedMouseEventOfType } from '../event-loop';
+import * as util from '../util';
 
 const elementClass = require('element-class');
 

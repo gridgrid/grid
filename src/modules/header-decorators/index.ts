@@ -1,5 +1,5 @@
-import { Grid } from '@grid/core';
-import { IDecorator } from '@grid/decorators';
+import { Grid } from '../core';
+import { IDecorator } from '../decorators';
 
 export interface IHeaderDecorator extends IDecorator {
     getDecoratorLeft(): number;

@@ -1,5 +1,5 @@
-import { AbstractRowColModel, IRowDescriptor } from '@grid/abstract-row-col-model';
-import { Grid } from '@grid/core';
+import { AbstractRowColModel, IRowDescriptor } from '../abstract-row-col-model';
+import { Grid } from '../core';
 
 export class RowModel extends AbstractRowColModel {
     height = (idx: number) => {

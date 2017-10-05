@@ -1,8 +1,8 @@
-import { Grid } from '@grid/core';
-import { IGridDataChange, IGridDataResult } from '@grid/data-model';
-import debounce from '@grid/debounce';
-import { RawPositionRange } from '@grid/position-range';
-import * as tsv from '@grid/tsv';
+import { Grid } from '../core';
+import { IGridDataChange, IGridDataResult } from '../data-model';
+import debounce from '../debounce';
+import { RawPositionRange } from '../position-range';
+import * as tsv from '../tsv';
 
 const innerText = require('inner-text-shim');
 

@@ -1,6 +1,6 @@
 
-import { AbstractRowColModel, IColDescriptor } from '@grid/abstract-row-col-model';
-import { Grid } from '@grid/core';
+import { AbstractRowColModel, IColDescriptor } from '../abstract-row-col-model';
+import { Grid } from '../core';
 
 export class ColModel extends AbstractRowColModel {
     width = (idx: number) => {

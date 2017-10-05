@@ -1,4 +1,4 @@
-var mockEvent = require('@grid/custom-event').default;
+var mockEvent = require('../custom-event').default;
 var key = require('key');
 
 describe('navigation-model', function () {

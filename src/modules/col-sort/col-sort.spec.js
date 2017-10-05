@@ -1,5 +1,5 @@
 (function () {
-    var mockEvent = require('@grid/custom-event').default;
+    var mockEvent = require('../custom-event').default;
     xdescribe('col-sort', function () {
 
 

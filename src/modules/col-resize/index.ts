@@ -1,7 +1,7 @@
-import { Grid } from '@grid/core';
-import { IDecorator } from '@grid/decorators';
-import { AnnotatedMouseEventUnion, IGridDragStartEvent } from '@grid/event-loop';
-import addHeaderDecorators, { IHeaderDecorator } from '@grid/header-decorators';
+import { Grid } from '../core';
+import { IDecorator } from '../decorators';
+import { AnnotatedMouseEventUnion, IGridDragStartEvent } from '../event-loop';
+import addHeaderDecorators, { IHeaderDecorator } from '../header-decorators';
 
 export interface IResizeHeader extends IHeaderDecorator {
     _dragLine: IDecorator;

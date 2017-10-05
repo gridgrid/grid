@@ -1,12 +1,12 @@
-import { Grid, IGridDimension } from '@grid/core';
-import debounce, { IDebounceFunction } from '@grid/debounce';
-import makeDirtyClean from '@grid/dirty-clean';
-import addDirtyProps from '@grid/dirty-props';
+import { Grid, IGridDimension } from '../core';
+import debounce, { IDebounceFunction } from '../debounce';
+import makeDirtyClean from '../dirty-clean';
+import addDirtyProps from '../dirty-props';
 import {
     RawPositionRange,
-} from '@grid/position-range';
-import * as rangeUtil from '@grid/range-util';
-import * as util from '@grid/util';
+} from '../position-range';
+import * as rangeUtil from '../range-util';
+import * as util from '../util';
 
 export interface IViewPort {
     rowInfo: IViewPortDimensionInfo;

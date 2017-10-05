@@ -1,11 +1,11 @@
-import { Grid } from '@grid/core';
-import { IGridDataChangeBody, IGridDataResult } from '@grid/data-model';
-import debounce from '@grid/debounce';
-import makeDirtyClean, { IDirtyClean } from '@grid/dirty-clean';
-import addDirtyProps from '@grid/dirty-props';
-import { IEditOptions } from '@grid/edit-model';
-import passThrough from '@grid/pass-through';
-import * as util from '@grid/util';
+import { Grid } from '../core';
+import { IGridDataChangeBody, IGridDataResult } from '../data-model';
+import debounce from '../debounce';
+import makeDirtyClean, { IDirtyClean } from '../dirty-clean';
+import addDirtyProps from '../dirty-props';
+import { IEditOptions } from '../edit-model';
+import passThrough from '../pass-through';
+import * as util from '../util';
 
 export interface IAbstractRowColModel {
   defaultSize: number;

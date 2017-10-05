@@ -1,4 +1,4 @@
-import { IDirtyClean } from '@grid/dirty-clean';
+import { IDirtyClean } from '../dirty-clean';
 
 export interface IHasPreDirty {
     preDirty(): void;

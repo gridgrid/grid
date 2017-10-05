@@ -1,5 +1,5 @@
-import { Grid } from '@grid/core';
-import { AnnotatedKeyEventUnion, EventUnion, isAnnotatedKeyEvent } from '@grid/event-loop';
+import { Grid } from '../core';
+import { AnnotatedKeyEventUnion, EventUnion, isAnnotatedKeyEvent } from '../event-loop';
 
 export interface ICellKeyboardModel {
     // add methods if needed

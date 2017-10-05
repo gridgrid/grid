@@ -1,5 +1,5 @@
-import { Grid } from '@grid/core';
-import makeDirtyClean from '@grid/dirty-clean';
+import { Grid } from '../core';
+import makeDirtyClean from '../dirty-clean';
 
 export interface IGridDataResult<T> {
   value: T;

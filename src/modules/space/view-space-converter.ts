@@ -1,5 +1,5 @@
 
-import { IColDescriptor, IRowDescriptor } from '@grid/abstract-row-col-model';
+import { IColDescriptor, IRowDescriptor } from '../abstract-row-col-model';
 import { AbstractSpaceConverter } from './converter';
 import { AbstractDimensionalSpaceConverter } from './dimensional-converter';
 

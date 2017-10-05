@@ -1,8 +1,8 @@
-import { Grid } from '@grid/core';
-import { IGridDataChange, IGridDataChangeBody } from '@grid/data-model';
-import { IDecorator } from '@grid/decorators';
-import { AnnotatedMouseOrKeyEventUnion, EventUnion, isAnnotatedMouseOrKeyEvent } from '@grid/event-loop';
-import { RawPositionRange } from '@grid/position-range';
+import { Grid } from '../core';
+import { IGridDataChange, IGridDataChangeBody } from '../data-model';
+import { IDecorator } from '../decorators';
+import { AnnotatedMouseOrKeyEventUnion, EventUnion, isAnnotatedMouseOrKeyEvent } from '../event-loop';
+import { RawPositionRange } from '../position-range';
 
 const key = require('key');
 const clickOff = require('click-off');

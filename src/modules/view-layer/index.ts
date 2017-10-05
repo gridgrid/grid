@@ -1,10 +1,10 @@
-import { IBuilderRenderContext } from '@grid/abstract-row-col-model';
-import { Grid, IGridDimension } from '@grid/core';
-import customEvent from '@grid/custom-event';
-import { IDecorator } from '@grid/decorators';
-import { EventUnion, isAnnotatedEvent } from '@grid/event-loop';
-import { RawPositionRange } from '@grid/position-range';
-import * as util from '@grid/util';
+import { IBuilderRenderContext } from '../abstract-row-col-model';
+import { Grid, IGridDimension } from '../core';
+import customEvent from '../custom-event';
+import { IDecorator } from '../decorators';
+import { EventUnion, isAnnotatedEvent } from '../event-loop';
+import { RawPositionRange } from '../position-range';
+import * as util from '../util';
 
 type IViewLayerDecorator = RawPositionRange & IDecorator & {
     scrollHorz?: boolean;

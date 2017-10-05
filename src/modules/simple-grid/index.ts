@@ -1,8 +1,8 @@
-import { IColDescriptor, IRowDescriptor } from '@grid/abstract-row-col-model';
-import { ColModel } from '@grid/col-model';
-import createGrid, { Grid, IGridOpts } from '@grid/core';
-import { RowModel } from '@grid/row-model';
-import createSimpleDataModel, { ISimpleDataModel } from '@grid/simple-data-model';
+import { IColDescriptor, IRowDescriptor } from '../abstract-row-col-model';
+import { ColModel } from '../col-model';
+import createGrid, { Grid, IGridOpts } from '../core';
+import { RowModel } from '../row-model';
+import createSimpleDataModel, { ISimpleDataModel } from '../simple-data-model';
 
 export interface ISimpleGrid extends Grid {
     dataModel: ISimpleDataModel;

@@ -1,40 +1,37 @@
 // tslint:disable-next-line:no-reference
 ///<reference path="../../global.d.ts"/>
-// there's a bug in ATL that requires this to be there in karma tests right now
-// remove if they fix this one : https://github.com/s-panferov/awesome-typescript-loader/issues/468
-
 require('es6-object-assign').polyfill();
 
-import { IAbstractRowColModel, IColDescriptor, IRowDescriptor } from '@grid/abstract-row-col-model';
-import creatCellClasses, { ICellClasses } from '@grid/cell-classes';
-import createCellKeyboardModel, { ICellKeyboardModel } from '@grid/cell-keyboard-model';
-import cellMouseModel, { ICellMouseModel, IEventDimensionInfoGetter } from '@grid/cell-mouse-model';
-import createCellScrollModel, { ICellScrollModel } from '@grid/cell-scroll-model';
-import createColModel, { ColModel } from '@grid/col-model';
-import createColReorder, { IColReorder } from '@grid/col-reorder';
-import createColResize, { IColResize } from '@grid/col-resize';
-import createCopyPaste, { ICopyPaste } from '@grid/copy-paste';
-import createDataModel from '@grid/data-model';
-import { IDataModel } from '@grid/data-model';
-import createDecorators, { IDecoratorModel } from '@grid/decorators';
-import makeDirtyClean from '@grid/dirty-clean';
-import createEditModel, { IEditModel } from '@grid/edit-model';
-import createEventLoop, { EventLoop, EventUnion } from '@grid/event-loop';
-import createFps, { IFps } from '@grid/fps';
-import createNavigationModel, { INavigationModel } from '@grid/navigation-model';
-import createPixelScrollModel, { IPixelScrollDimensionInfo, IPixelScrollModel } from '@grid/pixel-scroll-model';
-import { colPositionRangeDimension, IPositionRangeDimension, rowPositionRangeDimension } from '@grid/position-range';
-import createRowModel, { RowModel } from '@grid/row-model';
-import createShowHiddenCols, { IShowHiddenCols } from '@grid/show-hidden-cols';
-import { AbstractSpaceConverter } from '@grid/space/converter';
-import { DataSpaceConverter } from '@grid/space/data-space-converter';
-import { AbstractDimensionalSpaceConverter } from '@grid/space/dimensional-converter';
-import { ViewSpaceConverter } from '@grid/space/view-space-converter';
-import { VirtualSpaceConverter } from '@grid/space/virtual-space-converter';
-import * as util from '@grid/util';
-import createViewLayer, { IViewLayer } from '@grid/view-layer';
-import createViewPort, { IViewPort, IViewPortDimensionInfo } from '@grid/view-port';
-import createVirtualPixelCellModel, { IVirtualPixelCellDimensionInfo, IVirtualPixelCellModel } from '@grid/virtual-pixel-cell-model';
+import { IAbstractRowColModel, IColDescriptor, IRowDescriptor } from '../abstract-row-col-model';
+import creatCellClasses, { ICellClasses } from '../cell-classes';
+import createCellKeyboardModel, { ICellKeyboardModel } from '../cell-keyboard-model';
+import cellMouseModel, { ICellMouseModel, IEventDimensionInfoGetter } from '../cell-mouse-model';
+import createCellScrollModel, { ICellScrollModel } from '../cell-scroll-model';
+import createColModel, { ColModel } from '../col-model';
+import createColReorder, { IColReorder } from '../col-reorder';
+import createColResize, { IColResize } from '../col-resize';
+import createCopyPaste, { ICopyPaste } from '../copy-paste';
+import createDataModel from '../data-model';
+import { IDataModel } from '../data-model';
+import createDecorators, { IDecoratorModel } from '../decorators';
+import makeDirtyClean from '../dirty-clean';
+import createEditModel, { IEditModel } from '../edit-model';
+import createEventLoop, { EventLoop, EventUnion } from '../event-loop';
+import createFps, { IFps } from '../fps';
+import createNavigationModel, { INavigationModel } from '../navigation-model';
+import createPixelScrollModel, { IPixelScrollDimensionInfo, IPixelScrollModel } from '../pixel-scroll-model';
+import { colPositionRangeDimension, IPositionRangeDimension, rowPositionRangeDimension } from '../position-range';
+import createRowModel, { RowModel } from '../row-model';
+import createShowHiddenCols, { IShowHiddenCols } from '../show-hidden-cols';
+import { AbstractSpaceConverter } from '../space/converter';
+import { DataSpaceConverter } from '../space/data-space-converter';
+import { AbstractDimensionalSpaceConverter } from '../space/dimensional-converter';
+import { ViewSpaceConverter } from '../space/view-space-converter';
+import { VirtualSpaceConverter } from '../space/virtual-space-converter';
+import * as util from '../util';
+import createViewLayer, { IViewLayer } from '../view-layer';
+import createViewPort, { IViewPort, IViewPortDimensionInfo } from '../view-port';
+import createVirtualPixelCellModel, { IVirtualPixelCellDimensionInfo, IVirtualPixelCellModel } from '../virtual-pixel-cell-model';
 
 const escapeStack = require('escape-stack');
 const elementClass = require('element-class');

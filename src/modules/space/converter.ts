@@ -1,7 +1,7 @@
-import { IColDescriptor, IRowDescriptor } from '@grid/abstract-row-col-model';
-import { RawPositionRange } from '@grid/position-range';
-import { CellFn, getArgs, RowFn } from '@grid/range-util';
+import { IColDescriptor, IRowDescriptor } from '../abstract-row-col-model';
 import { Grid } from '../core';
+import { RawPositionRange } from '../position-range';
+import { CellFn, getArgs, RowFn } from '../range-util';
 
 import { AbstractDimensionalSpaceConverter } from './dimensional-converter';
 
