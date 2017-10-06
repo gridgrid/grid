@@ -1,5 +1,3 @@
-// tslint:disable-next-line:no-reference
-///<reference path="../../global.d.ts"/>
 require('es6-object-assign').polyfill();
 
 import { IAbstractRowColModel, IColDescriptor, IRowDescriptor } from '../abstract-row-col-model';
@@ -80,8 +78,8 @@ export interface IGridCore {
     data: AbstractSpaceConverter;
     virtual: AbstractSpaceConverter;
     view: AbstractSpaceConverter;
-    timeout: typeof setTimeout;
-    interval: typeof setInterval;
+    timeout: typeof window.setTimeout;
+    interval: typeof window.setInterval;
     requestDraw: () => void;
     build: (container: HTMLElement) => void;
     makeDirtyClean: () => any;
@@ -162,7 +160,7 @@ export function create(opts: IGridOpts = {}): Grid {
             if (grid.destroyed) {
                 return;
             }
-            const id = setTimeout.apply(window, arguments);
+            const id = window.setTimeout.apply(window, arguments);
             timeouts.push(id);
             return id;
         },
@@ -170,7 +168,7 @@ export function create(opts: IGridOpts = {}): Grid {
             if (grid.destroyed) {
                 return;
             }
-            const id = setInterval.apply(window, arguments);
+            const id = window.setInterval.apply(window, arguments);
             intervals.push(id);
             return id;
         },
@@ -337,7 +335,7 @@ export function create(opts: IGridOpts = {}): Grid {
             if (widthResetTimeout) {
                 clearTimeout(widthResetTimeout);
             }
-            widthResetTimeout = setTimeout(() => {
+            widthResetTimeout = window.setTimeout(() => {
                 textarea.style.zIndex = '0';
                 textarea.style.width = '0px';
                 textarea.style.height = '1px';

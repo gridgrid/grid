@@ -89,7 +89,7 @@ export function create(grid: Grid) {
         getFilteredAverage() {
             return filteredAverage;
         },
-        intervalId: setInterval(() => {
+        intervalId: window.setInterval(() => {
             fps.percentBelowThreshold = belowThresholdCount / numCalcs * 100;
             if (fps.percentBelowThreshold > 50) {
                 fps.slowCount++;

@@ -37,6 +37,8 @@
     "time-now": "~0.2.1"
   },
   "devDependencies": {
+    "@types/jasmine": "~2.6.0",
+    "@types/karma": "~1.7.0",
     "autoprefixer": "~6.4.0",
     "awesome-typescript-loader": "~3.2.3",
     "babel-cli": "~6.24.1",

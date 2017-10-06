@@ -16,7 +16,7 @@ export function debounce(fn: (...args: any[]) => void, delay: number) {
             f.timeout = undefined;
         }
         if (!f.canceled) {
-            f.timeout = setTimeout(fn, delay);
+            f.timeout = window.setTimeout(fn, delay);
         }
         f.cancel = () => {
             if (f.timeout != undefined) {

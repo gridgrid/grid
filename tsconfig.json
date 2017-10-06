@@ -15,9 +15,7 @@
     "noUnusedLocals": true,
     "jsx": "react",
     "baseUrl": ".",
-    "paths": {
-      "@grid/*": ["./src/modules/*"]
-    },
+    "paths": {},
     "lib": ["es2017", "dom"]
   },
   "compileOnSave": false,
