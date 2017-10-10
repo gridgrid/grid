@@ -4,6 +4,9 @@ machine:
 dependencies:
   pre:
     - npm install -g npm@5.x.x
+test:
+  override:
+    - npm run build
 deployment:
   master:
     branch: [master, next]
