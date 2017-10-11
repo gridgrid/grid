@@ -368,6 +368,7 @@ export function create(opts: IGridOpts = {}): Grid {
         textarea.style.color = 'transparent';
         textarea.style.border = 'none';
         textarea.style.boxShadow = 'none';
+        textarea.style.resize = 'none';
         textarea.style.cursor = 'default';
         textarea.classList.add('grid-textarea');
         textarea.setAttribute('ondragstart', 'return false;');
