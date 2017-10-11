@@ -2,7 +2,7 @@
   color: black; // extract text plugin fails on the the first css rule.........
 }
 
-$grid-teal: #39CCCC;
+$grid-teal: #39CCCC !default;
 body {
   font-family: 'Open Sans', sans-serif;
   font-size: 13px;
