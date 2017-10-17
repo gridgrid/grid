@@ -9,8 +9,8 @@ import createColModel, { ColModel } from '../col-model';
 import createColReorder, { IColReorder } from '../col-reorder';
 import createColResize, { IColResize } from '../col-resize';
 import createCopyPaste, { ICopyPaste } from '../copy-paste';
-import createDataModel from '../data-model';
 import { IDataModel } from '../data-model';
+import createDataModel from '../data-model';
 import createDecorators, { IDecoratorModel } from '../decorators';
 import makeDirtyClean from '../dirty-clean';
 import createEditModel, { IEditModel } from '../edit-model';
@@ -30,6 +30,7 @@ import * as util from '../util';
 import createViewLayer, { IViewLayer } from '../view-layer';
 import createViewPort, { IViewPort, IViewPortDimensionInfo } from '../view-port';
 import createVirtualPixelCellModel, { IVirtualPixelCellDimensionInfo, IVirtualPixelCellModel } from '../virtual-pixel-cell-model';
+import createVirtualizedDataModel, { RowLoader } from '../virtualized-data-model';
 
 const escapeStack = require('escape-stack');
 const elementClass = require('element-class');
@@ -37,6 +38,7 @@ const elementClass = require('element-class');
 export interface IGridOpts {
     snapToCell?: boolean;
     allowEdit?: boolean;
+    loadRows?: RowLoader;
     col?: {
         disableReorder?: boolean;
     };
@@ -271,7 +273,7 @@ export function create(opts: IGridOpts = {}): Grid {
     grid.cellClasses = creatCellClasses(grid);
     grid.rowModel = createRowModel(grid);
     grid.colModel = createColModel(grid);
-    grid.dataModel = createDataModel(grid);
+    grid.dataModel = opts.loadRows ? createVirtualizedDataModel(grid, opts.loadRows) : createDataModel(grid);
     grid.virtualPixelCellModel = createVirtualPixelCellModel(grid);
     grid.cellScrollModel = createCellScrollModel(grid);
     grid.cellMouseModel = cellMouseModel(grid);
