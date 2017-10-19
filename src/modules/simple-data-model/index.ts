@@ -28,6 +28,7 @@ export function create(_grid: Grid) {
 
     const api: ISimpleDataModel = {
         isDirty: dirtyClean.isDirty,
+        setDirty: dirtyClean.setDirty,
         set(rowOrData: number | Array<IGridDataChange<any>>, c?: number, datum?: string | string[]) {
             let data: Array<IGridDataChange<any>>;
             if (!Array.isArray(rowOrData)) {

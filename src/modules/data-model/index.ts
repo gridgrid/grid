@@ -19,6 +19,7 @@ export interface IGridDataChange<T> extends IGridDataChangeBody<T> {
 
 export interface IDataModel {
   isDirty(): boolean;
+  setDirty(): void;
   get(dataRow: number, dataCol: number, isCopy?: boolean): IGridDataResult<any>;
   getHeader(virtualRow: number, virtualCol: number): IGridDataResult<any>;
   set(dataRow: number, dataCol: number, value: any): void;
@@ -26,24 +27,89 @@ export interface IDataModel {
   toggleSort?(c: number): void;
 }
 
+export type RowLoader = (dataRow: number[]) => void;
+
 // untested basic data model impl
 const nullResult = { value: null, formatted: '' };
-const resultObj = { value: null, formatted: '' };
+const loadingResult = { value: null, formatted: 'Loading...' };
 
-export function create(grid: Grid): IDataModel {
+export function create(grid: Grid, loadRows?: RowLoader): IDataModel {
   const dirtyClean = makeDirtyClean(grid);
 
   const getData = (vR: number, vC: number) => {
-    const rowDescriptor = grid.rowModel.get(vR);
-    const rowData = rowDescriptor && rowDescriptor.data;
-    const result = rowData && rowData[vC] || nullResult;
-    resultObj.value = result.value;
-    resultObj.formatted = result.formatted || result.value;
-    return resultObj;
+    const cachedRow = getCachedRow(vR);
+    if (cachedRow) {
+      return {
+        formatted: '',
+        ...cachedRow[vC]
+      };
+    }
+    if (loadRows) {
+      return grid.cols.converters.virtual.toData(vC) === 0 ?
+        loadingResult :
+        nullResult;
+    }
+    return nullResult;
   };
+
+  const getCachedRow = (vR: number) => {
+    const rowDescriptor = grid.rowModel.get(vR);
+    return rowDescriptor && rowDescriptor.data;
+  };
+
+  async function maybeLoadRows() {
+    if (!loadRows) {
+      return;
+    }
+    const extras: number[] = [];
+    const visibles = [];
+    const numVisibleRows = grid.viewPort.rows;
+
+    const currentTopRow = grid.cellScrollModel.row;
+    const currentBottomRow = currentTopRow + numVisibleRows;
+    for (let row = Math.max(0, currentTopRow - numVisibleRows);
+      row < Math.min(currentBottomRow + 1 + numVisibleRows, grid.rows.converters.data.count());
+      row++) {
+      if (getCachedRow(grid.rows.converters.data.toVirtual(row))) {
+        // already have it cached
+        continue;
+      }
+      if (row >= currentBottomRow) {
+        extras.push(row);
+      } else {
+        visibles.push(row);
+      }
+    }
+
+    if (!extras.length && !visibles.length) {
+      // everything has previously been fetched
+      return;
+    }
+
+    // fetch if any visibles, or if extras > numVisibleRows / 2
+    if (!visibles.length && extras.length < (numVisibleRows / 2)) {
+      return;
+    }
+    const toFetchSet = new Set<number>(visibles);
+    extras.forEach((r) => toFetchSet.add(r));
+    const toFetch = Array.from(toFetchSet);
+    if (!toFetch.length) {
+      return;
+    }
+    loadRows(toFetch);
+  }
+
+  grid.eventLoop.bind('grid-cell-scroll', () => {
+    maybeLoadRows();
+  });
+
+  grid.eventLoop.bind('grid-viewport-change', () => {
+    maybeLoadRows();
+  });
 
   return {
     isDirty: dirtyClean.isDirty,
+    setDirty: dirtyClean.setDirty,
     get(dataRow: number, dataCol: number) {
       return getData(grid.rows.converters.data.toVirtual(dataRow), grid.cols.converters.data.toVirtual(dataCol));
     },
