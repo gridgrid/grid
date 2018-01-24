@@ -397,6 +397,11 @@ export class AbstractRowColModel {
     };
 
     addDirtyProps(descriptor, ['builder'], [this.builderDirtyClean]);
+    addDirtyProps(descriptor, [{
+      name: 'data', onDirty: () => {
+        this.grid.dataModel.setDirty();
+      }
+    }], []);
     descriptor.builder = builder;
 
     return addDirtyProps(descriptor, [{
