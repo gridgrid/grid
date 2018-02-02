@@ -249,3 +249,66 @@ The GridBuilderSrvc handles destroying the scope and properly removing the eleme
 
 Note: it's important for the update function of a builder to be extremely fast. Call `scope.$digest` not `scope.$apply`, and  use `grid.viewLayer.setTextContent` not `elem.innerHTML` where possible
 
+
+Styling
+===
+If you want to update the look and feel of the grid, here are a few classes that you can override to give you the look you want.
+
+
+## Classes
+
+**`.grid-cell`:**
+This class is responsble for the look of individual cells. 
+
+**`.grid-focus-decorator`:** This decorator class is applied when you click('focus') on a cell
+
+Ex. Adding the following style will give you a cell with a blue border around it when the cell is selected.
+``` css
+.grid-focus-decorator {
+  border: 2px solid blue;
+}
+```
+
+**`.grid-selection`:**
+When selecting rows and columns, this class sets the border and background so you know which rows you are exactly selecting
+
+Ex.
+```css
+$grid-teal: #39CCCC !default;
+.grid-selection {
+  border: 1px solid $grid-teal;
+  background: transparentize($grid-teal, .8);
+}
+```
+
+**`.grid-row`:**
+This class is responsible for the look of the row of cells.
+
+Ex. To apply, a background color when hovering over each row, add the following:
+```css
+.grid-row {
+  &.hover {
+    background-color: lighten($grid-teal, 30) !important;
+  }
+}
+```
+
+To apply styles only to the header row, use the following class:
+```css
+.grid-row {
+  &.grid-is-header {
+  }
+}
+
+```
+**`.col-resize`:** This class changes the look of the column resizing element. 
+
+**`.grid-drag-line`**: This class is used when you are resizing a column. A vertical line is added to guide you of how much to resize your columns.
+
+Ex. To show a blue vertical line when resizing a column, add the following
+```css
+.grid-drag-line {
+  background: #7FDBFF;
+}
+```
+
