@@ -221,7 +221,7 @@ If you want to update the look and feel of the grid, here are a few classes that
 ## Classes
 
 **`.grid-cell`:**
-This class is responsble for the look of individual cells. 
+This class is responsible for the look of individual cells. 
 
 **`.grid-focus-decorator`:** This decorator class is applied when you click('focus') on a cell
 
