@@ -1,0 +1,77 @@
+/**
+ * Colors
+ */
+$colors: (
+  label: #000,
+  header: #eee,
+  accent: #39cccc
+);
+
+$color-border: darken(map-get($colors, header), 10%);
+
+/**
+ * Globals
+ */
+$time-animation: 100ms;
+
+/**
+ * Standard Cells
+ */
+$cell-color-background: white;
+$cell-color-background-alternate: darken($cell-color-background, 2%);
+$cell-border: solid 1px map-get($colors, header);
+$cell-padding: 3px 5px;
+
+/**
+ * Headers
+ */
+$header-color-background: map-get($colors, header);
+$header-color-text: black;
+$header-padding: 3px 8px;
+$header-border-bottom: solid 2px $color-border;
+$header-border-sides: solid 1px darken($color-border, 10%);
+
+/**
+ * Scrollbars
+ */
+$scrollbar-color-background: blue;
+$scrollbar-border-radius: 6px;
+
+/**
+ * Reorderable Columns
+ */
+$reorder-target-color-background: rgba($header-color-background, 0.5);
+$reorder-drag-color-background: rgba(map-get($colors, accent), 0.15);
+$reorder-border: $header-border-sides;
+
+/**
+ * Resizable Columns
+ */
+$resize-width-handle: 5px;
+
+/**
+ * Hidden Columns
+ */
+$hiddencols-content: "⬌";
+$hiddencols-color-background: lighten(map-get($colors, header), 20%);
+$hiddencols-color-text: map-get($colors, label);
+$hiddencols-border: solid 1px darken(map-get($colors, header), 20%);
+$hiddencols-border-radius: 2px;
+$hiddencols-size-height: 15px;
+$hiddencols-size-width: 15px;
+$hiddencols-box-shadow: 0 2px 6px rgba(darken($hiddencols-color-background, 50%), 0.8);
+
+/**
+ * Selection
+ */
+$selection-color-background: rgba(map-get($colors, accent), 0.2);
+$selection-border: solid 1px map-get($colors, accent);
+$selection-header-color-background: darken($header-color-background, 10%);
+
+/**
+ * Focus
+ */
+$focus-color-background: rgba(map-get($colors, accent), 0.1);
+$focus-border: solid 1px map-get($colors, accent);
+
+
