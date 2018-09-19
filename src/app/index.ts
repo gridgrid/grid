@@ -1,7 +1,8 @@
 'use strict';
 
 import makeSimpleGrid from '../modules/simple-grid';
-require('../scss/grid.scss');
+
+require('../scss/grid-custom.scss')
 
 const container = document.getElementsByClassName('grid-app-container')[0] as HTMLElement;
 
@@ -56,7 +57,7 @@ expansionColDescriptor.builder = grid.colModel.createBuilder((ctx) => {
 }, (elem, ctx) => {
   if (elem) {
     const row = grid.rowModel.get(ctx.virtualRow);
-    elem.textContent = !row.children ? '' : '>';
+    elem.textContent = !row.children ? '' : '▸';
   }
   return elem;
 });
