@@ -37,3 +37,4 @@ workflows:
               only:
                 - master
                 - next
+
