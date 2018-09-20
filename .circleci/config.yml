@@ -22,7 +22,10 @@ jobs:
     steps:
       - attach_workspace:
           at: /home
-      - run: npm run semantic-release || true
+      - run:
+          name: Authenticate with registry
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/repo/.npmrc
+      - run: npm run semantic-release
 
 workflows:
   version: 2
