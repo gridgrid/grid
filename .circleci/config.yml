@@ -10,7 +10,7 @@ jobs:
     steps:
       - checkout
       - run: npm install
-      - run: npm build
+      - run: npm run build
       - persist_to_workspace:
           root: /home
           paths: circleci
@@ -37,4 +37,3 @@ workflows:
               only:
                 - master
                 - next
-
