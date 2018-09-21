@@ -25,6 +25,12 @@ jobs:
       - attach_workspace:
           at: /home
       - run:
+          name: Sanity check
+          command: echo "am I crazy?" $SANITY_CHECK
+      - run:
+          name: Another Sanity check
+          command: echo "am I crazy?" $SANITY_CHECK > ~/repo/insanity
+      - run:
           name: Authenticate with registry
           command: |
             echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > ~/repo/.npmrc
