@@ -26,7 +26,7 @@ jobs:
           at: /home
       - run:
           name: Authenticate with registry
-          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/repo/.npmrc
+          command: echo //registry.npmjs.org/:_authToken=$NPM_TOKEN > ~/repo/.npmrc
       - run: npm run semantic-release
 
 workflows:
