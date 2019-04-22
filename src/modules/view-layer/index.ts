@@ -441,6 +441,7 @@ export function create(grid: Grid) {
             positionRow(rows.fixed[r], height, top, virtualRow);
             positionRow(rows.nonFixed[r], height, top, virtualRow);
             lastVirtualRow = virtualRow;
+            lastVirtualCol = undefined;
         });
 
         rows.nonFixed.forEach((row) => {

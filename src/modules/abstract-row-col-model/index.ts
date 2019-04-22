@@ -95,6 +95,7 @@ export class AbstractRowColModel {
   areBuildersDirty: () => boolean;
   isDirty: () => boolean;
   private name: string;
+  rangeStates: any[];
   private descriptors: IRowColDescriptor[] = [];
   private _numFixed: number = 0;
   private _numHeaders: number = 0;
@@ -122,6 +123,38 @@ export class AbstractRowColModel {
     this.fireSelectionChange = debounce(() => {
       grid.eventLoop.fire('grid-' + name + '-selection-change');
     }, 1);
+  }
+
+
+
+  private compactAndSort() {
+    this.rangeStates = this.rangeStates
+      .slice()
+      .sort((a, b) => a.start - b.start)
+      .reduce((newRangeStates, rs) => {
+        const last = newRangeStates.pop()
+
+        if (!last) {
+          return [...newRangeStates, rs];
+        }
+
+        if (last.end < rs.start) {
+          return [...newRangeStates, last, rs];
+        }
+
+        if (last.end > rs.end) {
+          return [...newRangeStates, last];
+        }
+
+        // overlapping ranges
+        return [
+          ...newRangeStates,
+          {
+            start: last.start,
+            end: rs.end,
+          }
+        ]
+      }, [])
   }
 
   add(_toAdd?: IRowColDescriptor | IRowColDescriptor[]) {
