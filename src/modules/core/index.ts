@@ -1,38 +1,60 @@
-require('es6-object-assign').polyfill();
+require("es6-object-assign").polyfill();
 
-import { IAbstractRowColModel, IColDescriptor, IRowDescriptor } from '../abstract-row-col-model';
-import creatCellClasses, { ICellClasses } from '../cell-classes';
-import createCellKeyboardModel, { ICellKeyboardModel } from '../cell-keyboard-model';
-import cellMouseModel, { ICellMouseModel, IEventDimensionInfoGetter } from '../cell-mouse-model';
-import createCellScrollModel, { ICellScrollModel } from '../cell-scroll-model';
-import createColModel, { ColModel } from '../col-model';
-import createColReorder, { IColReorder } from '../col-reorder';
-import createColResize, { IColResize } from '../col-resize';
-import createCopyPaste, { ICopyPaste } from '../copy-paste';
-import { IDataModel } from '../data-model';
-import createDataModel, { RowLoader } from '../data-model';
-import createDecorators, { IDecoratorModel } from '../decorators';
-import makeDirtyClean from '../dirty-clean';
-import createEditModel, { IEditModel } from '../edit-model';
-import createEventLoop, { EventLoop, EventUnion } from '../event-loop';
-import createFps, { IFps } from '../fps';
-import createNavigationModel, { INavigationModel } from '../navigation-model';
-import createPixelScrollModel, { IPixelScrollDimensionInfo, IPixelScrollModel } from '../pixel-scroll-model';
-import { colPositionRangeDimension, IPositionRangeDimension, rowPositionRangeDimension } from '../position-range';
-import createRowModel, { RowModel } from '../row-model';
-import createShowHiddenCols, { IShowHiddenCols } from '../show-hidden-cols';
-import { AbstractSpaceConverter } from '../space/converter';
-import { DataSpaceConverter } from '../space/data-space-converter';
-import { AbstractDimensionalSpaceConverter } from '../space/dimensional-converter';
-import { ViewSpaceConverter } from '../space/view-space-converter';
-import { VirtualSpaceConverter } from '../space/virtual-space-converter';
-import * as util from '../util';
-import createViewLayer, { IViewLayer } from '../view-layer';
-import createViewPort, { IViewPort, IViewPortDimensionInfo } from '../view-port';
-import createVirtualPixelCellModel, { IVirtualPixelCellDimensionInfo, IVirtualPixelCellModel } from '../virtual-pixel-cell-model';
+import {
+  IAbstractRowColModel,
+  IColDescriptor,
+  IRowDescriptor
+} from "../abstract-row-col-model";
+import creatCellClasses, { ICellClasses } from "../cell-classes";
+import createCellKeyboardModel, {
+  ICellKeyboardModel
+} from "../cell-keyboard-model";
+import cellMouseModel, {
+  ICellMouseModel,
+  IEventDimensionInfoGetter
+} from "../cell-mouse-model";
+import createCellScrollModel, { ICellScrollModel } from "../cell-scroll-model";
+import createColModel, { ColModel } from "../col-model";
+import createColReorder, { IColReorder } from "../col-reorder";
+import createColResize, { IColResize } from "../col-resize";
+import createCopyPaste, { ICopyPaste } from "../copy-paste";
+import { IDataModel } from "../data-model";
+import createDataModel, { RowLoader } from "../data-model";
+import createDecorators, { IDecoratorModel } from "../decorators";
+import makeDirtyClean from "../dirty-clean";
+import createEditModel, { IEditModel } from "../edit-model";
+import createEventLoop, { EventLoop, EventUnion } from "../event-loop";
+import createFps, { IFps } from "../fps";
+import createNavigationModel, { INavigationModel } from "../navigation-model";
+import createPixelScrollModel, {
+  IPixelScrollDimensionInfo,
+  IPixelScrollModel
+} from "../pixel-scroll-model";
+import {
+  colPositionRangeDimension,
+  IPositionRangeDimension,
+  rowPositionRangeDimension
+} from "../position-range";
+import createRowModel, { RowModel } from "../row-model";
+import createShowHiddenCols, { IShowHiddenCols } from "../show-hidden-cols";
+import { AbstractSpaceConverter } from "../space/converter";
+import { DataSpaceConverter } from "../space/data-space-converter";
+import { AbstractDimensionalSpaceConverter } from "../space/dimensional-converter";
+import { ViewSpaceConverter } from "../space/view-space-converter";
+import { VirtualSpaceConverter } from "../space/virtual-space-converter";
+import * as util from "../util";
+import createViewLayer, { IViewLayer } from "../view-layer";
+import createViewPort, {
+  IViewPort,
+  IViewPortDimensionInfo
+} from "../view-port";
+import createVirtualPixelCellModel, {
+  IVirtualPixelCellDimensionInfo,
+  IVirtualPixelCellModel
+} from "../virtual-pixel-cell-model";
 
-const escapeStack = require('escape-stack');
-const elementClass = require('element-class');
+const escapeStack = require("escape-stack");
+const elementClass = require("element-class");
 
 export interface IGridOpts {
   snapToCell?: boolean;
@@ -40,6 +62,7 @@ export interface IGridOpts {
   loadRows?: RowLoader;
   col?: {
     disableReorder?: boolean;
+    disableResize?: boolean;
   };
 }
 
@@ -149,13 +172,13 @@ export function create(opts: IGridOpts = {}): Grid {
       }
     },
     get data() {
-      return lazyGetter('data', () => new DataSpaceConverter(grid));
+      return lazyGetter("data", () => new DataSpaceConverter(grid));
     },
     get view() {
-      return lazyGetter('view', () => new ViewSpaceConverter(grid));
+      return lazyGetter("view", () => new ViewSpaceConverter(grid));
     },
     get virtual() {
-      return lazyGetter('virtual', () => new VirtualSpaceConverter(grid));
+      return lazyGetter("virtual", () => new VirtualSpaceConverter(grid));
     },
     timeout() {
       if (grid.destroyed) {
@@ -179,9 +202,9 @@ export function create(opts: IGridOpts = {}): Grid {
       grid.viewPort.sizeToContainer(container);
       grid.viewLayer.build(container);
       grid.eventLoop.setContainer(container);
-      container.style.overflow = 'hidden';
+      container.style.overflow = "hidden";
       // the container should never actually scroll, but the browser does automatically sometimes so let's reset it when that happens
-      container.addEventListener('scroll', () => {
+      container.addEventListener("scroll", () => {
         container.scrollTop = 0;
         container.scrollLeft = 0;
       });
@@ -193,7 +216,7 @@ export function create(opts: IGridOpts = {}): Grid {
       return grid.viewLayer.eventIsOnCells(e);
     },
     destroy() {
-      grid.eventLoop.fire('grid-destroy');
+      grid.eventLoop.fire("grid-destroy");
     },
     rows: {
       get rowColModel() {
@@ -226,7 +249,7 @@ export function create(opts: IGridOpts = {}): Grid {
         },
         get data() {
           return gridCore.data.row;
-        },
+        }
       }
     },
     cols: {
@@ -260,7 +283,7 @@ export function create(opts: IGridOpts = {}): Grid {
         },
         get data() {
           return gridCore.data.col;
-        },
+        }
       }
     }
   };
@@ -293,7 +316,11 @@ export function create(opts: IGridOpts = {}): Grid {
 
   grid.pixelScrollModel = createPixelScrollModel(grid);
   grid.showHiddenCols = createShowHiddenCols(grid);
-  grid.colResize = createColResize(grid);
+
+  if (!(opts.col && opts.col.disableResize)) {
+    grid.colResize = createColResize(grid);
+  }
+
   grid.copyPaste = createCopyPaste(grid);
 
   // the order here matters because some of these depend on each other
@@ -306,48 +333,51 @@ export function create(opts: IGridOpts = {}): Grid {
     }
   });
 
-  function setupTextareaForContainer(textarea: HTMLTextAreaElement, container: HTMLElement) {
-    textarea.addEventListener('focus', () => {
+  function setupTextareaForContainer(
+    textarea: HTMLTextAreaElement,
+    container: HTMLElement
+  ) {
+    textarea.addEventListener("focus", () => {
       if (container) {
-        elementClass(container).add('focus');
+        elementClass(container).add("focus");
       }
       textarea.select();
       grid.focused = true;
-      grid.eventLoop.fire('grid-focus');
+      grid.eventLoop.fire("grid-focus");
     });
 
-    textarea.addEventListener('blur', () => {
+    textarea.addEventListener("blur", () => {
       if (container) {
-        elementClass(container).remove('focus');
+        elementClass(container).remove("focus");
       }
       grid.focused = false;
-      grid.eventLoop.fire('grid-blur');
+      grid.eventLoop.fire("grid-blur");
     });
 
     let widthResetTimeout: number | undefined;
     // TODO: type the interceptor properly
     grid.eventLoop.addInterceptor((e: MouseEvent) => {
-      if (e.type !== 'mousedown' || e.button !== 2) {
+      if (e.type !== "mousedown" || e.button !== 2) {
         return;
       }
-      textarea.style.width = '100%';
-      textarea.style.height = '100%';
-      textarea.style.zIndex = '1';
+      textarea.style.width = "100%";
+      textarea.style.height = "100%";
+      textarea.style.zIndex = "1";
       if (widthResetTimeout) {
         clearTimeout(widthResetTimeout);
       }
       widthResetTimeout = window.setTimeout(() => {
-        textarea.style.zIndex = '0';
-        textarea.style.width = '0px';
-        textarea.style.height = '1px';
+        textarea.style.zIndex = "0";
+        textarea.style.width = "0px";
+        textarea.style.height = "1px";
       }, 1);
     });
 
     container.appendChild(textarea);
-    if (!container.getAttribute('tabIndex')) {
+    if (!container.getAttribute("tabIndex")) {
       container.tabIndex = -1;
     }
-    container.addEventListener('focus', () => {
+    container.addEventListener("focus", () => {
       if (textarea) {
         textarea.focus();
       }
@@ -355,34 +385,34 @@ export function create(opts: IGridOpts = {}): Grid {
   }
 
   function createFocusTextArea() {
-    const textarea = document.createElement('textarea');
-    textarea.setAttribute('dts', 'grid-textarea');
+    const textarea = document.createElement("textarea");
+    textarea.setAttribute("dts", "grid-textarea");
     util.position(textarea, 0, 0);
-    textarea.style.width = '0px';
-    textarea.style.height = '1px';
-    textarea.style.maxWidth = '100%';
-    textarea.style.maxHeight = '100%';
-    textarea.style.zIndex = '0';
-    textarea.style.overflow = 'hidden';
+    textarea.style.width = "0px";
+    textarea.style.height = "1px";
+    textarea.style.maxWidth = "100%";
+    textarea.style.maxHeight = "100%";
+    textarea.style.zIndex = "0";
+    textarea.style.overflow = "hidden";
 
-    textarea.style.background = 'transparent';
-    textarea.style.color = 'transparent';
-    textarea.style.border = 'none';
-    textarea.style.boxShadow = 'none';
-    textarea.style.resize = 'none';
-    textarea.style.cursor = 'default';
-    textarea.classList.add('grid-textarea');
-    textarea.setAttribute('ondragstart', 'return false;');
+    textarea.style.background = "transparent";
+    textarea.style.color = "transparent";
+    textarea.style.border = "none";
+    textarea.style.boxShadow = "none";
+    textarea.style.resize = "none";
+    textarea.style.cursor = "default";
+    textarea.classList.add("grid-textarea");
+    textarea.setAttribute("ondragstart", "return false;");
 
     return textarea;
   }
 
-  grid.eventLoop.bind('grid-destroy', () => {
-    intervals.forEach((id) => {
+  grid.eventLoop.bind("grid-destroy", () => {
+    intervals.forEach(id => {
       clearInterval(id);
     });
 
-    timeouts.forEach((id) => {
+    timeouts.forEach(id => {
       clearTimeout(id);
     });
   });
@@ -392,33 +422,33 @@ export function create(opts: IGridOpts = {}): Grid {
 
 export default create;
 
-export * from '../abstract-row-col-model';
-export * from '../cell-classes';
-export * from '../cell-keyboard-model';
-export * from '../cell-mouse-model';
-export * from '../cell-scroll-model';
-export * from '../col-model';
-export * from '../col-reorder';
-export * from '../col-resize';
-export * from '../copy-paste';
-export * from '../data-model';
-export * from '../data-model';
-export * from '../decorators';
-export * from '../dirty-clean';
-export * from '../edit-model';
-export * from '../event-loop';
-export * from '../fps';
-export * from '../navigation-model';
-export * from '../pixel-scroll-model';
-export * from '../position-range';
-export * from '../row-model';
-export * from '../show-hidden-cols';
-export * from '../space/converter';
-export * from '../space/data-space-converter';
-export * from '../space/dimensional-converter';
-export * from '../space/view-space-converter';
-export * from '../space/virtual-space-converter';
-export * from '../util';
-export * from '../view-layer';
-export * from '../view-port';
-export * from '../virtual-pixel-cell-model';
+export * from "../abstract-row-col-model";
+export * from "../cell-classes";
+export * from "../cell-keyboard-model";
+export * from "../cell-mouse-model";
+export * from "../cell-scroll-model";
+export * from "../col-model";
+export * from "../col-reorder";
+export * from "../col-resize";
+export * from "../copy-paste";
+export * from "../data-model";
+export * from "../data-model";
+export * from "../decorators";
+export * from "../dirty-clean";
+export * from "../edit-model";
+export * from "../event-loop";
+export * from "../fps";
+export * from "../navigation-model";
+export * from "../pixel-scroll-model";
+export * from "../position-range";
+export * from "../row-model";
+export * from "../show-hidden-cols";
+export * from "../space/converter";
+export * from "../space/data-space-converter";
+export * from "../space/dimensional-converter";
+export * from "../space/view-space-converter";
+export * from "../space/virtual-space-converter";
+export * from "../util";
+export * from "../view-layer";
+export * from "../view-port";
+export * from "../virtual-pixel-cell-model";

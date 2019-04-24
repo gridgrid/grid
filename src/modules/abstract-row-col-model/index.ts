@@ -125,38 +125,6 @@ export class AbstractRowColModel {
     }, 1);
   }
 
-
-
-  private compactAndSort() {
-    this.rangeStates = this.rangeStates
-      .slice()
-      .sort((a, b) => a.start - b.start)
-      .reduce((newRangeStates, rs) => {
-        const last = newRangeStates.pop()
-
-        if (!last) {
-          return [...newRangeStates, rs];
-        }
-
-        if (last.end < rs.start) {
-          return [...newRangeStates, last, rs];
-        }
-
-        if (last.end > rs.end) {
-          return [...newRangeStates, last];
-        }
-
-        // overlapping ranges
-        return [
-          ...newRangeStates,
-          {
-            start: last.start,
-            end: rs.end,
-          }
-        ]
-      }, [])
-  }
-
   add(_toAdd?: IRowColDescriptor | IRowColDescriptor[]) {
     if (!_toAdd) {
       return;
