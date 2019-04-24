@@ -40,6 +40,7 @@ export interface IGridOpts {
   loadRows?: RowLoader;
   col?: {
     disableReorder?: boolean;
+    disableResize?: boolean;
   };
 }
 
@@ -293,7 +294,10 @@ export function create(opts: IGridOpts = {}): Grid {
 
   grid.pixelScrollModel = createPixelScrollModel(grid);
   grid.showHiddenCols = createShowHiddenCols(grid);
-  grid.colResize = createColResize(grid);
+
+  if (!(opts.col && opts.col.disableResize)) {
+    grid.colResize = createColResize(grid);
+  }
   grid.copyPaste = createCopyPaste(grid);
 
   // the order here matters because some of these depend on each other
