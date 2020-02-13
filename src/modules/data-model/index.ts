@@ -20,6 +20,7 @@ export interface IGridDataChange<T> extends IGridDataChangeBody<T> {
 export interface IDataModel {
   isDirty(): boolean;
   setDirty(): void;
+  handleCachedDataChange(): void;
   get(dataRow: number, dataCol: number, isCopy?: boolean): IGridDataResult<any>;
   getHeader(virtualRow: number, virtualCol: number): IGridDataResult<any>;
   set(dataRow: number, dataCol: number, value: any): void;
@@ -110,6 +111,11 @@ export function create(grid: Grid, loadRows?: RowLoader): IDataModel {
   return {
     isDirty: dirtyClean.isDirty,
     setDirty: dirtyClean.setDirty,
+    handleCachedDataChange() {
+      dirtyClean.setDirty();
+      // new data could include clearing rows that are in view
+      maybeLoadRows();
+    },
     get(dataRow: number, dataCol: number) {
       return getData(grid.rows.converters.data.toVirtual(dataRow), grid.cols.converters.data.toVirtual(dataCol));
     },
