@@ -138,7 +138,7 @@ export function create(grid: Grid, loadRows?: RowLoader): IDataModel {
         data = rowOrData;
       }
       data.forEach((change) => {
-        const rowDescriptor = grid.rowModel.get(change.row);
+        const rowDescriptor = grid.rowModel.get(grid.rows.converters.data.toVirtual(change.row));
         let rowData = rowDescriptor.data;
         if (!rowData) {
           rowData = rowDescriptor.data = [];
