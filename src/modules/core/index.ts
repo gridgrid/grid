@@ -80,8 +80,8 @@ export interface IGridCore {
   data: AbstractSpaceConverter;
   virtual: AbstractSpaceConverter;
   view: AbstractSpaceConverter;
-  timeout: typeof window.setTimeout;
-  interval: typeof window.setInterval;
+  timeout: (...args: Parameters<typeof window.setTimeout>) => number | undefined;
+  interval: (...args: Parameters<typeof window.setInterval>) => number | undefined;
   requestDraw: () => void;
   build: (container: HTMLElement) => void;
   makeDirtyClean: () => any;
@@ -160,7 +160,7 @@ export function create(opts: IGridOpts = {}): Grid {
     },
     timeout() {
       if (grid.destroyed) {
-        return;
+        return undefined;
       }
       const id = window.setTimeout.apply(window, arguments);
       timeouts.push(id);
@@ -168,7 +168,7 @@ export function create(opts: IGridOpts = {}): Grid {
     },
     interval() {
       if (grid.destroyed) {
-        return;
+        return undefined;
       }
       const id = window.setInterval.apply(window, arguments);
       intervals.push(id);

@@ -31,7 +31,7 @@ export function isElement(node?: any): node is HTMLElement {
         node.nodeName); // we are a direct element
 }
 export function toArray<T>(thing?: T | T[]): T[] {
-    return thing != undefined && !Array.isArray(thing) ? [thing] : thing || [];
+    return thing != undefined && (!Array.isArray(thing) ? [thing] : thing) || [];
 }
 
 export function position(elem: HTMLElement, t?: number, l?: number, b?: number, r?: number, h?: number, w?: number) {
