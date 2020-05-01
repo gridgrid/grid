@@ -143,7 +143,10 @@ export function create(grid: Grid, loadRows?: RowLoader): IDataModel {
         if (!rowData) {
           rowData = rowDescriptor.data = [];
         }
-        rowData[grid.cols.converters.data.toVirtual(change.col)] = { value: change.value, formatted: change.formatted || change.value };
+        rowData[grid.cols.converters.data.toVirtual(change.col)] = {
+          value: change.value,
+          formatted: change.formatted != undefined ? change.formatted : change.value,
+        };
       });
     }
   };
