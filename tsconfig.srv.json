@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "outDir": "./",
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "declaration": true,
+    "noImplicitAny": false,
+    "allowJs": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "strictNullChecks": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "noUnusedParameters": false,
+    "noUnusedLocals": false,
+    "esModuleInterop": true,
+    "jsx": "react",
+    "baseUrl": ".",
+    "paths": {},
+    "lib": ["es2017", "dom"]
+  },
+  "compileOnSave": false,
+  "include": ["src/**/*", "app/**/*"],
+  "exclude": ["node_modules", "dist"],
+  "awesomeTypescriptLoaderOptions": {
+    "forkChecker": true,
+    "useCache": true
+  }
+}
