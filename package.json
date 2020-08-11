@@ -1,7 +1,7 @@
 {
   "name": "grid",
   "version": "0.0.0-semantic-release",
-  "description": "A highly scalable grid component written in javscript",
+  "description": "A highly scalable grid component written in Typescript",
   "main": "dist/bundle.js",
   "typings": "dist/modules/core/index.d.ts",
   "publishConfig": {
@@ -9,13 +9,13 @@
     "tag": "next"
   },
   "engines": {
-    "node": ">=0.10.0"
+    "node": ">=10"
   },
   "iqproj": {
     "app": true
   },
   "scripts": {
-    "commitmsg": "validate-commit-msg",
+    "commitmsg": "commitlint -E GIT_PARAMS",
     "preversion": "npm run build",
     "open:src": "ts-node -P tsconfig.srv.json tools/srcServer.ts",
     "dev": "npm-run-all --parallel open:src test:watch",
@@ -37,43 +37,43 @@
     "time-now": "~0.2.1"
   },
   "devDependencies": {
+    "@commitlint/cli": "~9.1.2",
+    "@commitlint/config-conventional": "~9.1.1",
     "@types/browser-sync": "~2.26.1",
     "@types/jasmine": "~2.6.0",
     "@types/karma": "~1.7.0",
     "@types/webpack-dev-middleware": "~3.7.1",
     "@types/webpack-hot-middleware": "~2.25.3",
-    "autoprefixer": "~6.4.0",
-    "awesome-typescript-loader": "~3.2.3",
-    "browser-sync": "~2.18.12",
-    "condition-circle": "~1.5.0",
+    "autoprefixer": "~9.8.6",
+    "awesome-typescript-loader": "~5.2.1",
+    "browser-sync": "~2.26.12",
+    "condition-circle": "~2.0.2",
     "copy-webpack-plugin": "~3.0.1",
-    "core-js-webpack-plugin": "~1.0.3",
-    "css-loader": "~0.24.0",
-    "ejs-compiled-loader": "~1.1.0",
+    "css-loader": "~4.2.1",
+    "ejs-compiled-loader": "~3.0.0",
     "es6-promise": "~3.1.2",
-    "extract-text-webpack-plugin": "~3.0.1",
+    "fibers": "~5.0.0",
     "file-loader": "~0.9.0",
-    "html-webpack-plugin": "~2.22.0",
+    "html-webpack-plugin": "~4.3.0",
     "husky": "~0.13.3",
-    "jasmine": "~2.3.2",
-    "jasmine-tools-riq": "~0.3.2",
-    "jquery": "^2.1.0",
-    "karma": "~1.7.1",
-    "karma-chrome-launcher": "~0.2.1",
+    "install": "~0.13.0",
+    "jasmine": "~3.6.1",
+    "jquery": "~3.5.1",
+    "karma": "~5.1.1",
+    "karma-chrome-launcher": "~3.1.0",
     "karma-jasmine": "~0.3.6",
-    "karma-jasmine-jquery": "~0.1.1",
-    "karma-phantomjs-launcher": "~1.0.4",
     "karma-sourcemap-loader": "~0.3.7",
-    "karma-webpack": "~2.0.4",
-    "lodash": "~4.11.0",
-    "node-sass": "~4.9.3",
+    "karma-webpack": "~4.0.2",
+    "lodash": "~4.17.19",
+    "mini-css-extract-plugin": "~0.10.0",
+    "node-sass": "~4.12.0",
+    "npm": "~6.14.7",
     "npm-run-all": "~4.0.2",
-    "phantomjs-prebuilt": "~2.1.14",
     "polyfill-function-prototype-bind": "0.0.1",
     "postcss-loader": "~0.11.0",
-    "sass-loader": "~4.1.1",
-    "semantic-release": "^4.3.5",
-    "source-map-loader": "~0.2.0",
+    "sass-loader": "~9.0.3",
+    "semantic-release": "~17.1.1",
+    "source-map-loader": "~1.0.1",
     "style-loader": "~0.13.1",
     "transform-ts-paths": "^1.0.0",
     "ts-loader": "~2.3.7",
@@ -81,13 +81,12 @@
     "tslint": "^5.4.2",
     "tslint-eslint-rules": "^4.1.1",
     "typescript": "~3.7.5",
-    "url-loader": "~0.5.7",
-    "validate-commit-msg": "~2.12.1",
-    "webpack": "~3.6.0",
-    "webpack-bundle-analyzer": "^2.8.2",
-    "webpack-dev-middleware": "~1.6.1",
-    "webpack-fail-plugin": "~1.0.5",
-    "webpack-hot-middleware": "~2.12.2",
+    "url-loader": "~4.1.0",
+    "webpack": "~4.44.1",
+    "webpack-bundle-analyzer": "~3.8.0",
+    "webpack-cli": "~3.3.12",
+    "webpack-dev-middleware": "~3.7.2",
+    "webpack-hot-middleware": "~2.25.0",
     "webpack-md5-hash": "~0.0.5"
   },
   "repository": {
@@ -106,11 +105,6 @@
     "url": "https://github.com/gridgrid/grid/issues"
   },
   "homepage": "https://github.com/gridgrid/grid",
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    }
-  },
   "release": {
     "verifyConditions": "condition-circle",
     "branch": "next",

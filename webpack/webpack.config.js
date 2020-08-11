@@ -1,142 +1,154 @@
-var webpack = require('webpack');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var autoprefixer = require('autoprefixer');
-var CheckerPlugin = require('awesome-typescript-loader').CheckerPlugin;
-var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-var failPlugin = require('webpack-fail-plugin');
-var transformTsConfigPaths = require('../transformTSPaths');
+var webpack = require("webpack");
+var MiniCssExtractPlugin = require("mini-css-extract-plugin");
+var HtmlWebpackPlugin = require("html-webpack-plugin");
+var autoprefixer = require("autoprefixer");
+var CheckerPlugin = require("awesome-typescript-loader").CheckerPlugin;
+// var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+var transformTsConfigPaths = require("../transformTSPaths");
 
-var path = require('path');
+var path = require("path");
 
 var aliases = transformTsConfigPaths();
 
 module.exports = function (isProd, isTests) {
   var plugins = [
-    failPlugin,
     // new BundleAnalyzerPlugin(),
 
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('development'), // Tells React to build in either dev or prod modes. https://facebook.github.io/react/downloads.html (See bottom)
+      "process.env.NODE_ENV": JSON.stringify("development"), // Tells React to build in either dev or prod modes. https://facebook.github.io/react/downloads.html (See bottom)
     }),
     // new webpack.HotModuleReplacementPlugin(),
     // new webpack.NoErrorsPlugin(),
-    new CheckerPlugin()
+    new CheckerPlugin(),
   ];
   if (!isTests) {
     plugins = plugins.concat([
-      new ExtractTextPlugin({
-        filename: 'grid.css',
-        allChunks: false
+      new MiniCssExtractPlugin({
+        filename: "grid.css",
       }),
-      new HtmlWebpackPlugin({ // Create HTML file that includes references to bundled CSS and JS.
-        template: '!!ejs-compiled-loader!src/app/index.ejs',
+      new HtmlWebpackPlugin({
+        // Create HTML file that includes references to bundled CSS and JS.
+        template: "!!ejs-compiled-loader!src/app/index.ejs",
         minify: {
           removeComments: true,
-          collapseWhitespace: true
+          collapseWhitespace: true,
         },
-        inject: true
-      })
-    ])
+        inject: true,
+      }),
+    ]);
   }
 
   var output = {
-    path: path.resolve(__dirname, isProd ? '../dist' : '../src'), // Note: Physical files are only output by the production build task `npm run build`.
-    publicPath: '/',
-    filename: 'bundle.js'
+    path: path.resolve(__dirname, isProd ? "../dist" : "../src"), // Note: Physical files are only output by the production build task `npm run build`.
+    publicPath: "/",
+    filename: "bundle.js",
   };
   if (isProd) {
-    output.library = 'grid';
-    output.libraryTarget = 'umd';
+    output.library = "grid";
+    output.libraryTarget = "umd";
   }
 
   var config = {
     resolve: {
-      extensions: ['.js', '.ts'],
-      alias: aliases
+      extensions: [".js", ".ts"],
+      alias: aliases,
     },
-    devtool: isTests ? 'inline-source-map' : 'source-map', // more info:https://webpack.github.io/docs/build-performance.html#sourcemaps and https://webpack.github.io/docs/configuration.html#devtool
+    devtool: isTests ? "inline-source-map" : "source-map", // more info:https://webpack.github.io/docs/build-performance.html#sourcemaps and https://webpack.github.io/docs/configuration.html#devtool
     watch: !isProd,
-    target: 'web', // necessary per https://webpack.github.io/docs/testing.html#compile-and-test
+    mode: isProd ? "production" : "development",
+    target: "web", // necessary per https://webpack.github.io/docs/testing.html#compile-and-test
     output: output,
     plugins: plugins,
     module: {
-      rules: [{
+      rules: [
+        {
           test: isTests ? /\.(t|j)s$/ : /\.ts$/,
-          loader: isProd && !isTests ? {
-            loader: 'ts-loader',
-            options: {
-              entryFileIsJs: true,
-              compilerOptions: {
-                allowJs: false,
-                declaration: true
-              }
-            }
-          } : {
-            loader: 'awesome-typescript-loader',
-            options: {
-              configFileName: 'tsconfig.test.json'
-            }
-          }
+          loader:
+            isProd && !isTests
+              ? {
+                  loader: "ts-loader",
+                  options: {
+                    entryFileIsJs: true,
+                    compilerOptions: {
+                      allowJs: false,
+                      declaration: true,
+                    },
+                  },
+                }
+              : {
+                  loader: "awesome-typescript-loader",
+                  options: {
+                    configFileName: "tsconfig.test.json",
+                  },
+                },
         },
         {
           test: /\.js$/,
-          enforce: 'pre',
-          loader: "source-map-loader"
-        }
+          enforce: "pre",
+          loader: "source-map-loader",
+        },
         // {
         //     test: /\.js$/,
         //     exclude: /node_modules\/(?!(@creditiq)\/).*/,
         //     loaders: ['babel']
         // }
-        , {
+        {
           test: /\.eot(\?v=\d+.\d+.\d+)?$/,
-          loader: 'url-loader?name=assets/fonts/[name].[ext]'
-        }, {
+          loader: "url-loader?name=assets/fonts/[name].[ext]",
+        },
+        {
           test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-          loader: "url-loader?limit=10000&mimetype=application/font-woff&name=assets/fonts/[name].[ext]"
-        }, {
+          loader:
+            "url-loader?limit=10000&mimetype=application/font-woff&name=assets/fonts/[name].[ext]",
+        },
+        {
           test: /\.ttf(\?v=\d+.\d+.\d+)?$/,
-          loader: 'url-loader?limit=10000&mimetype=application/octet-stream&name=assets/fonts/[name].[ext]'
-        }, {
+          loader:
+            "url-loader?limit=10000&mimetype=application/octet-stream&name=assets/fonts/[name].[ext]",
+        },
+        {
           test: /\.svg(\?v=\d+.\d+.\d+)?$/,
-          loader: 'url-loader?limit=10000&mimetype=image/svg+xml&name=assets/fonts/[name].[ext]'
-        }, {
+          loader:
+            "url-loader?limit=10000&mimetype=image/svg+xml&name=assets/fonts/[name].[ext]",
+        },
+        {
           test: /\.(jpe?g|png|gif|pdf)$/i,
-          loader: 'file-loader?name=assets/images/[name].[ext]'
-        }, {
+          loader: "file-loader?name=assets/images/[name].[ext]",
+        },
+        {
           test: /\.ico$/,
-          loader: 'file-loader?name=assets/icons/[name].[ext]'
-        }, {
+          loader: "file-loader?name=assets/icons/[name].[ext]",
+        },
+        {
           test: /\.scss$/,
-          use: ExtractTextPlugin.extract({
-            fallback: 'style-loader',
-            use: ['css-loader', {
-              loader: 'postcss-loader',
+          use: [
+            {
+              loader: MiniCssExtractPlugin.loader,
+            },
+            "sass-loader",
+            "css-loader",
+            {
+              loader: "postcss-loader",
               options: {
-                plugins: (loader) => [
-                  autoprefixer(),
-                ],
-                sourceMap: true
-              }
-            }, 'sass-loader']
-          })
-        }, {
-          test: /\.css$/,
-          use: ExtractTextPlugin.extract({
-            fallback: 'style-loader',
-            use: 'css-loader!postcss-loader'
-          })
-        }
-      ]
+                plugins: () => [autoprefixer()],
+                sourceMap: true,
+              },
+            },
+          ],
+        },
+      ],
     },
-  }
+  };
   if (!isTests) {
-    config.entry = isProd ? ['./src/modules/core'] : ['./src/webpack-public-path',
-      // 'webpack-hot-middleware/client?reload=true',
-      './src/app/index'
-    ];
+    config.entry = isProd
+      ? ["./src/modules/core"]
+      : [
+          "./src/webpack-public-path",
+          // 'webpack-hot-middleware/client?reload=true',
+          "./src/app/index",
+        ];
   }
 
   return config;
 };
+

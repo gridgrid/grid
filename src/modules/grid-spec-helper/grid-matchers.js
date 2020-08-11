@@ -1,5 +1,5 @@
 (function () {
-  var tools = require("./main");
+  var tools = require("./helper-matchers");
 
   function isFunction(fn) {
     return typeof fn === "function";

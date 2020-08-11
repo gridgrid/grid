@@ -1,43 +1,6 @@
 (function () {
-  var tools = require("./main");
-
   function isFunction(fn) {
     return typeof fn === "function";
-  }
-
-  function addFieldMatcher(matchers, fieldName) {
-    matchers[fieldName + "ToBe"] = function () {
-      return {
-        compare: function (actual, val) {
-          var actualVal = actual[fieldName];
-          var pass = actualVal === val;
-          return {
-            pass: pass,
-            message:
-              tools.expectedObjectWithNot(actual, pass) +
-              " \nto have " +
-              fieldName +
-              " value of " +
-              val +
-              " but it was " +
-              actualVal +
-              "\n",
-          };
-        },
-      };
-    };
-  }
-
-  var $ = require("jquery");
-  $ = $ || window.$;
-
-  function makeFakeRange(t, l, h, w) {
-    return {
-      top: t,
-      left: l,
-      height: h,
-      width: w,
-    };
   }
 
   function makeFakePosRange(t, l, r, b) {
@@ -53,86 +16,85 @@
     return typeof v === "string" ? v : v + "px";
   }
 
-  var matchers = {
-    toHaveBeenCalledWithAll: function () {
-      return {
-        compare: function (actual, argsArrays) {
-          var spy = actual;
+  var $ = require("jquery");
+  var tools = require("./helper-matchers.js");
 
-          var numCalls = spy.calls.count() === argsArrays.length;
-          var allArrgs = true;
-          argsArrays.forEach(function (args, index) {
-            var argsForCall = spy.calls.argsFor(index);
-            if (!argsForCall) {
-              allArrgs = false;
-            } else {
-              if (Array.isArray(args)) {
-                args.forEach(function (arg, index) {
-                  if (arg !== argsForCall[index]) {
-                    allArrgs = false;
-                  }
-                });
-              } else {
-                if (args !== argsForCall[0]) {
-                  allArrgs = false;
-                }
-              }
-            }
-          });
-          return {
-            pass: numCalls && allArrgs,
-            message:
-              "Expected spy to have been called with all of " +
-              argsArrays +
-              " but instead got " +
-              spy.calls.allArgs(),
-          };
-        },
-      };
-    },
-    toBeDirty: tools.defineBasicMatcher(
-      function (actual) {
-        return actual.isDirty();
-      },
-      function (actual, expected, pass) {
-        return tools.expectedObjectWithNot(actual, pass) + " to be dirty";
+  var passFn = function (actual, array) {
+    array.forEach(function (item) {
+      if (actual.indexOf(item) === -1) {
+        return false;
       }
-    ),
-    toBeClean: tools.defineBasicMatcher(
-      function (actual) {
-        return actual.isClean();
+    });
+    return true;
+  };
+
+  function containAll(actual, array) {
+    array.forEach(function (item) {
+      if (actual.indexOf(item) === -1) {
+        return false;
+      }
+    });
+    return true;
+  }
+
+  var matchers = {
+    toBeANumber: tools.defineBasicMatcher(function (actual) {
+      return typeof actual === "number";
+    }),
+    toBeAFunction: tools.defineBasicMatcher(function (actual) {
+      return typeof actual === "function";
+    }),
+
+    toBeAnObject: tools.defineBasicMatcher(function (value) {
+      return value !== null && typeof value === "object";
+    }),
+
+    toBeAnArray: tools.defineBasicMatcher(function (actual) {
+      return Array.isArray(actual);
+    }),
+    toBeAString: tools.defineBasicMatcher(function (actual) {
+      return typeof actual === "string";
+    }),
+    toBeNully: tools.defineBasicMatcher(function (actual) {
+      return actual === undefined || actual === null;
+    }),
+    toBeAnElement: tools.defineBasicMatcher(function (actual) {
+      return !!(
+        actual &&
+        (actual.nodeName || // we are a direct element
+          (actual.prop && actual.attr && actual.find))
+      );
+    }),
+    toHaveField: tools.defineBasicMatcher(
+      function (actual, exp) {
+        return exp in actual;
       },
       function (actual, exp, pass) {
-        return tools.expectedObjectWithNot(actual, pass) + " to be clean";
+        return (
+          tools.expectedObjectWithNot(actual, pass) + " to have field: " + exp
+        );
       }
     ),
-    rangeToBe: function () {
-      return {
-        compare: function (actual, t, l, h, w) {
-          var pass =
-            actual.top === t &&
-            actual.left === l &&
-            actual.height === h &&
-            actual.width === w;
-          return {
-            pass: pass,
-            message:
-              tools.expectedObjectWithNot(
-                actual,
-                pass,
-                makeFakeRange(
-                  actual.top,
-                  actual.left,
-                  actual.height,
-                  actual.width
-                )
-              ) +
-              " to be " +
-              JSON.stringify(makeFakeRange(t, l, h, w)),
-          };
-        },
-      };
-    },
+    toContainAll: tools.defineBasicMatcher(containAll),
+    toContainOnly: tools.defineBasicMatcher(function (actual, array) {
+      return actual.length === array.length && containAll(actual, array);
+    }),
+    toHaveClass: tools.defineBasicMatcher(
+      function (actual, className) {
+        return $(actual).hasClass(className);
+      },
+      function (actual, expected, pass) {
+        return (
+          'Expected "' +
+          $(actual).attr("class") +
+          '"' +
+          (pass ? " not" : "") +
+          ' to have class "' +
+          expected +
+          '"'
+        );
+      }
+    ),
     toBePositioned: function () {
       return {
         compare: function (actual, t, l, b, r) {
@@ -161,68 +123,69 @@
         },
       };
     },
-    toHaveBeenBoundWith: tools.defineBasicMatcher(function (
-      actual,
-      name,
-      elem
-    ) {
-      var spy = actual;
-      var hasName = spy.calls.argsFor(0)[0] === name;
-      var hasElem = !elem || spy.calls.argsFor(0)[1] === elem;
-      var isAFunction =
-        (hasElem && isFunction(spy.calls.argsFor(0)[2])) ||
-        isFunction(spy.calls.argsFor(0)[1]);
-      return hasName && hasElem && isAFunction;
+    toBeDisplayNone: tools.defineBasicMatcher(function (actual) {
+      var elem = actual;
+      return jasmine.getEnv().equals_(elem.css("display"), "none");
     }),
-    toHaveBeenCalledWithAllPointsInRange: function () {
-      return {
-        compare: function (spy, range) {
-          var allArgs = spy.calls.allArgs();
-          var fails = [];
-          for (var r = range.top; r < range.top + range.height; r++) {
-            for (var c = range.left; c < range.left + range.width; c++) {
-              var hadArgs = allArgs.some(function (args) {
-                return args[0] === r && args[1] === c;
-              });
-              if (!hadArgs) {
-                fails.push(r + "," + c);
-              }
-            }
-          }
-          var pass = !fails.length;
-          return {
-            pass: pass,
-            message:
-              "Expected " +
-              spy.and.identity() +
-              (!pass ? "" : " not") +
-              " to have been called with all points in range " +
-              JSON.stringify(range) +
-              " but " +
-              JSON.stringify(fails) +
-              " were missing",
-          };
-        },
-      };
-    },
-  };
 
-  var commonFields = [
-    "row",
-    "col",
-    "top",
-    "left",
-    "width",
-    "height",
-    "units",
-    "space",
-    "class",
-    "gridX",
-    "gridY",
-  ];
-  commonFields.forEach(function (fieldName) {
-    addFieldMatcher(matchers, fieldName);
-  });
+    // determines visibillity based on display none for now irrespective of attachement to the document
+    toBeDisplayable: tools.defineBasicMatcher(function (actual) {
+      var element = actual;
+      if (!element || !isFunction(element.parent)) {
+        return false;
+      }
+      var lastParent = element;
+      do {
+        if (
+          lastParent.length === 0 ||
+          (lastParent[0] !== window &&
+            lastParent[0] !== document &&
+            (lastParent.css("display") === "none" ||
+              lastParent.hasClass("ng-hide")))
+        ) {
+          return false;
+        }
+        lastParent = lastParent.parent();
+      } while (lastParent.length > 0);
+      return true;
+    }),
+    toContainReference: tools.defineBasicMatcher(function (actual, val) {
+      return actual.any(function (item) {
+        return val === item;
+      });
+    }),
+
+    toBeDisabled: tools.defineBasicMatcher(function (actual) {
+      var disabled = actual.attr("disabled");
+      return (
+        disabled === true || disabled === "true" || disabled === "disabled"
+      );
+    }),
+
+    toContainAny: tools.defineBasicMatcher(function (actual, val) {
+      return isFunction(actual.any) && actual.any(val);
+    }),
+    toHaveOnlyTruthyProperty: tools.defineBasicMatcher(
+      function (actual, propertyName, includeFunctionReturnValues) {
+        return Object.keys(actual).every(function (key) {
+          var value =
+            typeof actual[key] === "function" && includeFunctionReturnValues
+              ? actual[key]()
+              : actual[key];
+          return key === propertyName ? !!value : !value;
+        });
+      },
+      function (actual, propertyName, includeFunctionReturnValues, pass) {
+        return (
+          'Expected "' +
+          propertyName +
+          '"' +
+          (pass ? " not" : "") +
+          " to be only truthy value of the given object."
+        );
+      }
+    ),
+  };
 
   beforeEach(function () {
     jasmine.addMatchers(matchers);
