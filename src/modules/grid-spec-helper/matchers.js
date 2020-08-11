@@ -1,2 +1,3 @@
-require('jasmine-tools-riq/basic-matchers');
-require('jasmine-tools-riq/grid-matchers');
+require("./basic-matchers");
+require("./grid-matchers");
+
