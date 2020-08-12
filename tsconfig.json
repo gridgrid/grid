@@ -18,7 +18,7 @@
     "lib": ["es2017", "dom"],
     "esModuleInterop": false
   },
-  "exclude": ["tools"],
+  "exclude": ["tools", "dist", "node_modules"],
   "compileOnSave": false,
   "awesomeTypescriptLoaderOptions": {
     "forkChecker": true,
