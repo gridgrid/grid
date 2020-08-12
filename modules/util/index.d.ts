@@ -1,0 +1,10 @@
+export declare type RowCol = 'row' | 'col';
+export declare function clamp(num: number, min: number, max: number, returnNaN?: boolean): number;
+export declare function isRow(rowCol: RowCol): boolean;
+export declare function isCol(rowCol: RowCol): boolean;
+export declare function isNumber(num: any): num is number;
+export declare function isElementWithStyle(node?: any): node is HTMLElement;
+export declare function isElement(node?: any): node is HTMLElement;
+export declare function toArray<T>(thing?: T | T[]): T[];
+export declare function position(elem: HTMLElement, t?: number, l?: number, b?: number, r?: number, h?: number, w?: number): void;
+export declare function position3D(elem: HTMLElement, t?: number, l?: number): void;

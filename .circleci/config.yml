@@ -12,7 +12,7 @@ jobs:
       - run: npm install
       - run: npm run build
       - persist_to_workspace:
-          root: .
+          root: ~/repo
           paths: 
             - .
 
@@ -24,7 +24,7 @@ jobs:
 
     steps:
       - attach_workspace:
-          at: /home
+          at: .
       - run:
           name: Authenticate with registry
           command: |

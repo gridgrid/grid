@@ -1,0 +1,65 @@
+import { Grid } from '../core';
+import { IDebounceFunction } from '../debounce';
+import { RawPositionRange } from '../position-range';
+export interface IViewPort {
+    rowInfo: IViewPortDimensionInfo;
+    colInfo: IViewPortDimensionInfo;
+    _onResize: IDebounceFunction;
+    shortDebouncedResize: IDebounceFunction;
+    rows: IViewPortDimensionInfo['count'];
+    cols: IViewPortDimensionInfo['count'];
+    top: IViewPortDimensionInfo['clientPx']['start'];
+    left: IViewPortDimensionInfo['clientPx']['start'];
+    width: IViewPortDimensionInfo['size'];
+    height: IViewPortDimensionInfo['size'];
+    toGridX: IViewPortDimensionInfo['clientPx']['toGrid'];
+    toGridY: IViewPortDimensionInfo['clientPx']['toGrid'];
+    toVirtualRow: IViewPortDimensionInfo['toVirtual'];
+    toVirtualCol: IViewPortDimensionInfo['toVirtual'];
+    rowIsInView: IViewPortDimensionInfo['isInView'];
+    colIsInView: IViewPortDimensionInfo['isInView'];
+    toRealRow: IViewPortDimensionInfo['toReal'];
+    toRealCol: IViewPortDimensionInfo['toReal'];
+    clampRow: IViewPortDimensionInfo['clampCell'];
+    clampCol: IViewPortDimensionInfo['clampCell'];
+    clampY: IViewPortDimensionInfo['clampPx'];
+    clampX: IViewPortDimensionInfo['clampPx'];
+    getRowTop: IViewPortDimensionInfo['toPx'];
+    getColLeft: IViewPortDimensionInfo['toPx'];
+    getVirtualRowByTop: IViewPortDimensionInfo['toVirtualFromPx'];
+    getVirtualColByLeft: IViewPortDimensionInfo['toVirtualFromPx'];
+    getRowByTop: IViewPortDimensionInfo['toViewFromPx'];
+    getColByLeft: IViewPortDimensionInfo['toViewFromPx'];
+    getRowHeight: IViewPortDimensionInfo['sizeOf'];
+    getColWidth: IViewPortDimensionInfo['sizeOf'];
+    isDirty(): boolean;
+    sizeToContainer(elem: HTMLElement): void;
+    _resize(): void;
+    toPx(realCellRange: RawPositionRange): RawPositionRange;
+    intersect(range: RawPositionRange): RawPositionRange | null;
+    iterateCells(cellFn: (r: number, c: number) => void, rowFn?: (r: number) => void, optionalMaxRow?: number, optionalMaxCol?: number): void;
+}
+export interface IViewPortDimensionInfo {
+    count: number;
+    size: number;
+    clientPx: {
+        start: number;
+        toGrid(clientPx: number): number;
+    };
+    _numFixed: number;
+    _getLengthBetweenCoords(s: number, e: number, inclusive?: boolean): number;
+    isInView(virtualCoord: number): boolean;
+    toVirtual(viewCoord: number): number;
+    toReal(virtualCoord: number): number;
+    clampCell(coord: number): number;
+    clampPx(px: number): number;
+    toPx(coord: number): number;
+    toVirtualFromPx(px: number): number;
+    toViewFromPx(px: number): number;
+    sizeOf(viewCoord: number): number;
+    totalSize(): number;
+    updateSize(newSize: number): boolean;
+    intersect(intersection: RawPositionRange, range: RawPositionRange): RawPositionRange | null;
+}
+export declare function create(grid: Grid): IViewPort;
+export default create;
