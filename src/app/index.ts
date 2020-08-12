@@ -27,7 +27,7 @@ grid.colModel.get(0).width = 60;
 grid.colModel.get(2).width = 60;
 grid.build(container);
 grid.pixelScrollModel.maxIsAllTheWayFor.height = true;
-grid.fps.logging = true;
+// grid.fps.logging = true;
 
 // hide column for testing
 for (let c = 0; c < grid.colModel.length(); c++) {
