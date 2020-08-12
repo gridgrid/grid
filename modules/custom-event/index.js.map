@@ -1,1 +1,0 @@
-{"version":3,"file":"index.js","sourceRoot":"","sources":["../../src/modules/custom-event/index.ts"],"names":[],"mappings":";;AAAA,mBAAyB,IAAY,EAAE,OAAgB,EAAE,UAA2B,EAAE,MAAY;IAAzC,2BAAA,EAAA,kBAA2B;IAChF,IAAM,KAAK,GAAG,QAAQ,CAAC,WAAW,CAAC,aAAa,CAAC,CAAC;IAClD,KAAK,CAAC,eAAe,CAAC,IAAI,EAAE,OAAO,EAAE,UAAU,EAAE,MAAM,CAAC,CAAC;IACzD,OAAO,KAAK,CAAC;AACjB,CAAC;AAJD,4BAIC"}

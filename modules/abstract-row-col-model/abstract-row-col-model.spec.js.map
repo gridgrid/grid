@@ -1,1 +1,0 @@
-{"version":3,"file":"abstract-row-col-model.spec.js","sourceRoot":"","sources":["../../src/modules/abstract-row-col-model/abstract-row-col-model.spec.ts"],"names":[],"mappings":";;AAAA,mBAAiB;AAGjB,QAAQ,CAAC,wBAAwB,EAAE;IAC/B,IAAM,cAAc,GAAG,OAAO,CAAC,2BAA2B,CAAC,CAAC,MAAM,CAAC;IACnE,OAAO,CAAC,aAAa,CAAC,CAAC,cAAc,EAAE,QAAQ,EAAE,QAAQ,EAAE,GAAG,CAAC,CAAC;AACpE,CAAC,CAAC,CAAC"}
