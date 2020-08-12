@@ -1,7 +1,6 @@
 var webpack = require('webpack');
 var MiniCssExtractPlugin = require('mini-css-extract-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
-var CheckerPlugin = require('awesome-typescript-loader').CheckerPlugin;
 // var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 var transformTsConfigPaths = require('../transformTSPaths');
 
@@ -20,7 +19,7 @@ console.log('Is Production?', isProd);
 let output = {
   path: dist,
   publicPath: '/',
-  filename: process.env.ENVIRONMENT === 'dev' ? '[name].js' : '[name].[hash].js',
+  filename: '[name].js',
 };
 
 if (isProd) {
@@ -36,6 +35,8 @@ module.exports = {
   context: src,
   entry: {
     app: './app/index.ts',
+    grid: './modules/core/index.ts',
+    css: './scss/grid.scss',
   },
   devtool: isProd ? 'source-map' : 'eval-source-map', // more info:https://webpack.github.io/docs/build-performance.html#sourcemaps and https://webpack.github.io/docs/configuration.html#devtool
   mode: isProd ? 'production' : 'development',
@@ -48,11 +49,11 @@ module.exports = {
     }),
     // new webpack.HotModuleReplacementPlugin(),
     // new webpack.NoErrorsPlugin(),
-    new CheckerPlugin(),
 
     new MiniCssExtractPlugin({
       filename: '[name].css',
     }),
+
     new HtmlWebpackPlugin({
       template: './app/index.html',
       output: {
@@ -65,25 +66,11 @@ module.exports = {
     rules: [
       {
         test: /\.ts$/,
-        loader: isProd
-          ? {
-              loader: 'ts-loader',
-              options: {
-                compilerOptions: {
-                  declaration: true,
-                },
-              },
-            }
-          : {
-              loader: 'awesome-typescript-loader',
-              options: {
-                configFileName: 'tsconfig.json',
-              },
-            },
+        loader: 'ts-loader',
       },
       {
         test: /\.scss$/,
-        use: ['style-loader', 'css-loader', 'sass-loader'],
+        use: [isProd ? MiniCssExtractPlugin.loader : 'style-loader', 'css-loader', 'sass-loader'],
       },
       {
         test: /\.js$/,
