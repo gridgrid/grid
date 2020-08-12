@@ -26,7 +26,7 @@
     "build": "NODE_ENV=production node tools/build.js",
     "test": "node_modules/karma/bin/karma start --single-run --no-auto-watch karma.conf.js",
     "test:watch": "node_modules/karma/bin/karma start karma.conf.js",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+    "semantic-release": "semantic-release"
   },
   "dependencies": {
     "capitalize": "^0.5.0",
