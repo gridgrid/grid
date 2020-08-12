@@ -3,7 +3,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:8
+      - image: gridgrid/build:latest
 
     working_directory: ~/repo
 
@@ -12,8 +12,9 @@ jobs:
       - run: npm install
       - run: npm run build
       - persist_to_workspace:
-          root: /home
-          paths: circleci
+          root: .
+          paths: 
+            - .
 
   deploy:
     docker:
