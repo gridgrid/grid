@@ -23,7 +23,7 @@
     "dev": "npm-run-all --parallel open:src test:watch ts:watch",
     "clean": "rm -rf ./dist && mkdir dist",
     "prebuild": "npm run clean && npm run test",
-    "build": "NODE_ENV=production node tools/build.js",
+    "build": "tsc -P tsconfig.json && NODE_ENV=production node tools/build.js",
     "test": "node_modules/karma/bin/karma start --single-run --no-auto-watch karma.conf.js",
     "test:watch": "node_modules/karma/bin/karma start karma.conf.js",
     "semantic-release": "semantic-release"
