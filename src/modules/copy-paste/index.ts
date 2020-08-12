@@ -112,7 +112,6 @@ export function create(grid: Grid): ICopyPaste {
 
     setTimeout(() => {
       const tempDiv = document.createElement('div');
-      const tempText = document.createElement('textarea');
       tempDiv.innerHTML = pasteHtml;
       const table = tempDiv.querySelector('table');
       let pasteData: Array<Array<string | IGridDataResult<any>>> = tsvPasteData;
