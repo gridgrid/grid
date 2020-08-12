@@ -194,7 +194,7 @@
             pass: pass,
             message:
               "Expected " +
-              spy.and.identity() +
+              spy.and.identity +
               (!pass ? "" : " not") +
               " to have been called with all points in range " +
               JSON.stringify(range) +
