@@ -29,7 +29,7 @@ module.exports = function (config) {
     },
     browserNoActivityTimeout: 3000000,
     reportSlowerThan: 250,
-    webpack: webpackConfig(false, true),
+    webpack: require("./webpack/webpack.test"),
   };
   config.set(configObject);
 };

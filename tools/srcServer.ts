@@ -6,10 +6,9 @@ import browserSync from "browser-sync";
 import webpack from "webpack";
 import webpackDevMiddleware from "webpack-dev-middleware";
 import webpackHotMiddleware from "webpack-hot-middleware";
-import createConfig from "../webpack/webpack.config";
+import config from "../webpack/webpack.config";
 
-const config: any = createConfig();
-const bundler = webpack(config);
+const bundler = webpack(config as any);
 
 // Run Browsersync and use middleware for Hot Module Replacement
 browserSync({

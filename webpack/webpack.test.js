@@ -11,15 +11,6 @@ var aliases = transformTsConfigPaths();
 console.log("aliases", aliases);
 
 const src = path.join(__dirname, "..", "src");
-const dist = path.join(__dirname, "..", "dist");
-const isProd = process.env.NODE_ENV === "production";
-
-if (isProd) {
-  output.library = "grid";
-  output.libraryTarget = "umd";
-}
-
-console.log("Is Production?", isProd);
 
 module.exports = {
   resolve: {
@@ -27,16 +18,13 @@ module.exports = {
     alias: aliases,
   },
   context: src,
-  entry: {
-    app: "./app/index.ts",
-  },
-  devtool: isProd ? "source-map" : "eval-source-map", // more info:https://webpack.github.io/docs/build-performance.html#sourcemaps and https://webpack.github.io/docs/configuration.html#devtool
-  mode: isProd ? "production" : "development",
+  devtool: "inline-source-map", // more info:https://webpack.github.io/docs/build-performance.html#sourcemaps and https://webpack.github.io/docs/configuration.html#devtool
+  mode: "development",
+  entry: "./modules/core/index.ts",
   output: {
-    path: dist,
+    path: src, // Note: Physical files are only output by the production build task `npm run build`.
     publicPath: "/",
-    filename:
-      process.env.ENVIRONMENT === "dev" ? "[name].js" : "[name].[hash].js",
+    filename: "bundle.js",
   },
   plugins: [
     // new BundleAnalyzerPlugin(),
@@ -44,44 +32,24 @@ module.exports = {
     new webpack.DefinePlugin({
       "process.env.NODE_ENV": JSON.stringify("development"), // Tells React to build in either dev or prod modes. https://facebook.github.io/react/downloads.html (See bottom)
     }),
-    // new webpack.HotModuleReplacementPlugin(),
-    // new webpack.NoErrorsPlugin(),
     new CheckerPlugin(),
-
-    new MiniCssExtractPlugin({
-      filename: "[name].css",
-    }),
-    new HtmlWebpackPlugin({
-      template: "./app/index.html",
-      output: {
-        filename: "dist/index.html",
-      },
-      inject: true,
-    }),
   ],
+  target: "web",
+  resolve: {
+    extensions: [".js", ".ts", ".tsx"],
+    mainFields: ["browser", "main"],
+  },
   module: {
     rules: [
       {
-        test: /\.ts$/,
-        loader: isProd
-          ? {
-              loader: "ts-loader",
-              options: {
-                compilerOptions: {
-                  declaration: true,
-                },
-              },
-            }
-          : {
-              loader: "awesome-typescript-loader",
-              options: {
-                configFileName: "tsconfig.json",
-              },
-            },
-      },
-      {
-        test: /\.scss$/,
-        use: ["style-loader", "css-loader", "sass-loader"],
+        test: /\.(t|j)s$/,
+        loader: {
+          loader: "awesome-typescript-loader",
+          options: {
+            transpileOnly: true,
+            configFileName: "tsconfig.test.json",
+          },
+        },
       },
       {
         test: /\.js$/,
@@ -114,6 +82,10 @@ module.exports = {
       {
         test: /\.ico$/,
         loader: "file-loader?name=assets/icons/[name].[ext]",
+      },
+      {
+        test: /\.scss$/,
+        use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
       },
     ],
   },

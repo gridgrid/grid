@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./",
+    "outDir": "./dist",
     "target": "es5",
     "module": "commonjs",
     "moduleResolution": "node",
@@ -14,19 +14,12 @@
     "noUnusedParameters": false,
     "noUnusedLocals": false,
     "jsx": "react",
-    "baseUrl": ".",
-    "paths": {},
-    "lib": ["es2017", "dom"]
+    "rootDir": "./src",
+    "lib": ["es2017", "dom"],
+    "esModuleInterop": false
   },
+  "exclude": ["tools"],
   "compileOnSave": false,
-  "include": [
-    "src/**/*",
-    "app/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ],
   "awesomeTypescriptLoaderOptions": {
     "forkChecker": true,
     "useCache": true
