@@ -19,7 +19,7 @@ export function create(grid: Grid): ICopyPaste {
         top: grid.navigationModel.focus.row,
         left: grid.navigationModel.focus.col,
         width: 1,
-        height: 1
+        height: 1,
       };
     }
     return selectionRange;
@@ -39,32 +39,36 @@ export function create(grid: Grid): ICopyPaste {
     const tsvData: string[][] = [];
     const selectionRange = getCopyPasteRange();
     let gotNull = false;
-    grid.data.iterate(selectionRange, () => {
-      const row = document.createElement('tr');
-      tableBody.appendChild(row);
-      const array: string[] = [];
-      tsvData.push(array);
-      return {
-        row,
-        array
-      };
-    }, (r: number, c: number, rowResult: { row: HTMLTableRowElement, array: string[] }) => {
-      const data = grid.dataModel.get(r, c, true);
+    grid.data.iterate(
+      selectionRange,
+      () => {
+        const row = document.createElement('tr');
+        tableBody.appendChild(row);
+        const array: string[] = [];
+        tsvData.push(array);
+        return {
+          row,
+          array,
+        };
+      },
+      (r: number, c: number, rowResult: { row: HTMLTableRowElement; array: string[] }) => {
+        const data = grid.dataModel.get(r, c, true);
 
-      // intentional == checks null or undefined
-      if (data == null) {
-        return gotNull = true; // this breaks the col loop
-      }
-      const td = document.createElement('td');
-      if (data.value) {
-        td.setAttribute('grid-data', JSON.stringify(data.value));
-      }
-      td.textContent = data.formatted || ' ';
-      td.innerHTML = td.innerHTML.replace(/\n/g, '<br>') || ' ';
-      rowResult.row.appendChild(td);
-      rowResult.array.push(data.formatted);
-      return undefined;
-    });
+        // intentional == checks null or undefined
+        if (data == null) {
+          return (gotNull = true); // this breaks the col loop
+        }
+        const td = document.createElement('td');
+        if (data.value) {
+          td.setAttribute('grid-data', JSON.stringify(data.value));
+        }
+        td.textContent = data.formatted || ' ';
+        td.innerHTML = td.innerHTML.replace(/\n/g, '<br>') || ' ';
+        rowResult.row.appendChild(td);
+        rowResult.array.push(data.formatted);
+        return undefined;
+      },
+    );
     if (!gotNull) {
       e.clipboardData?.setData('text/plain', tsv.stringify(tsvData));
       e.clipboardData?.setData('text/html', copyTable.outerHTML);
@@ -89,7 +93,7 @@ export function create(grid: Grid): ICopyPaste {
       col: c,
       value,
       formatted,
-      paste: true
+      paste: true,
     };
   }
 
@@ -108,9 +112,6 @@ export function create(grid: Grid): ICopyPaste {
 
     setTimeout(() => {
       const tempDiv = document.createElement('div');
-      if (pasteHtml.match(/<meta name=ProgId content=Excel.Sheet>/)) {
-        pasteHtml = pasteHtml.replace(/[\n\r]+  /g, ' ').replace(/[\n\r]+/g, '');
-      }
       tempDiv.innerHTML = pasteHtml;
       const table = tempDiv.querySelector('table');
       let pasteData: Array<Array<string | IGridDataResult<any>>> = tsvPasteData;
@@ -127,14 +128,14 @@ export function create(grid: Grid): ICopyPaste {
             const text = innerText(td);
             const dataResult: IGridDataResult<any> = {
               formatted: text && text.trim(),
-              value: undefined
+              value: undefined,
             };
             const gridData = td.getAttribute('grid-data');
             if (gridData) {
               try {
                 dataResult.value = JSON.parse(gridData);
               } catch (error) {
-                console.warn('somehow couldn\'t parse grid data');
+                console.warn("somehow couldn't parse grid data");
               }
             }
             row.push(dataResult);
@@ -180,7 +181,7 @@ export function create(grid: Grid): ICopyPaste {
           top,
           left,
           height: pasteData.length,
-          width: pasteData[0].length
+          width: pasteData[0].length,
         };
 
         grid.navigationModel.clearSelection();
@@ -193,7 +194,8 @@ export function create(grid: Grid): ICopyPaste {
 
   const maybeSelectText = debounce(function maybeSelectTextInner() {
     if (!(grid.editModel && grid.editModel.editing) && grid.focused) {
-      grid.textarea.value = grid.dataModel.get(grid.navigationModel.focus.row, grid.navigationModel.focus.col).formatted || '.';
+      grid.textarea.value =
+        grid.dataModel.get(grid.navigationModel.focus.row, grid.navigationModel.focus.col).formatted || '.';
       grid.textarea.select();
     }
   }, 1);
@@ -211,8 +213,9 @@ export function create(grid: Grid): ICopyPaste {
     maybeSelectText();
   });
   return {
-    _maybeSelectText: maybeSelectText
+    _maybeSelectText: maybeSelectText,
   };
 }
 
 export default create;
+
