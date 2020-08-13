@@ -112,6 +112,14 @@ export function create(grid: Grid): ICopyPaste {
 
     setTimeout(() => {
       const tempDiv = document.createElement('div');
+
+      // this nonsense is required so .innerText converts <br> to \n
+      tempDiv.style.opacity = '0';
+      tempDiv.style.pointerEvents = 'none';
+      tempDiv.style.position = 'absolute';
+      document.body.appendChild(tempDiv);
+      //////
+
       tempDiv.innerHTML = pasteHtml;
       const table = tempDiv.querySelector('table');
       let pasteData: Array<Array<string | IGridDataResult<any>>> = tsvPasteData;
@@ -143,6 +151,8 @@ export function create(grid: Grid): ICopyPaste {
         });
         pasteData = tablePasteData;
       }
+
+      document.body.removeChild(tempDiv);
       const dataChanges: Array<IGridDataChange<any>> = [];
       let singlePasteValue: string | IGridDataResult<any> | undefined;
       if (pasteData.length === 1 && pasteData[0].length === 1) {
@@ -218,4 +228,3 @@ export function create(grid: Grid): ICopyPaste {
 }
 
 export default create;
-
