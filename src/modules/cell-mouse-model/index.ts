@@ -10,11 +10,23 @@ import {
   IGridDragStartEvent,
   ILoopEvent,
   isAnnotatedMouseEvent,
-  isAnnotatedMouseEventOfType
+  isAnnotatedMouseEventOfType,
 } from '../event-loop';
 
-const PROPS_TO_COPY_FROM_MOUSE_EVENTS: Array<keyof AnnotatedMouseEventUnion | 'layerX' | 'layerY'> =
-  ['clientX', 'clientY', 'gridX', 'gridY', 'layerX', 'layerY', 'row', 'col', 'realRow', 'realCol', 'virtualRow', 'virtualCol'];
+const PROPS_TO_COPY_FROM_MOUSE_EVENTS: Array<keyof AnnotatedMouseEventUnion | 'layerX' | 'layerY'> = [
+  'clientX',
+  'clientY',
+  'gridX',
+  'gridY',
+  'layerX',
+  'layerY',
+  'row',
+  'col',
+  'realRow',
+  'realCol',
+  'virtualRow',
+  'virtualCol',
+];
 
 export interface IEventDimensionInfoGetter {
   view(e: IAnnotatedEvent): number;
@@ -52,7 +64,7 @@ export function create(grid: Grid) {
       },
       layerPx(e: AnnotatedMouseEventUnion | IGridCustomMouseEvent) {
         return (e as any).layerY;
-      }
+      },
     },
     colInfo: {
       view(e: IAnnotatedEvent) {
@@ -69,7 +81,7 @@ export function create(grid: Grid) {
       },
       layerPx(e: AnnotatedMouseEventUnion | IGridCustomMouseEvent) {
         return (e as any).layerX;
-      }
+      },
     },
     _annotateEvent(e: EventUnion) {
       if (isAnnotatedMouseEvent(e)) {
@@ -113,7 +125,7 @@ export function create(grid: Grid) {
 
   function calculateColScrollDiff(e: AnnotatedMouseEventUnion | IGridCustomMouseEvent) {
     let colDiff = 0;
-    if (e.clientX > (grid.container && grid.container.getBoundingClientRect().right || window.innerWidth)) {
+    if (e.clientX > ((grid.container && grid.container.getBoundingClientRect().right) || window.innerWidth)) {
       colDiff = 1;
     } else if (grid.viewPort.toGridX(e.clientX) < grid.virtualPixelCellModel.fixedWidth()) {
       colDiff = -1;
@@ -123,7 +135,7 @@ export function create(grid: Grid) {
 
   function calculateRowScrollDiff(e: AnnotatedMouseEventUnion | IGridCustomMouseEvent) {
     let rowDiff = 0;
-    if (e.clientY > (grid.container && grid.container.getBoundingClientRect().bottom || window.innerHeight)) {
+    if (e.clientY > ((grid.container && grid.container.getBoundingClientRect().bottom) || window.innerHeight)) {
       rowDiff = 1;
     } else if (grid.viewPort.toGridY(e.clientY) < grid.virtualPixelCellModel.fixedHeight()) {
       rowDiff = -1;
@@ -139,10 +151,8 @@ export function create(grid: Grid) {
     const lastX = downEvent.clientX;
     const lastY = downEvent.clientY;
     const unbindMove = grid.eventLoop.bind(window, 'mousemove', (mousemoveEvent) => {
-
       if (dragStarted && !mousemoveEvent.which) {
         // got a move event without mouse down which means we somehow missed the mouseup
-        console.log('mousemove unbind, how on earth do these happen?');
         handleMouseUp(mousemoveEvent);
         return;
       }
@@ -157,7 +167,7 @@ export function create(grid: Grid) {
             ' when the last position was ',
             lastX,
             ',',
-            lastY
+            lastY,
           );
         }
         createAndFireCustomMouseEvent('grid-drag-start', downEvent, (dragStart: IGridDragStartEvent) => {
@@ -185,7 +195,6 @@ export function create(grid: Grid) {
                   grid.cellScrollModel.scrollTo(grid.cellScrollModel.row + rowDiff, grid.cellScrollModel.col + colDiff);
                 }, 100);
               }
-
             });
           };
         });
@@ -200,7 +209,6 @@ export function create(grid: Grid) {
         lastDragRow = mousemoveEvent.row;
         lastDragCol = mousemoveEvent.col;
       }
-
     });
 
     const unbindUp = grid.eventLoop.bind(window, 'mouseup', handleMouseUp);
@@ -234,7 +242,7 @@ export function create(grid: Grid) {
   function createAndFireCustomMouseEvent(
     type: GridCustomMouseEventTypes,
     e: AnnotatedMouseEventUnion,
-    annotateEvent?: (e: ILoopEvent) => any
+    annotateEvent?: (e: ILoopEvent) => any,
   ) {
     let drag = createCustomEventFromMouseEvent(type, e);
     if (annotateEvent) {
@@ -252,3 +260,4 @@ export function create(grid: Grid) {
 }
 
 export default create;
+
