@@ -3,7 +3,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: gridgrid/build:latest
+      - image: gridgrid/build-npm7:latest
 
     working_directory: ~/repo
 
@@ -13,12 +13,12 @@ jobs:
       - run: npm run build
       - persist_to_workspace:
           root: ~/repo
-          paths: 
+          paths:
             - .
 
   deploy:
     docker:
-      - image: gridgrid/build:latest
+      - image: gridgrid/build-npm7:latest
 
     working_directory: ~/repo
 
