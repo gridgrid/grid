@@ -14,21 +14,6 @@ Installation
 ===
 `npm install --save grid`
 
-if using angular the wrapping module can simply be accessed:
-
-
-`angular.module('myGridApp', [require('grid')])`
-
-
-the three srvcs currently exposed can be injected
-
-`function(GridSrvc, GridBuilderSrvc, GridDecoratorSrvc){}`
-
-
-if not using angular 
-
-`var core = require('grid/src/modules/core')`
-
 
 Example / Quick-Start
 ===
@@ -36,7 +21,8 @@ Example / Quick-Start
 To run the sample app locally, run `npm start` and hit http://localhost:8082
 
 ##### Create a Grid Instance
-`var grid = core();` or in angular `var grid = GridSrvc.core();`
+`var core = require('grid')`
+`var grid = core();`
 
 The grid handles most complexity for you. There are only three user supplied requirements to a get a grid up and running
 
@@ -171,7 +157,7 @@ Decorators are great for adding a piece of one-off ui that doesn't relate direct
 
 Puts a link over the cell at row 1 col 2 that doesn’t move with the scroll (why you would do this is questionable but it's just an example).
 
-You can do more complicated things like render 
+You can do more complicated things like render directives: (requires grid-angular-adapter)
 
 **angular directive decorator**
 ``` javascript
@@ -224,28 +210,68 @@ var colDescriptor = grid.colModel.create(builder);
 
 have `<a>` tags in your cells for all the rows in that column
 
-**angular cell builder**
+Note: it's important for the update function of a builder to be extremely fast. Call `scope.$digest` not `scope.$apply`, and  use `grid.viewLayer.setTextContent` not `elem.innerHTML` where possible
 
-``` javascript
-angular.module('myCoolGrid', [require('grid')])
 
-.controller('MyGridCtrl', function($scope, GridSrvc, GridBuilderSrvc) {
-    var grid = GridSrvc.core();
+Styling
+===
+If you want to update the look and feel of the grid, here are a few classes that you can override to give you the look you want.
 
-    // do row col and datamodel setup...
 
-    grid.colModel.create(grid.colModel.createBuilder(function render(ctx) {
-        return GridBuilderSrvc.render($scope, '<my-directive data="interestingData"></my-directive>');
-    }, function update(elem, ctx) {
-        var scope = angular.element(elem).scope();
-        scope.interestingData = ctx.data.formatted;
-        scope.$digest();
-        return elem;
-    }));
-});
+## Classes
+
+**`.grid-cell`:**
+This class is responsible for the look of individual cells. 
+
+**`.grid-focus-decorator`:** This decorator class is applied when you click('focus') on a cell
+
+Ex. Adding the following style will give you a cell with a blue border around it when the cell is selected.
+``` css
+.grid-focus-decorator {
+  border: 2px solid blue;
+}
 ```
 
-The GridBuilderSrvc handles destroying the scope and properly removing the elements to prevent memory leaks.
+**`.grid-selection`:**
+When selecting rows and columns, this class sets the border and background so you know which rows you are exactly selecting
 
-Note: it's important for the update function of a builder to be extremely fast. Call `scope.$digest` not `scope.$apply`, and  use `grid.viewLayer.setTextContent` not `elem.innerHTML` where possible
+Ex.
+```css
+$grid-teal: #39CCCC !default;
+.grid-selection {
+  border: 1px solid $grid-teal;
+  background: transparentize($grid-teal, .8);
+}
+```
+
+**`.grid-row`:**
+This class is responsible for the look of the row of cells.
+
+Ex. To apply, a background color when hovering over each row, add the following:
+```css
+.grid-row {
+  &.hover {
+    background-color: lighten($grid-teal, 30) !important;
+  }
+}
+```
+
+To apply styles only to the header row, use the following class:
+```css
+.grid-row {
+  &.grid-is-header {
+  }
+}
+
+```
+**`.col-resize`:** This class changes the look of the column resizing element. 
+
+**`.grid-drag-line`**: This class is used when you are resizing a column. A vertical line is added to guide you of how much to resize your columns.
+
+Ex. To show a blue vertical line when resizing a column, add the following
+```css
+.grid-drag-line {
+  background: #7FDBFF;
+}
+```
 

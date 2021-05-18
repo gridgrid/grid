@@ -179,13 +179,13 @@ describe('view-layer', function () {
 
             it('should rebuild colbuilders and draw cells if col builders are dirty', function (done) {
                 expectRedraw.call(this, ['_buildCols', '_drawCells'], function () {
-                    grid.colModel.get(0).builder = grid.colModel.createBuilder();
+                    grid.colModel.get(0).builder = grid.colModel.createBuilder(function () {});
                 }, done);
             });
 
             it('should rebuild row headers and draw cells if row builders are dirty', function (done) {
                 expectRedraw.call(this, ['_buildRows', '_drawCells'], function () {
-                    grid.rowModel.get(0).builder = grid.rowModel.createBuilder();
+                    grid.rowModel.get(0).builder = grid.rowModel.createBuilder(function () {});
                 }, done);
             });
 
@@ -203,7 +203,7 @@ describe('view-layer', function () {
 
             it('should redraw cells if data model is dirty', function (done) {
                 expectRedraw.call(this, ['_drawCells'], function () {
-                    grid.dataModel.toggleSort();
+                    grid.dataModel.set(1, 2, 'something something');
                 }, done);
             });
         });
@@ -625,7 +625,7 @@ describe('view-layer', function () {
             testBuilders('col');
 
             it('should not call update for cols out of the view', function (done) {
-                var builder = grid.colModel.createBuilder();
+                var builder = grid.colModel.createBuilder(function () {}, undefined, true);
                 var updateSpy = spyOn(builder, 'update');
                 grid.colModel.get(0).builder = builder;
                 grid.cellScrollModel.scrollTo(1, 1);
@@ -736,7 +736,7 @@ describe('view-layer', function () {
 
     function testBuilders(rowOrCol) {
         it('should call render for each view ' + rowOrCol + 'on build', function (done) {
-            var builder = this.rowColModel.createBuilder();
+            var builder = this.rowColModel.createBuilder(function () {}, undefined, true);
             var renderSpy = spyOn(builder, 'render');
             this.rowColModel.get(0).builder = builder;
             this.onDraw(function () {
@@ -751,7 +751,7 @@ describe('view-layer', function () {
                 return document.createElement('a');
             }, function (elem) {
                 return elem;
-            });
+            }, true);
             this.rowColModel.get(0).builder = builder;
             this.onDraw(function () {
                 this.findCells(0).each(function () {
@@ -770,7 +770,7 @@ describe('view-layer', function () {
                     return undefined;
                 }
                 return elem;
-            });
+            }, true);
             this.rowColModel.get(0).builder = builder;
             this.onDraw(function () {
                 this.findCells(0).each(function (index) {
@@ -787,7 +787,7 @@ describe('view-layer', function () {
 
 
         it('should call update for each view cell on draw', function (done) {
-            var builder = this.rowColModel.createBuilder();
+            var builder = this.rowColModel.createBuilder(function () {}, undefined, true);
             var updateSpy = spyOn(builder, 'update');
             this.rowColModel.get(this.scrolledBuilderRowCol).builder = builder;
             this.onDraw(function () {
@@ -801,7 +801,23 @@ describe('view-layer', function () {
                     done();
                 });
             });
+        });
 
+        it('should not call update for the headers by default', function (done) {
+            var builder = this.rowColModel.createBuilder(function () {});
+            var updateSpy = spyOn(builder, 'update');
+            this.rowColModel.get(this.scrolledBuilderRowCol).builder = builder;
+            this.onDraw(function () {
+                expect(updateSpy).toHaveBeenCalled();
+                expect(updateSpy.calls.count()).toBe(this.numBuilt - this.rowColModel.numHeaders());
+                updateSpy.calls.reset();
+                grid.cellScrollModel.scrollTo(1, 1);
+                this.onDraw(function () {
+                    expect(updateSpy).toHaveBeenCalled();
+                    expect(updateSpy.calls.count()).toBe(this.numBuilt - this.rowColModel.numHeaders());
+                    done();
+                });
+            });
         });
 
 
@@ -812,7 +828,7 @@ describe('view-layer', function () {
                 var aTag = document.createElement('a');
                 aTags.push(aTag);
                 return aTag;
-            }, updateSpy);
+            }, updateSpy, true);
             grid.colModel.get(0).builder = builder;
             this.onDraw(function () {
                 expect(aTags.length).toBe(this.numBuilt);
@@ -825,7 +841,7 @@ describe('view-layer', function () {
 
         it('should call update with a context obj', function (done) {
             var updateSpy = jasmine.createSpy('update');
-            var builder = this.rowColModel.createBuilder(undefined, updateSpy);
+            var builder = this.rowColModel.createBuilder(function () {}, updateSpy, true);
             this.rowColModel.get(this.scrolledBuilderRowCol).builder = builder;
             grid.cellScrollModel.scrollTo(1, 1);
             this.onDraw(function () {

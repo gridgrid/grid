@@ -1,5 +1,41 @@
-module.exports = function(config) {
-    // store the karma config in a JSON file to make it easy to change w/jq
-    var contents = require('fs').readFileSync('karma.conf.json');
-    config.set(JSON.parse(contents));
+var webpackConfig = require('./webpack/webpack.config.js');
+
+module.exports = function (config) {
+  var configObject = {
+    frameworks: ['jasmine'],
+    basePath: '',
+    files: [
+      'node_modules/polyfill-function-prototype-bind/bind.js',
+      'node_modules/es6-promise/dist/es6-promise.js',
+      'src/modules/grid-spec-helper/matchers.js',
+      'webpack/test-entry.js',
+    ],
+    preprocessors: {
+      'webpack/test-entry.js': ['webpack', 'sourcemap'],
+      'src/modules/grid-spec-helper/matchers.js': ['webpack', 'sourcemap'],
+    },
+    webpackMiddleware: {
+      noInfo: true,
+    },
+    autoWatch: true,
+    reporters: ['progress'],
+    browsers: ['ChromeHeadlessNoSandbox'],
+    customLaunchers: {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox'],
+      },
+    },
+    junitReporter: {
+      outputFile: 'test_out/unit.xml',
+      suite: 'unit',
+    },
+    notifyReporter: {
+      reportSuccess: false,
+    },
+    browserNoActivityTimeout: 3000000,
+    reportSlowerThan: 250,
+    webpack: require('./webpack/webpack.test'),
+  };
+  config.set(configObject);
 };

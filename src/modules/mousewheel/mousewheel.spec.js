@@ -1,14 +1,14 @@
 describe('mousewheel', function () {
     var mousewheel;
     var $ = require('jquery');
-    var mockEvent = require('../custom-event');
+    var mockEvent = require('../custom-event').default;
     var div;
 
     var events = ['mousewheel', 'wheel', 'DOMMouseScroll'];
 
 
     beforeEach(function () {
-        mousewheel = require('../mousewheel');
+        mousewheel = require('../mousewheel').default;
         div = document.createElement('div');
     });
 
@@ -16,8 +16,7 @@ describe('mousewheel', function () {
 
         var div = document.createElement('div');
         var add = spyOn(div, 'addEventListener');
-        var listener = function () {
-        };
+        var listener = function () {};
         mousewheel.bind(div, listener);
 
         expect(add).toHaveBeenCalledWithAll(events);
@@ -31,8 +30,7 @@ describe('mousewheel', function () {
     it('should let me unbind the wheel events', function () {
 
         var remove = spyOn(div, 'removeEventListener');
-        var listener = function () {
-        };
+        var listener = function () {};
         var unbind = mousewheel.bind(div, listener);
         unbind();
 

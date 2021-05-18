@@ -1,4 +1,4 @@
-var mockEvent = require('../custom-event');
+var mockEvent = require('../custom-event').default;
 
 describe('cell-mouse-model', function () {
 

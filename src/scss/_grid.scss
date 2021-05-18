@@ -1,0 +1,181 @@
+/**
+ * grid core
+ */
+.grid-decorators {
+  z-index: 1;
+}
+
+.pin-to-edges {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/**
+ * Standard Cells
+ */
+.grid-cell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  border: $cell-border;
+  padding: $cell-padding;
+}
+
+.grid-row:not(.grid-is-header):nth-child(even) {
+  .grid-cell {
+    background: $cell-color-background;
+  }
+}
+
+.grid-row:not(.grid-is-header):nth-child(odd) {
+  .grid-cell {
+    background: $cell-color-background-alternate;
+  }
+}
+
+/**
+ * Scrollbars
+ */
+.grid-scroll-bar {
+  @extend .pin-to-edges;
+  z-index: 10;
+
+  border-radius: $scrollbar-border-radius;
+  background: $scrollbar-color-background;
+}
+
+/**
+ * Headers
+ */
+.grid-is-header {
+  z-index: 2;
+}
+
+.grid-header {
+  background-color: $header-color-background;
+  border-bottom: $header-border-bottom;
+
+  &.grid-cell {
+    padding: $header-padding;
+    border-left: $header-border-sides;
+  }
+}
+
+.grid-row-header {
+  border-right: $header-border-bottom;
+}
+
+.grid-last-fixed-col {
+  border-right: $header-border-bottom;
+}
+
+/**
+ * Selection
+ */
+.grid-selection {
+  border: $selection-border;
+  background-color: $selection-color-background;
+}
+
+.grid-header.selected {
+  background-color: $selection-header-color-background;
+}
+
+
+/**
+ * Focus
+ */
+.grid-focus-decorator {
+  z-index: 1;
+  border: $focus-border;
+}
+
+/**
+ * Reorderable Columns
+ */
+.grid-reorder-target {
+  background: $reorder-target-color-background;
+  z-index: 10000;
+  border-left: $reorder-border;
+  border-right: $reorder-border;
+}
+
+.grid-drag-rect {
+  background: $reorder-drag-color-background;
+  z-index: 10000;
+}
+
+
+/**
+ * Resizable Columns
+ */
+.grid-drag-line {
+  background: cyan;
+}
+
+.col-resize {
+  pointer-events: all;
+  width: 15px;
+  text-align: center;
+  cursor: col-resize;
+  z-index: 20;
+
+  &:hover:after {
+    visibility: visible;
+  }
+
+  &:after {
+    content: '';
+    background-color: $color-border;
+    display: inline-block;
+    height: 100%;
+    visibility: hidden;
+    width: $resize-width-handle;
+  }
+}
+
+/**
+ * Hidden Columns
+ */
+.show-hidden-cols {
+  z-index: 21;
+
+  &:hover {
+    &:after {
+      background: $hiddencols-color-background;
+      border: $hiddencols-border;
+      border-radius: $hiddencols-border-radius;
+      box-shadow: $hiddencols-box-shadow;
+    }
+  }
+
+  &:after {
+    transition: all $time-animation;
+    cursor: pointer;
+    display: block;
+    text-align: center;
+
+    content: $hiddencols-content;
+    color: $hiddencols-color-text;
+    border: $hiddencols-border;
+    border-color: transparent;
+
+    width: $hiddencols-size-width;
+
+    font-size: $hiddencols-size-height;
+    height: $hiddencols-size-height;
+    line-height: $hiddencols-size-height;
+  }
+}
+
+/**
+ * Hidden Columns
+ */
+.grid-focus-decorator {
+  border: $focus-border;
+  background-color: $focus-color-background;
+}

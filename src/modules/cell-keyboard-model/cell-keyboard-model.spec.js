@@ -1,6 +1,6 @@
-var mockEvent = require('../custom-event');
+var mockEvent = require('../custom-event').default;
 
-describe('cell-keyboard-model', function() {
+describe('cell-keyboard-model', function () {
 
     require('../grid-spec-helper')();
     var model;
@@ -8,7 +8,7 @@ describe('cell-keyboard-model', function() {
     var numCols = 10;
     var grid;
 
-    var beforeEachFunction = function(fixedR, fixedC, hRows, hCols) {
+    var beforeEachFunction = function (fixedR, fixedC, hRows, hCols) {
         grid = this.buildSimpleGrid(numRows, numCols, false, false, fixedR, fixedC, hRows, hCols);
         //set container without building to save perf
         grid.container = this.container;
@@ -25,15 +25,15 @@ describe('cell-keyboard-model', function() {
 
     var annotatedEvents = ['keydown', 'keypress', 'keyup'];
 
-    describe('general', function() {
-        beforeEach(function() {
+    describe('general', function () {
+        beforeEach(function () {
             beforeEachFunction.call(this, 0, 0, 1, 1);
         });
 
-        it('should annotate key events with the current focus cell', function() {
+        it('should annotate key events with the current focus cell', function () {
             grid.navigationModel.setFocus(3, 4);
             grid.cellScrollModel.scrollTo(2, 2);
-            annotatedEvents.forEach(function(type) {
+            annotatedEvents.forEach(function (type) {
                 var event = createEvent(type);
                 model._annotateEvent(event);
                 expect(event).rowToBe(3);

@@ -1,0 +1,36 @@
+@import "grid-theme-default-colors";
+@import "grid";
+
+/**
+ * Sample app overrides
+ */
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 13px;
+  color: #111;
+}
+
+a {
+  color: darken(map-get($colors, accent), 10);
+  cursor: pointer;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+// expand/collapse
+.grid-row-header {
+  a {
+    display: block;
+    transition: transform $time-animation linear;
+    padding: 2px 4px;
+  }
+
+  &.grid-expanded {
+    a {
+      transform: rotate(90deg);
+    }
+  }
+}

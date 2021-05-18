@@ -9,4 +9,11 @@ tmp
 test-assets
 /coverage
 release
+dist
+.awcache
 release/bundle*.css
+
+src/**/*.d.ts
+src/**/*.js.map
+src/modules/**/index.js
+tsconfig.tsbuildinfo

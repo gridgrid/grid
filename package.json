@@ -1,80 +1,98 @@
 {
   "name": "grid",
   "version": "0.0.0-semantic-release",
-  "description": "A highly scalable grid component written in javscript",
-  "main": "src/modules/grid-entry.js",
+  "description": "A highly scalable grid component written in Typescript",
+  ".browser": "dist/grid.js",
+  "main": "dist/modules/core/index.js",
+  "typings": "dist/modules/core/index.d.ts",
   "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
+    "registry": "https://registry.npmjs.org/",
+    "tag": "next"
   },
   "engines": {
-    "node": ">=0.10.0"
+    "node": ">=10"
   },
   "iqproj": {
     "app": true
   },
   "scripts": {
-    "commitmsg": "validate-commit-msg",
-    "test": "bin/iqb test",
-    "start": "bin/iqb start",
-    "preversion": "bin/iqb test",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+    "commitmsg": "commitlint -E GIT_PARAMS",
+    "preversion": "npm run build",
+    "open:src": "ts-node -P tsconfig.srv.json tools/srcServer.ts",
+    "ts:watch": "tsc --watch --incremental",
+    "dev": "npm-run-all --parallel open:src test:watch ts:watch",
+    "clean": "rm -rf ./dist && mkdir dist",
+    "prebuild": "npm run clean && npm run test",
+    "build": "tsc -P tsconfig.json && NODE_ENV=production node tools/build.js",
+    "test": "node_modules/karma/bin/karma start --single-run --no-auto-watch karma.conf.js",
+    "test:watch": "node_modules/karma/bin/karma start karma.conf.js",
+    "semantic-release": "semantic-release"
   },
   "dependencies": {
-    "angular": "~1.4.7",
-    "angular-mocks": "~1.4.7",
-    "angular-route": "~1.4.7",
     "capitalize": "^0.5.0",
     "click-off": "~0.2.1",
     "element-class": "^0.1.1",
+    "es6-object-assign": "~1.1.0",
     "escape-stack": "~0.1.2",
     "inner-text-shim": "~1.0.1",
     "key": "^0.1.11",
     "time-now": "~0.2.1"
   },
   "devDependencies": {
-    "aliasify": "^1.5.0",
-    "browserify": "~12.0.1",
-    "browserify-istanbul": "~0.2.1",
-    "chokidar-cli": "~1.1.1",
-    "condition-circle": "~1.5.0",
-    "connect-livereload": "~0.5.3",
+    "@commitlint/cli": "~9.1.2",
+    "@commitlint/config-conventional": "~12.1.4",
+    "@types/browser-sync": "~2.26.1",
+    "@types/jasmine": "~2.6.0",
+    "@types/karma": "~1.7.0",
+    "@types/webpack-dev-middleware": "~3.7.1",
+    "@types/webpack-hot-middleware": "~2.25.3",
+    "autoprefixer": "~10.2.5",
+    "awesome-typescript-loader": "~5.2.1",
+    "browser-sync": "~2.26.12",
+    "condition-circle": "~2.0.2",
+    "copy-webpack-plugin": "~3.0.1",
+    "css-loader": "~5.2.4",
+    "ejs-compiled-loader": "~3.0.0",
     "es6-promise": "~3.1.2",
-    "exorcist": "~0.4.0",
-    "express": "~4.13.3",
+    "fibers": "~5.0.0",
+    "file-loader": "~0.9.0",
+    "html-webpack-plugin": "~4.3.0",
     "husky": "~0.13.3",
-    "jasmine": "~2.3.2",
-    "jasmine-tools-riq": "~0.3.0",
-    "jquery": "^2.1.0",
-    "karma": "~0.13.14",
-    "karma-browserify": "~4.4.0",
-    "karma-chrome-launcher": "~0.2.1",
+    "install": "~0.13.0",
+    "jasmine": "~3.6.1",
+    "jquery": "~3.5.1",
+    "karma": "~6.3.2",
+    "karma-chrome-launcher": "~3.1.0",
     "karma-jasmine": "~0.3.6",
-    "karma-jasmine-jquery": "~0.1.1",
-    "karma-phantomjs-launcher": "~0.2.1",
-    "lodash": "~4.11.0",
-    "node-sass": "~3.4.1",
-    "phantomjs": "~1.9.18",
+    "karma-sourcemap-loader": "~0.3.7",
+    "karma-webpack": "~4.0.2",
+    "lodash": "~4.17.19",
+    "mini-css-extract-plugin": "~0.10.0",
+    "node-sass": "~4.14.1",
+    "npm-run-all": "~4.0.2",
     "polyfill-function-prototype-bind": "0.0.1",
-    "semantic-release": "^4.3.5",
-    "tiny-lr": "~0.2.1",
-    "validate-commit-msg": "~2.12.1",
-    "watchify": "~3.6.0",
-    "yargs": "^1.2.2"
+    "postcss-loader": "~0.11.0",
+    "sass-loader": "~9.0.3",
+    "semantic-release": "~17.4.3",
+    "source-map-loader": "~1.0.1",
+    "style-loader": "~1.2.1",
+    "transform-ts-paths": "^1.0.0",
+    "ts-loader": "~8.0.2",
+    "ts-node": "~8.10.2",
+    "tslint": "^5.4.2",
+    "tslint-eslint-rules": "^4.1.1",
+    "typescript": "~3.7.5",
+    "url-loader": "~4.1.0",
+    "webpack": "^4.44.1",
+    "webpack-bundle-analyzer": "~3.8.0",
+    "webpack-cli": "~3.3.12",
+    "webpack-dev-middleware": "~3.7.2",
+    "webpack-hot-middleware": "~2.25.0",
+    "webpack-md5-hash": "~0.0.5"
   },
-  "browserify": {
-    "transform": [
-      "aliasify"
-    ]
-  },
-  "aliasify": {
-    "aliases": {
-      "@grid": "./src/modules"
-    }
-  },
-  "browserify-shim": {},
   "repository": {
     "type": "git",
-    "url": "https://github.com/relateiq/grid.git"
+    "url": "https://github.com/gridgrid/grid.git"
   },
   "keywords": [
     "grid",
@@ -85,15 +103,14 @@
   "author": "Sterling Camden",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/relateiq/grid/issues"
+    "url": "https://github.com/gridgrid/grid/issues"
   },
-  "homepage": "https://github.com/relateiq/grid",
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    }
-  },
+  "homepage": "https://github.com/gridgrid/grid",
   "release": {
-    "verifyConditions": "condition-circle"
+    "verifyConditions": "condition-circle",
+    "branch": "next",
+    "fallbackTags": {
+      "next": "latest"
+    }
   }
 }

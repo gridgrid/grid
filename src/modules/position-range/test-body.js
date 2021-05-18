@@ -2,7 +2,9 @@ function testPositionRange(context) {
     describe('position-range', function () {
         var range;
         var parent;
-        var dirtyPropsCtx = {props: ['top', 'left', 'height', 'width', 'units', 'space']};
+        var dirtyPropsCtx = {
+            props: ['top', 'left', 'height', 'width', 'units', 'space']
+        };
         beforeEach(function () {
             range = context.range;
             parent = context.parent;
@@ -21,7 +23,7 @@ function testPositionRange(context) {
         });
 
         describe('should satisfy', function () {
-            require('../add-dirty-props/test-body')(dirtyPropsCtx);
+            require('../dirty-props/test-body')(dirtyPropsCtx);
         });
     });
 }
