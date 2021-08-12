@@ -2,9 +2,7 @@ import { Grid, IGridDimension } from '../core';
 import debounce, { IDebounceFunction } from '../debounce';
 import makeDirtyClean from '../dirty-clean';
 import addDirtyProps from '../dirty-props';
-import {
-    RawPositionRange,
-} from '../position-range';
+import { RawPositionRange } from '../position-range';
 import * as rangeUtil from '../range-util';
 import * as util from '../util';
 
@@ -52,7 +50,7 @@ export interface IViewPort {
         cellFn: (r: number, c: number) => void,
         rowFn?: (r: number) => void,
         optionalMaxRow?: number,
-        optionalMaxCol?: number
+        optionalMaxCol?: number,
     ): void;
 }
 
@@ -64,6 +62,7 @@ export interface IViewPortDimensionInfo {
         toGrid(clientPx: number): number;
     };
     _numFixed: number;
+    _numFixedAtLastResize: number;
     _getLengthBetweenCoords(s: number, e: number, inclusive?: boolean): number;
     isInView(virtualCoord: number): boolean;
     toVirtual(viewCoord: number): number;
@@ -88,9 +87,7 @@ export function create(grid: Grid) {
         return container && container.getClientRects && container.getClientRects()[0];
     }
 
-    function makeDimension(
-        gridDimension: IGridDimension
-    ) {
+    function makeDimension(gridDimension: IGridDimension) {
         function getVirtualRowColUnsafe(coord: number) {
             // could cache this on changes i.e. row-change or col-change events
             const numFixed = viewDimension._numFixed;
@@ -100,11 +97,7 @@ export function create(grid: Grid) {
             return coord + gridDimension.cellScroll.position;
         }
 
-        function getLengthBetweenViewCoords(
-            startCoord: number,
-            endCoord: number,
-            inclusive?: boolean
-        ) {
+        function getLengthBetweenViewCoords(startCoord: number, endCoord: number, inclusive?: boolean) {
             const toVirtual = viewDimension.toVirtual;
             const lengthFn = gridDimension.virtualPixelCell.sizeOf;
             const clampFn = viewDimension.clampCell;
@@ -112,9 +105,9 @@ export function create(grid: Grid) {
             const numFixed = viewDimension._numFixed;
             const isInNonfixedArea = endCoord >= numFixed;
             const isInFixedArea = startCoord < numFixed;
-            const exclusiveOffset = (inclusive ? 0 : 1);
+            const exclusiveOffset = inclusive ? 0 : 1;
             if (isInFixedArea) {
-                const fixedEndCoord = (isInNonfixedArea ? numFixed - 1 : endCoord - exclusiveOffset);
+                const fixedEndCoord = isInNonfixedArea ? numFixed - 1 : endCoord - exclusiveOffset;
                 pos += lengthFn(startCoord, fixedEndCoord);
             }
             if (isInNonfixedArea) {
@@ -131,7 +124,8 @@ export function create(grid: Grid) {
             const toVirtual = viewDimension.toVirtual;
             const lengthFn = gridDimension.virtualPixelCell.sizeOf;
             const fixedSize = gridDimension.virtualPixelCell.fixedSize();
-            let summedLength = grid.viewLayer.getBorderWidth() + (pos <= fixedSize ? 0 : gridDimension.pixelScroll.offset);
+            let summedLength =
+                grid.viewLayer.getBorderWidth() + (pos <= fixedSize ? 0 : gridDimension.pixelScroll.offset);
             for (let i = 0; i < viewMax; i++) {
                 const virtual = toVirtual(i);
                 const length = lengthFn(virtual);
@@ -177,95 +171,109 @@ export function create(grid: Grid) {
                 if (windowSize > maxSize) {
                     maxSize = windowSize;
                 }
-
             }
             return Math.min(maxSize + numFixed + 1, gridDimension.rowColModel.length(true));
         }
 
-        const viewDimension: IViewPortDimensionInfo = addDirtyProps({
-            count: 0,
-            size: 0,
-            clientPx: {
-                get start() {
-                    const clientRect = getFirstClientRect();
-                    return clientRect && gridDimension.positionRange.getPosition(clientRect) || 0;
+        const viewDimension: IViewPortDimensionInfo = addDirtyProps(
+            {
+                count: 0,
+                size: 0,
+                clientPx: {
+                    get start() {
+                        const clientRect = getFirstClientRect();
+                        return (clientRect && gridDimension.positionRange.getPosition(clientRect)) || 0;
+                    },
+                    toGrid(clientPx: number) {
+                        return clientPx - viewDimension.clientPx.start;
+                    },
                 },
-                toGrid(clientPx: number) {
-                    return clientPx - viewDimension.clientPx.start;
-                }
-            },
-            _numFixed: 0,
-            isInView(virtualCoord: number) {
-                const realRow = viewDimension.toReal(virtualCoord);
-                return !isNaN(realRow) &&
-                    getLengthBetweenViewCoords(0, realRow, true) < viewDimension.totalSize();
-            },
-            toVirtual(viewCoord: number) {
-                const virtualRowCol = getVirtualRowColUnsafe(viewCoord);
-                return gridDimension.virtualPixelCell.clampCell(virtualRowCol);
-            },
-            toReal(virtualCoord: number) {
-                const numFixed = viewDimension._numFixed;
-                if (virtualCoord < numFixed) {
-                    return virtualCoord;
-                }
-                const maxViewPortIndex = viewDimension.count - 1;
-                return util.clamp(virtualCoord - gridDimension.cellScroll.position, numFixed, maxViewPortIndex, true);
-            },
-            clampCell(coord: number) {
-                return util.clamp(coord, 0, viewDimension.count - 1);
-            },
-            clampPx(px: number) {
-                return util.clamp(px, 0, viewDimension.totalSize());
-            },
-            toPx(coord: number) {
-                return getLengthBetweenViewCoords(0, coord);
-            },
-            toVirtualFromPx(px: number) {
-                return getRowOrColFromPosition(px, true);
-            },
-            toViewFromPx(px: number) {
-                return getRowOrColFromPosition(px);
-            },
-            sizeOf(viewCoord: number) {
-                return gridDimension.virtualPixelCell.sizeOf(viewDimension.toVirtual(viewDimension.clampCell(viewCoord)));
-            },
-            totalSize() {
-                return viewDimension.size;
-            },
-            // TODO: based on looking at the code i think range can sometimes be Partial, def worth checking for npes
-            intersect(intersection: RawPositionRange, range: RawPositionRange) {
-                const numFixed = viewDimension._numFixed;
-                const fixedRange = [0, numFixed];
+                _numFixed: 0,
+                _numFixedAtLastResize: 0,
+                isInView(virtualCoord: number) {
+                    const realRow = viewDimension.toReal(virtualCoord);
+                    return !isNaN(realRow) && getLengthBetweenViewCoords(0, realRow, true) < viewDimension.totalSize();
+                },
+                toVirtual(viewCoord: number) {
+                    const virtualRowCol = getVirtualRowColUnsafe(viewCoord);
+                    return gridDimension.virtualPixelCell.clampCell(virtualRowCol);
+                },
+                toReal(virtualCoord: number) {
+                    const numFixed = viewDimension._numFixed;
+                    if (virtualCoord < numFixed) {
+                        return virtualCoord;
+                    }
+                    const maxViewPortIndex = viewDimension.count - 1;
+                    return util.clamp(
+                        virtualCoord - gridDimension.cellScroll.position,
+                        numFixed,
+                        maxViewPortIndex,
+                        true,
+                    );
+                },
+                clampCell(coord: number) {
+                    return util.clamp(coord, 0, viewDimension.count - 1);
+                },
+                clampPx(px: number) {
+                    return util.clamp(px, 0, viewDimension.totalSize());
+                },
+                toPx(coord: number) {
+                    return getLengthBetweenViewCoords(0, coord);
+                },
+                toVirtualFromPx(px: number) {
+                    return getRowOrColFromPosition(px, true);
+                },
+                toViewFromPx(px: number) {
+                    return getRowOrColFromPosition(px);
+                },
+                sizeOf(viewCoord: number) {
+                    return gridDimension.virtualPixelCell.sizeOf(
+                        viewDimension.toVirtual(viewDimension.clampCell(viewCoord)),
+                    );
+                },
+                totalSize() {
+                    return viewDimension.size;
+                },
+                // TODO: based on looking at the code i think range can sometimes be Partial, def worth checking for npes
+                intersect(intersection: RawPositionRange, range: RawPositionRange) {
+                    const numFixed = viewDimension._numFixed;
+                    const fixedRange = [0, numFixed];
 
-                const virtualRange = [gridDimension.positionRange.getPosition(range), gridDimension.positionRange.getSize(range)];
-                const fixedIntersection = rangeUtil.intersect(fixedRange, virtualRange);
-                const scrollRange = [numFixed, viewDimension.count - numFixed];
-                virtualRange[0] -= gridDimension.cellScroll.position;
-                const scrollIntersection = rangeUtil.intersect(scrollRange, virtualRange);
-                const resultRange = rangeUtil.union(fixedIntersection, scrollIntersection);
-                if (!resultRange) {
-                    return null;
-                }
+                    const virtualRange = [
+                        gridDimension.positionRange.getPosition(range),
+                        gridDimension.positionRange.getSize(range),
+                    ];
+                    const fixedIntersection = rangeUtil.intersect(fixedRange, virtualRange);
+                    const scrollRange = [numFixed, viewDimension.count - numFixed];
+                    virtualRange[0] -= gridDimension.cellScroll.position;
+                    const scrollIntersection = rangeUtil.intersect(scrollRange, virtualRange);
+                    const resultRange = rangeUtil.union(fixedIntersection, scrollIntersection);
+                    if (!resultRange) {
+                        return null;
+                    }
 
-                gridDimension.positionRange.setPosition(intersection, resultRange[0]);
-                gridDimension.positionRange.setSize(intersection, resultRange[1]);
-                return intersection;
+                    gridDimension.positionRange.setPosition(intersection, resultRange[0]);
+                    gridDimension.positionRange.setSize(intersection, resultRange[1]);
+                    return intersection;
+                },
+                updateSize(newSize: number) {
+                    const oldSize = viewDimension.size;
+                    viewDimension.size = newSize;
+                    viewDimension.count = calculateMaxLengths(newSize);
+                    viewDimension._numFixedAtLastResize = viewDimension._numFixed;
+                    return oldSize !== newSize;
+                },
+                _getLengthBetweenCoords: getLengthBetweenViewCoords,
             },
-            updateSize(newSize: number) {
-                const oldSize = viewDimension.size;
-                viewDimension.size = newSize;
-                viewDimension.count = calculateMaxLengths(newSize);
-                return oldSize !== newSize;
-            },
-            _getLengthBetweenCoords: getLengthBetweenViewCoords
-        }, ['count', 'size'], [dirtyClean]);
+            ['count', 'size', '_numFixedAtLastResize'],
+            [dirtyClean],
+        );
         return viewDimension;
     }
 
     const dimensions = {
         rowInfo: makeDimension(grid.rows),
-        colInfo: makeDimension(grid.cols)
+        colInfo: makeDimension(grid.cols),
     };
 
     const viewPort: IViewPort = {
@@ -298,8 +306,16 @@ export function create(grid: Grid) {
             return {
                 top: viewPort.getRowTop(realCellRange.top),
                 left: viewPort.getColLeft(realCellRange.left),
-                height: viewPort.rowInfo._getLengthBetweenCoords(realCellRange.top, realCellRange.top + realCellRange.height - 1, true),
-                width: viewPort.colInfo._getLengthBetweenCoords(realCellRange.left, realCellRange.left + realCellRange.width - 1, true)
+                height: viewPort.rowInfo._getLengthBetweenCoords(
+                    realCellRange.top,
+                    realCellRange.top + realCellRange.height - 1,
+                    true,
+                ),
+                width: viewPort.colInfo._getLengthBetweenCoords(
+                    realCellRange.left,
+                    realCellRange.left + realCellRange.width - 1,
+                    true,
+                ),
             };
         },
         intersect(range: RawPositionRange) {
@@ -314,7 +330,7 @@ export function create(grid: Grid) {
             cellFn: (r: number, c: number) => void,
             rowFn?: (r: number) => void,
             maxRow: number = Infinity,
-            maxCol: number = Infinity
+            maxCol: number = Infinity,
         ) {
             for (let r = 0; r < Math.min(viewPort.rows, maxRow); r++) {
                 if (rowFn) {
@@ -323,7 +339,6 @@ export function create(grid: Grid) {
                 if (cellFn) {
                     for (let c = 0; c < Math.min(viewPort.cols, maxCol); c++) {
                         cellFn(r, c);
-
                     }
                 }
             }

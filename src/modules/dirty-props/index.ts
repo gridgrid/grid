@@ -12,19 +12,15 @@ export interface IDirtyProp extends Partial<IHasPreDirty>, Partial<IHasOnDirty> 
     name: string;
 }
 
-export type DirtyProp = string | IDirtyProp;
+export type DirtyProp<T> = keyof T | IDirtyProp;
 
-const isDirtyPropWithPre =
-    (dirtyProp: any): dirtyProp is IHasPreDirty =>
-        !!(dirtyProp as IDirtyProp).preDirty;
-const isDirtyPropWithOn =
-    (dirtyProp: any): dirtyProp is IHasOnDirty =>
-        !!(dirtyProp as IDirtyProp).onDirty;
+const isDirtyPropWithPre = (dirtyProp: any): dirtyProp is IHasPreDirty => !!(dirtyProp as IDirtyProp).preDirty;
+const isDirtyPropWithOn = (dirtyProp: any): dirtyProp is IHasOnDirty => !!(dirtyProp as IDirtyProp).onDirty;
 
-export function add<T>(obj: T, props: DirtyProp[], dirtyCleans: IDirtyClean[]) {
+export function add<T>(obj: T, props: DirtyProp<T>[], dirtyCleans: IDirtyClean[]) {
     props.forEach((prop) => {
         let val: any;
-        const name = (prop as IDirtyProp).name || prop as string;
+        const name = (prop as IDirtyProp).name || (prop as string);
         // store the value if it was already there
         const initialVal = (obj as any)[name];
         Object.defineProperty(obj, name, {
@@ -48,7 +44,7 @@ export function add<T>(obj: T, props: DirtyProp[], dirtyCleans: IDirtyClean[]) {
                         prop.onDirty(newVal, oldVal);
                     }
                 }
-            }
+            },
         });
         // reset the initial value both to keep it and to trigger the dirty logic
         (obj as any)[name] = initialVal;
