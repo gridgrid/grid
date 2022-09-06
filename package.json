@@ -6,8 +6,7 @@
   "main": "dist/modules/core/index.js",
   "typings": "dist/modules/core/index.d.ts",
   "publishConfig": {
-    "registry": "https://registry.npmjs.org/",
-    "tag": "next"
+    "registry": "https://registry.npmjs.org/"
   },
   "engines": {
     "node": ">=10"
