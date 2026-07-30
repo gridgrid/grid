@@ -26,6 +26,7 @@ import { DataSpaceConverter } from '../space/data-space-converter';
 import { AbstractDimensionalSpaceConverter } from '../space/dimensional-converter';
 import { ViewSpaceConverter } from '../space/view-space-converter';
 import { VirtualSpaceConverter } from '../space/virtual-space-converter';
+import createTouch, { ITouch } from '../touch';
 import * as util from '../util';
 import createViewLayer, { IViewLayer } from '../view-layer';
 import createViewPort, { IViewPort, IViewPortDimensionInfo } from '../view-port';
@@ -42,6 +43,8 @@ export interface IGridOpts {
     disableReorder?: boolean;
     disableResize?: boolean;
   };
+  touchScroll?: boolean;
+  touchFriction?: number;
 }
 
 export type EscapeStackHandler = () => boolean | void;
@@ -112,6 +115,7 @@ export interface IGridModels {
   showHiddenCols: IShowHiddenCols;
   colResize: IColResize;
   copyPaste: ICopyPaste;
+  touch?: ITouch;
 }
 
 export type Grid = IGridCore & IGridModels;
@@ -180,6 +184,9 @@ export function create(opts: IGridOpts = {}): Grid {
       grid.viewPort.sizeToContainer(container);
       grid.viewLayer.build(container);
       grid.eventLoop.setContainer(container);
+      if (grid.touch) {
+        grid.touch.bindTo(container);
+      }
       container.style.overflow = 'hidden';
       // the container should never actually scroll, but the browser does automatically sometimes so let's reset it when that happens
       container.addEventListener('scroll', () => {
@@ -299,6 +306,10 @@ export function create(opts: IGridOpts = {}): Grid {
     grid.colResize = createColResize(grid);
   }
   grid.copyPaste = createCopyPaste(grid);
+
+  if (opts.touchScroll !== false) {
+    grid.touch = createTouch(grid);
+  }
 
   // the order here matters because some of these depend on each other
 
@@ -422,6 +433,7 @@ export * from '../space/data-space-converter';
 export * from '../space/dimensional-converter';
 export * from '../space/view-space-converter';
 export * from '../space/virtual-space-converter';
+export * from '../touch';
 export * from '../util';
 export * from '../view-layer';
 export * from '../view-port';
